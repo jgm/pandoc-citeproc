@@ -1,6 +1,7 @@
 module Text.CSL.Pandoc (processCites, processCites') where
 
-import Text.CSL (readBiblioFile, Reference(..), Style(..), parseCSL)
+import Text.CSL (readBiblioFile, Reference(..), Style(..), parseCSL,
+                 readJsonAbbrevFile)
 import Text.Pandoc.Definition
 import Text.Pandoc.JSON
 import Text.Pandoc.Walk
@@ -48,9 +49,18 @@ processCites' (Pandoc meta blocks) = do
   bibRefs <- getBibRefs $ maybe (MetaList []) id
                         $ lookupMeta "bibliography" meta
   let refs = inlineRefs ++ bibRefs
-  csl <- getDataFileName "default.csl" >>= readFile >>= parseCSL
-  -- TODO allow choice, abbrevs
-  return $ processCites csl refs $ Pandoc meta blocks
+  let cslfile = lookupMeta "csl" meta >>= toPath
+  let cslAbbrevFile = lookupMeta "csl-abbrevs" meta >>= toPath
+  csl <- maybe (getDataFileName "chicago-author-date.csl") return cslfile
+             >>= readFile >>= parseCSL
+  abbrevs <- maybe (return []) readJsonAbbrevFile cslAbbrevFile
+  let csl' = csl{ styleAbbrevs = abbrevs }
+  return $ processCites csl' refs $ Pandoc meta blocks
+
+toPath :: MetaValue -> Maybe String
+toPath (MetaString s) = Just s
+toPath (MetaInlines ils) = Just $ stringify ils
+toPath _ = Nothing
 
 stringify :: [Inline] -> String
 stringify = query getStr
