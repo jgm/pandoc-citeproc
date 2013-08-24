@@ -1,9 +1,9 @@
-name:               citeproc-pandoc
+name:               pandoc-citeproc
 version:            0.1
 cabal-version:      >= 1.12
 synopsis:           Supports using pandoc with citeproc
 
-description:        The citeproc-pandoc library exports functions for
+description:        The pandoc-citeproc library exports functions for
                     using the citeproc system with pandoc.  It relies on
                     citeproc-hs, a library for rendering
                     bibliographic reference citations into a variety
@@ -118,11 +118,12 @@ library
                       Text.CSL.Input.Json
                       Text.CSL.Output.Pandoc
                       Text.CSL.Output.Plain
-                      Paths_citeproc_pandoc
+                      Paths_pandoc_citeproc
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
     build-depends:    containers, directory, mtl, json, utf8-string,
-                      bytestring, filepath, pandoc-types >= 1.12, tagsoup
+                      bytestring, filepath, pandoc-types >= 1.12, tagsoup,
+                      aeson
 
     if flag(bibutils)
        build-depends:   hs-bibutils >= 0.3
@@ -164,6 +165,6 @@ executable citeproc
     hs-source-dirs:   .
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
-    build-depends:    base >= 4, citeproc-pandoc, pandoc-types >= 1.12, aeson
+    build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12, aeson
     default-language: Haskell98
 

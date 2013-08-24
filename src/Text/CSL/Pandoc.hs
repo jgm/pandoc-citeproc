@@ -1,3 +1,4 @@
+{-# LANGUAGE PatternGuards #-}
 module Text.CSL.Pandoc (processCites, processCites') where
 
 import Text.CSL (readBiblioFile, Reference(..), Style(..), parseCSL,
@@ -6,16 +7,17 @@ import Text.Pandoc.Definition
 import Text.Pandoc.JSON
 import Text.Pandoc.Walk
 import Text.HTML.TagSoup.Entity (lookupEntity)
-import Paths_citeproc_pandoc (getDataFileName)
+import Paths_pandoc_citeproc (getDataFileName)
 
+import qualified Data.Traversable as Traversable
+import Data.Monoid
+import Data.Aeson
 import Data.List
 import Data.Char ( isDigit, isPunctuation )
 import qualified Data.Map as M
 import Text.CSL hiding ( Cite(..), Citation(..), endWithPunct )
 import qualified Text.CSL as CSL ( Cite(..) )
-import Text.Pandoc.Definition
 import Text.Pandoc.Generic
-import Text.Pandoc.Walk
 import Text.Parsec hiding (State)
 import Control.Monad
 import Control.Monad.State
@@ -96,7 +98,39 @@ handleCite sty refs (Cite cs ils) = Cite cs [Str "CITE"]
 handleCite _ _ x = x
 
 convertRefs :: MetaValue -> Maybe [Reference]
-convertRefs _ = Nothing
+convertRefs v =
+  case metaValueToJSON blockWriter inlineWriter v >>= fromJSON of
+       Data.Aeson.Error s   -> Nothing
+       Success x            -> Just x
+
+instance FromJSON Reference where
+  parseJSON (Object v) = mzero -- Reference <$>
+  parseJSON _ = mzero
+
+metaValueToJSON :: Monad m
+                => ([Block] -> m String)
+                -> ([Inline] -> m String)
+                -> MetaValue
+                -> m Value
+metaValueToJSON blockWriter inlineWriter (MetaMap metamap) = liftM toJSON $
+  Traversable.mapM (metaValueToJSON blockWriter inlineWriter) metamap
+metaValueToJSON blockWriter inlineWriter (MetaList xs) = liftM toJSON $
+  Traversable.mapM (metaValueToJSON blockWriter inlineWriter) xs
+metaValueToJSON _ _ (MetaBool b) = return $ toJSON b
+metaValueToJSON _ _ (MetaString s) = return $ toJSON s
+metaValueToJSON blockWriter _ (MetaBlocks bs) = liftM toJSON $ blockWriter bs
+metaValueToJSON _ inlineWriter (MetaInlines bs) = liftM toJSON $ inlineWriter bs
+
+blockWriter :: (Functor m, Monad m) => [Block] -> m String
+blockWriter [Plain xs] = inlineWriter xs
+blockWriter [Para xs] = inlineWriter xs
+blockWriter _ = fail "unsupported"
+
+inlineWriter :: (Functor m, Monad m) => [Inline] -> m String
+inlineWriter = fmap mconcat . mapM go
+  where go (Str xs) = return $ xs
+        go Space    = return " "
+        go _        = fail "unsupported"
 
 -- | Substitute 'Cite' elements with formatted citations.
 processCite :: Style -> M.Map [Citation] [FormattedOutput] -> Inline -> Inline

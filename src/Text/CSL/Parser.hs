@@ -24,7 +24,7 @@ import Text.CSL.Pickle
 import Data.FileEmbed
 import qualified Data.ByteString as S
 #else
-import Paths_citeproc_pandoc ( getDataFileName )
+import Paths_pandoc_citeproc (getDataFileName)
 import System.Directory  ( doesFileExist   )
 #endif
 
