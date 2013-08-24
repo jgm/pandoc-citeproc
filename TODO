@@ -1,0 +1,7 @@
+TODO:
+
+- inlinesToString:  expand and cover the forms of inline
+  markup allowed in citeproc
+- add ToJSON instance for Reference and associated types;
+  then add exporter so we can convert from MODS to JSON.
+
