@@ -1,22 +1,27 @@
 module Main where
-import Text.CSL (readBiblioFile)
-import Text.CSL.Reference (Reference(..))
+import Text.CSL (readBiblioFile, Reference(..), Style(..))
 import Text.Pandoc.Definition
 import Text.Pandoc.JSON
 import Text.Pandoc.Walk
 import Text.HTML.TagSoup.Entity (lookupEntity)
 
 main :: IO ()
-main = toJSONFilter processCites
+main = toJSONFilter processCites'
 
-processCites :: Pandoc -> IO Pandoc
-processCites (Pandoc meta blocks) = do
+processCites' :: Pandoc -> IO Pandoc
+processCites' (Pandoc meta blocks) = do
   let inlineRefs = maybe [] id $ lookupMeta "references" meta >>= convertRefs
   bibRefs <- getBibRefs $ maybe (MetaList []) id
                         $ lookupMeta "bibliography" meta
   let refs = inlineRefs ++ bibRefs
-  let meta' = walk (handleCite refs) meta
-  return $ Pandoc meta' (walk (handleCite refs) blocks)
+  let csl = undefined
+  processCites csl refs $ Pandoc meta blocks
+
+---
+
+processCites :: Style -> [Reference] -> Pandoc -> IO Pandoc
+processCites style refs doc = do
+  return $ walk (handleCite style refs) doc
 
 getStr :: Inline -> String
 getStr (Str x) = x
@@ -46,9 +51,9 @@ decodeEntities ('&':xs) =
            _      -> '&' : decodeEntities xs
 decodeEntities (x:xs) = x : decodeEntities xs
 
-handleCite :: [Reference] -> Inline -> Inline
-handleCite refs (Cite cs ils) = Cite cs [Str "CITE"]
-handleCite _ x = x
+handleCite :: Style -> [Reference] -> Inline -> Inline
+handleCite sty refs (Cite cs ils) = Cite cs [Str "CITE"]
+handleCite _ _ x = x
 
 convertRefs :: MetaValue -> Maybe [Reference]
 convertRefs _ = Nothing

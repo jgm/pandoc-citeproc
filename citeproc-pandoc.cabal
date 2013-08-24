@@ -163,6 +163,7 @@ executable citeproc
     hs-source-dirs:   .
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
-    build-depends:    base >= 4, citeproc-pandoc, pandoc-types >= 1.12, tagsoup
+    build-depends:    base >= 4, citeproc-pandoc, pandoc-types >= 1.12, tagsoup,
+                      aeson
     default-language: Haskell98
 
