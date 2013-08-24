@@ -1,10 +1,13 @@
-{-# LANGUAGE PatternGuards, OverloadedStrings #-}
+{-# LANGUAGE PatternGuards, OverloadedStrings, FlexibleInstances,
+    ScopedTypeVariables #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Text.CSL.Pandoc where -- (processCites, processCites') where
 
 import Text.CSL (readBiblioFile, Reference(..),
                  Style(..), parseCSL,
                  readJsonAbbrevFile)
 import Text.CSL.Reference (RefType(..), Agent(..), CNum(..), RefDate(..))
+import Data.Aeson.Types (Parser)
 import Text.Pandoc.Definition
 import Text.Pandoc.JSON
 import Text.Pandoc.Walk
@@ -14,7 +17,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Control.Applicative ((<$>),(<*>))
 import Data.Char (toUpper, isSpace)
-
+import qualified Data.Vector as V
 import qualified Data.Traversable as Traversable
 import Data.Monoid
 import Data.Aeson
@@ -53,7 +56,9 @@ processCites style refs doc =
 -- field.
 processCites' :: Pandoc -> IO Pandoc
 processCites' (Pandoc meta blocks) = do
-  let inlineRefs = maybe [] id $ lookupMeta "references" meta >>= convertRefs
+  let inlineRefError s = error $ "Error parsing references: " ++ s
+  let inlineRefs = either inlineRefError id
+                   $ convertRefs $ lookupMeta "references" meta
   bibRefs <- getBibRefs $ maybe (MetaList []) id
                         $ lookupMeta "bibliography" meta
   let refs = inlineRefs ++ bibRefs
@@ -103,11 +108,12 @@ handleCite :: Style -> [Reference] -> Inline -> Inline
 handleCite sty refs (Cite cs ils) = Cite cs [Str "CITE"]
 handleCite _ _ x = x
 
-convertRefs :: MetaValue -> Maybe [Reference]
-convertRefs v =
+convertRefs :: Maybe MetaValue -> Either String [Reference]
+convertRefs Nothing = Right []
+convertRefs (Just v) =
   case metaValueToJSON blockWriter inlineWriter v >>= fromJSON of
-       Data.Aeson.Error s   -> Nothing
-       Success x            -> Just x
+       Data.Aeson.Error s   -> Left s
+       Success x            -> Right x
 
 instance FromJSON RefType where
   parseJSON (String t) = safeRead (capitalize . camelize . T.unpack $ t)
@@ -122,7 +128,7 @@ instance FromJSON RefType where
 
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
-              v .:? "given" != [] <*>
+              v .:? "given" .!= [] <*>
               v .:?  "dropping-particle" .!= "" <*>
               v .:? "non-dropping-particle" .!= "" <*>
               v .:? "family" .!= "" <*>
@@ -222,6 +228,34 @@ instance FromJSON Reference where
        v .:? "citation-number" .!= CNum 0 <*>
        v .:? "first-reference-note-number" .!= 1 <*>
        v .:? "citation-label" .!= ""
+  parseJSON _ = mzero
+
+instance FromJSON [Agent] where
+  parseJSON (Array xs) = mapM parseJSON $ V.toList xs
+  parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
+  parseJSON (String t) = parseJSON (String t) >>= mkAgent
+  parseJSON _ = mzero
+
+mkAgent :: Text -> Parser [Agent]
+mkAgent t =
+  case reverse (words $ T.unpack t) of
+       (x:ys) -> return [Agent (reverse ys) [] [] x [] [] False]
+       []     -> mzero
+
+instance FromJSON [RefDate] where
+  parseJSON (Array xs) = mapM parseJSON $ V.toList xs
+  parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
+  parseJSON x          = parseJSON x >>= mkRefDate
+
+mkRefDate :: String -> Parser [RefDate]
+mkRefDate xs
+  | all isDigit xs = return [RefDate xs "" "" "" "" ""]
+  | otherwise      = return [RefDate "" "" "" "" xs ""]
+
+instance FromJSON [String] where
+  parseJSON (Array xs) = mapM parseJSON $ V.toList xs
+  parseJSON (String t) = (:[]) `fmap` parseJSON (String t)
+  parseJSON (Number n) = return [show n]
   parseJSON _ = mzero
 
 metaValueToJSON :: Monad m
