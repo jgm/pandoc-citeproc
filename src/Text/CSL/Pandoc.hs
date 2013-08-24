@@ -1,13 +1,19 @@
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE PatternGuards, OverloadedStrings #-}
 module Text.CSL.Pandoc (processCites, processCites') where
 
-import Text.CSL (readBiblioFile, Reference(..), Style(..), parseCSL,
+import Text.CSL (readBiblioFile, Reference(..),
+                 Style(..), parseCSL,
                  readJsonAbbrevFile)
+import Text.CSL.Reference (RefType(..), Agent(..), CNum(..), RefDate(..))
 import Text.Pandoc.Definition
 import Text.Pandoc.JSON
 import Text.Pandoc.Walk
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import Paths_pandoc_citeproc (getDataFileName)
+import Data.Text (Text)
+import qualified Data.Text as T
+import Control.Applicative ((<$>),(<*>))
+import Data.Char (toUpper, isSpace)
 
 import qualified Data.Traversable as Traversable
 import Data.Monoid
@@ -103,8 +109,119 @@ convertRefs v =
        Data.Aeson.Error s   -> Nothing
        Success x            -> Just x
 
+instance FromJSON RefType where
+  parseJSON (String t) = safeRead (capitalize . camelize . T.unpack $ t)
+    where camelize x
+            | '-':y:ys <- x = toUpper y : camelize ys
+            | '_':y:ys <- x = toUpper y : camelize ys
+            |     y:ys <- x =        y : camelize ys
+            | otherwise     = []
+          capitalize (x:xs) = toUpper x : xs
+          capitalize     [] = []
+  parseJSON _ = mzero
+
+instance FromJSON Agent where
+  parseJSON (Object v) = Agent <$>
+              v .:? "given" .!= [] <*>
+              v .:?  "dropping-particle" .!= "" <*>
+              v .:? "non-dropping-particle" .!= "" <*>
+              v .:? "family" .!= "" <*>
+              v .:? "suffix" .!= "" <*>
+              v .:? "literal" .!= "" <*>
+              v .:? "comma-suffix" .!= False
+  parseJSON _ = mzero
+
+instance FromJSON CNum where
+  parseJSON x = case fromJSON x of
+                     Success n -> return $ CNum n
+                     _         -> mzero
+
+instance FromJSON RefDate where
+  parseJSON (Object v) = RefDate <$>
+              v .:? "year" .!= "" <*>
+              v .:? "month" .!= "" <*>
+              v .:? "season" .!= "" <*>
+              v .:? "day" .!= "" <*>
+              v .:? "other" .!= "" <*>
+              v .:? "circa" .!= ""
+  parseJSON _ = mzero
+
 instance FromJSON Reference where
-  parseJSON (Object v) = mzero -- Reference <$>
+  parseJSON (Object v) = Reference <$>
+       v .: "id" <*>
+       v .:? "type" .!= NoType <*>
+       v .:? "author" .!= [] <*>
+       v .:? "editor" .!= [] <*>
+       v .:? "translator" .!= [] <*>
+       v .:? "recipient" .!= [] <*>
+       v .:? "interviewer" .!= [] <*>
+       v .:? "composer" .!= [] <*>
+       v .:? "director" .!= [] <*>
+       v .:? "illustrator" .!= [] <*>
+       v .:? "original-author" .!= [] <*>
+       v .:? "container-author" .!= [] <*>
+       v .:? "collection-editor" .!= [] <*>
+       v .:? "editorial-director" .!= [] <*>
+       v .:? "reviewed-author" .!= [] <*>
+       v .:? "issued" .!= [] <*>
+       v .:? "event-date" .!= [] <*>
+       v .:? "accessed" .!= [] <*>
+       v .:? "container" .!= [] <*>
+       v .:? "original-date" .!= [] <*>
+       v .:? "submitted" .!= [] <*>
+       v .:? "title" .!= "" <*>
+       v .:? "title-short" .!= "" <*>
+       v .:? "reviewed-title" .!= "" <*>
+       v .:? "container-title" .!= "" <*>
+       v .:? "collection-title" .!= "" <*>
+       v .:? "container-title-short" .!= "" <*>
+       v .:? "collection-number" .!= "" <*>
+       v .:? "original-title" .!= "" <*>
+       v .:? "publisher" .!= "" <*>
+       v .:? "original-publisher" .!= "" <*>
+       v .:? "publisher-place" .!= "" <*>
+       v .:? "original-publisher-place" .!= "" <*>
+       v .:? "authority" .!= "" <*>
+       v .:? "jurisdiction" .!= "" <*>
+       v .:? "archive" .!= "" <*>
+       v .:? "archive-place" .!= "" <*>
+       v .:? "archive-location" .!= "" <*>
+       v .:? "event" .!= "" <*>
+       v .:? "event-place" .!= "" <*>
+       v .:? "page" .!= "" <*>
+       v .:? "page-first" .!= "" <*>
+       v .:? "number-of-pages" .!= "" <*>
+       v .:? "version" .!= "" <*>
+       v .:? "volume" .!= "" <*>
+       v .:? "number-of-volumes" .!= "" <*>
+       v .:? "issue" .!= "" <*>
+       v .:? "chapter-number" .!= "" <*>
+       v .:? "medium" .!= "" <*>
+       v .:? "status" .!= "" <*>
+       v .:? "edition" .!= "" <*>
+       v .:? "section" .!= "" <*>
+       v .:? "source" .!= "" <*>
+       v .:? "genre" .!= "" <*>
+       v .:? "note" .!= "" <*>
+       v .:? "annote" .!= "" <*>
+       v .:? "abstract" .!= "" <*>
+       v .:? "keyword" .!= "" <*>
+       v .:? "number" .!= "" <*>
+       v .:? "references" .!= "" <*>
+       v .:? "url" .!= "" <*>
+       v .:? "doi" .!= "" <*>
+       v .:? "isbn" .!= "" <*>
+       v .:? "issn" .!= "" <*>
+       v .:? "pmcid" .!= "" <*>
+       v .:? "pmid" .!= "" <*>
+       v .:? "call-number" .!= "" <*>
+       v .:? "dimensions" .!= "" <*>
+       v .:? "scale" .!= "" <*>
+       v .:? "categories" .!= [] <*>
+       v .:? "language" .!= "" <*>
+       v .:? "citation-number" .!= CNum 0 <*>
+       v .:? "first-reference-note-number" .!= 1 <*>
+       v .:? "citation-label" .!= ""
   parseJSON _ = mzero
 
 metaValueToJSON :: Monad m
@@ -290,4 +407,11 @@ pWordWithDigits = try $ do
   let s = stringify r
   guard $ any isDigit s
   return s
+
+safeRead :: (Monad m, Read a) => String -> m a
+safeRead s = case reads s of
+                  (d,x):_
+                    | all isSpace x -> return d
+                  _                 -> fail $ "Could not read `" ++ s ++ "'"
+
 
