@@ -1,0 +1,168 @@
+name:               citeproc-pandoc
+version:            0.1
+cabal-version:      >= 1.12
+synopsis:           Supports using pandoc with citeproc
+
+description:        The citeproc-pandoc library exports functions for
+                    using the citeproc system with pandoc.  It relies on
+                    citeproc-hs, a library for rendering
+                    bibliographic reference citations into a variety
+                    of styles using a macro language called Citation
+                    Style Language (CSL). More details on CSL can be
+                    found here: <http://citationstyles.org/>.
+                    .
+                    Currently this package includes a copy of the citeproc-hs
+                    code. When citeproc-hs is updated to be compatible,
+                    this package will simply depend on citeproc-hs.
+                    .
+                    This package also contains an executable, citeproc,
+                    which works as a pandoc filter (pandoc >= 1.12).
+
+category:           Text
+license:            BSD3
+license-file:       LICENSE
+author:             John MacFarlane, Andrea Rossato
+maintainer:         jgm@berkeley.edu
+build-type:         Simple
+data-files:         locales/locales-af-ZA.xml
+                    locales/locales-ar-AR.xml
+                    locales/locales-bg-BG.xml
+                    locales/locales-ca-AD.xml
+                    locales/locales-cs-CZ.xml
+                    locales/locales-da-DK.xml
+                    locales/locales-de-AT.xml
+                    locales/locales-de-CH.xml
+                    locales/locales-de-DE.xml
+                    locales/locales-el-GR.xml
+                    locales/locales-en-GB.xml
+                    locales/locales-en-US.xml
+                    locales/locales-es-ES.xml
+                    locales/locales-et-EE.xml
+                    locales/locales-eu.xml
+                    locales/locales-fa-IR.xml
+                    locales/locales-fi-FI.xml
+                    locales/locales-fr-CA.xml
+                    locales/locales-fr-FR.xml
+                    locales/locales-he-IL.xml
+                    locales/locales-hr-HR.xml
+                    locales/locales-hu-HU.xml
+                    locales/locales-is-IS.xml
+                    locales/locales-it-IT.xml
+                    locales/locales-ja-JP.xml
+                    locales/locales-km-KH.xml
+                    locales/locales-ko-KR.xml
+                    locales/locales-lt-LT.xml
+                    locales/locales-lv-LV.xml
+                    locales/locales-mn-MN.xml
+                    locales/locales-nb-NO.xml
+                    locales/locales-nl-NL.xml
+                    locales/locales-nn-NO.xml
+                    locales/locales-pl-PL.xml
+                    locales/locales-pt-BR.xml
+                    locales/locales-pt-PT.xml
+                    locales/locales-ro-RO.xml
+                    locales/locales-ru-RU.xml
+                    locales/locales-sk-SK.xml
+                    locales/locales-sl-SI.xml
+                    locales/locales-sr-RS.xml
+                    locales/locales-sv-SE.xml
+                    locales/locales-th-TH.xml
+                    locales/locales-tr-TR.xml
+                    locales/locales-uk-UA.xml
+                    locales/locales-vi-VN.xml
+                    locales/locales-zh-CN.xml
+                    locales/locales-zh-TW.xml
+
+flag small_base
+  description: Choose the new smaller, split-up base package.
+
+flag bibutils
+  description: Use Chris Putnam's Bibutils.
+  default:     True
+
+flag network
+  description: Use network and HTTP to retrieve csl file from URIs.
+  default:     True
+
+flag hexpat
+  description: Use hexpat to parse XML
+  default:     True
+
+flag embed_data_files
+  description: Embed locale files into the library (needed for windows packaging)
+  default:     False
+
+flag unicode_collation
+  description: Use Haskell bindings to the International Components for Unicode (ICU) libraries
+  default:     False
+
+library
+    hs-source-dirs:   src
+    exposed-modules:  Text.CSL.Pandoc
+                      Text.CSL
+                      Text.CSL.Eval
+                      Text.CSL.Eval.Common
+                      Text.CSL.Eval.Date
+                      Text.CSL.Eval.Names
+                      Text.CSL.Eval.Output
+                      Text.CSL.Pickle
+                      Text.CSL.Parser
+                      Text.CSL.Proc
+                      Text.CSL.Proc.Collapse
+                      Text.CSL.Proc.Disamb
+                      Text.CSL.Reference
+                      Text.CSL.Style
+                      Text.CSL.Input.MODS
+                      Text.CSL.Input.Bibutils
+                      Text.CSL.Input.Json
+                      Text.CSL.Output.Pandoc
+                      Text.CSL.Output.Plain
+                      Paths_citeproc_pandoc
+    ghc-options:      -funbox-strict-fields -Wall
+    ghc-prof-options: -prof -auto-all
+    build-depends:    containers, directory, mtl, json, utf8-string,
+                      bytestring, filepath, pandoc-types >= 1.12, tagsoup
+
+    if flag(bibutils)
+       build-depends:   hs-bibutils >= 0.3
+       default-extensions: CPP
+       cpp-options:     -DUSE_BIBUTILS
+
+    if flag(network)
+       build-depends: network >= 2, HTTP >= 4000.0.9
+       default-extensions:    CPP
+       cpp-options:   -DUSE_NETWORK
+
+    if flag(hexpat)
+       build-depends: hexpat >= 0.20.2
+       exposed-modules:  Text.CSL.Pickle.Hexpat
+       cpp-options:   -DUSE_HEXPAT
+    else
+       build-depends: xml
+       exposed-modules:  Text.CSL.Pickle.Xml
+
+    if flag(embed_data_files)
+       build-depends: template-haskell, file-embed
+       default-extensions:    CPP
+       cpp-options:   -DEMBED_DATA_FILES
+
+    if flag(unicode_collation)
+       build-depends: text, text-icu
+       default-extensions:    CPP
+       cpp-options:   -DUNICODE_COLLATION
+
+    if impl(ghc >= 6.10)
+       build-depends: base >= 4, syb, parsec, old-locale, time
+    else
+       build-depends: base >= 3 && < 4
+
+    default-language: Haskell98
+
+executable citeproc
+    main-is:          citeproc.hs
+    hs-source-dirs:   .
+    ghc-options:      -funbox-strict-fields -Wall
+    ghc-prof-options: -prof -auto-all
+    build-depends:    base >= 4, citeproc-pandoc, pandoc-types >= 1.12, tagsoup
+    default-language: Haskell98
+
