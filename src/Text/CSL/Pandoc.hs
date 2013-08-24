@@ -4,6 +4,7 @@
 module Text.CSL.Pandoc where -- (processCites, processCites') where
 
 import Text.CSL.Reference (RefType(..), Agent(..), CNum(..), RefDate(..))
+import Text.TeXMath (texMathToPandoc, DisplayType(..))
 import Data.Aeson.Types (Parser)
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk
@@ -288,6 +289,9 @@ inlinesToString = fmap mconcat . mapM go
         go (Span _ xs)      = inlinesToString xs
         go (Note _)         = return ""
         go (LineBreak)      = return " "
+        go (Math _ xs)      = either (\_ -> return $ surround '$' '$' xs)
+                              inlinesToString
+                              $ texMathToPandoc DisplayInline xs
         go (Cite _ ils)     = inlinesToString ils
         go (Quoted SingleQuote xs) = surround '‘' '’' <$> inlinesToString xs
         go (Quoted DoubleQuote xs) = surround '“' '”' <$> inlinesToString xs

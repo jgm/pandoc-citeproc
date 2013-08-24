@@ -123,7 +123,7 @@ library
     ghc-prof-options: -prof -auto-all
     build-depends:    containers, directory, mtl, json, utf8-string,
                       bytestring, filepath, pandoc-types >= 1.12, tagsoup,
-                      aeson, text, vector
+                      aeson, text, vector, texmath >= 0.6.4
 
     if flag(bibutils)
        build-depends:   hs-bibutils >= 0.3
