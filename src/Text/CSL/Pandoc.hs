@@ -3,13 +3,9 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Text.CSL.Pandoc where -- (processCites, processCites') where
 
-import Text.CSL (readBiblioFile, Reference(..),
-                 Style(..), parseCSL,
-                 readJsonAbbrevFile)
 import Text.CSL.Reference (RefType(..), Agent(..), CNum(..), RefDate(..))
 import Data.Aeson.Types (Parser)
 import Text.Pandoc.Definition
-import Text.Pandoc.JSON
 import Text.Pandoc.Walk
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import Paths_pandoc_citeproc (getDataFileName)
@@ -104,14 +100,10 @@ decodeEntities ('&':xs) =
            _      -> '&' : decodeEntities xs
 decodeEntities (x:xs) = x : decodeEntities xs
 
-handleCite :: Style -> [Reference] -> Inline -> Inline
-handleCite sty refs (Cite cs ils) = Cite cs [Str "CITE"]
-handleCite _ _ x = x
-
 convertRefs :: Maybe MetaValue -> Either String [Reference]
 convertRefs Nothing = Right []
 convertRefs (Just v) =
-  case metaValueToJSON blockWriter inlineWriter v >>= fromJSON of
+  case metaValueToJSON blocksToString inlinesToString v >>= fromJSON of
        Data.Aeson.Error s   -> Left s
        Success x            -> Right x
 
@@ -272,13 +264,13 @@ metaValueToJSON _ _ (MetaString s) = return $ toJSON s
 metaValueToJSON blockWriter _ (MetaBlocks bs) = liftM toJSON $ blockWriter bs
 metaValueToJSON _ inlineWriter (MetaInlines bs) = liftM toJSON $ inlineWriter bs
 
-blockWriter :: (Functor m, Monad m) => [Block] -> m String
-blockWriter [Plain xs] = inlineWriter xs
-blockWriter [Para xs] = inlineWriter xs
-blockWriter _ = fail "unsupported"
+blocksToString :: (Functor m, Monad m) => [Block] -> m String
+blocksToString [Plain xs] = inlinesToString xs
+blocksToString [Para xs] = inlinesToString xs
+blocksToString _ = fail "unsupported"
 
-inlineWriter :: (Functor m, Monad m) => [Inline] -> m String
-inlineWriter = fmap mconcat . mapM go
+inlinesToString :: (Functor m, Monad m) => [Inline] -> m String
+inlinesToString = fmap mconcat . mapM go
   where go (Str xs) = return $ xs
         go Space    = return " "
         go _        = fail "unsupported"
