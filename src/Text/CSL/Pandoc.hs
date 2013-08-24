@@ -1,5 +1,5 @@
 {-# LANGUAGE PatternGuards, OverloadedStrings #-}
-module Text.CSL.Pandoc (processCites, processCites') where
+module Text.CSL.Pandoc where -- (processCites, processCites') where
 
 import Text.CSL (readBiblioFile, Reference(..),
                  Style(..), parseCSL,
@@ -122,7 +122,7 @@ instance FromJSON RefType where
 
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
-              v .:? "given" .!= [] <*>
+              v .:? "given" != [] <*>
               v .:?  "dropping-particle" .!= "" <*>
               v .:? "non-dropping-particle" .!= "" <*>
               v .:? "family" .!= "" <*>
