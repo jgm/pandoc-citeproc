@@ -1,6 +1,5 @@
 TODO:
 
-- change mods2yaml to biblio2yaml, using bibutils?
 - add some tests to this module (tests previously in pandoc?)
   (see tests directory)
 - add some citation parsing tests to pandoc.
