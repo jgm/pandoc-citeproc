@@ -2,3 +2,5 @@ TODO:
 
 - allow YAML version of csl-abbrevs.  document here and in
 pandoc README.
+- add some citation parsing tests to pandoc.
+
