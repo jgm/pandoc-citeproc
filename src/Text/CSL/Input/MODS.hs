@@ -21,7 +21,7 @@ import Text.CSL.Output.Plain ( (<+>), tail' )
 import Text.CSL.Pickle
 import Text.CSL.Reference
 import Text.CSL.Style ( betterThen )
-
+import qualified Data.ByteString.Lazy as B
 import Data.Char ( isDigit, isLower )
 import qualified Data.Map as M
 
@@ -32,6 +32,9 @@ readModsFile = readXmlFile xpMods
 -- | Read a file with a collection of MODS records.
 readModsCollectionFile :: FilePath -> IO [Reference]
 readModsCollectionFile = readXmlFile xpModsCollection
+
+readModsCollection :: B.ByteString -> [Reference]
+readModsCollection = readXmlString xpModsCollection
 
 xpModsCollection :: PU [Reference]
 xpModsCollection = xpIElem "modsCollection" $ xpList xpMods

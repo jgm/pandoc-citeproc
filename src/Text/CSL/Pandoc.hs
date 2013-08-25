@@ -579,7 +579,10 @@ safeRead s = case reads s of
                   _                 -> fail $ "Could not read `" ++ s ++ "'"
 
 object' :: [Pair] -> Value
-object' = object . filter nonempty
-  where nonempty (_, Array v)  = not $ V.null v
-        nonempty (_, String t) = not $ T.null t
-        nonempty (_, _)        = True
+object' = object . filter (not . isempty)
+  where isempty (_, Array v)  = V.null v
+        isempty (_, String t) = T.null t
+        isempty ("first-reference-note-number", Number n) = n == 0
+        isempty ("citation-number", Number n) = n == 0
+        isempty ("comma-suffix", Bool b) = not b
+        isempty (_, _)        = False
