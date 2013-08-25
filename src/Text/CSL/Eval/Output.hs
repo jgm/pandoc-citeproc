@@ -18,6 +18,7 @@ module Text.CSL.Eval.Output where
 import Text.CSL.Output.Plain
 import Text.CSL.Style
 import Text.ParserCombinators.Parsec hiding ( State (..) )
+import Control.Applicative ((<*))
 
 output :: Formatting -> String -> [Output]
 output fm s
@@ -99,37 +100,25 @@ rtfTags =
 rtfParser :: Formatting -> String -> [Output]
 rtfParser _ [] = []
 rtfParser fm s
-    = either (const [OStr s fm]) (return . flip Output fm . concat) $
+    = either (const [OStr s fm]) (return . flip Output fm) $
       parse (manyTill parser eof) "" s
     where
-      parser = parseText <|> parseMarkup
+      parser = parseText <|> parseQuotes <|> parseMarkup
 
       parseText = do
-        let amper = string "&" >> notFollowedBy (char '#') >>
-                    return [OStr "&" emptyFormatting]
-            apos  = string "'" >> return [OStr "’" emptyFormatting]
-        x  <- many $ noneOf "<'\"`“‘&"
-        xs <- parseQuotes <|> parseMarkup <|> amper <|> apos
-        r  <- manyTill anyChar eof
-        return (OStr x emptyFormatting : xs ++
-                [Output (rtfParser emptyFormatting r) emptyFormatting])
+        let amper = try $ char '&' <* notFollowedBy (char '#')
+            apos  = char '\''
+            regChar = noneOf "<'\"`“‘&"
+        many1 (regChar <|> amper <|> apos) >>= \x ->
+                        return (OStr x emptyFormatting)
 
       parseMarkup = do
-        let tillTag = many $ noneOf "<"
-        m   <- string "<" >> manyTill anyChar (try $ string ">")
-        res <- case lookup m rtfTags of
-                 Just tf -> do let ot = "<"  ++ fst tf ++ ">"
-                                   ct = "</" ++ fst tf ++ ">"
-                                   parseGreedy = do a <- tillTag
-                                                    _ <- string ct
-                                                    return a
-                               x <- manyTill anyChar $ try $ string ct
-                               y <- try parseGreedy <|> (string ot >> pzero) <|> return []
-                               let r = if null y then x else x ++ ct ++ y
-                               return [Output (rtfParser emptyFormatting r) (snd tf)]
-                 Nothing -> do r <- tillTag
-                               return [OStr ("<" ++ m ++ ">" ++ r) emptyFormatting]
-        return [Output res emptyFormatting]
+        m   <- char '<' >> manyTill anyChar (char '>')
+        case lookup m rtfTags of
+             Just tf -> do let ct = try $ string $ "</" ++ fst tf ++ ">"
+                           contents <- manyTill parser ct
+                           return (Output contents (snd tf))
+             Nothing -> do return (OStr ("<" ++ m ++ ">") emptyFormatting)
 
       parseQuotes = choice [parseQ "'" "'"
                            ,parseQ "\"" "\""
@@ -143,5 +132,6 @@ rtfParser fm s
                            ,parseQ "&apos;" "&apos;"
                            ]
       parseQ a b = try $ do
-        q <- string a >> manyTill anyChar (try $ string b >> notFollowedBy letter)
-        return [Output (rtfParser emptyFormatting q) (emptyFormatting {quotes = ParsedQuote})]
+        _ <- string a
+        contents <- manyTill parser (try $ string b >> notFollowedBy letter)
+        return (Output contents (emptyFormatting {quotes = ParsedQuote}))
