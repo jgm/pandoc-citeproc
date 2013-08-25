@@ -176,5 +176,6 @@ executable biblio2yaml
     hs-source-dirs:   .
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
-    build-depends:    base >= 4, pandoc-citeproc, yaml, bytestring
+    build-depends:    base >= 4, pandoc-citeproc, yaml, bytestring,
+                      attoparsec, text
     default-language: Haskell98
