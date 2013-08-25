@@ -1,6 +1,13 @@
 TODO:
 
 - allow YAML version of csl-abbrevs.  document here and in
-pandoc README.
+  pandoc README.
 - add some citation parsing tests to pandoc.
+- add some tests to this module (tests previously in pandoc?)
+- is there a way to get lossless transfer of math from refs to
+  pandoc?  a custom formatting block?
+- fix not found behavior in citeproc-hs
+- add something about this module to pandoc's INSTALL instructions
+- make pandoc emit explanations if you try to use --bibliography,
+  --csl, --csl-abbrevs
 
