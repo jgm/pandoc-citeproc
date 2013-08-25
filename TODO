@@ -1,5 +1,4 @@
 TODO:
 
-- add ToJSON instance for Reference and associated types;
-  then add exporter so we can convert from MODS to JSON.
-
+- allow YAML version of csl-abbrevs.  document here and in
+pandoc README.
