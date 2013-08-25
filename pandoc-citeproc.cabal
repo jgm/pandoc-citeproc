@@ -17,8 +17,9 @@ description:        The pandoc-citeproc library exports functions for
                     .
                     This package also contains two executables: citeproc,
                     which works as a pandoc filter (pandoc >= 1.12), and
-                    mods2yaml, which converts mods databases to a yaml
-                    format suitable for inclusion in pandoc YAML metadata.
+                    biblio2yaml, which converts bibliographic databases to
+                    a yaml format suitable for inclusion in pandoc YAML
+                    metadata.
 
 category:           Text
 license:            BSD3
@@ -170,8 +171,8 @@ executable pandoc-citeproc
     build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12, aeson
     default-language: Haskell98
 
-executable mods2yaml
-    main-is:          mods2yaml.hs
+executable biblio2yaml
+    main-is:          biblio2yaml.hs
     hs-source-dirs:   .
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
