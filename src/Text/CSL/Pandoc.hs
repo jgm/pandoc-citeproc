@@ -279,8 +279,7 @@ inlinesToString = fmap mconcat . mapM go
         go (Strong xs)      = inTag "b" <$> inlinesToString xs
         go (Superscript xs) = inTag "sup" <$> inlinesToString xs
         go (Subscript xs)   = inTag "sub" <$> inlinesToString xs
-        go (SmallCaps xs)   = inTag "span style=\"font-variant:small-caps;\""
-                                   <$> inlinesToString xs
+        go (SmallCaps xs)   = inTag "sc" <$> inlinesToString xs
         go (Code _ xs)      = return xs
         go (Link xs _)      = inlinesToString xs
         go (Image xs _)     = inlinesToString xs
