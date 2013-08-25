@@ -340,6 +340,10 @@ instance FromJSON [Agent] where
   parseJSON (String t) = parseJSON (String t) >>= mkAgent
   parseJSON _ = mzero
 
+instance ToJSON [Agent] where
+  toJSON [x] = toJSON x
+  toJSON xs  = Array (V.fromList $ map toJSON xs)
+
 mkAgent :: Text -> Parser [Agent]
 mkAgent t =
   case reverse (words $ T.unpack t) of
@@ -351,6 +355,10 @@ instance FromJSON [RefDate] where
   parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
   parseJSON x          = parseJSON x >>= mkRefDate
 
+instance ToJSON [RefDate] where
+  toJSON [x] = toJSON x
+  toJSON xs  = Array (V.fromList $ map toJSON xs)
+
 mkRefDate :: String -> Parser [RefDate]
 mkRefDate xs
   | all isDigit xs = return [RefDate xs "" "" "" "" ""]
@@ -361,6 +369,10 @@ instance FromJSON [String] where
   parseJSON (String t) = (:[]) `fmap` parseJSON (String t)
   parseJSON (Number n) = return [show n]
   parseJSON _ = mzero
+
+instance ToJSON [String] where
+  toJSON [x] = String (T.pack x)
+  toJSON xs  = Array (V.fromList $ map toJSON xs)
 
 metaValueToJSON :: Monad m
                 => ([Block] -> m String)
