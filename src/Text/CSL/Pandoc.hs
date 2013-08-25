@@ -5,7 +5,7 @@ module Text.CSL.Pandoc where -- (processCites, processCites') where
 
 import Text.CSL.Reference (RefType(..), Agent(..), CNum(..), RefDate(..))
 import Text.TeXMath (texMathToPandoc, DisplayType(..))
-import Data.Aeson.Types (Parser)
+import Data.Aeson.Types (Parser, Pair)
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk
 import Text.HTML.TagSoup.Entity (lookupEntity)
@@ -13,7 +13,7 @@ import Paths_pandoc_citeproc (getDataFileName)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Control.Applicative ((<$>),(<*>))
-import Data.Char (toUpper, isSpace)
+import Data.Char (toUpper, isSpace, toLower, isUpper, isLower)
 import qualified Data.Vector as V
 import qualified Data.Traversable as Traversable
 import Data.Monoid
@@ -119,6 +119,15 @@ instance FromJSON RefType where
           capitalize     [] = []
   parseJSON _ = mzero
 
+instance ToJSON RefType where
+  toJSON reftype = toJSON (uncamelize $ uncapitalize $ show reftype)
+   where uncamelize [] = []
+         uncamelize (x:y:zs)
+          | isLower x && isUpper y = x:'-':toLower y:uncamelize zs
+         uncamelize (x:xs) = x : uncamelize xs
+         uncapitalize (x:xs) = toLower x : xs
+         uncapitalize []     = []
+
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
               v .:? "given" .!= [] <*>
@@ -130,10 +139,24 @@ instance FromJSON Agent where
               v .:? "comma-suffix" .!= False
   parseJSON _ = mzero
 
+instance ToJSON Agent where
+  toJSON agent = object' [
+      "given" .= givenName agent
+    , "dropping-particle" .= droppingPart agent
+    , "non-dropping-particle" .= nonDroppingPart agent
+    , "family" .= familyName agent
+    , "suffix" .= nameSuffix agent
+    , "literal" .= literal agent
+    , "comma-suffix" .= commaSuffix agent
+    ]
+
 instance FromJSON CNum where
   parseJSON x = case fromJSON x of
                      Success n -> return $ CNum n
                      _         -> mzero
+
+instance ToJSON CNum where
+  toJSON (CNum n) = toJSON n
 
 instance FromJSON RefDate where
   parseJSON (Object v) = RefDate <$>
@@ -144,6 +167,16 @@ instance FromJSON RefDate where
               v .:? "other" .!= "" <*>
               v .:? "circa" .!= ""
   parseJSON _ = mzero
+
+instance ToJSON RefDate where
+  toJSON refdate = object' [
+      "year" .= year refdate
+    , "month" .= month refdate
+    , "season" .= season refdate
+    , "day" .= day refdate
+    , "other" .= other refdate
+    , "circa" .= circa refdate
+    ]
 
 instance FromJSON Reference where
   parseJSON (Object v) = Reference <$>
@@ -222,6 +255,84 @@ instance FromJSON Reference where
        v .:? "first-reference-note-number" .!= 1 <*>
        v .:? "citation-label" .!= ""
   parseJSON _ = mzero
+
+instance ToJSON Reference where
+  toJSON ref = object' [
+      "id" .= refId ref
+    , "type" .= refType ref
+    , "author" .= author ref
+    , "editor" .= editor ref
+    , "translator" .= translator ref
+    , "recipient" .= recipient ref
+    , "interviewer" .= interviewer ref
+    , "composer" .= composer ref
+    , "director" .= director ref
+    , "illustrator" .= illustrator ref
+    , "original-author" .= originalAuthor ref
+    , "container-author" .= containerAuthor ref
+    , "collection-editor" .= collectionEditor ref
+    , "editorial-director" .= editorialDirector ref
+    , "reviewed-author" .= reviewedAuthor ref
+    , "issued" .= issued ref
+    , "event-date" .= eventDate ref
+    , "accessed" .= accessed ref
+    , "container" .= container ref
+    , "original-date" .= originalDate ref
+    , "submitted" .= submitted ref
+    , "title" .= title ref
+    , "title-short" .= titleShort ref
+    , "reviewed-title" .= reviewedTitle ref
+    , "container-title" .= containerTitle ref
+    , "collection-title" .= collectionTitle ref
+    , "container-title-short" .= containerTitleShort ref
+    , "collection-number" .= collectionNumber ref
+    , "original-title" .= originalTitle ref
+    , "publisher" .= publisher ref
+    , "original-publisher" .= originalPublisher ref
+    , "publisher-place" .= publisherPlace ref
+    , "original-publisher-place" .= originalPublisherPlace ref
+    , "authority" .= authority ref
+    , "jurisdiction" .= jurisdiction ref
+    , "archive" .= archive ref
+    , "archive-place" .= archivePlace ref
+    , "archive-location" .= archiveLocation ref
+    , "event" .= event ref
+    , "event-place" .= eventPlace ref
+    , "page" .= page ref
+    , "page-first" .= pageFirst ref
+    , "number-of-pages" .= numberOfPages ref
+    , "version" .= version ref
+    , "volume" .= volume ref
+    , "number-of-volumes" .= numberOfVolumes ref
+    , "issue" .= issue ref
+    , "chapter-number" .= chapterNumber ref
+    , "medium" .= medium ref
+    , "status" .= status ref
+    , "edition" .= edition ref
+    , "section" .= section ref
+    , "source" .= source ref
+    , "genre" .= genre ref
+    , "note" .= note ref
+    , "annote" .= annote ref
+    , "abstract" .= abstract ref
+    , "keyword" .= keyword ref
+    , "number" .= number ref
+    , "references" .= references ref
+    , "url" .= url ref
+    , "doi" .= doi ref
+    , "isbn" .= isbn ref
+    , "issn" .= issn ref
+    , "pmcid" .= pmcid ref
+    , "pmid" .= pmid ref
+    , "call-number" .= callNumber ref
+    , "dimensions" .= dimensions ref
+    , "scale" .= scale ref
+    , "categories" .= categories ref
+    , "language" .= language ref
+    , "citation-number" .= citationNumber ref
+    , "first-reference-note-number" .= firstReferenceNoteNumber ref
+    , "citation-label" .= citationLabel ref
+    ]
 
 instance FromJSON [Agent] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
@@ -467,4 +578,8 @@ safeRead s = case reads s of
                     | all isSpace x -> return d
                   _                 -> fail $ "Could not read `" ++ s ++ "'"
 
-
+object' :: [Pair] -> Value
+object' = object . filter nonempty
+  where nonempty (_, Array v)  = not $ V.null v
+        nonempty (_, String t) = not $ T.null t
+        nonempty (_, _)        = True
