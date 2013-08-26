@@ -2,9 +2,6 @@ module Main where
 import Text.CSL.Input.Bibutils (readBiblioFile)
 import Text.CSL.Pandoc ()
 import Data.Char (chr)
-import System.IO
-import System.Environment
-import System.Exit
 import Data.Monoid
 import Data.Yaml
 import Control.Applicative
@@ -13,18 +10,32 @@ import qualified Data.ByteString.Char8 as B8
 import Data.Attoparsec.ByteString.Char8 as Attoparsec
 import qualified Data.Text as T
 import Data.Text.Encoding (encodeUtf8)
+import System.Console.ParseArgs
+import Control.Monad
 
 main :: IO ()
 main = do
-  args <- getArgs
-  refs <- case args of
-               [x] | x /= "-h" && x /= "--help" ->
-                 readBiblioFile x
-               _    -> do
-                 hPutStrLn stderr $ "Usage: mods2yaml MODSFILE"
-                 exitWith (ExitFailure 1)
+  parsedArgs <- parseArgsIO ArgsComplete arguments
+  when (gotArg parsedArgs Help) $
+     usageError parsedArgs ""
+  let mbbibfile = getArg parsedArgs BibFile
+  refs <- maybe (usageError parsedArgs "Missing bibfile argument")
+            readBiblioFile mbbibfile
   B.putStr $ unescapeTags $ encode refs
 
+data Argument =
+    Help | Version | BibFile
+  deriving (Ord, Eq, Show)
+
+arguments :: [Arg Argument]
+arguments = [ Arg Version (Just 'v') (Just "version")
+                 Nothing "print version"
+            , Arg Help (Just 'h') (Just "help")
+                 Nothing "print usage information"
+            , Arg BibFile Nothing Nothing
+                (argDataRequired "bibfile" ArgtypeString)
+                "bibfile"
+            ]
 
 -- turn
 -- id: ! "\u043F\u0443\u043D\u043A\u04423"
