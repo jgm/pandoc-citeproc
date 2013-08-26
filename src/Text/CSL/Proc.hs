@@ -20,7 +20,7 @@ import Control.Arrow ( (&&&), (>>>), second )
 import Data.Char ( toLower )
 import Data.List
 import Data.Ord  ( comparing )
-
+import Data.Maybe ( mapMaybe )
 import Text.CSL.Eval hiding ( trim )
 import Text.CSL.Output.Plain
 import Text.CSL.Parser
@@ -66,7 +66,7 @@ citeproc ops s rs cs
     where
       -- the list of bib entries, as a list of Reference, with
       -- position, locator and year suffix set.
-      biblioRefs   = procRefs s . map (getReference rs) .
+      biblioRefs   = procRefs s . mapMaybe (getReference rs) .
                      nubBy (\a b -> citeId a == citeId b) . concat $ cs
       biblioOutput = if "disambiguate-add-year-suffix" `elem` getCitDisambOptions s
                      then map formatOutputList $

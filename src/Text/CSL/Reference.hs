@@ -319,11 +319,11 @@ parseLocator s
     where
       mk c = if null s then ([], []) else (,) c . unwords . tail . words $ s
 
-getReference :: [Reference] -> Cite -> Reference
+getReference :: [Reference] -> Cite -> Maybe Reference
 getReference  r c
     = case citeId c `elemIndex` map refId r of
-        Just i  -> setPageFirst $ r !! i
-        Nothing -> emptyReference { title = citeId c ++ " not found!" }
+        Just i  -> Just $ setPageFirst $ r !! i
+        Nothing -> Nothing
 
 processCites :: [Reference] -> [[Cite]] -> [[(Cite, Reference)]]
 processCites rs cs
