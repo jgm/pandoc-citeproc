@@ -38,7 +38,7 @@ formatFromExtension :: FilePath -> Maybe BibFormat
 formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
 
 data Argument =
-    Help | Version | BibFile | Format
+    Help | BibFile | Format
   deriving (Ord, Eq, Show)
 
 readFormat :: String -> Maybe BibFormat
@@ -60,9 +60,7 @@ readFormat = go . map toLower
         go _          = Nothing
 
 arguments :: [Arg Argument]
-arguments = [ Arg Version (Just 'v') (Just "version")
-                 Nothing "print version"
-            , Arg Help (Just 'h') (Just "help")
+arguments = [ Arg Help (Just 'h') (Just "help")
                  Nothing "print usage information"
             , Arg Format (Just 'f') (Just "format")
                 (argDataOptional "format" ArgtypeString)
