@@ -2,12 +2,8 @@ TODO:
 
 - add some tests to this module (tests previously in pandoc?)
   (see tests directory)
-- add some citation parsing tests to pandoc.
 - allow YAML version of csl-abbrevs.  document here and in pandoc README.
 - improve "not found" behavior in citeproc-hs:
-  - don't add a "not found" message to bibliography
   - use nicer "???" for citations
   - or change types so warnings can be omitted
 - add something about this module to pandoc's INSTALL instructions
-- make pandoc emit explanations if you try to use --bibliography,
-  --csl, --csl-abbrevs
