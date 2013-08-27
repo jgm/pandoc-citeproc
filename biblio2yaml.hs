@@ -1,7 +1,7 @@
 module Main where
-import Text.CSL.Input.Bibutils (readBiblioFile)
+import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
 import Text.CSL.Pandoc ()
-import Data.Char (chr)
+import Data.Char (chr, toLower)
 import Data.Monoid
 import Data.Yaml
 import Control.Applicative
@@ -12,28 +12,57 @@ import qualified Data.Text as T
 import Data.Text.Encoding (encodeUtf8)
 import System.Console.ParseArgs
 import Control.Monad
+import System.IO
+import System.FilePath (takeExtension)
 
 main :: IO ()
 main = do
   parsedArgs <- parseArgsIO ArgsComplete arguments
   when (gotArg parsedArgs Help) $
      usageError parsedArgs ""
-  let mbbibfile = getArg parsedArgs BibFile
-  refs <- maybe (usageError parsedArgs "Missing bibfile argument")
-            readBiblioFile mbbibfile
-  B.putStr $ unescapeTags $ encode refs
+  bibstring <- hGetContents =<< getArgStdio parsedArgs BibFile ReadMode
+  let bibformat = (getArg parsedArgs Format >>= readFormat)
+              <|> (getArg parsedArgs BibFile >>= formatFromExtension)
+  case bibformat of
+       Nothing  -> usageError parsedArgs "Unknown format"
+       Just f   -> readBiblioString f bibstring >>=
+                     B.putStr . unescapeTags . encode
+
+formatFromExtension :: FilePath -> Maybe BibFormat
+formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
 
 data Argument =
-    Help | Version | BibFile
+    Help | Version | BibFile | Format
   deriving (Ord, Eq, Show)
+
+readFormat :: String -> Maybe BibFormat
+readFormat = go . map toLower
+  where go "mods"     = Just Mods
+        go "biblatex" = Just BibLatex
+        go "bib"      = Just BibLatex
+        go "bibtex"   = Just Bibtex
+        go "ris"      = Just Ris
+        go "endnote"  = Just Endnote
+        go "enl"      = Just Endnote
+        go "endnotexml" = Just EndnotXml
+        go "xml"      = Just EndnotXml
+        go "wos"      = Just Isi
+        go "isi"      = Just Isi
+        go "medline"  = Just Medline
+        go "copac"    = Just Copac
+        go "json"     = Just Json
+        go _          = Nothing
 
 arguments :: [Arg Argument]
 arguments = [ Arg Version (Just 'v') (Just "version")
                  Nothing "print version"
             , Arg Help (Just 'h') (Just "help")
                  Nothing "print usage information"
+            , Arg Format (Just 'f') (Just "format")
+                (argDataOptional "format" ArgtypeString)
+                "format"
             , Arg BibFile Nothing Nothing
-                (argDataRequired "bibfile" ArgtypeString)
+                (argDataOptional "bibfile" ArgtypeString)
                 "bibfile"
             ]
 
