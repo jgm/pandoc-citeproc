@@ -26,7 +26,13 @@ main = do
   case bibformat of
        Nothing  -> usageError parsedArgs "Unknown format"
        Just f   -> readBiblioString f bibstring >>=
-                     B.putStr . unescapeTags . encode
+                     outputYamlBlock . unescapeTags . encode
+
+outputYamlBlock :: B.ByteString -> IO ()
+outputYamlBlock contents = do
+  putStrLn "---\nreferences:"
+  B.putStr contents
+  putStrLn "..."
 
 formatFromExtension :: FilePath -> Maybe BibFormat
 formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
