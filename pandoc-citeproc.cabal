@@ -186,3 +186,9 @@ test-suite test-pandoc-citeproc
   Hs-Source-Dirs: tests
   build-depends:  base >= 4, aeson-pretty, pandoc-citeproc
   default-language: Haskell98
+  data-files:     tests/chicago-author-date.in.json,
+                  tests/chicago-author-date.expected.json,
+                  tests/ieee.in.json,
+                  tests/ieee.expected.json,
+                  tests/mhra.in.json,
+                  tests/mhra.expected.json
