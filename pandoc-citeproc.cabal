@@ -179,3 +179,10 @@ executable biblio2yaml
     build-depends:    base >= 4, pandoc-citeproc, yaml, bytestring,
                       attoparsec, text, parseargs, filepath
     default-language: Haskell98
+
+test-suite test-pandoc-citeproc
+  Type:           exitcode-stdio-1.0
+  Main-Is:        test-pandoc-citeproc.hs
+  Hs-Source-Dirs: tests
+  build-depends:  base >= 4, aeson-pretty, pandoc-citeproc
+  default-language: Haskell98
