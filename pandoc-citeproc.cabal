@@ -191,5 +191,5 @@ test-suite test-pandoc-citeproc
   Type:           exitcode-stdio-1.0
   Main-Is:        test-pandoc-citeproc.hs
   Hs-Source-Dirs: tests
-  build-depends:  base >= 4, aeson-pretty, pandoc-citeproc, Diff >= 0.3, process
+  build-depends:  base >= 4, pandoc-citeproc, process, Diff >= 0.3
   default-language: Haskell98

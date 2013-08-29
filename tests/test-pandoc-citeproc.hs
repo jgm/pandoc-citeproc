@@ -2,37 +2,42 @@ module Main where
 import System.Process
 import System.Exit
 import Text.Printf
+import System.IO
+import Data.Monoid (mempty)
 import Data.Algorithm.Diff
+import Text.Printf
 
 main = do
-  putStr "done"
+  testCase "chicago-author-date"
+  testCase "ieee"
+  testCase "mhra"
+  exitWith ExitSuccess
 
-testCase :: String -> IO Bool
+err :: String -> IO ()
+err = hPutStrLn stderr
+
+testCase :: String -> IO ()
 testCase csl = do
-  let infile = "tests/" ++ csl ++ ".in.json"
-  let expected = "tests/" ++ csl ++ ".expected.json"
-  let outfile = "tests/" ++ csl ++ ".out.json"
-  indata <- readFile infile
-  (ec, result, err) <- readProcessWithExitCode
-                        "dist/build/pandoc-citeproc" [] indata
-  expected' <- readFile expected
-  if expected' == result
-     then exitWith ExitSuccess
-     else exitWith $ ExitFailure 1
-
-data TestResult = TestPassed
-                | TestError ExitCode
-                | TestFailed String FilePath [Diff String]
-     deriving (Eq)
-
-instance Show TestResult where
-  show TestPassed     = "PASSED"
-  show (TestError ec) = "ERROR " ++ show ec
-  show (TestFailed cmd file d) = '\n' : dash ++
-                                 "\n--- " ++ file ++
-                                 "\n+++ " ++ cmd ++ "\n" ++ showDiff (1,1) d ++
-                                 dash
-    where dash = replicate 72 '-'
+  err $ "TEST: " ++ csl
+  indata <- readFile $ "tests/" ++ csl ++ ".in.json"
+  expected <- readFile $ "tests/" ++ csl ++ ".expected.json"
+  (ec, result, errout) <- readProcessWithExitCode
+                     "dist/build/pandoc-citeproc/pandoc-citeproc"
+                     [] indata
+  if ec == ExitSuccess
+     then do
+       let expected' = breakup expected
+       let result'   = breakup result
+       if result' == expected'
+          then return ()
+          else do
+            let diff = getDiff expected' result'
+            err $ showDiff (1,1) diff
+            exitWith $ ExitFailure 1
+     else do
+       err $ "Error status " ++ show ec
+       err errout
+       exitWith ec
 
 showDiff :: (Int,Int) -> [Diff String] -> String
 showDiff _ []             = ""
@@ -43,4 +48,9 @@ showDiff (l,r) (Second ln : ds) =
 showDiff (l,r) (Both _ _ : ds) =
   showDiff (l+1,r+1) ds
 
-
+breakup :: String -> [String]
+breakup = snd . foldr go ("",[])
+  where go :: Char -> (String,[String]) -> (String,[String])
+        go '{' (s,acc) = ("",('{':s):acc)
+        go '\n' (s,acc) = (s, acc)
+        go x (s,acc)   = (x:s,acc)

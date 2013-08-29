@@ -1,7 +1,7 @@
 {-# LANGUAGE PatternGuards, OverloadedStrings, FlexibleInstances,
     ScopedTypeVariables, CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-module Text.CSL.Pandoc where -- (processCites, processCites') where
+module Text.CSL.Pandoc (processCites, processCites') where
 
 import Text.CSL.Reference (RefType(..), Agent(..), CNum(..), RefDate(..))
 import Text.TeXMath (texMathToPandoc, DisplayType(..))
