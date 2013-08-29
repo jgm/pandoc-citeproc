@@ -6,6 +6,10 @@ import System.IO
 import Data.Monoid (mempty)
 import Data.Algorithm.Diff
 import Text.Printf
+import Data.ByteString.Lazy.UTF8 (fromString, toString)
+import Data.Aeson (decode)
+import Data.Aeson.Encode.Pretty
+import Text.Pandoc.Definition
 
 main = do
   testCase "chicago-author-date"
@@ -26,8 +30,16 @@ testCase csl = do
                      [] indata
   if ec == ExitSuccess
      then do
-       let expected' = breakup expected
-       let result'   = breakup result
+       let resultDoc :: Maybe Pandoc
+           resultDoc = decode $ fromString result
+       let expectedDoc :: Maybe Pandoc
+           expectedDoc = decode $ fromString expected
+       let result' = maybe [] (lines . toString
+                     . encodePretty' Config{ confIndent = 2, confCompare = compare } )
+                     resultDoc
+       let expected' = maybe [] (lines . toString
+                     . encodePretty' Config{ confIndent = 2, confCompare = compare } )
+                     expectedDoc
        if result' == expected'
           then return ()
           else do
@@ -48,9 +60,3 @@ showDiff (l,r) (Second ln : ds) =
 showDiff (l,r) (Both _ _ : ds) =
   showDiff (l+1,r+1) ds
 
-breakup :: String -> [String]
-breakup = snd . foldr go ("",[])
-  where go :: Char -> (String,[String]) -> (String,[String])
-        go '{' (s,acc) = ("",('{':s):acc)
-        go '\n' (s,acc) = (s, acc)
-        go x (s,acc)   = (x:s,acc)

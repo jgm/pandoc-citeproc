@@ -1,835 +1,2782 @@
 [
-{"unMeta":
-{"csl":
-{"MetaInlines":[
-{"Str":"tests/mhra.csl"}]},"references":
-{"MetaList":[
-{"MetaMap":
-{"title":
-{"MetaInlines":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},"id":
-{"MetaInlines":[
-{"Str":"item1"}]},"issued":
-{"MetaMap":
-{"year":
-{"MetaString":"2005"}}},"author":
-{"MetaMap":
-{"given":
-{"MetaInlines":[
-{"Str":"John"}]},"family":
-{"MetaInlines":[
-{"Str":"Doe"}]}}},"publisher":
-{"MetaInlines":[
-{"Str":"Cambridge"},
-{"Space":[]},
-{"Str":"University"},
-{"Space":[]},
-{"Str":"Press"}]},"type":
-{"MetaInlines":[
-{"Str":"book"}]},"publisher-place":
-{"MetaInlines":[
-{"Str":"Cambridge"}]}}},
-{"MetaMap":
-{"page":
-{"MetaInlines":[
-{"Str":"33-34"}]},"title":
-{"MetaInlines":[
-{"Str":"Article"}]},"volume":
-{"MetaString":"6"},"id":
-{"MetaInlines":[
-{"Str":"item2"}]},"issued":
-{"MetaMap":
-{"year":
-{"MetaString":"2006"}}},"author":
-{"MetaMap":
-{"given":
-{"MetaInlines":[
-{"Str":"John"}]},"family":
-{"MetaInlines":[
-{"Str":"Doe"}]}}},"container-title":
-{"MetaInlines":[
-{"Str":"Journal"},
-{"Space":[]},
-{"Str":"of"},
-{"Space":[]},
-{"Str":"Generic"},
-{"Space":[]},
-{"Str":"Studies"}]},"type":
-{"MetaInlines":[
-{"Str":"article-journal"}]}}},
-{"MetaMap":
-{"title":
-{"MetaInlines":[
-{"Str":"Why"},
-{"Space":[]},
-{"Str":"Water"},
-{"Space":[]},
-{"Str":"Is"},
-{"Space":[]},
-{"Str":"Wet"}]},"id":
-{"MetaInlines":[
-{"Str":"пункт3"}]},"issued":
-{"MetaMap":
-{"year":
-{"MetaString":"2007"}}},"author":
-{"MetaList":[
-{"MetaMap":
-{"given":
-{"MetaInlines":[
-{"Str":"John"}]},"family":
-{"MetaInlines":[
-{"Str":"Doe"}]}}},
-{"MetaMap":
-{"given":
-{"MetaInlines":[
-{"Str":"Jenny"}]},"family":
-{"MetaInlines":[
-{"Str":"Roe"}]}}}]},"container-title":
-{"MetaInlines":[
-{"Str":"Third"},
-{"Space":[]},
-{"Str":"Book"}]},"editor":
-{"MetaMap":
-{"given":
-{"MetaInlines":[
-{"Str":"Sam"}]},"family":
-{"MetaInlines":[
-{"Str":"Smith"}]}}},"publisher":
-{"MetaInlines":[
-{"Str":"Oxford"},
-{"Space":[]},
-{"Str":"University"},
-{"Space":[]},
-{"Str":"Press"}]},"type":
-{"MetaInlines":[
-{"Str":"chapter"}]},"publisher-place":
-{"MetaInlines":[
-{"Str":"Oxford"}]}}}]}}},[
-{"Header":[1,["pandoc-with-citeproc-hs",[],[]],[
-{"Str":"Pandoc"},
-{"Space":[]},
-{"Str":"with"},
-{"Space":[]},
-{"Str":"citeproc-hs"}]]},
-{"BulletList":[[
-{"Para":[
-{"Cite":[[
-{"citationId":"nonexistent","citationSuffix":[],"citationHash":1,"citationPrefix":[],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0}],[
-{"Note":[
-{"Para":[
-{"Str":"[CSL"},
-{"Space":[]},
-{"Str":"BIBLIOGRAPHIC"},
-{"Space":[]},
-{"Str":"DATA"},
-{"Space":[]},
-{"Str":"ERROR:"},
-{"Space":[]},
-{"Str":"reference"},
-{"Space":[]},
-{"Str":"\"nonexistent\""},
-{"Space":[]},
-{"Str":"not"},
-{"Space":[]},
-{"Str":"found.]"},
-{"Str":"."}]}]}]]}]}],[
-{"Para":[
-{"Cite":[[
-{"citationId":"nonexistent","citationSuffix":[],"citationHash":2,"citationPrefix":[],"citationMode":
-{"AuthorInText":[]},"citationNoteNum":0}],[
-{"Note":[
-{"Para":[
-{"Str":"[CSL"},
-{"Space":[]},
-{"Str":"STYLE"},
-{"Space":[]},
-{"Str":"ERROR:"},
-{"Space":[]},
-{"Str":"reference"},
-{"Space":[]},
-{"Str":"with"},
-{"Space":[]},
-{"Str":"no"},
-{"Space":[]},
-{"Str":"printed"},
-{"Space":[]},
-{"Str":"form.]"},
-{"Str":"."}]}]}]]}]}],[
-{"Para":[
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[],"citationHash":3,"citationPrefix":[],"citationMode":
-{"AuthorInText":[]},"citationNoteNum":0}],[
-{"Str":"John"},
-{"Space":[]},
-{"Str":"Doe"},
-{"Note":[
-{"Para":[
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Space":[]},
-{"Str":"("},
-{"Str":"Cambridge:"},
-{"Space":[]},
-{"Str":"Cambridge"},
-{"Space":[]},
-{"Str":"University"},
-{"Space":[]},
-{"Str":"Press,"},
-{"Space":[]},
-{"Str":"2005"},
-{"Str":")"},
-{"Str":"."}]}]}]]},
-{"Space":[]},
-{"Str":"says"},
-{"Space":[]},
-{"Str":"blah."}]}],[
-{"Para":[
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[
-{"Str":"p."},
-{"Space":[]},
-{"Str":"30"}],"citationHash":4,"citationPrefix":[],"citationMode":
-{"AuthorInText":[]},"citationNoteNum":0}],[
-{"Str":"Doe"},
-{"Note":[
-{"Para":[
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"p."},
-{"Space":[]},
-{"Str":"30"},
-{"Str":"."}]}]}]]},
-{"Space":[]},
-{"Str":"says"},
-{"Space":[]},
-{"Str":"blah."}]}],[
-{"Para":[
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[
-{"Str":"p."},
-{"Space":[]},
-{"Str":"30,"},
-{"Space":[]},
-{"Str":"with"},
-{"Space":[]},
-{"Str":"suffix"}],"citationHash":5,"citationPrefix":[],"citationMode":
-{"AuthorInText":[]},"citationNoteNum":0}],[
-{"Str":"Doe"},
-{"Note":[
-{"Para":[
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"p."},
-{"Space":[]},
-{"Str":"30"},
-{"Str":","},
-{"Space":[]},
-{"Str":"with"},
-{"Space":[]},
-{"Str":"suffix"},
-{"Str":"."}]}]}]]},
-{"Space":[]},
-{"Str":"says"},
-{"Space":[]},
-{"Str":"blah."}]}],[
-{"Para":[
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[],"citationHash":6,"citationPrefix":[],"citationMode":
-{"AuthorInText":[]},"citationNoteNum":0},
-{"citationId":"item2","citationSuffix":[
-{"Space":[]},
-{"Str":"p."},
-{"Space":[]},
-{"Str":"30"}],"citationHash":7,"citationPrefix":[],"citationMode":
-{"SuppressAuthor":[]},"citationNoteNum":0},
-{"citationId":"пункт3","citationSuffix":[],"citationHash":8,"citationPrefix":[
-{"Str":"see"},
-{"Space":[]},
-{"Str":"also"}],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0}],[
-{"Str":"Doe"},
-{"Note":[
-{"Para":[
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":";"},
-{"Space":[]},
-{"Str":"‘"},
-{"Str":"Article"},
-{"Str":"’"},
-{"Str":","},
-{"Space":[]},
-{"Emph":[
-{"Str":"Journal"},
-{"Space":[]},
-{"Str":"of"},
-{"Space":[]},
-{"Str":"Generic"},
-{"Space":[]},
-{"Str":"Studies"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"6"},
-{"Space":[]},
-{"Str":"("},
-{"Str":"2006"},
-{"Str":")"},
-{"Str":","},
-{"Space":[]},
-{"Str":"33–34"},
-{"Space":[]},
-{"Str":"("},
-{"Str":"p."},
-{"Space":[]},
-{"Str":"30"},
-{"Str":")"},
-{"Str":";"},
-{"Space":[]},
-{"Str":"see"},
-{"Space":[]},
-{"Str":"also"},
-{"Space":[]},
-{"Str":"John"},
-{"Space":[]},
-{"Str":"Doe"},
-{"Space":[]},
-{"Str":"a"},
-{"Str":"n"},
-{"Str":"d"},
-{"Space":[]},
-{"Str":"Jenny"},
-{"Space":[]},
-{"Str":"Roe"},
-{"Str":","},
-{"Space":[]},
-{"Str":"‘"},
-{"Str":"Why"},
-{"Space":[]},
-{"Str":"Water"},
-{"Space":[]},
-{"Str":"Is"},
-{"Space":[]},
-{"Str":"Wet"},
-{"Str":"’"},
-{"Str":","},
-{"Space":[]},
-{"Str":"in"},
-{"Space":[]},
-{"Emph":[
-{"Str":"Third"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"ed."},
-{"Space":[]},
-{"Str":"by"},
-{"Space":[]},
-{"Str":"Sam"},
-{"Space":[]},
-{"Str":"Smith"},
-{"Space":[]},
-{"Str":"("},
-{"Str":"Oxford:"},
-{"Space":[]},
-{"Str":"Oxford"},
-{"Space":[]},
-{"Str":"University"},
-{"Space":[]},
-{"Str":"Press,"},
-{"Space":[]},
-{"Str":"2007"},
-{"Str":")"},
-{"Str":"."}]}]}]]},
-{"Space":[]},
-{"Str":"says"},
-{"Space":[]},
-{"Str":"blah."}]}],[
-{"Para":[
-{"Str":"In"},
-{"Space":[]},
-{"Str":"a"},
-{"Space":[]},
-{"Str":"note."},
-{"Note":[
-{"Para":[
-{"Cite":[[
-{"citationId":"пункт3","citationSuffix":[
-{"Str":"p."},
-{"Space":[]},
-{"Str":"12"}],"citationHash":9,"citationPrefix":[],"citationMode":
-{"AuthorInText":[]},"citationNoteNum":0}],[
-{"Str":"Doe"},
-{"Space":[]},
-{"Str":"and"},
-{"Space":[]},
-{"Str":"Roe"},
-{"Str":","},
-{"Space":[]},
-{"Str":"p."},
-{"Space":[]},
-{"Str":"12"},
-{"Str":""}]]},
-{"Space":[]},
-{"Str":"and"},
-{"Space":[]},
-{"Str":"a"},
-{"Space":[]},
-{"Str":"citation"},
-{"Space":[]},
-{"Str":"without"},
-{"Space":[]},
-{"Str":"locators"},
-{"Space":[]},
-{"Cite":[[
-{"citationId":"пункт3","citationSuffix":[],"citationHash":10,"citationPrefix":[],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0}],[
-{"Str":"Doe"},
-{"Space":[]},
-{"Str":"a"},
-{"Str":"n"},
-{"Str":"d"},
-{"Space":[]},
-{"Str":"Roe"},
-{"Str":""}]]},
-{"Str":"."}]}]}]}],[
-{"Para":[
-{"Str":"A"},
-{"Space":[]},
-{"Str":"citation"},
-{"Space":[]},
-{"Str":"group"},
-{"Str":"."},
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[
-{"Space":[]},
-{"Str":"chap."},
-{"Space":[]},
-{"Str":"3"}],"citationHash":11,"citationPrefix":[
-{"Str":"see"}],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0},
-{"citationId":"пункт3","citationSuffix":[
-{"Space":[]},
-{"Str":"p."},
-{"Space":[]},
-{"Str":"34-35"}],"citationHash":12,"citationPrefix":[
-{"Str":"also"}],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0}],[
-{"Note":[
-{"Para":[
-{"Str":"See"},
-{"Space":[]},
-{"Str":"Doe"},
-{"Str":","},
-{"Space":[]},
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"chap."},
-{"Space":[]},
-{"Str":"3"},
-{"Str":";"},
-{"Space":[]},
-{"Str":"also"},
-{"Space":[]},
-{"Str":"Doe"},
-{"Space":[]},
-{"Str":"a"},
-{"Str":"n"},
-{"Str":"d"},
-{"Space":[]},
-{"Str":"Roe"},
-{"Str":","},
-{"Space":[]},
-{"Str":"pp."},
-{"Space":[]},
-{"Str":"34–35"},
-{"Str":"."}]}]}]]},
-{"Str":""}]}],[
-{"Para":[
-{"Str":"Another"},
-{"Space":[]},
-{"Str":"one"},
-{"Str":"."},
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[
-{"Space":[]},
-{"Str":"p."},
-{"Space":[]},
-{"Str":"34-35"}],"citationHash":13,"citationPrefix":[
-{"Str":"see"}],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0}],[
-{"Note":[
-{"Para":[
-{"Str":"See"},
-{"Space":[]},
-{"Str":"Doe"},
-{"Str":","},
-{"Space":[]},
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"pp."},
-{"Space":[]},
-{"Str":"34–35"},
-{"Str":"."}]}]}]]},
-{"Str":""}]}],[
-{"Para":[
-{"Str":"And"},
-{"Space":[]},
-{"Str":"another"},
-{"Space":[]},
-{"Str":"one"},
-{"Space":[]},
-{"Str":"in"},
-{"Space":[]},
-{"Str":"a"},
-{"Space":[]},
-{"Str":"note."},
-{"Note":[
-{"Para":[
-{"Str":"Some"},
-{"Space":[]},
-{"Str":"citations"},
-{"Space":[]},
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[
-{"Space":[]},
-{"Str":"chap."},
-{"Space":[]},
-{"Str":"3"}],"citationHash":14,"citationPrefix":[
-{"Str":"see"}],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0},
-{"citationId":"пункт3","citationSuffix":[],"citationHash":15,"citationPrefix":[],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0},
-{"citationId":"item2","citationSuffix":[],"citationHash":16,"citationPrefix":[],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0}],[
-{"Str":"see"},
-{"Space":[]},
-{"Str":"Doe"},
-{"Str":","},
-{"Space":[]},
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"chap."},
-{"Space":[]},
-{"Str":"3"},
-{"Str":";"},
-{"Space":[]},
-{"Str":"Doe"},
-{"Space":[]},
-{"Str":"a"},
-{"Str":"n"},
-{"Str":"d"},
-{"Space":[]},
-{"Str":"Roe"},
-{"Str":";"},
-{"Space":[]},
-{"Str":"Doe"},
-{"Str":","},
-{"Space":[]},
-{"Str":"‘Article’"},
-{"Str":","},
-{"Space":[]},
-{"Str":"33–34"},
-{"Str":""}]]},
-{"Str":"."}]}]}]}],[
-{"Para":[
-{"Str":"Citation"},
-{"Space":[]},
-{"Str":"with"},
-{"Space":[]},
-{"Str":"a"},
-{"Space":[]},
-{"Str":"suffix"},
-{"Space":[]},
-{"Str":"and"},
-{"Space":[]},
-{"Str":"locator"},
-{"Str":"."},
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[
-{"Space":[]},
-{"Str":"pp."},
-{"Space":[]},
-{"Str":"33,"},
-{"Space":[]},
-{"Str":"35-37,"},
-{"Space":[]},
-{"Str":"and"},
-{"Space":[]},
-{"Str":"nowhere"},
-{"Space":[]},
-{"Str":"else"}],"citationHash":17,"citationPrefix":[],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0}],[
-{"Note":[
-{"Para":[
-{"Str":"Doe"},
-{"Str":","},
-{"Space":[]},
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"pp."},
-{"Space":[]},
-{"Str":"33,"},
-{"Space":[]},
-{"Str":"35–37"},
-{"Str":","},
-{"Space":[]},
-{"Str":"and"},
-{"Space":[]},
-{"Str":"nowhere"},
-{"Space":[]},
-{"Str":"else"},
-{"Str":"."}]}]}]]},
-{"Str":""}]}],[
-{"Para":[
-{"Str":"Citation"},
-{"Space":[]},
-{"Str":"with"},
-{"Space":[]},
-{"Str":"suffix"},
-{"Space":[]},
-{"Str":"only"},
-{"Str":"."},
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[
-{"Space":[]},
-{"Str":"and"},
-{"Space":[]},
-{"Str":"nowhere"},
-{"Space":[]},
-{"Str":"else"}],"citationHash":18,"citationPrefix":[],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0}],[
-{"Note":[
-{"Para":[
-{"Str":"Doe"},
-{"Str":","},
-{"Space":[]},
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Space":[]},
-{"Str":"and"},
-{"Space":[]},
-{"Str":"nowhere"},
-{"Space":[]},
-{"Str":"else"},
-{"Str":"."}]}]}]]},
-{"Str":""}]}],[
-{"Para":[
-{"Str":"Now"},
-{"Space":[]},
-{"Str":"some"},
-{"Space":[]},
-{"Str":"modifiers."},
-{"Note":[
-{"Para":[
-{"Str":"Like"},
-{"Space":[]},
-{"Str":"a"},
-{"Space":[]},
-{"Str":"citation"},
-{"Space":[]},
-{"Str":"without"},
-{"Space":[]},
-{"Str":"author:"},
-{"Space":[]},
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[],"citationHash":19,"citationPrefix":[],"citationMode":
-{"SuppressAuthor":[]},"citationNoteNum":0}],[
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":""}]]},
-{"Str":","},
-{"Space":[]},
-{"Str":"and"},
-{"Space":[]},
-{"Str":"now"},
-{"Space":[]},
-{"Str":"Doe"},
-{"Space":[]},
-{"Str":"with"},
-{"Space":[]},
-{"Str":"a"},
-{"Space":[]},
-{"Str":"locator"},
-{"Space":[]},
-{"Cite":[[
-{"citationId":"item2","citationSuffix":[
-{"Space":[]},
-{"Str":"p."},
-{"Space":[]},
-{"Str":"44"}],"citationHash":20,"citationPrefix":[],"citationMode":
-{"SuppressAuthor":[]},"citationNoteNum":0}],[
-{"Str":"‘"},
-{"Str":"Article"},
-{"Str":"’"},
-{"Str":","},
-{"Space":[]},
-{"Str":"33–34"},
-{"Space":[]},
-{"Str":"("},
-{"Str":"p."},
-{"Space":[]},
-{"Str":"44"},
-{"Str":")"},
-{"Str":""}]]},
-{"Str":"."}]}]}]}],[
-{"Para":[
-{"Str":"With"},
-{"Space":[]},
-{"Str":"some"},
-{"Space":[]},
-{"Str":"markup"},
-{"Str":"."},
-{"Cite":[[
-{"citationId":"item1","citationSuffix":[
-{"Space":[]},
-{"Str":"p."},
-{"Space":[]},
-{"Strong":[
-{"Str":"32"}]}],"citationHash":21,"citationPrefix":[
-{"Emph":[
-{"Str":"see"}]}],"citationMode":
-{"NormalCitation":[]},"citationNoteNum":0}],[
-{"Note":[
-{"Para":[
-{"Emph":[
-{"Str":"See"}]},
-{"Space":[]},
-{"Str":"Doe"},
-{"Str":","},
-{"Space":[]},
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"p."},
-{"Space":[]},
-{"Str":"32"},
-{"Str":"."}]}]}]]},
-{"Str":""}]}]]},
-{"Div":[["",["references"],[]],[
-{"Header":[1,["references",[],[]],[
-{"Str":"References"}]]},
-{"Para":[
-{"Str":"Doe,"},
-{"Space":[]},
-{"Str":"John,"},
-{"Space":[]},
-{"Str":"‘Article’,"},
-{"Space":[]},
-{"Emph":[
-{"Str":"Journal"},
-{"Space":[]},
-{"Str":"of"},
-{"Space":[]},
-{"Str":"Generic"},
-{"Space":[]},
-{"Str":"Studies"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"6"},
-{"Space":[]},
-{"Str":"(2006),"},
-{"Space":[]},
-{"Str":"33–34"},
-{"Str":"."}]},
-{"Para":[
-{"Str":"---,"},
-{"Space":[]},
-{"Emph":[
-{"Str":"First"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Space":[]},
-{"Str":"(Cambridge:"},
-{"Space":[]},
-{"Str":"Cambridge"},
-{"Space":[]},
-{"Str":"University"},
-{"Space":[]},
-{"Str":"Press,"},
-{"Space":[]},
-{"Str":"2005)"},
-{"Str":"."}]},
-{"Para":[
-{"Str":"Doe,"},
-{"Space":[]},
-{"Str":"John,"},
-{"Space":[]},
-{"Str":"and"},
-{"Space":[]},
-{"Str":"Jenny"},
-{"Space":[]},
-{"Str":"Roe,"},
-{"Space":[]},
-{"Str":"‘Why"},
-{"Space":[]},
-{"Str":"Water"},
-{"Space":[]},
-{"Str":"Is"},
-{"Space":[]},
-{"Str":"Wet’,"},
-{"Space":[]},
-{"Str":"in"},
-{"Space":[]},
-{"Emph":[
-{"Str":"Third"},
-{"Space":[]},
-{"Str":"Book"}]},
-{"Str":","},
-{"Space":[]},
-{"Str":"ed."},
-{"Space":[]},
-{"Str":"by"},
-{"Space":[]},
-{"Str":"Sam"},
-{"Space":[]},
-{"Str":"Smith"},
-{"Space":[]},
-{"Str":"(Oxford:"},
-{"Space":[]},
-{"Str":"Oxford"},
-{"Space":[]},
-{"Str":"University"},
-{"Space":[]},
-{"Str":"Press,"},
-{"Space":[]},
-{"Str":"2007)"},
-{"Str":"."}]}]]}]]
+  {
+    "unMeta": {
+      "references": {
+        "MetaList": [
+          {
+            "MetaMap": {
+              "publisher-place": {
+                "MetaInlines": [
+                  {
+                    "Str": "Cambridge"
+                  }
+                ]
+              },
+              "author": {
+                "MetaMap": {
+                  "family": {
+                    "MetaInlines": [
+                      {
+                        "Str": "Doe"
+                      }
+                    ]
+                  },
+                  "given": {
+                    "MetaInlines": [
+                      {
+                        "Str": "John"
+                      }
+                    ]
+                  }
+                }
+              },
+              "id": {
+                "MetaInlines": [
+                  {
+                    "Str": "item1"
+                  }
+                ]
+              },
+              "issued": {
+                "MetaMap": {
+                  "year": {
+                    "MetaString": "2005"
+                  }
+                }
+              },
+              "title": {
+                "MetaInlines": [
+                  {
+                    "Str": "First"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Book"
+                  }
+                ]
+              },
+              "type": {
+                "MetaInlines": [
+                  {
+                    "Str": "book"
+                  }
+                ]
+              },
+              "publisher": {
+                "MetaInlines": [
+                  {
+                    "Str": "Cambridge"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "University"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Press"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "MetaMap": {
+              "volume": {
+                "MetaString": "6"
+              },
+              "page": {
+                "MetaInlines": [
+                  {
+                    "Str": "33-34"
+                  }
+                ]
+              },
+              "container-title": {
+                "MetaInlines": [
+                  {
+                    "Str": "Journal"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "of"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Generic"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Studies"
+                  }
+                ]
+              },
+              "author": {
+                "MetaMap": {
+                  "family": {
+                    "MetaInlines": [
+                      {
+                        "Str": "Doe"
+                      }
+                    ]
+                  },
+                  "given": {
+                    "MetaInlines": [
+                      {
+                        "Str": "John"
+                      }
+                    ]
+                  }
+                }
+              },
+              "id": {
+                "MetaInlines": [
+                  {
+                    "Str": "item2"
+                  }
+                ]
+              },
+              "issued": {
+                "MetaMap": {
+                  "year": {
+                    "MetaString": "2006"
+                  }
+                }
+              },
+              "title": {
+                "MetaInlines": [
+                  {
+                    "Str": "Article"
+                  }
+                ]
+              },
+              "type": {
+                "MetaInlines": [
+                  {
+                    "Str": "article-journal"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "MetaMap": {
+              "publisher-place": {
+                "MetaInlines": [
+                  {
+                    "Str": "Oxford"
+                  }
+                ]
+              },
+              "container-title": {
+                "MetaInlines": [
+                  {
+                    "Str": "Third"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Book"
+                  }
+                ]
+              },
+              "author": {
+                "MetaList": [
+                  {
+                    "MetaMap": {
+                      "family": {
+                        "MetaInlines": [
+                          {
+                            "Str": "Doe"
+                          }
+                        ]
+                      },
+                      "given": {
+                        "MetaInlines": [
+                          {
+                            "Str": "John"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "MetaMap": {
+                      "family": {
+                        "MetaInlines": [
+                          {
+                            "Str": "Roe"
+                          }
+                        ]
+                      },
+                      "given": {
+                        "MetaInlines": [
+                          {
+                            "Str": "Jenny"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "id": {
+                "MetaInlines": [
+                  {
+                    "Str": "пункт3"
+                  }
+                ]
+              },
+              "issued": {
+                "MetaMap": {
+                  "year": {
+                    "MetaString": "2007"
+                  }
+                }
+              },
+              "title": {
+                "MetaInlines": [
+                  {
+                    "Str": "Why"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Water"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Is"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Wet"
+                  }
+                ]
+              },
+              "type": {
+                "MetaInlines": [
+                  {
+                    "Str": "chapter"
+                  }
+                ]
+              },
+              "publisher": {
+                "MetaInlines": [
+                  {
+                    "Str": "Oxford"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "University"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Press"
+                  }
+                ]
+              },
+              "editor": {
+                "MetaMap": {
+                  "family": {
+                    "MetaInlines": [
+                      {
+                        "Str": "Smith"
+                      }
+                    ]
+                  },
+                  "given": {
+                    "MetaInlines": [
+                      {
+                        "Str": "Sam"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "csl": {
+        "MetaInlines": [
+          {
+            "Str": "tests/mhra.csl"
+          }
+        ]
+      }
+    }
+  },
+  [
+    {
+      "Header": [
+        1,
+        [
+          "pandoc-with-citeproc-hs",
+          [],
+          []
+        ],
+        [
+          {
+            "Str": "Pandoc"
+          },
+          {
+            "Space": []
+          },
+          {
+            "Str": "with"
+          },
+          {
+            "Space": []
+          },
+          {
+            "Str": "citeproc-hs"
+          }
+        ]
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "NormalCitation": []
+                },
+                "citationPrefix": [],
+                "citationId": "nonexistent",
+                "citationHash": 1
+              }
+            ],
+            [
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Str": "[CSL"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "BIBLIOGRAPHIC"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "DATA"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "ERROR:"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "reference"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "\"nonexistent\""
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "not"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "found.]"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "AuthorInText": []
+                },
+                "citationPrefix": [],
+                "citationId": "nonexistent",
+                "citationHash": 2
+              }
+            ],
+            [
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Str": "[CSL"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "STYLE"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "ERROR:"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "reference"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "with"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "no"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "printed"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "form.]"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "AuthorInText": []
+                },
+                "citationPrefix": [],
+                "citationId": "item1",
+                "citationHash": 3
+              }
+            ],
+            [
+              {
+                "Str": "John"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Doe"
+              },
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "("
+                      },
+                      {
+                        "Str": "Cambridge:"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Cambridge"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "University"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Press,"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "2005"
+                      },
+                      {
+                        "Str": ")"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "says"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "blah."
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [
+                  {
+                    "Str": "p."
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "30"
+                  }
+                ],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "AuthorInText": []
+                },
+                "citationPrefix": [],
+                "citationId": "item1",
+                "citationHash": 4
+              }
+            ],
+            [
+              {
+                "Str": "Doe"
+              },
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "p."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "30"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "says"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "blah."
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [
+                  {
+                    "Str": "p."
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "30,"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "with"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "suffix"
+                  }
+                ],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "AuthorInText": []
+                },
+                "citationPrefix": [],
+                "citationId": "item1",
+                "citationHash": 5
+              }
+            ],
+            [
+              {
+                "Str": "Doe"
+              },
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "p."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "30"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "with"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "suffix"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "says"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "blah."
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "AuthorInText": []
+                },
+                "citationPrefix": [],
+                "citationId": "item1",
+                "citationHash": 6
+              },
+              {
+                "citationSuffix": [
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "p."
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "30"
+                  }
+                ],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "SuppressAuthor": []
+                },
+                "citationPrefix": [],
+                "citationId": "item2",
+                "citationHash": 7
+              },
+              {
+                "citationSuffix": [],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "NormalCitation": []
+                },
+                "citationPrefix": [
+                  {
+                    "Str": "see"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "also"
+                  }
+                ],
+                "citationId": "пункт3",
+                "citationHash": 8
+              }
+            ],
+            [
+              {
+                "Str": "Doe"
+              },
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ";"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "‘"
+                      },
+                      {
+                        "Str": "Article"
+                      },
+                      {
+                        "Str": "’"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Emph": [
+                          {
+                            "Str": "Journal"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "of"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Generic"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Studies"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "6"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "("
+                      },
+                      {
+                        "Str": "2006"
+                      },
+                      {
+                        "Str": ")"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "33–34"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "("
+                      },
+                      {
+                        "Str": "p."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "30"
+                      },
+                      {
+                        "Str": ")"
+                      },
+                      {
+                        "Str": ";"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "see"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "also"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "John"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "a"
+                      },
+                      {
+                        "Str": "n"
+                      },
+                      {
+                        "Str": "d"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Jenny"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Roe"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "‘"
+                      },
+                      {
+                        "Str": "Why"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Water"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Is"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Wet"
+                      },
+                      {
+                        "Str": "’"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "in"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Emph": [
+                          {
+                            "Str": "Third"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "ed."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "by"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Sam"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Smith"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "("
+                      },
+                      {
+                        "Str": "Oxford:"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Oxford"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "University"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Press,"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "2007"
+                      },
+                      {
+                        "Str": ")"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "says"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "blah."
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Str": "In"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "a"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "note."
+        },
+        {
+          "Note": [
+            {
+              "Para": [
+                {
+                  "Cite": [
+                    [
+                      {
+                        "citationSuffix": [
+                          {
+                            "Str": "p."
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "12"
+                          }
+                        ],
+                        "citationNoteNum": 0,
+                        "citationMode": {
+                          "AuthorInText": []
+                        },
+                        "citationPrefix": [],
+                        "citationId": "пункт3",
+                        "citationHash": 9
+                      }
+                    ],
+                    [
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "and"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Roe"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "p."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "12"
+                      },
+                      {
+                        "Str": ""
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "and"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "a"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "citation"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "without"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "locators"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Cite": [
+                    [
+                      {
+                        "citationSuffix": [],
+                        "citationNoteNum": 0,
+                        "citationMode": {
+                          "NormalCitation": []
+                        },
+                        "citationPrefix": [],
+                        "citationId": "пункт3",
+                        "citationHash": 10
+                      }
+                    ],
+                    [
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "a"
+                      },
+                      {
+                        "Str": "n"
+                      },
+                      {
+                        "Str": "d"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Roe"
+                      },
+                      {
+                        "Str": ""
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Str": "."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Str": "A"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "citation"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "group"
+        },
+        {
+          "Str": "."
+        },
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "chap."
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "3"
+                  }
+                ],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "NormalCitation": []
+                },
+                "citationPrefix": [
+                  {
+                    "Str": "see"
+                  }
+                ],
+                "citationId": "item1",
+                "citationHash": 11
+              },
+              {
+                "citationSuffix": [
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "p."
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "34-35"
+                  }
+                ],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "NormalCitation": []
+                },
+                "citationPrefix": [
+                  {
+                    "Str": "also"
+                  }
+                ],
+                "citationId": "пункт3",
+                "citationHash": 12
+              }
+            ],
+            [
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Str": "See"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "chap."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "3"
+                      },
+                      {
+                        "Str": ";"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "also"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "a"
+                      },
+                      {
+                        "Str": "n"
+                      },
+                      {
+                        "Str": "d"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Roe"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "pp."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "34–35"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "Str": ""
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Str": "Another"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "one"
+        },
+        {
+          "Str": "."
+        },
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "p."
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "34-35"
+                  }
+                ],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "NormalCitation": []
+                },
+                "citationPrefix": [
+                  {
+                    "Str": "see"
+                  }
+                ],
+                "citationId": "item1",
+                "citationHash": 13
+              }
+            ],
+            [
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Str": "See"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "pp."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "34–35"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "Str": ""
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Str": "And"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "another"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "one"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "in"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "a"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "note."
+        },
+        {
+          "Note": [
+            {
+              "Para": [
+                {
+                  "Str": "Some"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "citations"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Cite": [
+                    [
+                      {
+                        "citationSuffix": [
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "chap."
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "3"
+                          }
+                        ],
+                        "citationNoteNum": 0,
+                        "citationMode": {
+                          "NormalCitation": []
+                        },
+                        "citationPrefix": [
+                          {
+                            "Str": "see"
+                          }
+                        ],
+                        "citationId": "item1",
+                        "citationHash": 14
+                      },
+                      {
+                        "citationSuffix": [],
+                        "citationNoteNum": 0,
+                        "citationMode": {
+                          "NormalCitation": []
+                        },
+                        "citationPrefix": [],
+                        "citationId": "пункт3",
+                        "citationHash": 15
+                      },
+                      {
+                        "citationSuffix": [],
+                        "citationNoteNum": 0,
+                        "citationMode": {
+                          "NormalCitation": []
+                        },
+                        "citationPrefix": [],
+                        "citationId": "item2",
+                        "citationHash": 16
+                      }
+                    ],
+                    [
+                      {
+                        "Str": "see"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "chap."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "3"
+                      },
+                      {
+                        "Str": ";"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "a"
+                      },
+                      {
+                        "Str": "n"
+                      },
+                      {
+                        "Str": "d"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Roe"
+                      },
+                      {
+                        "Str": ";"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "‘Article’"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "33–34"
+                      },
+                      {
+                        "Str": ""
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Str": "."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Str": "Citation"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "with"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "a"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "suffix"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "and"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "locator"
+        },
+        {
+          "Str": "."
+        },
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "pp."
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "33,"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "35-37,"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "and"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "nowhere"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "else"
+                  }
+                ],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "NormalCitation": []
+                },
+                "citationPrefix": [],
+                "citationId": "item1",
+                "citationHash": 17
+              }
+            ],
+            [
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "pp."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "33,"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "35–37"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "and"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "nowhere"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "else"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "Str": ""
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Str": "Citation"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "with"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "suffix"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "only"
+        },
+        {
+          "Str": "."
+        },
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "and"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "nowhere"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "else"
+                  }
+                ],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "NormalCitation": []
+                },
+                "citationPrefix": [],
+                "citationId": "item1",
+                "citationHash": 18
+              }
+            ],
+            [
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "and"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "nowhere"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "else"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "Str": ""
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Str": "Now"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "some"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "modifiers."
+        },
+        {
+          "Note": [
+            {
+              "Para": [
+                {
+                  "Str": "Like"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "a"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "citation"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "without"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "author:"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Cite": [
+                    [
+                      {
+                        "citationSuffix": [],
+                        "citationNoteNum": 0,
+                        "citationMode": {
+                          "SuppressAuthor": []
+                        },
+                        "citationPrefix": [],
+                        "citationId": "item1",
+                        "citationHash": 19
+                      }
+                    ],
+                    [
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ""
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Str": ","
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "and"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "now"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "Doe"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "with"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "a"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Str": "locator"
+                },
+                {
+                  "Space": []
+                },
+                {
+                  "Cite": [
+                    [
+                      {
+                        "citationSuffix": [
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "p."
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "44"
+                          }
+                        ],
+                        "citationNoteNum": 0,
+                        "citationMode": {
+                          "SuppressAuthor": []
+                        },
+                        "citationPrefix": [],
+                        "citationId": "item2",
+                        "citationHash": 20
+                      }
+                    ],
+                    [
+                      {
+                        "Str": "‘"
+                      },
+                      {
+                        "Str": "Article"
+                      },
+                      {
+                        "Str": "’"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "33–34"
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "("
+                      },
+                      {
+                        "Str": "p."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "44"
+                      },
+                      {
+                        "Str": ")"
+                      },
+                      {
+                        "Str": ""
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "Str": "."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Para": [
+        {
+          "Str": "With"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "some"
+        },
+        {
+          "Space": []
+        },
+        {
+          "Str": "markup"
+        },
+        {
+          "Str": "."
+        },
+        {
+          "Cite": [
+            [
+              {
+                "citationSuffix": [
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "p."
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Strong": [
+                      {
+                        "Str": "32"
+                      }
+                    ]
+                  }
+                ],
+                "citationNoteNum": 0,
+                "citationMode": {
+                  "NormalCitation": []
+                },
+                "citationPrefix": [
+                  {
+                    "Emph": [
+                      {
+                        "Str": "see"
+                      }
+                    ]
+                  }
+                ],
+                "citationId": "item1",
+                "citationHash": 21
+              }
+            ],
+            [
+              {
+                "Note": [
+                  {
+                    "Para": [
+                      {
+                        "Emph": [
+                          {
+                            "Str": "See"
+                          }
+                        ]
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "Doe"
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Emph": [
+                          {
+                            "Str": "First"
+                          },
+                          {
+                            "Space": []
+                          },
+                          {
+                            "Str": "Book"
+                          }
+                        ]
+                      },
+                      {
+                        "Str": ","
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "p."
+                      },
+                      {
+                        "Space": []
+                      },
+                      {
+                        "Str": "32"
+                      },
+                      {
+                        "Str": "."
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "Str": ""
+        }
+      ]
+    },
+    {
+      "Div": [
+        [
+          "",
+          [
+            "references"
+          ],
+          []
+        ],
+        [
+          {
+            "Header": [
+              1,
+              [
+                "references",
+                [],
+                []
+              ],
+              [
+                {
+                  "Str": "References"
+                }
+              ]
+            ]
+          },
+          {
+            "Para": [
+              {
+                "Str": "Doe,"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "John,"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "‘Article’,"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Emph": [
+                  {
+                    "Str": "Journal"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "of"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Generic"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Studies"
+                  }
+                ]
+              },
+              {
+                "Str": ","
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "6"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "(2006),"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "33–34"
+              },
+              {
+                "Str": "."
+              }
+            ]
+          },
+          {
+            "Para": [
+              {
+                "Str": "---,"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Emph": [
+                  {
+                    "Str": "First"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Book"
+                  }
+                ]
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "(Cambridge:"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Cambridge"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "University"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Press,"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "2005)"
+              },
+              {
+                "Str": "."
+              }
+            ]
+          },
+          {
+            "Para": [
+              {
+                "Str": "Doe,"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "John,"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "and"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Jenny"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Roe,"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "‘Why"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Water"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Is"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Wet’,"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "in"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Emph": [
+                  {
+                    "Str": "Third"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Book"
+                  }
+                ]
+              },
+              {
+                "Str": ","
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "ed."
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "by"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Sam"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Smith"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "(Oxford:"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Oxford"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "University"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "Press,"
+              },
+              {
+                "Space": []
+              },
+              {
+                "Str": "2007)"
+              },
+              {
+                "Str": "."
+              }
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+]

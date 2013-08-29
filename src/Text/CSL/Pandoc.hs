@@ -27,6 +27,8 @@ import Text.Pandoc.Generic
 import Text.Parsec hiding (State)
 import Control.Monad
 import Control.Monad.State
+import System.FilePath
+import System.Directory
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -79,10 +81,12 @@ stringify = query getStr
 
 getBibRefs :: MetaValue -> IO [Reference]
 getBibRefs (MetaList xs) = concat `fmap` mapM getBibRefs xs
-getBibRefs (MetaInlines xs) =
-  map unescapeRefId `fmap` readBiblioFile (stringify xs)
-getBibRefs (MetaString s) =
-  map unescapeRefId `fmap` readBiblioFile s
+getBibRefs (MetaInlines xs) = getBibRefs (MetaString $ stringify xs)
+getBibRefs (MetaString s) = do
+  mbpath <- findFile ["."] s
+  maybe (error $ "Not found: " ++ s)
+    (fmap (map unescapeRefId) . readBiblioFile)
+    mbpath
 getBibRefs _ = return []
 
 -- unescape reference ids, which may contain XML entities, so
@@ -602,3 +606,11 @@ object' = object . filter (not . isempty)
         isempty ("citation-number", Number n) = n == 0
         isempty ("comma-suffix", Bool b) = not b
         isempty (_, _)        = False
+
+findFile :: [FilePath] -> FilePath -> IO (Maybe FilePath)
+findFile [] _ = return Nothing
+findFile (p:ps) f = do
+  exists <- doesFileExist (p </> f)
+  if exists
+     then return $ Just (p </> f)
+     else findFile ps f
