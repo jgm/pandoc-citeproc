@@ -27,6 +27,7 @@ import Text.CSL.Input.MODS
 import Text.JSON.Generic
 
 #ifdef USE_BIBUTILS
+import qualified Control.Exception as E
 import Control.Exception ( bracket, catch )
 import Control.Monad.Trans ( liftIO )
 import System.FilePath ( (</>), (<.>) )
@@ -110,19 +111,23 @@ readBiblioString b s
 readBiblioFile' :: FilePath -> BiblioIn -> IO [Reference]
 readBiblioFile' fin bin
     | bin == mods_in = readModsCollectionFile fin
-    | otherwise      = withTempDir "citeproc" $ \tdir -> do
-                          let tfile = tdir </> "bibutils-tmp"
-                          param <- bibl_initparams bin mods_out "hs-bibutils"
-                          bibl  <- bibl_init
-                          unsetBOM        param
-                          setCharsetIn    param bibl_charset_unicode
-                          setCharsetOut   param bibl_charset_unicode
-                          _ <- bibl_read  param bibl fin
-                          _ <- bibl_write param bibl tfile
-                          bibl_free bibl
-                          bibl_freeparams param
-                          refs <- readModsCollectionFile tfile
-                          return $! refs
+    | otherwise      = E.handle handleBibfileError
+                       $ withTempDir "citeproc"
+                       $ \tdir -> do
+                            let tfile = tdir </> "bibutils-tmp"
+                            param <- bibl_initparams bin mods_out "hs-bibutils"
+                            bibl  <- bibl_init
+                            unsetBOM        param
+                            setCharsetIn    param bibl_charset_unicode
+                            setCharsetOut   param bibl_charset_unicode
+                            _ <- bibl_read  param bibl fin
+                            _ <- bibl_write param bibl tfile
+                            bibl_free bibl
+                            bibl_freeparams param
+                            refs <- readModsCollectionFile tfile
+                            return $! refs
+  where handleBibfileError :: E.SomeException -> IO [Reference]
+        handleBibfileError e = error $ "Error reading " ++ fin ++ "\n" ++ show e
 
 -- | Perform a function in a temporary directory and clean up.
 withTempDir :: FilePath -> (FilePath -> IO a) -> IO a
