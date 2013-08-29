@@ -1,5 +1,9 @@
 TODO:
 
+- better error reporting around readBiblioFile, which fails
+  with a cryptic fopen message
+  pandoc-citeproc: fopen: : does not exist (No such file or directory)
+  if the file doesn't exist. sim for csl, csl-abbrevs.  make this robust.
 - add some tests to this module (tests previously in pandoc?)
   (see tests directory)
 - allow YAML version of csl-abbrevs.  document here and in pandoc README.
