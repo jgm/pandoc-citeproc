@@ -1,5 +1,6 @@
 TODO:
 
+- search ~/.csl for csl files; add env variable for common bib file location?
 - for operations that read biblio files or csl, make error reporting
   better; even better: have the functions return an Either
 - allow YAML version of csl-abbrevs.  document here and in pandoc README.
