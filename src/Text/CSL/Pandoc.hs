@@ -1,5 +1,5 @@
 {-# LANGUAGE PatternGuards, OverloadedStrings, FlexibleInstances,
-    ScopedTypeVariables #-}
+    ScopedTypeVariables, CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Text.CSL.Pandoc where -- (processCites, processCites') where
 
@@ -96,7 +96,11 @@ decodeEntities ('&':xs) =
   let (ys,zs) = break (==';') xs
   in  case zs of
            ';':ws -> case lookupEntity ('&':ys ++ ";") of
+#if MIN_VERSION_tagsoup(0,13,0)
+                                       Just s  -> s ++ decodeEntities ws
+#else
                                        Just c  -> [c] ++ decodeEntities ws
+#endif
                                        Nothing -> '&' : decodeEntities xs
            _      -> '&' : decodeEntities xs
 decodeEntities (x:xs) = x : decodeEntities xs
