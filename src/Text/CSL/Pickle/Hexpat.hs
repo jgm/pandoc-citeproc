@@ -15,7 +15,6 @@ module Text.CSL.Pickle.Hexpat where
 
 import qualified Data.ByteString.Lazy as L
 import Data.ByteString.Lazy.UTF8 ( toString )
-import Data.Maybe
 import Text.XML.Expat.Tree hiding ( mkText, getText, getChildren )
 import Text.XML.Expat.Format
 import Text.XML.Expat.Proc
