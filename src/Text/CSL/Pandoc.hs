@@ -28,7 +28,7 @@ import Text.Parsec hiding (State)
 import Control.Monad
 import Control.Monad.State
 import System.FilePath
-import System.Directory
+import System.Directory hiding (findFile)
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
