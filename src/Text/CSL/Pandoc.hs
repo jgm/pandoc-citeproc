@@ -55,6 +55,7 @@ processCites style refs doc =
 -- field.
 processCites' :: Pandoc -> IO Pandoc
 processCites' (Pandoc meta blocks) = do
+  csldir <- getAppUserDataDirectory "csl"
   let inlineRefError s = error $ "Error parsing references: " ++ s
   let inlineRefs = either inlineRefError id
                    $ convertRefs $ lookupMeta "references" meta
@@ -62,10 +63,12 @@ processCites' (Pandoc meta blocks) = do
                         $ lookupMeta "bibliography" meta
   let refs = inlineRefs ++ bibRefs
   let cslfile = lookupMeta "csl" meta >>= toPath
-  let cslAbbrevFile = lookupMeta "csl-abbrevs" meta >>= toPath
   csl <- maybe (getDataFileName "chicago-author-date.csl") return cslfile
-             >>= readFile >>= parseCSL
-  abbrevs <- maybe (return []) readJsonAbbrevFile cslAbbrevFile
+             >>= findFile [".", csldir] >>= readFile >>= parseCSL
+  let cslAbbrevFile = lookupMeta "csl-abbrevs" meta >>= toPath
+  abbrevs <- maybe (return [])
+             (\f -> findFile [".", csldir] f >>= readJsonAbbrevFile)
+                cslAbbrevFile
   let csl' = csl{ styleAbbrevs = abbrevs }
   return $ processCites csl' refs $ Pandoc meta blocks
 
@@ -83,10 +86,8 @@ getBibRefs :: MetaValue -> IO [Reference]
 getBibRefs (MetaList xs) = concat `fmap` mapM getBibRefs xs
 getBibRefs (MetaInlines xs) = getBibRefs (MetaString $ stringify xs)
 getBibRefs (MetaString s) = do
-  mbpath <- findFile ["."] s
-  maybe (error $ "Not found: " ++ s)
-    (fmap (map unescapeRefId) . readBiblioFile)
-    mbpath
+  path <- findFile ["."] s
+  map unescapeRefId `fmap` readBiblioFile path
 getBibRefs _ = return []
 
 -- unescape reference ids, which may contain XML entities, so
@@ -607,10 +608,11 @@ object' = object . filter (not . isempty)
         isempty ("comma-suffix", Bool b) = not b
         isempty (_, _)        = False
 
-findFile :: [FilePath] -> FilePath -> IO (Maybe FilePath)
-findFile [] _ = return Nothing
+findFile :: [FilePath] -> FilePath -> IO FilePath
+findFile [] f = fail $ "Not found: " ++ f
 findFile (p:ps) f = do
   exists <- doesFileExist (p </> f)
   if exists
-     then return $ Just (p </> f)
+     then return (p </> f)
      else findFile ps f
+
