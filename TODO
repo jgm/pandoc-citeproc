@@ -1,6 +1,7 @@
 TODO:
 
 - man pages
+- document fact that bibliography is put in a div
 - document rich text and math formatting
 - error reporting has been improved, but warnings still don't appear with
   numerical styles
