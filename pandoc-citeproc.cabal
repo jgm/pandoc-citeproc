@@ -15,7 +15,7 @@ description:        The pandoc-citeproc library exports functions for
                     code. When citeproc-hs is updated to be compatible,
                     this package will simply depend on citeproc-hs.
                     .
-                    This package also contains two executables: citeproc,
+                    This package also contains two executables: pandoc-citeproc,
                     which works as a pandoc filter (pandoc >= 1.12), and
                     biblio2yaml, which converts bibliographic databases to
                     a yaml format suitable for inclusion in pandoc YAML
