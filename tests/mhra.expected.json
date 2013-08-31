@@ -398,52 +398,29 @@
                   {
                     "Para": [
                       {
-                        "Str": "[CSL"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "BIBLIOGRAPHIC"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "DATA"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "ERROR:"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "reference"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "\"nonexistent\""
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "not"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "found.]"
-                      },
-                      {
-                        "Str": "."
+                        "Span": [
+                          [
+                            "",
+                            [
+                              "citeproc-not-found"
+                            ],
+                            [
+                              [
+                                "data-reference-id",
+                                "nonexistent"
+                              ]
+                            ]
+                          ],
+                          [
+                            {
+                              "Strong": [
+                                {
+                                  "Str": "???"
+                                }
+                              ]
+                            }
+                          ]
+                        ]
                       }
                     ]
                   }
@@ -476,52 +453,24 @@
                   {
                     "Para": [
                       {
-                        "Str": "[CSL"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "STYLE"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "ERROR:"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "reference"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "with"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "no"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "printed"
-                      },
-                      {
-                        "Space": []
-                      },
-                      {
-                        "Str": "form.]"
-                      },
-                      {
-                        "Str": "."
+                        "Span": [
+                          [
+                            "",
+                            [
+                              "citeproc-no-output"
+                            ],
+                            []
+                          ],
+                          [
+                            {
+                              "Strong": [
+                                {
+                                  "Str": "???"
+                                }
+                              ]
+                            }
+                          ]
+                        ]
                       }
                     ]
                   }

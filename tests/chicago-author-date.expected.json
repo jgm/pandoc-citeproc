@@ -51,14 +51,14 @@
           "Cite": [
             [
               {
-                "citationSuffix": [],
                 "citationNoteNum": 0,
+                "citationSuffix": [],
+                "citationHash": 1,
                 "citationMode": {
                   "NormalCitation": []
                 },
                 "citationPrefix": [],
-                "citationId": "nonexistent",
-                "citationHash": 1
+                "citationId": "nonexistent"
               }
             ],
             [
@@ -66,49 +66,29 @@
                 "Str": "("
               },
               {
-                "Str": "[CSL"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "BIBLIOGRAPHIC"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "DATA"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "ERROR:"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "reference"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "\"nonexistent\""
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "not"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "found.]"
+                "Span": [
+                  [
+                    "",
+                    [
+                      "citeproc-not-found"
+                    ],
+                    [
+                      [
+                        "data-reference-id",
+                        "nonexistent"
+                      ]
+                    ]
+                  ],
+                  [
+                    {
+                      "Strong": [
+                        {
+                          "Str": "???"
+                        }
+                      ]
+                    }
+                  ]
+                ]
               },
               {
                 "Str": ")"
@@ -124,14 +104,14 @@
           "Cite": [
             [
               {
-                "citationSuffix": [],
                 "citationNoteNum": 0,
+                "citationSuffix": [],
+                "citationHash": 2,
                 "citationMode": {
                   "AuthorInText": []
                 },
                 "citationPrefix": [],
-                "citationId": "nonexistent",
-                "citationHash": 2
+                "citationId": "nonexistent"
               }
             ],
             [
@@ -142,49 +122,29 @@
                 "Str": "("
               },
               {
-                "Str": "[CSL"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "BIBLIOGRAPHIC"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "DATA"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "ERROR:"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "reference"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "\"nonexistent\""
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "not"
-              },
-              {
-                "Space": []
-              },
-              {
-                "Str": "found.]"
+                "Span": [
+                  [
+                    "",
+                    [
+                      "citeproc-not-found"
+                    ],
+                    [
+                      [
+                        "data-reference-id",
+                        "nonexistent"
+                      ]
+                    ]
+                  ],
+                  [
+                    {
+                      "Strong": [
+                        {
+                          "Str": "???"
+                        }
+                      ]
+                    }
+                  ]
+                ]
               },
               {
                 "Str": ")"
@@ -200,14 +160,14 @@
           "Cite": [
             [
               {
-                "citationSuffix": [],
                 "citationNoteNum": 0,
+                "citationSuffix": [],
+                "citationHash": 3,
                 "citationMode": {
                   "AuthorInText": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 3
+                "citationId": "item1"
               }
             ],
             [
@@ -249,6 +209,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Str": "p."
@@ -260,13 +221,12 @@
                     "Str": "30"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 4,
                 "citationMode": {
                   "AuthorInText": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 4
+                "citationId": "item1"
               }
             ],
             [
@@ -317,6 +277,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Str": "p."
@@ -340,13 +301,12 @@
                     "Str": "suffix"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 5,
                 "citationMode": {
                   "AuthorInText": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 5
+                "citationId": "item1"
               }
             ],
             [
@@ -412,16 +372,17 @@
           "Cite": [
             [
               {
-                "citationSuffix": [],
                 "citationNoteNum": 0,
+                "citationSuffix": [],
+                "citationHash": 6,
                 "citationMode": {
                   "AuthorInText": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 6
+                "citationId": "item1"
               },
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -436,17 +397,17 @@
                     "Str": "30"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 7,
                 "citationMode": {
                   "SuppressAuthor": []
                 },
                 "citationPrefix": [],
-                "citationId": "item2",
-                "citationHash": 7
+                "citationId": "item2"
               },
               {
-                "citationSuffix": [],
                 "citationNoteNum": 0,
+                "citationSuffix": [],
+                "citationHash": 8,
                 "citationMode": {
                   "NormalCitation": []
                 },
@@ -461,8 +422,7 @@
                     "Str": "also"
                   }
                 ],
-                "citationId": "пункт3",
-                "citationHash": 8
+                "citationId": "пункт3"
               }
             ],
             [
@@ -586,6 +546,7 @@
                   "Cite": [
                     [
                       {
+                        "citationNoteNum": 0,
                         "citationSuffix": [
                           {
                             "Str": "p."
@@ -597,13 +558,12 @@
                             "Str": "12"
                           }
                         ],
-                        "citationNoteNum": 0,
+                        "citationHash": 9,
                         "citationMode": {
                           "AuthorInText": []
                         },
                         "citationPrefix": [],
-                        "citationId": "пункт3",
-                        "citationHash": 9
+                        "citationId": "пункт3"
                       }
                     ],
                     [
@@ -683,14 +643,14 @@
                   "Cite": [
                     [
                       {
-                        "citationSuffix": [],
                         "citationNoteNum": 0,
+                        "citationSuffix": [],
+                        "citationHash": 10,
                         "citationMode": {
                           "NormalCitation": []
                         },
                         "citationPrefix": [],
-                        "citationId": "пункт3",
-                        "citationHash": 10
+                        "citationId": "пункт3"
                       }
                     ],
                     [
@@ -763,6 +723,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -777,7 +738,7 @@
                     "Str": "3"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 11,
                 "citationMode": {
                   "NormalCitation": []
                 },
@@ -786,10 +747,10 @@
                     "Str": "see"
                   }
                 ],
-                "citationId": "item1",
-                "citationHash": 11
+                "citationId": "item1"
               },
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -804,7 +765,7 @@
                     "Str": "34-35"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 12,
                 "citationMode": {
                   "NormalCitation": []
                 },
@@ -813,8 +774,7 @@
                     "Str": "also"
                   }
                 ],
-                "citationId": "пункт3",
-                "citationHash": 12
+                "citationId": "пункт3"
               }
             ],
             [
@@ -928,6 +888,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -942,7 +903,7 @@
                     "Str": "34-35"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 13,
                 "citationMode": {
                   "NormalCitation": []
                 },
@@ -951,8 +912,7 @@
                     "Str": "see"
                   }
                 ],
-                "citationId": "item1",
-                "citationHash": 13
+                "citationId": "item1"
               }
             ],
             [
@@ -1049,6 +1009,7 @@
                   "Cite": [
                     [
                       {
+                        "citationNoteNum": 0,
                         "citationSuffix": [
                           {
                             "Space": []
@@ -1063,7 +1024,7 @@
                             "Str": "3"
                           }
                         ],
-                        "citationNoteNum": 0,
+                        "citationHash": 14,
                         "citationMode": {
                           "NormalCitation": []
                         },
@@ -1072,28 +1033,27 @@
                             "Str": "see"
                           }
                         ],
-                        "citationId": "item1",
-                        "citationHash": 14
+                        "citationId": "item1"
                       },
                       {
-                        "citationSuffix": [],
                         "citationNoteNum": 0,
+                        "citationSuffix": [],
+                        "citationHash": 15,
                         "citationMode": {
                           "NormalCitation": []
                         },
                         "citationPrefix": [],
-                        "citationId": "пункт3",
-                        "citationHash": 15
+                        "citationId": "пункт3"
                       },
                       {
-                        "citationSuffix": [],
                         "citationNoteNum": 0,
+                        "citationSuffix": [],
+                        "citationHash": 16,
                         "citationMode": {
                           "NormalCitation": []
                         },
                         "citationPrefix": [],
-                        "citationId": "item2",
-                        "citationHash": 16
+                        "citationId": "item2"
                       }
                     ],
                     [
@@ -1235,6 +1195,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -1273,13 +1234,12 @@
                     "Str": "else"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 17,
                 "citationMode": {
                   "NormalCitation": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 17
+                "citationId": "item1"
               }
             ],
             [
@@ -1372,6 +1332,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -1392,13 +1353,12 @@
                     "Str": "else"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 18,
                 "citationMode": {
                   "NormalCitation": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 18
+                "citationId": "item1"
               }
             ],
             [
@@ -1498,14 +1458,14 @@
                   "Cite": [
                     [
                       {
-                        "citationSuffix": [],
                         "citationNoteNum": 0,
+                        "citationSuffix": [],
+                        "citationHash": 19,
                         "citationMode": {
                           "SuppressAuthor": []
                         },
                         "citationPrefix": [],
-                        "citationId": "item1",
-                        "citationHash": 19
+                        "citationId": "item1"
                       }
                     ],
                     [
@@ -1567,6 +1527,7 @@
                   "Cite": [
                     [
                       {
+                        "citationNoteNum": 0,
                         "citationSuffix": [
                           {
                             "Space": []
@@ -1581,13 +1542,12 @@
                             "Str": "44"
                           }
                         ],
-                        "citationNoteNum": 0,
+                        "citationHash": 20,
                         "citationMode": {
                           "SuppressAuthor": []
                         },
                         "citationPrefix": [],
-                        "citationId": "item2",
-                        "citationHash": 20
+                        "citationId": "item2"
                       }
                     ],
                     [
@@ -1645,6 +1605,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -1663,7 +1624,7 @@
                     ]
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 21,
                 "citationMode": {
                   "NormalCitation": []
                 },
@@ -1676,8 +1637,7 @@
                     ]
                   }
                 ],
-                "citationId": "item1",
-                "citationHash": 21
+                "citationId": "item1"
               }
             ],
             [
