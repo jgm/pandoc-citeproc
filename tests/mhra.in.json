@@ -1,17 +1,17 @@
 [
   {
     "unMeta": {
+      "csl": {
+        "MetaInlines": [
+          {
+            "Str": "tests/mhra.csl"
+          }
+        ]
+      },
       "references": {
         "MetaList": [
           {
             "MetaMap": {
-              "publisher-place": {
-                "MetaInlines": [
-                  {
-                    "Str": "Cambridge"
-                  }
-                ]
-              },
               "author": {
                 "MetaMap": {
                   "family": {
@@ -22,25 +22,15 @@
                     ]
                   },
                   "given": {
-                    "MetaInlines": [
+                    "MetaList": [
                       {
-                        "Str": "John"
+                        "MetaInlines": [
+                          {
+                            "Str": "John"
+                          }
+                        ]
                       }
                     ]
-                  }
-                }
-              },
-              "id": {
-                "MetaInlines": [
-                  {
-                    "Str": "item1"
-                  }
-                ]
-              },
-              "issued": {
-                "MetaMap": {
-                  "year": {
-                    "MetaString": "2005"
                   }
                 }
               },
@@ -57,12 +47,19 @@
                   }
                 ]
               },
-              "type": {
+              "id": {
                 "MetaInlines": [
                   {
-                    "Str": "book"
+                    "Str": "item1"
                   }
                 ]
+              },
+              "issued": {
+                "MetaMap": {
+                  "year": {
+                    "MetaString": "2005"
+                  }
+                }
               },
               "publisher": {
                 "MetaInlines": [
@@ -82,13 +79,53 @@
                     "Str": "Press"
                   }
                 ]
+              },
+              "type": {
+                "MetaInlines": [
+                  {
+                    "Str": "book"
+                  }
+                ]
+              },
+              "publisher-place": {
+                "MetaInlines": [
+                  {
+                    "Str": "Cambridge"
+                  }
+                ]
               }
             }
           },
           {
             "MetaMap": {
-              "volume": {
-                "MetaString": "6"
+              "author": {
+                "MetaMap": {
+                  "family": {
+                    "MetaInlines": [
+                      {
+                        "Str": "Doe"
+                      }
+                    ]
+                  },
+                  "given": {
+                    "MetaList": [
+                      {
+                        "MetaInlines": [
+                          {
+                            "Str": "John"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              "title": {
+                "MetaInlines": [
+                  {
+                    "Str": "Article"
+                  }
+                ]
               },
               "page": {
                 "MetaInlines": [
@@ -96,6 +133,30 @@
                     "Str": "33-34"
                   }
                 ]
+              },
+              "id": {
+                "MetaInlines": [
+                  {
+                    "Str": "item2"
+                  }
+                ]
+              },
+              "issued": {
+                "MetaMap": {
+                  "year": {
+                    "MetaString": "2006"
+                  }
+                }
+              },
+              "type": {
+                "MetaInlines": [
+                  {
+                    "Str": "article-journal"
+                  }
+                ]
+              },
+              "volume": {
+                "MetaString": "6"
               },
               "container-title": {
                 "MetaInlines": [
@@ -121,77 +182,11 @@
                     "Str": "Studies"
                   }
                 ]
-              },
-              "author": {
-                "MetaMap": {
-                  "family": {
-                    "MetaInlines": [
-                      {
-                        "Str": "Doe"
-                      }
-                    ]
-                  },
-                  "given": {
-                    "MetaInlines": [
-                      {
-                        "Str": "John"
-                      }
-                    ]
-                  }
-                }
-              },
-              "id": {
-                "MetaInlines": [
-                  {
-                    "Str": "item2"
-                  }
-                ]
-              },
-              "issued": {
-                "MetaMap": {
-                  "year": {
-                    "MetaString": "2006"
-                  }
-                }
-              },
-              "title": {
-                "MetaInlines": [
-                  {
-                    "Str": "Article"
-                  }
-                ]
-              },
-              "type": {
-                "MetaInlines": [
-                  {
-                    "Str": "article-journal"
-                  }
-                ]
               }
             }
           },
           {
             "MetaMap": {
-              "publisher-place": {
-                "MetaInlines": [
-                  {
-                    "Str": "Oxford"
-                  }
-                ]
-              },
-              "container-title": {
-                "MetaInlines": [
-                  {
-                    "Str": "Third"
-                  },
-                  {
-                    "Space": []
-                  },
-                  {
-                    "Str": "Book"
-                  }
-                ]
-              },
               "author": {
                 "MetaList": [
                   {
@@ -204,9 +199,13 @@
                         ]
                       },
                       "given": {
-                        "MetaInlines": [
+                        "MetaList": [
                           {
-                            "Str": "John"
+                            "MetaInlines": [
+                              {
+                                "Str": "John"
+                              }
+                            ]
                           }
                         ]
                       }
@@ -222,9 +221,13 @@
                         ]
                       },
                       "given": {
-                        "MetaInlines": [
+                        "MetaList": [
                           {
-                            "Str": "Jenny"
+                            "MetaInlines": [
+                              {
+                                "Str": "Jenny"
+                              }
+                            ]
                           }
                         ]
                       }
@@ -232,17 +235,25 @@
                   }
                 ]
               },
-              "id": {
-                "MetaInlines": [
-                  {
-                    "Str": "пункт3"
-                  }
-                ]
-              },
-              "issued": {
+              "editor": {
                 "MetaMap": {
-                  "year": {
-                    "MetaString": "2007"
+                  "family": {
+                    "MetaInlines": [
+                      {
+                        "Str": "Smith"
+                      }
+                    ]
+                  },
+                  "given": {
+                    "MetaList": [
+                      {
+                        "MetaInlines": [
+                          {
+                            "Str": "Sam"
+                          }
+                        ]
+                      }
+                    ]
                   }
                 }
               },
@@ -271,12 +282,19 @@
                   }
                 ]
               },
-              "type": {
+              "id": {
                 "MetaInlines": [
                   {
-                    "Str": "chapter"
+                    "Str": "пункт3"
                   }
                 ]
+              },
+              "issued": {
+                "MetaMap": {
+                  "year": {
+                    "MetaString": "2007"
+                  }
+                }
               },
               "publisher": {
                 "MetaInlines": [
@@ -297,32 +315,34 @@
                   }
                 ]
               },
-              "editor": {
-                "MetaMap": {
-                  "family": {
-                    "MetaInlines": [
-                      {
-                        "Str": "Smith"
-                      }
-                    ]
-                  },
-                  "given": {
-                    "MetaInlines": [
-                      {
-                        "Str": "Sam"
-                      }
-                    ]
+              "type": {
+                "MetaInlines": [
+                  {
+                    "Str": "chapter"
                   }
-                }
+                ]
+              },
+              "publisher-place": {
+                "MetaInlines": [
+                  {
+                    "Str": "Oxford"
+                  }
+                ]
+              },
+              "container-title": {
+                "MetaInlines": [
+                  {
+                    "Str": "Third"
+                  },
+                  {
+                    "Space": []
+                  },
+                  {
+                    "Str": "Book"
+                  }
+                ]
               }
             }
-          }
-        ]
-      },
-      "csl": {
-        "MetaInlines": [
-          {
-            "Str": "tests/mhra.csl"
           }
         ]
       }
@@ -362,14 +382,14 @@
           "Cite": [
             [
               {
-                "citationSuffix": [],
                 "citationNoteNum": 0,
+                "citationSuffix": [],
+                "citationHash": 0,
                 "citationMode": {
                   "NormalCitation": []
                 },
                 "citationPrefix": [],
-                "citationId": "nonexistent",
-                "citationHash": 0
+                "citationId": "nonexistent"
               }
             ],
             [
@@ -387,14 +407,14 @@
           "Cite": [
             [
               {
-                "citationSuffix": [],
                 "citationNoteNum": 0,
+                "citationSuffix": [],
+                "citationHash": 0,
                 "citationMode": {
                   "AuthorInText": []
                 },
                 "citationPrefix": [],
-                "citationId": "nonexistent",
-                "citationHash": 0
+                "citationId": "nonexistent"
               }
             ],
             [
@@ -412,14 +432,14 @@
           "Cite": [
             [
               {
-                "citationSuffix": [],
                 "citationNoteNum": 0,
+                "citationSuffix": [],
+                "citationHash": 0,
                 "citationMode": {
                   "AuthorInText": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 0
+                "citationId": "item1"
               }
             ],
             [
@@ -449,6 +469,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Str": "p."
@@ -460,13 +481,12 @@
                     "Str": "30"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 0,
                 "citationMode": {
                   "AuthorInText": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 0
+                "citationId": "item1"
               }
             ],
             [
@@ -496,6 +516,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Str": "p."
@@ -519,13 +540,12 @@
                     "Str": "suffix"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 0,
                 "citationMode": {
                   "AuthorInText": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 0
+                "citationId": "item1"
               }
             ],
             [
@@ -555,16 +575,17 @@
           "Cite": [
             [
               {
-                "citationSuffix": [],
                 "citationNoteNum": 0,
+                "citationSuffix": [],
+                "citationHash": 0,
                 "citationMode": {
                   "AuthorInText": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 0
+                "citationId": "item1"
               },
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -579,17 +600,17 @@
                     "Str": "30"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 0,
                 "citationMode": {
                   "SuppressAuthor": []
                 },
                 "citationPrefix": [],
-                "citationId": "item2",
-                "citationHash": 0
+                "citationId": "item2"
               },
               {
-                "citationSuffix": [],
                 "citationNoteNum": 0,
+                "citationSuffix": [],
+                "citationHash": 0,
                 "citationMode": {
                   "NormalCitation": []
                 },
@@ -604,8 +625,7 @@
                     "Str": "also"
                   }
                 ],
-                "citationId": "пункт3",
-                "citationHash": 0
+                "citationId": "пункт3"
               }
             ],
             [
@@ -654,6 +674,7 @@
                   "Cite": [
                     [
                       {
+                        "citationNoteNum": 0,
                         "citationSuffix": [
                           {
                             "Str": "p."
@@ -665,13 +686,12 @@
                             "Str": "12"
                           }
                         ],
-                        "citationNoteNum": 0,
+                        "citationHash": 0,
                         "citationMode": {
                           "AuthorInText": []
                         },
                         "citationPrefix": [],
-                        "citationId": "пункт3",
-                        "citationHash": 0
+                        "citationId": "пункт3"
                       }
                     ],
                     [
@@ -718,14 +738,14 @@
                   "Cite": [
                     [
                       {
-                        "citationSuffix": [],
                         "citationNoteNum": 0,
+                        "citationSuffix": [],
+                        "citationHash": 0,
                         "citationMode": {
                           "NormalCitation": []
                         },
                         "citationPrefix": [],
-                        "citationId": "пункт3",
-                        "citationHash": 0
+                        "citationId": "пункт3"
                       }
                     ],
                     [
@@ -768,6 +788,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -782,7 +803,7 @@
                     "Str": "3"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 0,
                 "citationMode": {
                   "NormalCitation": []
                 },
@@ -791,10 +812,10 @@
                     "Str": "see"
                   }
                 ],
-                "citationId": "item1",
-                "citationHash": 0
+                "citationId": "item1"
               },
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -809,7 +830,7 @@
                     "Str": "34-35"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 0,
                 "citationMode": {
                   "NormalCitation": []
                 },
@@ -818,8 +839,7 @@
                     "Str": "also"
                   }
                 ],
-                "citationId": "пункт3",
-                "citationHash": 0
+                "citationId": "пункт3"
               }
             ],
             [
@@ -852,6 +872,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -866,7 +887,7 @@
                     "Str": "34-35"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 0,
                 "citationMode": {
                   "NormalCitation": []
                 },
@@ -875,8 +896,7 @@
                     "Str": "see"
                   }
                 ],
-                "citationId": "item1",
-                "citationHash": 0
+                "citationId": "item1"
               }
             ],
             [
@@ -946,6 +966,7 @@
                   "Cite": [
                     [
                       {
+                        "citationNoteNum": 0,
                         "citationSuffix": [
                           {
                             "Space": []
@@ -960,7 +981,7 @@
                             "Str": "3"
                           }
                         ],
-                        "citationNoteNum": 0,
+                        "citationHash": 0,
                         "citationMode": {
                           "NormalCitation": []
                         },
@@ -969,28 +990,27 @@
                             "Str": "see"
                           }
                         ],
-                        "citationId": "item1",
-                        "citationHash": 0
+                        "citationId": "item1"
                       },
                       {
-                        "citationSuffix": [],
                         "citationNoteNum": 0,
+                        "citationSuffix": [],
+                        "citationHash": 0,
                         "citationMode": {
                           "NormalCitation": []
                         },
                         "citationPrefix": [],
-                        "citationId": "пункт3",
-                        "citationHash": 0
+                        "citationId": "пункт3"
                       },
                       {
-                        "citationSuffix": [],
                         "citationNoteNum": 0,
+                        "citationSuffix": [],
+                        "citationHash": 0,
                         "citationMode": {
                           "NormalCitation": []
                         },
                         "citationPrefix": [],
-                        "citationId": "item2",
-                        "citationHash": 0
+                        "citationId": "item2"
                       }
                     ],
                     [
@@ -1051,6 +1071,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -1089,13 +1110,12 @@
                     "Str": "else"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 0,
                 "citationMode": {
                   "NormalCitation": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 0
+                "citationId": "item1"
               }
             ],
             [
@@ -1140,6 +1160,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -1160,13 +1181,12 @@
                     "Str": "else"
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 0,
                 "citationMode": {
                   "NormalCitation": []
                 },
                 "citationPrefix": [],
-                "citationId": "item1",
-                "citationHash": 0
+                "citationId": "item1"
               }
             ],
             [
@@ -1236,14 +1256,14 @@
                   "Cite": [
                     [
                       {
-                        "citationSuffix": [],
                         "citationNoteNum": 0,
+                        "citationSuffix": [],
+                        "citationHash": 0,
                         "citationMode": {
                           "SuppressAuthor": []
                         },
                         "citationPrefix": [],
-                        "citationId": "item1",
-                        "citationHash": 0
+                        "citationId": "item1"
                       }
                     ],
                     [
@@ -1299,6 +1319,7 @@
                   "Cite": [
                     [
                       {
+                        "citationNoteNum": 0,
                         "citationSuffix": [
                           {
                             "Space": []
@@ -1313,13 +1334,12 @@
                             "Str": "44"
                           }
                         ],
-                        "citationNoteNum": 0,
+                        "citationHash": 0,
                         "citationMode": {
                           "SuppressAuthor": []
                         },
                         "citationPrefix": [],
-                        "citationId": "item2",
-                        "citationHash": 0
+                        "citationId": "item2"
                       }
                     ],
                     [
@@ -1362,6 +1382,7 @@
           "Cite": [
             [
               {
+                "citationNoteNum": 0,
                 "citationSuffix": [
                   {
                     "Space": []
@@ -1380,7 +1401,7 @@
                     ]
                   }
                 ],
-                "citationNoteNum": 0,
+                "citationHash": 0,
                 "citationMode": {
                   "NormalCitation": []
                 },
@@ -1393,8 +1414,7 @@
                     ]
                   }
                 ],
-                "citationId": "item1",
-                "citationHash": 0
+                "citationId": "item1"
               }
             ],
             [
