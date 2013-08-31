@@ -1,4 +1,7 @@
 TODO:
 
+- man pages
+- document rich text and math formatting
 - error reporting has been improved, but warnings still don't appear with
   numerical styles
+
