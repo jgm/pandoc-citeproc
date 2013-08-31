@@ -66,11 +66,10 @@ addDelim d = foldr (\x xs -> if length xs < 1 then x : xs else check x xs) []
                              else      x                 : xs
 
 noOutputError :: Output
-noOutputError = OStr "[CSL STYLE ERROR: reference with no printed form.]" emptyFormatting
+noOutputError = OErr NoOutput
 
 noBibDataError :: Cite -> Output
-noBibDataError c = OStr ("[CSL BIBLIOGRAPHIC DATA ERROR: reference " ++ show (citeId c) ++ " not found.]")
-                   emptyFormatting
+noBibDataError c = OErr $ ReferenceNotFound (citeId c)
 
 oStr :: String -> [Output]
 oStr s = oStr' s emptyFormatting

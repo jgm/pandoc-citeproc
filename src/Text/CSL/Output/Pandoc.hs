@@ -79,10 +79,15 @@ renderFo :: Style -> FormattedOutput -> [Inline]
 renderFo _ (FPan i) = i
 renderFo _ (FDel s) = toStr s
 renderFo sty fo
-    | FS str fm    <- fo = toPandoc fm $ toStr str
-    | FN str fm    <- fo = toPandoc fm $ toStr $ rmZeros str
-    | FO     fm xs <- fo = toPandoc fm $ rest xs
-    | FUrl u fm    <- fo = toPandoc fm [Link (toStr $ snd u) u]
+    | FS str fm                  <- fo = toPandoc fm $ toStr str
+    | FN str fm                  <- fo = toPandoc fm $ toStr $ rmZeros str
+    | FO     fm xs               <- fo = toPandoc fm $ rest xs
+    | FUrl u fm                  <- fo = toPandoc fm [Link (toStr $ snd u) u]
+    | FErr NoOutput              <- fo = [Span ("",["citeproc-no-output"],[])
+                                              [Strong [Str "???"]]]
+    | FErr (ReferenceNotFound r) <- fo = [Span ("",["citeproc-not-found"],
+                                            [("data-reference-id",r)])
+                                            [Strong [Str "???"]]]
     | otherwise = []
     where
       addSuffix f i
