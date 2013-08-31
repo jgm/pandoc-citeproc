@@ -84,6 +84,10 @@ data-files:         chicago-author-date.csl
                     tests/mhra.in.json
                     tests/mhra.expected.json
 
+source-repository head
+  type:          git
+  location:      git://github.com/jgm/pandoc-citeproc.git
+
 flag small_base
   description: Choose the new smaller, split-up base package.
 
