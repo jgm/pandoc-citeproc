@@ -5,6 +5,11 @@ This package provides a library and executable to facilitate the use of
 citeproc with pandoc 1.12 and greater.  (Earlier versions of pandoc have
 integrated citeproc support.)
 
+The current version of the package includes code from citeproc-hs,
+which has not been updated for some time.  When citeproc-hs is brought
+up to date, this code can be removed and this package will depend
+on citeproc-hs.
+
 `pandoc-citeproc`
 -----------------
 
