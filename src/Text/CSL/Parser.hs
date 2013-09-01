@@ -92,10 +92,10 @@ readLocaleFile s = do
                                                maybe "en-US"
                                                id (lookup x langBase) ++ ".xml")
            | otherwise     -> getDataFileName ("locales/locales-" ++ take 5 x ++ ".xml")
-  b <- doesFileExist f
-  if b
-     then readXmlFile xpLocale f
-     else readLocaleFile $ take 2 s
+  exists <- doesFileExist f
+  if not exists && length s > 2
+     then readLocaleFile $ take 2 s  -- try again with base locale
+     else readXmlFile xpLocale f
 #endif
 
 instance XmlPickler Layout where
