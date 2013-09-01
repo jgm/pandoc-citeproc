@@ -16,6 +16,8 @@ import System.IO
 import System.FilePath (takeExtension)
 import System.Environment (getArgs)
 import System.Exit
+import Data.Version (showVersion)
+import Paths_pandoc_citeproc (version)
 
 main :: IO ()
 main = do
@@ -25,6 +27,9 @@ main = do
   unless (null errs && length args < 2) $ do
     hPutStrLn stderr $ usageInfo (unlines $ errs ++ [header]) options
     exitWith $ ExitFailure 1
+  when (Version `elem` flags) $ do
+    putStrLn $ "biblio2yaml " ++ showVersion version
+    exitWith ExitSuccess
   when (Help `elem` flags) $ do
     putStrLn $ usageInfo header options
     exitWith ExitSuccess
@@ -52,7 +57,7 @@ formatFromExtension :: FilePath -> Maybe BibFormat
 formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
 
 data Option =
-    Help | Format String
+    Help | Version | Format String
   deriving (Ord, Eq, Show)
 
 readFormat :: String -> Maybe BibFormat
@@ -76,6 +81,7 @@ readFormat = go . map toLower
 options :: [OptDescr Option]
 options =
   [ Option ['h'] ["help"] (NoArg Help) "show usage information"
+  , Option ['v'] ["version"] (NoArg Version) "show program version"
   , Option ['f'] ["format"] (ReqArg Format "FORMAT") "bibliography format"
   ]
 
