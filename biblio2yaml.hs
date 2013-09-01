@@ -81,7 +81,7 @@ readFormat = go . map toLower
 options :: [OptDescr Option]
 options =
   [ Option ['h'] ["help"] (NoArg Help) "show usage information"
-  , Option ['v'] ["version"] (NoArg Version) "show program version"
+  , Option ['V'] ["version"] (NoArg Version) "show program version"
   , Option ['f'] ["format"] (ReqArg Format "FORMAT") "bibliography format"
   ]
 

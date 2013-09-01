@@ -47,7 +47,7 @@ data Option =
 options :: [OptDescr Option]
 options =
   [ Option ['h'] ["help"] (NoArg Help) "show usage information"
-  , Option ['v'] ["version"] (NoArg Version) "show program version"
+  , Option ['V'] ["version"] (NoArg Version) "show program version"
   ]
 
 
