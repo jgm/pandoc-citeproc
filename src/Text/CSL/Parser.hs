@@ -75,23 +75,23 @@ localeFiles = $(embedDir "locales/")
 readLocaleFile :: String -> IO Locale
 readLocaleFile s = do
 #ifdef EMBED_DATA_FILES
-  f <- case s of
-         x | length x == 2 -> let fn = ("locales-" ++
-                                        maybe "en-US"
-                                        id (lookup x langBase) ++ ".xml")
-                              in case lookup fn localeFiles of
-                                   Just x' -> return x'
-                                   _       -> error "could not load the locale file"
-            | otherwise     -> case lookup ("locales-" ++ take 5 x ++ ".xml") localeFiles of
-                                 Just x' -> return x'
-                                 _       -> error "could not load the locale file"
+  f <- case length s of
+         0 -> return "locales-en-US.xml"
+         2 -> let fn = ("locales-" ++ maybe "en-US"
+                                      id (lookup s langBase) ++ ".xml")
+              in case lookup fn localeFiles of
+                   Just x' -> return x'
+                   _       -> error "could not load the locale file"
+         _ -> case lookup ("locales-" ++ take 5 s ++ ".xml") localeFiles of
+                    Just x' -> return x'
+                    _       -> error "could not load the locale file"
   return $ readXmlString xpLocale $ L.fromChunks [f]
 #else
-  f <- case s of
-         x | length x == 2 -> getDataFileName ("locales/locales-" ++
-                                               maybe "en-US"
-                                               id (lookup x langBase) ++ ".xml")
-           | otherwise     -> getDataFileName ("locales/locales-" ++ take 5 x ++ ".xml")
+  f <- case length s of
+             0 -> return "locales/locales-en-US.xml"
+             2 -> getDataFileName ("locales/locales-" ++
+                                maybe "en-US" id (lookup s langBase) ++ ".xml")
+             _ -> getDataFileName ("locales/locales-" ++ take 5 s ++ ".xml")
   exists <- doesFileExist f
   if not exists && length s > 2
      then readLocaleFile $ take 2 s  -- try again with base locale
