@@ -10,21 +10,35 @@ import qualified Data.ByteString.Char8 as B8
 import Data.Attoparsec.ByteString.Char8 as Attoparsec
 import qualified Data.Text as T
 import Data.Text.Encoding (encodeUtf8)
-import System.Console.ParseArgs
+import System.Console.GetOpt
 import Control.Monad
 import System.IO
 import System.FilePath (takeExtension)
+import System.Environment (getArgs)
+import System.Exit
 
 main :: IO ()
 main = do
-  parsedArgs <- parseArgsIO ArgsComplete arguments
-  when (gotArg parsedArgs Help) $
-     usageError parsedArgs ""
-  bibstring <- hGetContents =<< getArgStdio parsedArgs BibFile ReadMode
-  let bibformat = (getArg parsedArgs Format >>= readFormat)
-              <|> (getArg parsedArgs BibFile >>= formatFromExtension)
+  argv <- getArgs
+  let (flags, args, errs) = getOpt Permute options argv
+  let header = "Usage: biblio2yaml [OPTION..] [FILE]"
+  unless (null errs && length args < 2) $ do
+    hPutStrLn stderr $ usageInfo (unlines $ errs ++ [header]) options
+    exitWith $ ExitFailure 1
+  when (Help `elem` flags) $ do
+    putStrLn $ usageInfo header options
+    exitWith ExitSuccess
+  let mbformat = case [f | Format f <- flags] of
+                      [x] -> readFormat x
+                      _   -> Nothing
+  bibstring <- case args of
+                    (x:_) -> readFile x
+                    []    -> getContents
+  let bibformat = mbformat <|> msum (map formatFromExtension args)
   case bibformat of
-       Nothing  -> usageError parsedArgs "Unknown format"
+       Nothing  -> do
+         hPutStrLn stderr $ usageInfo ("Unknown format\n" ++ header) options
+         exitWith $ ExitFailure 3
        Just f   -> readBiblioString f bibstring >>=
                      outputYamlBlock . unescapeTags . encode
 
@@ -37,8 +51,8 @@ outputYamlBlock contents = do
 formatFromExtension :: FilePath -> Maybe BibFormat
 formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
 
-data Argument =
-    Help | BibFile | Format
+data Option =
+    Help | Format String
   deriving (Ord, Eq, Show)
 
 readFormat :: String -> Maybe BibFormat
@@ -59,16 +73,11 @@ readFormat = go . map toLower
         go "json"     = Just Json
         go _          = Nothing
 
-arguments :: [Arg Argument]
-arguments = [ Arg Help (Just 'h') (Just "help")
-                 Nothing "print usage information"
-            , Arg Format (Just 'f') (Just "format")
-                (argDataOptional "format" ArgtypeString)
-                "format"
-            , Arg BibFile Nothing Nothing
-                (argDataOptional "bibfile" ArgtypeString)
-                "bibfile"
-            ]
+options :: [OptDescr Option]
+options =
+  [ Option ['h'] ["help"] (NoArg Help) "show usage information"
+  , Option ['f'] ["format"] (ReqArg Format "FORMAT") "bibliography format"
+  ]
 
 -- turn
 -- id: ! "\u043F\u0443\u043D\u043A\u04423"
