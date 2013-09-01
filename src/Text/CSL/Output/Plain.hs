@@ -44,7 +44,7 @@ render _ (FPan i) = show i
 render _ (FDel s) = s
 render b fo
     | (FS str fm   ) <- fo = prefix fm <++> format fm (trim   str    ) <++> suffix fm
-    | (FErr e )      <- fo = "???"
+    | (FErr _ )      <- fo = "???"
     | (FN str fm   ) <- fo = prefix fm <++> format fm (trim   str    ) <++> suffix fm
     | (FUrl t fm   ) <- fo = prefix fm <++> format fm (trim $ fst  t ) <++> suffix fm
     | (FO     fm xs) <- fo = prefix fm <++> format fm (trim $ rest xs) <++> suffix fm
