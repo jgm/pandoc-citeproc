@@ -21,6 +21,9 @@ To process citations with pandoc, call pandoc-citeproc as a filter:
 
     pandoc --filter pandoc-citeproc input.md -s -o output.html
 
+The bibliography will be put into a pandoc `Div` container with
+class `references`.
+
 pandoc-citeproc will look for the following metadata fields in
 the input:
 
@@ -55,6 +58,11 @@ object.  The format is essentially CSL JSON format.  Here is an example:
       type: article-journal
       volume: 6
       container-title: Journal of Generic Studies
+
+The contents of fields will be interpreted as markdown when
+appropriate:  so, for example, emphasis and strong emphasis can
+be used in title fileds. Simple tex math will also be
+parsed and rendered appropriately.
 
 `csl`: Path to a CSL style file.  If the file is not found relative
 to the working directory, pandoc-citeproc will look in the
