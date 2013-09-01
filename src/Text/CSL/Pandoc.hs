@@ -12,7 +12,7 @@ import Text.HTML.TagSoup.Entity (lookupEntity)
 import Paths_pandoc_citeproc (getDataFileName)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Control.Applicative ((<$>),(<*>))
+import Control.Applicative ((<$>),(<*>), (<|>))
 import Data.Char (toUpper, isSpace, toLower, isUpper, isLower)
 import qualified Data.Vector as V
 import qualified Data.Traversable as Traversable
@@ -24,7 +24,7 @@ import qualified Data.Map as M
 import Text.CSL hiding ( Cite(..), Citation(..), endWithPunct )
 import qualified Text.CSL as CSL ( Cite(..) )
 import Text.Pandoc.Generic
-import Text.Parsec hiding (State)
+import Text.Parsec hiding (State, (<|>))
 import Control.Monad
 import Control.Monad.State
 import System.FilePath
@@ -62,10 +62,11 @@ processCites' (Pandoc meta blocks) = do
   bibRefs <- getBibRefs $ maybe (MetaList []) id
                         $ lookupMeta "bibliography" meta
   let refs = inlineRefs ++ bibRefs
-  let cslfile = lookupMeta "csl" meta >>= toPath
+  let cslfile = (lookupMeta "csl" meta <|> lookupMeta "citation-style" meta)
+                >>= toPath
   csl <- maybe (getDataFileName "chicago-author-date.csl") return cslfile
              >>= findFile [".", csldir] >>= readFile >>= parseCSL
-  let cslAbbrevFile = lookupMeta "csl-abbreviations" meta >>= toPath
+  let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
   abbrevs <- maybe (return [])
              (\f -> findFile [".", csldir] f >>= readJsonAbbrevFile)
                 cslAbbrevFile
