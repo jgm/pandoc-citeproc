@@ -69,7 +69,7 @@ to the working directory, pandoc-citeproc will look in the
 `$HOME/.csl` directory (or `C:\Users\USERNAME\AppData\Roaming\csl`
 in Windows 7).
 
-`csl-abbrevs`:  Path to a CSL abbreviations JSON file. The format
+`csl-abbreviations`:  Path to a CSL abbreviations JSON file. The format
 is described [here](http://citationstylist.org/2011/10/19/abbreviations-for-zotero-test-release).  Here is a short example:
 
     { "default": {

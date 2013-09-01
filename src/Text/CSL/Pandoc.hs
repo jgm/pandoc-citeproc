@@ -65,7 +65,7 @@ processCites' (Pandoc meta blocks) = do
   let cslfile = lookupMeta "csl" meta >>= toPath
   csl <- maybe (getDataFileName "chicago-author-date.csl") return cslfile
              >>= findFile [".", csldir] >>= readFile >>= parseCSL
-  let cslAbbrevFile = lookupMeta "csl-abbrevs" meta >>= toPath
+  let cslAbbrevFile = lookupMeta "csl-abbreviations" meta >>= toPath
   abbrevs <- maybe (return [])
              (\f -> findFile [".", csldir] f >>= readJsonAbbrevFile)
                 cslAbbrevFile
