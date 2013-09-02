@@ -83,6 +83,11 @@ data-files:         chicago-author-date.csl
                     tests/ieee.expected.json
                     tests/mhra.in.json
                     tests/mhra.expected.json
+                    -- documentation
+                    README.md
+                    LICENSE
+                    man/biblio2yaml.1
+                    man/pandoc-citeproc.1
 
 source-repository head
   type:          git
