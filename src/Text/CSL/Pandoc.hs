@@ -9,7 +9,6 @@ import Data.Aeson.Types (Parser, Pair)
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk
 import Text.HTML.TagSoup.Entity (lookupEntity)
-import Paths_pandoc_citeproc (getDataFileName)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Control.Applicative ((<$>),(<*>), (<|>))
@@ -29,6 +28,12 @@ import Control.Monad
 import Control.Monad.State
 import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)
+#ifdef EMBED_DATA_FILES
+import Text.CSL.Parser (defaultCSL)
+import Data.ByteString.UTF8 (toString)
+#else
+import Paths_pandoc_citeproc (getDataFileName)
+#endif
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -64,14 +69,22 @@ processCites' (Pandoc meta blocks) = do
   let refs = inlineRefs ++ bibRefs
   let cslfile = (lookupMeta "csl" meta <|> lookupMeta "citation-style" meta)
                 >>= toPath
-  csl <- maybe (getDataFileName "chicago-author-date.csl") return cslfile
-             >>= findFile [".", csldir] >>= readFile >>= parseCSL
+  csl <- maybe getDefaultCSL
+          (\f -> findFile [".", csldir] f >>= readFile >>= parseCSL) cslfile
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
   abbrevs <- maybe (return [])
              (\f -> findFile [".", csldir] f >>= readJsonAbbrevFile)
                 cslAbbrevFile
   let csl' = csl{ styleAbbrevs = abbrevs }
   return $ processCites csl' refs $ Pandoc meta blocks
+
+getDefaultCSL :: IO Style
+getDefaultCSL =
+#ifdef EMBED_DATA_FILES
+  parseCSL $ toString $ defaultCSL
+#else
+  getDataFileName "chicago-author-date.csl" >>= readFile >>= parseCSL
+#endif
 
 toPath :: MetaValue -> Maybe String
 toPath (MetaString s) = Just s

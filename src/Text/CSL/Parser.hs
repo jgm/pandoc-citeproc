@@ -70,6 +70,9 @@ parseCSL' f = do
 #ifdef EMBED_DATA_FILES
 localeFiles :: [(FilePath, S.ByteString)]
 localeFiles = $(embedDir "locales/")
+
+defaultCSL :: S.ByteString
+defaultCSL = $(embedFile "chicago-author-date.csl")
 #endif
 
 readLocaleFile :: String -> IO Locale
