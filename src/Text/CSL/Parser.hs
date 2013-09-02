@@ -76,7 +76,8 @@ readLocaleFile :: String -> IO Locale
 readLocaleFile s = do
 #ifdef EMBED_DATA_FILES
   f <- case length s of
-         0 -> return "locales-en-US.xml"
+         0 -> maybe (return S.empty) return
+              $ lookup "locales-en-US.xml" localeFiles
          2 -> let fn = ("locales-" ++ maybe "en-US"
                                       id (lookup s langBase) ++ ".xml")
               in case lookup fn localeFiles of
