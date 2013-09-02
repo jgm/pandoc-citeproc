@@ -1,0 +1,122 @@
+.TH "pandoc\-citeproc" "1" "August 31, 2013" "pandoc\-citeproc manual" ""
+.SH NAME
+.PP
+pandoc\-citeproc \- filter to resolve citations in a pandoc document.
+.SH SYNOPSIS
+.PP
+pandoc\-citeproc [\f[I]options\f[]]
+.SH DESCRIPTION
+.PP
+The \f[C]pandoc\-citeproc\f[] executable is a filter that takes a
+JSON\-encoded Pandoc document, formats citations and adds a
+bibliography, and returns a JSON\-encoded pandoc document.
+.PP
+To process citations with pandoc, call pandoc\-citeproc as a filter:
+.IP
+.nf
+\f[C]
+pandoc\ \-\-filter\ pandoc\-citeproc\ input.md\ \-s\ \-o\ output.html
+\f[]
+.fi
+.PP
+The bibliography will be put into a pandoc \f[C]Div\f[] container with
+class \f[C]references\f[].
+.PP
+pandoc\-citeproc will look for the following metadata fields in the
+input:
+.PP
+\f[C]bibliography\f[]: A path, or YAML list of paths, of bibliography
+files to use.
+These may be in any of the formats supported by bibutils.
+.IP
+.nf
+\f[C]
+Format\ \ \ \ \ \ \ \ \ \ \ \ File\ extension
+\-\-\-\-\-\-\-\-\-\-\-\-\ \ \ \ \ \ \-\-\-\-\-\-\-\-\-\-\-\-\-\-
+MODS\ \ \ \ \ \ \ \ \ \ \ \ \ \ .mods
+BibLaTeX\ \ \ \ \ \ \ \ \ \ .bib
+BibTeX\ \ \ \ \ \ \ \ \ \ \ \ .bibtex
+RIS\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .ris
+EndNote\ \ \ \ \ \ \ \ \ \ \ .enl
+EndNote\ XML\ \ \ \ \ \ \ .xml
+ISI\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .wos
+MEDLINE\ \ \ \ \ \ \ \ \ \ \ .medline
+Copac\ \ \ \ \ \ \ \ \ \ \ \ \ .copac
+JSON\ citeproc\ \ \ \ \ .json
+\f[]
+.fi
+.PP
+\f[C]references\f[]: A YAML list of references.
+Each reference is a YAML object.
+The format is essentially CSL JSON format.
+Here is an example:
+.IP
+.nf
+\f[C]
+\-\ id:\ doe2006
+\ \ author:
+\ \ \ \ family:\ Doe
+\ \ \ \ given:\ [John,\ F.]
+\ \ title:\ Article
+\ \ page:\ 33\-34
+\ \ issued:
+\ \ \ \ year:\ 2006
+\ \ type:\ article\-journal
+\ \ volume:\ 6
+\ \ container\-title:\ Journal\ of\ Generic\ Studies
+\f[]
+.fi
+.PP
+The contents of fields will be interpreted as markdown when appropriate:
+so, for example, emphasis and strong emphasis can be used in title
+fileds.
+Simple tex math will also be parsed and rendered appropriately.
+.PP
+\f[C]csl\f[] or \f[C]citation\-style\f[]: Path to a CSL style file.
+If the file is not found relative to the working directory,
+pandoc\-citeproc will look in the \f[C]$HOME/.csl\f[] directory (or
+\f[C]C:\\Users\\USERNAME\\AppData\\Roaming\\csl\f[] in Windows 7).
+.PP
+\f[C]citation\-abbreviations\f[]: Path to a CSL abbreviations JSON file.
+The format is described
+here (http://citationstylist.org/2011/10/19/abbreviations-for-zotero-test-release).
+Here is a short example:
+.IP
+.nf
+\f[C]
+{\ "default":\ {
+\ \ \ \ "container\-title":\ {
+\ \ \ \ \ \ \ \ \ \ \ \ "Lloyd\[aq]s\ Law\ Reports":\ "Lloyd\[aq]s\ Rep",
+\ \ \ \ \ \ \ \ \ \ \ \ "Estates\ Gazette":\ "EG",
+\ \ \ \ \ \ \ \ \ \ \ \ "Scots\ Law\ Times":\ "SLT"
+\ \ \ \ }
+\ \ }
+}
+\f[]
+.fi
+.PP
+The metadata must contain either \f[C]references\f[] or
+\f[C]bibliography\f[] or both as a source of references.
+\f[C]csl\f[] and \f[C]citation\-abbreviations\f[] are optional.
+If \f[C]csl\f[] is not provided, \f[C]chicago\-author\-date.csl\f[] will
+be used by default.
+.SH OPTIONS
+.TP
+.B \f[C]\-h,\ \-\-help\f[]
+Print usage information.
+.RS
+.RE
+.TP
+.B \f[C]\-V,\ \-\-version\f[]
+Print version.
+.RS
+.RE
+.SH AUTHORS
+.PP
+Andrea Rossato and John MacFarlane.
+.SH SEE ALSO
+.PP
+\f[C]pandoc\f[] (1), \f[C]biblio2yaml\f[] (1).
+.PP
+The pandoc\-citeproc source code and all documentation may be downloaded
+from <http://github.com/jgm/pandoc-citeproc/>.
