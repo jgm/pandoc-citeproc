@@ -86,8 +86,8 @@ data-files:         chicago-author-date.csl
                     -- documentation
                     README.md
                     LICENSE
-                    man/biblio2yaml.1
-                    man/pandoc-citeproc.1
+                    man/man1/biblio2yaml.1
+                    man/man1/pandoc-citeproc.1
 
 source-repository head
   type:          git

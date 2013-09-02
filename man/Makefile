@@ -1,7 +1,7 @@
-ALL=biblio2yaml.1 pandoc-citeproc.1
+ALL=man1/biblio2yaml.1 man1/pandoc-citeproc.1
 
 .PHONY: all
 
 all: $(ALL)
-%.1: %.1.md
+man1/%.1: %.1.md
 	pandoc $< -o $@ -s -t man
