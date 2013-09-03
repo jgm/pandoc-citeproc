@@ -137,7 +137,8 @@ library
                       Text.CSL.Input.Json
                       Text.CSL.Output.Pandoc
                       Text.CSL.Output.Plain
-    other-modules:    Paths_pandoc_citeproc
+    other-modules:    Text.CSL.Data
+                      Paths_pandoc_citeproc
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
     build-depends:    containers, directory, mtl, json, utf8-string,

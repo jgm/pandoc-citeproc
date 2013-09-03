@@ -4,6 +4,7 @@
 module Text.CSL.Pandoc (processCites, processCites') where
 
 import Text.CSL.Reference (RefType(..), Agent(..), CNum(..), RefDate(..))
+import Text.CSL.Parser (parseCSL')
 import Text.TeXMath (texMathToPandoc, DisplayType(..))
 import Data.Aeson.Types (Parser, Pair)
 import Text.Pandoc.Definition
@@ -11,6 +12,7 @@ import Text.Pandoc.Walk
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.ByteString.Lazy as L
 import Control.Applicative ((<$>),(<*>), (<|>))
 import Data.Char (toUpper, isSpace, toLower, isUpper, isLower)
 import qualified Data.Vector as V
@@ -21,6 +23,7 @@ import Data.List
 import Data.Char ( isDigit, isPunctuation )
 import qualified Data.Map as M
 import Text.CSL hiding ( Cite(..), Citation(..), endWithPunct )
+import Text.CSL.Data (getDefaultCSL)
 import qualified Text.CSL as CSL ( Cite(..) )
 import Text.Pandoc.Generic
 import Text.Parsec hiding (State, (<|>))
@@ -28,12 +31,6 @@ import Control.Monad
 import Control.Monad.State
 import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)
-#ifdef EMBED_DATA_FILES
-import Text.CSL.Parser (defaultCSL)
-import Data.ByteString.UTF8 (toString)
-#else
-import Paths_pandoc_citeproc (getDataFileName)
-#endif
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -69,22 +66,14 @@ processCites' (Pandoc meta blocks) = do
   let refs = inlineRefs ++ bibRefs
   let cslfile = (lookupMeta "csl" meta <|> lookupMeta "citation-style" meta)
                 >>= toPath
-  csl <- maybe getDefaultCSL
-          (\f -> findFile [".", csldir] f >>= readFile >>= parseCSL) cslfile
+  csl <- maybe (getDefaultCSL >>= parseCSL')
+          (\f -> findFile [".", csldir] f >>= L.readFile >>= parseCSL') cslfile
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
   abbrevs <- maybe (return [])
              (\f -> findFile [".", csldir] f >>= readJsonAbbrevFile)
                 cslAbbrevFile
   let csl' = csl{ styleAbbrevs = abbrevs }
   return $ processCites csl' refs $ Pandoc meta blocks
-
-getDefaultCSL :: IO Style
-getDefaultCSL =
-#ifdef EMBED_DATA_FILES
-  parseCSL $ toString $ defaultCSL
-#else
-  getDataFileName "chicago-author-date.csl" >>= readFile >>= parseCSL
-#endif
 
 toPath :: MetaValue -> Maybe String
 toPath (MetaString s) = Just s
