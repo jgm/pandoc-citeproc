@@ -6,7 +6,6 @@ import qualified Data.ByteString.Lazy as L
 #ifdef EMBED_DATA_FILES
 import Data.FileEmbed
 import qualified Data.ByteString as S
-import Text.CSL.Parser (defaultCSL)
 import Data.ByteString.UTF8 (toString)
 #else
 import Paths_pandoc_citeproc (getDataFileName)
