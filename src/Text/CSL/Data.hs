@@ -1,22 +1,14 @@
-{-# LANGUAGE CPP, TemplateHaskell #-}
+{-# LANGUAGE CPP #-}
 module Text.CSL.Data (getLocale, getDefaultCSL) where
 
 import System.FilePath ()
 import qualified Data.ByteString.Lazy as L
 #ifdef EMBED_DATA_FILES
-import Data.FileEmbed
+import Text.CSL.Data.Embedded (localeFiles, defaultCSL)
 import qualified Data.ByteString as S
 #else
 import Paths_pandoc_citeproc (getDataFileName)
 import System.Directory  (doesFileExist)
-#endif
-
-#ifdef EMBED_DATA_FILES
-localeFiles :: [(FilePath, S.ByteString)]
-localeFiles = $(embedDir "locales/")
-
-defaultCSL :: S.ByteString
-defaultCSL = $(embedFile "chicago-author-date.csl")
 #endif
 
 getLocale :: String -> IO L.ByteString

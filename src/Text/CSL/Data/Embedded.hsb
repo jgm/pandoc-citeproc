@@ -1,0 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
+-- to be processed using hsb2hs
+module Text.CSL.Data.Embedded (localeFiles, defaultCSL) where
+import qualified Data.ByteString as S
+
+localeFiles :: [(FilePath, S.ByteString)]
+localeFiles = %blobs "locales/"
+
+defaultCSL :: S.ByteString
+defaultCSL = %blob "chicago-author-date.csl"

@@ -1,5 +1,4 @@
 {-# LANGUAGE PatternGuards, CPP #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -----------------------------------------------------------------------------
 -- |

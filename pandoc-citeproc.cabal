@@ -26,7 +26,7 @@ license:            BSD3
 license-file:       LICENSE
 author:             John MacFarlane, Andrea Rossato
 maintainer:         jgm@berkeley.edu
-build-type:         Simple
+build-type:         Custom
 data-files:         chicago-author-date.csl
                     locales/locales-af-ZA.xml
                     locales/locales-ar-AR.xml
@@ -164,9 +164,9 @@ library
        exposed-modules:  Text.CSL.Pickle.Xml
 
     if flag(embed_data_files)
-       build-depends: template-haskell, file-embed
        default-extensions:    CPP
        cpp-options:   -DEMBED_DATA_FILES
+       other-modules: Text.CSL.Data.Embedded
 
     if flag(unicode_collation)
        build-depends: text, text-icu
