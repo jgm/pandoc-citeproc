@@ -36,9 +36,12 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
           ] ++
           [("title", latex tit') | tit' <- getField "title"] ++
           [("page", latex page') | page' <- getField "pages"] ++
-          [("issued", MetaMap $ M.fromList [("year", latex year')])
-            | year' <- getField "year"] ++
+          [("issued", MetaMap $ M.fromList $
+             [("year", latex year') | year' <- getField "year"] ++
+             [("month", latex month') | month' <- getField "month"])
+          ] ++
           [("volume", latex vol') | vol' <- getField "volume"] ++
+          [("number", latex num') | num' <- getField "number"] ++
           [("url", latex url') | url' <- getField "url"] ++
           [("journal", latex j) | j <- getField "journal"] ++
           [("publisher", latex pub) | pub <- getField "publisher"] ++
