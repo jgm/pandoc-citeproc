@@ -30,23 +30,30 @@ itemToMetaValue :: T -> MetaValue
 itemToMetaValue entry = MetaMap $ M.fromList fs'
   where getField f = maybeToList $ lookup f fs
         fs = fields entry
+        f ==> f' = [(f', latex x) | x <- getField f]
+        f *=> f' = [(f', toAuthorList $ latex as) | as <- getField f]
         fs' =
           [("id", MetaString $ identifier entry)
           ,("type", MetaString $ readType $ map toLower $ entryType entry)
           ] ++
-          [("title", latex tit') | tit' <- getField "title"] ++
-          [("page", latex page') | page' <- getField "pages"] ++
+          "title" ==> "title" ++
+          "booktitle" ==> "container-title" ++
+          "pages" ==> "page" ++
+          "volume" ==> "volume" ++
+          "number" ==> "number" ++
+          "chapter" ==> "chapter-number" ++
+          "edition" ==> "edition" ++
+          "note" ==> "note" ++
+          "url" ==> "url" ++
+          "journal" ==> "container-title" ++
+          "publisher" ==> "publisher" ++
+          "address" ==> "publisher-place" ++
+          "author" *=> "author" ++
+          "editor" *=> "editor" ++
           [("issued", MetaMap $ M.fromList $
-             [("year", latex year') | year' <- getField "year"] ++
-             [("month", latex month') | month' <- getField "month"])
-          ] ++
-          [("volume", latex vol') | vol' <- getField "volume"] ++
-          [("number", latex num') | num' <- getField "number"] ++
-          [("url", latex url') | url' <- getField "url"] ++
-          [("journal", latex j) | j <- getField "journal"] ++
-          [("publisher", latex pub) | pub <- getField "publisher"] ++
-          [("publisher-place", latex addr) | addr <- getField "address"] ++
-          [("author", toAuthorList $ latex as) | as <- getField "author"]
+             "year" ==> "year" ++
+             "month" ==> "month")
+          ]
 
 toAuthorList :: MetaValue -> MetaValue
 toAuthorList (MetaBlocks [Para xs]) =
