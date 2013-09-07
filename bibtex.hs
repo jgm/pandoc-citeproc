@@ -36,6 +36,8 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
           [("id", MetaString $ identifier entry)
           ,("type", MetaString $ readType $ map toLower $ entryType entry)
           ] ++
+          [("genre", MetaString "Ph.D. thesis") | entryType entry == "phdthesis"] ++
+          [("genre", MetaString "Masters thesis") | entryType entry == "mastersthesis"] ++
           "title" ==> "title" ++
           "booktitle" ==> "container-title" ++
           "pages" ==> "page" ++
@@ -46,6 +48,8 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
           "note" ==> "note" ++
           "url" ==> "url" ++
           "journal" ==> "container-title" ++
+          "school" ==> "publisher" ++
+          "institution" ==> "publisher" ++
           "publisher" ==> "publisher" ++
           "address" ==> "publisher-place" ++
           "author" *=> "author" ++
