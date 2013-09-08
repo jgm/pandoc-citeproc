@@ -40,6 +40,7 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
           [("genre", MetaString "Masters thesis") | entryType entry == "mastersthesis"] ++
           "title" ==> "title" ++
           "booktitle" ==> "container-title" ++
+          "series" ==> "collection-title" ++
           "pages" ==> "page" ++
           "volume" ==> "volume" ++
           "number" ==> "number" ++
