@@ -83,6 +83,10 @@ data-files:         chicago-author-date.csl
                     tests/ieee.expected.json
                     tests/mhra.in.json
                     tests/mhra.expected.json
+                    tests/biblio.bib
+                    tests/chicago-author-date.csl
+                    tests/ieee.csl
+                    tests/mhra.csl
                     -- documentation
                     README.md
                     LICENSE
