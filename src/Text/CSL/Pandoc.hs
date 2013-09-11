@@ -376,18 +376,6 @@ mkRefDate xs
   | all isDigit xs = return [RefDate xs "" "" "" "" ""]
   | otherwise      = return [RefDate "" "" "" "" xs ""]
 
-{-
-instance FromJSON [String] where
-  parseJSON (Array xs) = mapM parseJSON $ V.toList xs
-  parseJSON (String t) = (:[]) `fmap` parseJSON (String t)
-  parseJSON (Number n) = return [show n]
-  parseJSON _ = mzero
-
-instance ToJSON [String] where
-  toJSON [x] = String (T.pack x)
-  toJSON xs  = Array (V.fromList $ map toJSON xs)
--}
-
 metaValueToJSON :: Monad m
                 => ([Block] -> m String)
                 -> ([Inline] -> m String)
