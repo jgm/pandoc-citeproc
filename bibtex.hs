@@ -79,7 +79,9 @@ toAuthor ils = MetaMap $ M.fromList
         (family, givens) =
            case ys of
               (Str ws : rest) ->
-                  (MetaInlines $ xs ++ [Str (stripComma ws)], map MetaInlines $ splitOn [Space] rest)
+                  (MetaInlines $ xs ++ [Str (stripComma ws)], map MetaInlines
+                                                              $ splitOn [Space]
+                                                              $ dropWhile (== Space) rest)
               _ -> case reverse $ splitOn [Space] xs of
                         []     -> (MetaInlines [Str ""], [])
                         (z:zs) -> (MetaInlines z, map MetaInlines $ reverse zs)
