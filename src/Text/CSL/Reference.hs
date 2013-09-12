@@ -1,5 +1,5 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, PatternGuards,
-  DeriveDataTypeable, ExistentialQuantification #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, PatternGuards, OverloadedStrings,
+  DeriveDataTypeable, ExistentialQuantification, FlexibleInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Reference
@@ -16,10 +16,18 @@
 
 module Text.CSL.Reference where
 
-import Data.Char  ( isUpper, toLower      )
 import Data.List  ( elemIndex, isPrefixOf )
 import Data.Maybe ( fromMaybe             )
 import Data.Generics
+import Data.Aeson hiding (Value)
+import qualified Data.Aeson as Aeson
+import Data.Aeson.Types (Parser, Pair)
+import Control.Applicative ((<$>),(<*>))
+import Data.Text (Text)
+import qualified Data.Text as T
+import qualified Data.Vector as V
+import Control.Monad
+import Data.Char (toUpper, isSpace, toLower, isUpper, isLower, isDigit)
 
 import Text.CSL.Style
 import Text.CSL.Output.Plain ((<+>))
@@ -74,6 +82,45 @@ instance Show Agent where
     show (Agent g d n f s [] _) = (foldr (<+>) [] g) <+> d <+> n <+> f <+> s
     show (Agent _ _ _ _ _ l  _) = l
 
+instance FromJSON Agent where
+  parseJSON (Object v) = Agent <$>
+              v .:? "given" .!= [] <*>
+              v .:?  "dropping-particle" .!= "" <*>
+              v .:? "non-dropping-particle" .!= "" <*>
+              v .:? "family" .!= "" <*>
+              v .:? "suffix" .!= "" <*>
+              v .:? "literal" .!= "" <*>
+              v .:? "comma-suffix" .!= False
+  parseJSON _ = mzero
+
+instance ToJSON Agent where
+  toJSON agent = object' [
+      "given" .= givenName agent
+    , "dropping-particle" .= droppingPart agent
+    , "non-dropping-particle" .= nonDroppingPart agent
+    , "family" .= familyName agent
+    , "suffix" .= nameSuffix agent
+    , "literal" .= literal agent
+    , "comma-suffix" .= commaSuffix agent
+    ]
+
+instance FromJSON [Agent] where
+  parseJSON (Array xs) = mapM parseJSON $ V.toList xs
+  parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
+  parseJSON (String t) = parseJSON (String t) >>= mkAgent
+  parseJSON _ = mzero
+
+instance ToJSON [Agent] where
+  toJSON [x] = toJSON x
+  toJSON xs  = Array (V.fromList $ map toJSON xs)
+
+mkAgent :: Text -> Parser [Agent]
+mkAgent t =
+  case reverse (words $ T.unpack t) of
+       (x:ys) -> return [Agent (reverse ys) [] [] x [] [] False]
+       []     -> mzero
+
+
 data RefDate =
     RefDate { year   :: String
             , month  :: String
@@ -82,6 +129,40 @@ data RefDate =
             , other  :: String
             , circa  :: String
             } deriving ( Show, Read, Eq, Typeable, Data )
+
+instance FromJSON RefDate where
+  parseJSON (Object v) = RefDate <$>
+              v .:? "year" .!= "" <*>
+              v .:? "month" .!= "" <*>
+              v .:? "season" .!= "" <*>
+              v .:? "day" .!= "" <*>
+              v .:? "other" .!= "" <*>
+              v .:? "circa" .!= ""
+  parseJSON _ = mzero
+
+instance ToJSON RefDate where
+  toJSON refdate = object' [
+      "year" .= year refdate
+    , "month" .= month refdate
+    , "season" .= season refdate
+    , "day" .= day refdate
+    , "other" .= other refdate
+    , "circa" .= circa refdate
+    ]
+
+instance FromJSON [RefDate] where
+  parseJSON (Array xs) = mapM parseJSON $ V.toList xs
+  parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
+  parseJSON x          = parseJSON x >>= mkRefDate
+
+instance ToJSON [RefDate] where
+  toJSON [x] = toJSON x
+  toJSON xs  = Array (V.fromList $ map toJSON xs)
+
+mkRefDate :: String -> Parser [RefDate]
+mkRefDate xs
+  | all isDigit xs = return [RefDate xs "" "" "" "" ""]
+  | otherwise      = return [RefDate "" "" "" "" xs ""]
 
 data RefType
     = NoType
@@ -125,7 +206,35 @@ data RefType
 instance Show RefType where
     show = map toLower . formatField . showConstr . toConstr
 
+instance FromJSON RefType where
+  parseJSON (String t) = safeRead (capitalize . camelize . T.unpack $ t)
+    where camelize x
+            | '-':y:ys <- x = toUpper y : camelize ys
+            | '_':y:ys <- x = toUpper y : camelize ys
+            |     y:ys <- x =        y : camelize ys
+            | otherwise     = []
+          capitalize (x:xs) = toUpper x : xs
+          capitalize     [] = []
+  parseJSON _ = mzero
+
+instance ToJSON RefType where
+  toJSON reftype = toJSON (uncamelize $ uncapitalize $ show reftype)
+   where uncamelize [] = []
+         uncamelize (x:y:zs)
+          | isLower x && isUpper y = x:'-':toLower y:uncamelize zs
+         uncamelize (x:xs) = x : uncamelize xs
+         uncapitalize (x:xs) = toLower x : xs
+         uncapitalize []     = []
+
 newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data )
+
+instance FromJSON CNum where
+  parseJSON x = case fromJSON x of
+                     Success n -> return $ CNum n
+                     _         -> mzero
+
+instance ToJSON CNum where
+  toJSON (CNum n) = toJSON n
 
 -- | The 'Reference' record.
 data Reference =
@@ -209,6 +318,162 @@ data Reference =
     , firstReferenceNoteNumber :: Int
     , citationLabel            :: String
     } deriving ( Eq, Show, Read, Typeable, Data )
+
+instance FromJSON Reference where
+  parseJSON (Object v) = Reference <$>
+       v .: "id" <*>
+       v .:? "type" .!= NoType <*>
+       v .:? "author" .!= [] <*>
+       v .:? "editor" .!= [] <*>
+       v .:? "translator" .!= [] <*>
+       v .:? "recipient" .!= [] <*>
+       v .:? "interviewer" .!= [] <*>
+       v .:? "composer" .!= [] <*>
+       v .:? "director" .!= [] <*>
+       v .:? "illustrator" .!= [] <*>
+       v .:? "original-author" .!= [] <*>
+       v .:? "container-author" .!= [] <*>
+       v .:? "collection-editor" .!= [] <*>
+       v .:? "editorial-director" .!= [] <*>
+       v .:? "reviewed-author" .!= [] <*>
+       v .:? "issued" .!= [] <*>
+       v .:? "event-date" .!= [] <*>
+       v .:? "accessed" .!= [] <*>
+       v .:? "container" .!= [] <*>
+       v .:? "original-date" .!= [] <*>
+       v .:? "submitted" .!= [] <*>
+       v .:? "title" .!= "" <*>
+       v .:? "title-short" .!= "" <*>
+       v .:? "reviewed-title" .!= "" <*>
+       v .:? "container-title" .!= "" <*>
+       v .:? "collection-title" .!= "" <*>
+       v .:? "container-title-short" .!= "" <*>
+       v .:? "collection-number" .!= "" <*>
+       v .:? "original-title" .!= "" <*>
+       v .:? "publisher" .!= "" <*>
+       v .:? "original-publisher" .!= "" <*>
+       v .:? "publisher-place" .!= "" <*>
+       v .:? "original-publisher-place" .!= "" <*>
+       v .:? "authority" .!= "" <*>
+       v .:? "jurisdiction" .!= "" <*>
+       v .:? "archive" .!= "" <*>
+       v .:? "archive-place" .!= "" <*>
+       v .:? "archive-location" .!= "" <*>
+       v .:? "event" .!= "" <*>
+       v .:? "event-place" .!= "" <*>
+       v .:? "page" .!= "" <*>
+       v .:? "page-first" .!= "" <*>
+       v .:? "number-of-pages" .!= "" <*>
+       v .:? "version" .!= "" <*>
+       v .:? "volume" .!= "" <*>
+       v .:? "number-of-volumes" .!= "" <*>
+       v .:? "issue" .!= "" <*>
+       v .:? "chapter-number" .!= "" <*>
+       v .:? "medium" .!= "" <*>
+       v .:? "status" .!= "" <*>
+       v .:? "edition" .!= "" <*>
+       v .:? "section" .!= "" <*>
+       v .:? "source" .!= "" <*>
+       v .:? "genre" .!= "" <*>
+       v .:? "note" .!= "" <*>
+       v .:? "annote" .!= "" <*>
+       v .:? "abstract" .!= "" <*>
+       v .:? "keyword" .!= "" <*>
+       v .:? "number" .!= "" <*>
+       v .:? "references" .!= "" <*>
+       v .:? "url" .!= "" <*>
+       v .:? "doi" .!= "" <*>
+       v .:? "isbn" .!= "" <*>
+       v .:? "issn" .!= "" <*>
+       v .:? "pmcid" .!= "" <*>
+       v .:? "pmid" .!= "" <*>
+       v .:? "call-number" .!= "" <*>
+       v .:? "dimensions" .!= "" <*>
+       v .:? "scale" .!= "" <*>
+       v .:? "categories" .!= [] <*>
+       v .:? "language" .!= "" <*>
+       v .:? "citation-number" .!= CNum 0 <*>
+       v .:? "first-reference-note-number" .!= 1 <*>
+       v .:? "citation-label" .!= ""
+  parseJSON _ = mzero
+
+instance ToJSON Reference where
+  toJSON ref = object' [
+      "id" .= refId ref
+    , "type" .= refType ref
+    , "author" .= author ref
+    , "editor" .= editor ref
+    , "translator" .= translator ref
+    , "recipient" .= recipient ref
+    , "interviewer" .= interviewer ref
+    , "composer" .= composer ref
+    , "director" .= director ref
+    , "illustrator" .= illustrator ref
+    , "original-author" .= originalAuthor ref
+    , "container-author" .= containerAuthor ref
+    , "collection-editor" .= collectionEditor ref
+    , "editorial-director" .= editorialDirector ref
+    , "reviewed-author" .= reviewedAuthor ref
+    , "issued" .= issued ref
+    , "event-date" .= eventDate ref
+    , "accessed" .= accessed ref
+    , "container" .= container ref
+    , "original-date" .= originalDate ref
+    , "submitted" .= submitted ref
+    , "title" .= title ref
+    , "title-short" .= titleShort ref
+    , "reviewed-title" .= reviewedTitle ref
+    , "container-title" .= containerTitle ref
+    , "collection-title" .= collectionTitle ref
+    , "container-title-short" .= containerTitleShort ref
+    , "collection-number" .= collectionNumber ref
+    , "original-title" .= originalTitle ref
+    , "publisher" .= publisher ref
+    , "original-publisher" .= originalPublisher ref
+    , "publisher-place" .= publisherPlace ref
+    , "original-publisher-place" .= originalPublisherPlace ref
+    , "authority" .= authority ref
+    , "jurisdiction" .= jurisdiction ref
+    , "archive" .= archive ref
+    , "archive-place" .= archivePlace ref
+    , "archive-location" .= archiveLocation ref
+    , "event" .= event ref
+    , "event-place" .= eventPlace ref
+    , "page" .= page ref
+    , "page-first" .= pageFirst ref
+    , "number-of-pages" .= numberOfPages ref
+    , "version" .= version ref
+    , "volume" .= volume ref
+    , "number-of-volumes" .= numberOfVolumes ref
+    , "issue" .= issue ref
+    , "chapter-number" .= chapterNumber ref
+    , "medium" .= medium ref
+    , "status" .= status ref
+    , "edition" .= edition ref
+    , "section" .= section ref
+    , "source" .= source ref
+    , "genre" .= genre ref
+    , "note" .= note ref
+    , "annote" .= annote ref
+    , "abstract" .= abstract ref
+    , "keyword" .= keyword ref
+    , "number" .= number ref
+    , "references" .= references ref
+    , "url" .= url ref
+    , "doi" .= doi ref
+    , "isbn" .= isbn ref
+    , "issn" .= issn ref
+    , "pmcid" .= pmcid ref
+    , "pmid" .= pmid ref
+    , "call-number" .= callNumber ref
+    , "dimensions" .= dimensions ref
+    , "scale" .= scale ref
+    , "categories" .= categories ref
+    , "language" .= language ref
+    , "citation-number" .= citationNumber ref
+    , "first-reference-note-number" .= firstReferenceNoteNumber ref
+    , "citation-label" .= citationLabel ref
+    ]
 
 emptyReference :: Reference
 emptyReference =
@@ -384,6 +649,22 @@ setNearNote s cs
                                   citeNoteNumber x /= "0" &&
                                   readNum (citeNoteNumber c) - readNum (citeNoteNumber x) <= near_note
                            _   -> False
+
+object' :: [Pair] -> Aeson.Value
+object' = object . filter (not . isempty)
+  where isempty (_, Array v)  = V.null v
+        isempty (_, String t) = T.null t
+        isempty ("first-reference-note-number", Aeson.Number n) = n == 0
+        isempty ("citation-number", Aeson.Number n) = n == 0
+        isempty ("comma-suffix", Bool b) = not b
+        isempty (_, _)        = False
+
+safeRead :: (Monad m, Read a) => String -> m a
+safeRead s = case reads s of
+                  (d,x):_
+                    | all isSpace x -> return d
+                  _                 -> fail $ "Could not read `" ++ s ++ "'"
+
 
 readNum :: String -> Int
 readNum s = case reads s of
