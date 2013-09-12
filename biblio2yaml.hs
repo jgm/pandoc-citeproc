@@ -1,6 +1,5 @@
 module Main where
 import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
-import Text.CSL.Pandoc ()
 import Data.Char (chr, toLower)
 import Data.Monoid
 import Data.Yaml
