@@ -19,6 +19,7 @@ main = do
   let items = case parse (skippingLeadingSpace file) "stdin" inp of
                    Left err -> error (show err)
                    Right xs -> xs
+  print items
   putStrLn
     $ writeMarkdown def{ writerTemplate = "$titleblock$"
                        , writerStandalone = True }
@@ -29,7 +30,7 @@ main = do
 itemToMetaValue :: T -> MetaValue
 itemToMetaValue entry = MetaMap $ M.fromList fs'
   where getField f = maybeToList $ lookup f fs
-        fs = fields entry
+        fs = map (\(k,v) -> (map toLower k, v)) $ fields entry
         f +=> f' = [(f', MetaString x) | x <- getField f]
         f ==> f' = [(f', latex x) | x <- getField f]
         f *=> f' = [(f', toAuthorList $ latex as) | as <- getField f]
