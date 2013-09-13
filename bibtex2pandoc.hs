@@ -64,9 +64,27 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
         f --> f' = [(f', MetaString x) | x <- getField f]
         f ==> f' = [(f', latex x) | x <- getField f]
         f *=> f' = [(f', toAuthorList $ latex as) | as <- getField f]
+        f !=> xs = if null xs
+                      then xs
+                      else [(f, MetaMap $ M.fromList xs)]
         fs' =
-          [("id", MetaString $ identifier entry)
-          ,("type", MetaString $ readType $ map toLower $ entryType entry)
+          [("id", MetaString $ trim $ identifier entry)
+          ,("type", MetaString
+                    $ case map toLower (entryType entry) of
+                           "article"       -> "article-journal"
+                           "book"          -> "book"
+                           "booklet"       -> "pamphlet"
+                           "inbook"        -> "chapter"
+                           "incollection"  -> "chapter"
+                           "inproceedings" -> "paper-conference"
+                           "manual"        -> "book"
+                           "mastersthesis" -> "thesis"
+                           "misc"          -> "no-type"
+                           "phdthesis"     -> "thesis"
+                           "proceedings"   -> "book"
+                           "techreport"    -> "report"
+                           "unpublished"   -> "manuscript"
+                           _               -> "no-type")
           ] ++ concat
           [ case entryType entry of
                  "phdthesis"     -> "genre" --> "Ph.D. thesis"
@@ -89,10 +107,10 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
           , "address" ==> "publisher-place"
           , "author" *=> "author"
           , "editor" *=> "editor"
-          , [("issued", MetaMap $ M.fromList $
-               "year" ==> "year" ++
-               "month" ==> "month")
-            ]
+          , "issued" !=> concat
+             [ "year" ==> "year"
+             , "month" ==> "month"
+             ]
           ]
 
 toAuthorList :: MetaValue -> MetaValue
@@ -124,19 +142,5 @@ latex :: String -> MetaValue
 latex s = MetaBlocks bs
   where Pandoc _ bs = readLaTeX def s
 
-readType :: String -> String
-readType "article" = "article-journal"
-readType "book"    = "book"
-readType "booklet" = "pamphlet"
-readType "inbook"  = "chapter"
-readType "incollection" = "chapter"
-readType "inproceedings" = "paper-conference"
-readType "manual" = "book"
-readType "mastersthesis" = "thesis"
-readType "misc" = "no-type"
-readType "phdthesis" = "thesis"
-readType "proceedings" = "book"
-readType "techreport" = "report"
-readType "unpublished" = "manuscript"
-readType _ = "no-type"
-
+trim :: String -> String
+trim = unwords . words
