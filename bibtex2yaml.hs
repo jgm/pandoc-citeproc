@@ -31,7 +31,7 @@ itemToMetaValue :: T -> MetaValue
 itemToMetaValue entry = MetaMap $ M.fromList fs'
   where getField f = maybeToList $ lookup f fs
         fs = map (\(k,v) -> (map toLower k, v)) $ fields entry
-        f => f' = [(f', MetaString x) | x <- getField f]
+        f --> f' = [(f', MetaString x) | x <- getField f]
         f ==> f' = [(f', latex x) | x <- getField f]
         f *=> f' = [(f', toAuthorList $ latex as) | as <- getField f]
         fs' =
@@ -39,8 +39,8 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
           ,("type", MetaString $ readType $ map toLower $ entryType entry)
           ] ++
           (case entryType entry of
-                "phdthesis"     -> "genre" => "Ph.D. thesis"
-                "mastersthesis" -> "genre" => "Masters thesis"
+                "phdthesis"     -> "genre" --> "Ph.D. thesis"
+                "mastersthesis" -> "genre" --> "Masters thesis"
                 _               -> []) ++
           "title" ==> "title" ++
           "booktitle" ==> "container-title" ++
@@ -51,7 +51,7 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
           "chapter" ==> "chapter-number" ++
           "edition" ==> "edition" ++
           "note" ==> "note" ++
-          "url" => "url" ++
+          "url" --> "url" ++
           "journal" ==> "container-title" ++
           "school" ==> "publisher" ++
           "institution" ==> "publisher" ++
