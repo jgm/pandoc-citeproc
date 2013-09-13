@@ -128,6 +128,9 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
           , "author" *=> "author"
           , "editor" *=> "editor"
           , "howpublished" ==> "note"
+          , "abstract" ==> "abstract"
+          , "addendum" ==> "note"
+          , "annotation" ==> "note"
           , "issued" !=> concat
              [ "year" ==> "year"
              , "month" ==> "month"
@@ -141,10 +144,12 @@ toAuthorList (MetaBlocks []) = MetaList []
 toAuthorList x = error $ "toAuthorList: " ++ show x
 
 toAuthor :: [Inline] -> MetaValue
-toAuthor ils = MetaMap $ M.fromList
+toAuthor ils = MetaMap $ M.fromList $
   [ ("given", MetaList givens)
   , ("family", family)
-  , ("non-dropping-particle", particle) ]
+  ] ++ case particle of
+            MetaInlines [] -> []
+            _              -> [("non-dropping-particle", particle)]
   where endsWithComma (Str zs) = not (null zs) && last zs == ','
         endsWithComma _ = False
         stripComma xs = case reverse xs of
@@ -163,7 +168,7 @@ toAuthor ils = MetaMap $ M.fromList
                         (z:zs) -> let (us,vs) = break startsWithCapital zs
                                   in  ( MetaInlines [z]
                                       , map MetaInlines $ splitOn [Space] $ reverse vs
-                                      , MetaInlines $ reverse us
+                                      , MetaInlines $ dropWhile (==Space) $ reverse us
                                       )
 
 startsWithCapital :: Inline -> Bool
