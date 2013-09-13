@@ -23,12 +23,12 @@ main :: IO ()
 main = do
   argv <- getArgs
   let (flags, args, errs) = getOpt Permute options argv
-  let header = "Usage: bibtex2yaml [OPTION..] [FILE]"
+  let header = "Usage: bibtex2pandoc [OPTION..] [FILE]"
   unless (null errs && length args < 2) $ do
     hPutStrLn stderr $ usageInfo (unlines $ errs ++ [header]) options
     exitWith $ ExitFailure 1
   when (Version `elem` flags) $ do
-    putStrLn $ "bibtex2yaml " ++ "0.0" -- TODO: showVersion version
+    putStrLn $ "bibtex2pandoc " ++ "0.0" -- TODO: showVersion version
     exitWith ExitSuccess
   when (Help `elem` flags) $ do
     putStrLn $ usageInfo header options
@@ -67,31 +67,32 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
         fs' =
           [("id", MetaString $ identifier entry)
           ,("type", MetaString $ readType $ map toLower $ entryType entry)
-          ] ++
-          (case entryType entry of
-                "phdthesis"     -> "genre" --> "Ph.D. thesis"
-                "mastersthesis" -> "genre" --> "Masters thesis"
-                _               -> []) ++
-          "title" ==> "title" ++
-          "booktitle" ==> "container-title" ++
-          "series" ==> "collection-title" ++
-          "pages" ==> "page" ++
-          "volume" ==> "volume" ++
-          "number" ==> "number" ++
-          "chapter" ==> "chapter-number" ++
-          "edition" ==> "edition" ++
-          "note" ==> "note" ++
-          "url" --> "url" ++
-          "journal" ==> "container-title" ++
-          "school" ==> "publisher" ++
-          "institution" ==> "publisher" ++
-          "publisher" ==> "publisher" ++
-          "address" ==> "publisher-place" ++
-          "author" *=> "author" ++
-          "editor" *=> "editor" ++
-          [("issued", MetaMap $ M.fromList $
-             "year" ==> "year" ++
-             "month" ==> "month")
+          ] ++ concat
+          [ case entryType entry of
+                 "phdthesis"     -> "genre" --> "Ph.D. thesis"
+                 "mastersthesis" -> "genre" --> "Masters thesis"
+                 _               -> []
+          , "title" ==> "title"
+          , "booktitle" ==> "container-title"
+          , "series" ==> "collection-title"
+          , "pages" ==> "page"
+          , "volume" ==> "volume"
+          , "number" ==> "number"
+          , "chapter" ==> "chapter-number"
+          , "edition" ==> "edition"
+          , "note" ==> "note"
+          , "url" --> "url"
+          , "journal" ==> "container-title"
+          , "school" ==> "publisher"
+          , "institution" ==> "publisher"
+          , "publisher" ==> "publisher"
+          , "address" ==> "publisher-place"
+          , "author" *=> "author"
+          , "editor" *=> "editor"
+          , [("issued", MetaMap $ M.fromList $
+               "year" ==> "year" ++
+               "month" ==> "month")
+            ]
           ]
 
 toAuthorList :: MetaValue -> MetaValue
