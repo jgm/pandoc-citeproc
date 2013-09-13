@@ -13,19 +13,49 @@ import qualified Data.Map as M
 import Data.List.Split (splitOn)
 import Data.Maybe
 import Data.Char (toLower)
+import System.Console.GetOpt
+import System.Environment
+import System.Exit
+import System.IO (stderr, hPutStrLn)
+import Control.Monad
 
+main :: IO ()
 main = do
-  inp <- getContents
-  let items = case parse (skippingLeadingSpace file) "stdin" inp of
+  argv <- getArgs
+  let (flags, args, errs) = getOpt Permute options argv
+  let header = "Usage: bibtex2yaml [OPTION..] [FILE]"
+  unless (null errs && length args < 2) $ do
+    hPutStrLn stderr $ usageInfo (unlines $ errs ++ [header]) options
+    exitWith $ ExitFailure 1
+  when (Version `elem` flags) $ do
+    putStrLn $ "bibtex2yaml " ++ "0.0" -- TODO: showVersion version
+    exitWith ExitSuccess
+  when (Help `elem` flags) $ do
+    putStrLn $ usageInfo header options
+    exitWith ExitSuccess
+  bibstring <- case args of
+                    (x:_) -> readFile x
+                    []    -> getContents
+  let items = case parse (skippingLeadingSpace file) "stdin" bibstring of
                    Left err -> error (show err)
                    Right xs -> xs
-  print items
   putStrLn
     $ writeMarkdown def{ writerTemplate = "$titleblock$"
                        , writerStandalone = True }
     $ Pandoc (Meta $ M.fromList [
                      ("references" , MetaList $ map itemToMetaValue items)]
              ) []
+
+data Option =
+    Help | Version
+  deriving (Ord, Eq, Show)
+
+options :: [OptDescr Option]
+options =
+  [ Option ['h'] ["help"] (NoArg Help) "show usage information"
+  , Option ['V'] ["version"] (NoArg Version) "show program version"
+  ]
+
 
 itemToMetaValue :: T -> MetaValue
 itemToMetaValue entry = MetaMap $ M.fromList fs'
