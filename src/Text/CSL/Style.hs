@@ -27,6 +27,8 @@ import Text.Pandoc.Definition ( Inline, Target )
 #ifdef UNICODE_COLLATION
 import qualified Data.Text     as T
 import qualified Data.Text.ICU as T
+#else
+import Data.RFC5051 (compareUnicode)
 #endif
 
 -- | The representation of a parsed CSL style.
@@ -233,7 +235,7 @@ compare' x y
 #ifdef UNICODE_COLLATION
         comp a b = T.collate (T.collator T.Current) (T.pack a) (T.pack b)
 #else
-        comp a b = compare a b
+        comp a b = compareUnicode a b
 #endif
 
 data Form
