@@ -75,8 +75,12 @@ toPath _ = Nothing
 
 stringify :: [Inline] -> String
 stringify = query getStr
-  where getStr (Str x) = x
-        getStr _ = ""
+  where getStr (Str x)    = x
+        getStr Space      = " "
+        getStr (Code _ x) = x
+        getStr (Math _ x) = x
+        getStr LineBreak  = " "
+        getStr _          = ""
 
 getBibRefs :: MetaValue -> IO [Reference]
 getBibRefs (MetaList xs) = concat `fmap` mapM getBibRefs xs
