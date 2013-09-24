@@ -34,6 +34,7 @@ main = do
   when (Help `elem` flags) $ do
     putStrLn $ usageInfo header options
     exitWith ExitSuccess
+  let isBibtex = Bibtex `elem` flags
   bibstring <- case args of
                     (x:_) -> readFile x
                     []    -> getContents
@@ -44,22 +45,24 @@ main = do
     $ writeMarkdown def{ writerTemplate = "$titleblock$"
                        , writerStandalone = True }
     $ Pandoc (Meta $ M.fromList [
-                     ("references" , MetaList $ map itemToMetaValue items)]
+                     ("references" , MetaList
+                                    $ map (itemToMetaValue isBibtex) items)]
              ) []
 
 data Option =
-    Help | Version
+    Help | Version | Bibtex
   deriving (Ord, Eq, Show)
 
 options :: [OptDescr Option]
 options =
-  [ Option ['h'] ["help"] (NoArg Help) "show usage information"
+  [ Option ['b'] ["bibtex"] (NoArg Bibtex) "parse as BibTeX, not BibLaTeX"
+  , Option ['h'] ["help"] (NoArg Help) "show usage information"
   , Option ['V'] ["version"] (NoArg Version) "show program version"
   ]
 
 
-itemToMetaValue :: T -> MetaValue
-itemToMetaValue entry = MetaMap $ M.fromList fs'
+itemToMetaValue :: Bool -> T -> MetaValue
+itemToMetaValue isBibtex entry = MetaMap $ M.fromList fs'
   where getField f = maybeToList $ lookup f fs
         fs = map (\(k,v) -> (map toLower k, v)) $ fields entry
         f --> f' = [(f', MetaString x) | x <- getField f]
@@ -137,9 +140,18 @@ itemToMetaValue entry = MetaMap $ M.fromList fs'
              ]
           ]
 
+splitByAnd :: [Inline] -> [[Inline]]
+splitByAnd = splitOn [Space, Str "and", Space]
+
+toLiteralList :: MetaValue -> MetaValue
+toLiteralList (MetaBlocks [Para xs]) =
+  MetaList $ map MetaInlines $ splitByAnd xs
+toLiteralList (MetaBlocks []) = MetaList []
+toLiteralList x = error $ "toLiteralList: " ++ show x
+
 toAuthorList :: MetaValue -> MetaValue
 toAuthorList (MetaBlocks [Para xs]) =
-  MetaList $ map toAuthor $ splitOn [Space, Str "and", Space] xs
+  MetaList $ map toAuthor $ splitByAnd xs
 toAuthorList (MetaBlocks []) = MetaList []
 toAuthorList x = error $ "toAuthorList: " ++ show x
 
