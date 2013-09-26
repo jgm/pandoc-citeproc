@@ -19,6 +19,7 @@ import System.Environment
 import System.Exit
 import System.IO (stderr, hPutStrLn)
 import Control.Monad
+import Control.Monad.RWS.Strict
 
 main :: IO ()
 main = do
@@ -60,6 +61,17 @@ options =
   , Option ['V'] ["version"] (NoArg Version) "show program version"
   ]
 
+type BibM = RWS [(String, String)] () (M.Map String MetaValue)
+
+getField :: String -> BibM (Maybe MetaValue)
+getField f = (fmap MetaString .lookup f) `fmap` ask
+
+setField :: String -> Maybe MetaValue -> BibM ()
+setField f Nothing  = return ()
+setField f (Just x) = modify $ M.insert f x
+
+makeBib :: BibM a -> [(String, String)] -> MetaValue
+makeBib m fields = MetaMap $ fst $ execRWS m fields (M.empty)
 
 itemToMetaValue :: Bool -> T -> MetaValue
 itemToMetaValue isBibtex entry = MetaMap $ M.fromList fs'
