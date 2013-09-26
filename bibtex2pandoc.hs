@@ -3,11 +3,11 @@
 -- properly parses LaTeX bibtex fields, including math
 -- does not yet support biblatex fields
 -- probably does not support bibtex accurately
-
+module Main where
 import Text.BibTeX.Entry
 import Text.BibTeX.Parse hiding (identifier)
 import Text.Parsec.String
-import Text.Parsec
+import Text.Parsec hiding (optional)
 import Text.Pandoc
 import qualified Data.Map as M
 import Data.List.Split (splitOn)
@@ -61,18 +61,75 @@ options =
   , Option ['V'] ["version"] (NoArg Version) "show program version"
   ]
 
-type BibM = RWS [(String, String)] () (M.Map String MetaValue)
+data BibState = BibState{ isBibtex  :: Bool
+                        , bibFields :: [(String,String)]
+                        }
+type BibM = RWST BibState () (M.Map String MetaValue) Maybe
 
-getField :: String -> BibM (Maybe MetaValue)
-getField f = (fmap MetaString .lookup f) `fmap` ask
+opt :: BibM () -> BibM ()
+opt m = m `mplus` return ()
 
-setField :: String -> Maybe MetaValue -> BibM ()
-setField f Nothing  = return ()
-setField f (Just x) = modify $ M.insert f x
+getField :: String -> BibM MetaValue
+getField f = do
+  fs <- asks bibFields
+  case lookup f fs of
+       Just x  -> return $ latex x
+       Nothing -> fail "not found"
 
-makeBib :: BibM a -> [(String, String)] -> MetaValue
-makeBib m fields = MetaMap $ fst $ execRWS m fields (M.empty)
+setField :: String -> MetaValue -> BibM ()
+setField f x = modify $ M.insert f x
 
+notFound :: String -> BibM a
+notFound f = fail $ f ++ " not found"
+
+getRawField :: String -> BibM String
+getRawField f = do
+  fs <- asks bibFields
+  case lookup f fs of
+       Just x  -> return x
+       Nothing -> notFound f
+
+setRawField :: String -> String -> BibM ()
+setRawField f x = modify $ M.insert f (MetaString x)
+
+getAuthorList :: String -> BibM [MetaValue]
+getAuthorList f = do
+  fs <- asks bibFields
+  case lookup f fs of
+       Just x  -> return $ toAuthorList $ latex x
+       Nothing -> notFound f
+
+setAuthorList :: String -> [MetaValue] -> BibM ()
+setAuthorList f as = undefined
+
+getLiteralList :: String -> BibM [MetaValue]
+getLiteralList f = do
+  fs <- asks bibFields
+  case lookup f fs of
+       Just x  -> return $ toLiteralList $ latex x
+       Nothing -> notFound f
+
+setLiteralList :: String -> [MetaValue] -> BibM ()
+setLiteralList f as = undefined
+
+setSubField :: String -> String -> MetaValue -> BibM ()
+setSubField f k v = do
+  fs <- get
+  case M.lookup f fs of
+       Just (MetaMap m) -> modify $ M.insert f (MetaMap $ M.insert k v m)
+       _ -> modify $ M.insert f (MetaMap $ M.singleton k v)
+
+bibItem :: Bool -> BibM a -> T -> MetaValue
+bibItem bibtex m entry =
+  MetaMap $ maybe M.empty fst
+          $ execRWST m BibState{ isBibtex = bibtex
+                               , bibFields = fields entry } M.empty
+
+itemToMetaValue bibtex = bibItem bibtex $ do
+  opt $ getField "title" >>= setField "collection-title"
+  opt $ getField "month" >>= setSubField "issued" "month"
+
+{-
 itemToMetaValue :: Bool -> T -> MetaValue
 itemToMetaValue isBibtex entry = MetaMap $ M.fromList fs'
   where getField f = maybeToList $ lookup f fs
@@ -151,20 +208,21 @@ itemToMetaValue isBibtex entry = MetaMap $ M.fromList fs'
              , "month" ==> "month"
              ]
           ]
+-}
 
 splitByAnd :: [Inline] -> [[Inline]]
 splitByAnd = splitOn [Space, Str "and", Space]
 
-toLiteralList :: MetaValue -> MetaValue
+toLiteralList :: MetaValue -> [MetaValue]
 toLiteralList (MetaBlocks [Para xs]) =
-  MetaList $ map MetaInlines $ splitByAnd xs
-toLiteralList (MetaBlocks []) = MetaList []
+  map MetaInlines $ splitByAnd xs
+toLiteralList (MetaBlocks []) = []
 toLiteralList x = error $ "toLiteralList: " ++ show x
 
-toAuthorList :: MetaValue -> MetaValue
+toAuthorList :: MetaValue -> [MetaValue]
 toAuthorList (MetaBlocks [Para xs]) =
-  MetaList $ map toAuthor $ splitByAnd xs
-toAuthorList (MetaBlocks []) = MetaList []
+  map toAuthor $ splitByAnd xs
+toAuthorList (MetaBlocks []) = []
 toAuthorList x = error $ "toAuthorList: " ++ show x
 
 toAuthor :: [Inline] -> MetaValue
