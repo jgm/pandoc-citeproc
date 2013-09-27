@@ -41,7 +41,8 @@ main = do
                     []    -> getContents
   let items = case parse (skippingLeadingSpace file) "stdin" bibstring of
                    Left err -> error (show err)
-                   Right xs -> xs
+                   Right xs -> resolveCrossRefs isBibtex
+                                  $ map lowercaseFieldNames xs
   putStrLn
     $ writeMarkdown def{ writerTemplate = "$titleblock$"
                        , writerStandalone = True }
@@ -60,6 +61,26 @@ options =
   , Option ['h'] ["help"] (NoArg Help) "show usage information"
   , Option ['V'] ["version"] (NoArg Version) "show program version"
   ]
+
+lowercaseFieldNames :: T -> T
+lowercaseFieldNames e = e{ fields = [(map toLower f, v) | (f,v) <- fields e] }
+
+resolveCrossRefs :: Bool -> [T] -> [T]
+resolveCrossRefs isBibtex entries =
+  map (resolveCrossRef isBibtex entries) entries
+
+resolveCrossRef :: Bool -> [T] -> T -> T
+resolveCrossRef isBibtex entries entry =
+  case lookup "crossref" (fields entry) of
+       Just xref -> case [e | e <- entries, identifier e == xref] of
+                         []     -> entry
+                         (e':_)
+                          | isBibtex -> entry{ fields = fields entry ++
+                                           [(k,v) | (k,v) <- fields e',
+                                            isNothing (lookup k $ fields entry)]
+                                        }
+                          | otherwise -> undefined
+       Nothing   -> entry
 
 type BibM = RWST T () (M.Map String MetaValue) Maybe
 
@@ -128,41 +149,42 @@ x ==> y = (x >>= y) `mplus` return ()
 itemToMetaValue bibtex = bibItem $ do
   getId ==> setRawField "id"
   et <- getEntryType
-  setRawField "type" $ case map toLower et of
-                            "article"         -> "article-journal"
-                            "book"            -> "book"
-                            "booklet"         -> "pamphlet"
-                            "bookinbook"      -> "book"
-                            "collection"      -> "book"
-                            "electronic"      -> "webpage"
-                            "inbook"          -> "chapter"
-                            "incollection"    -> "chapter"
-                            "inreference "    -> "chapter"
-                            "inproceedings"   -> "paper-conference"
-                            "manual"          -> "book"
-                            "mastersthesis"   -> "thesis"
-                            "misc"            -> "no-type"
-                            "mvbook"          -> "book"
-                            "mvcollection"    -> "book"
-                            "mvproceedings"   -> "book"
-                            "mvreference"     -> "book"
-                            "online"          -> "webpage"
-                            "patent"          -> "patent"
-                            "periodical"      -> "article-journal"
-                            "phdthesis"       -> "thesis"
-                            "proceedings"     -> "book"
-                            "reference"       -> "book"
-                            "report"          -> "report"
-                            "suppbook"        -> "chapter"
-                            "suppcollection"  -> "chapter"
-                            "suppperiodical"  -> "article-journal"
-                            "techreport"      -> "report"
-                            "thesis"          -> "thesis"
-                            "unpublished"     -> "manuscript"
-                            "www"             -> "webpage"
-                            _                 -> "no-type"
-  when (et == "phdthesis") $ setRawField "genre" "Ph.D. thesis"
-  when (et == "mastersthesis") $ setRawField "genre" "Masters thesis"
+  let setType = setRawField "type"
+  case map toLower et of
+       "article"         -> setType "article-journal"
+       "book"            -> setType "book"
+       "booklet"         -> setType "pamphlet"
+       "bookinbook"      -> setType "book"
+       "collection"      -> setType "book"
+       "electronic"      -> setType "webpage"
+       "inbook"          -> setType "chapter"
+       "incollection"    -> setType "chapter"
+       "inreference "    -> setType "chapter"
+       "inproceedings"   -> setType "paper-conference"
+       "manual"          -> setType "book"
+       "mastersthesis"   -> setType "thesis" >>
+                             setRawField "genre" "Ph.D. thesis"
+       "misc"            -> setType "no-type"
+       "mvbook"          -> setType "book"
+       "mvcollection"    -> setType "book"
+       "mvproceedings"   -> setType "book"
+       "mvreference"     -> setType "book"
+       "online"          -> setType "webpage"
+       "patent"          -> setType "patent"
+       "periodical"      -> setType "article-journal"
+       "phdthesis"       -> setType "thesis" >>
+                             setRawField "genre" "Ph.D. thesis"
+       "proceedings"     -> setType "book"
+       "reference"       -> setType "book"
+       "report"          -> setType "report"
+       "suppbook"        -> setType "chapter"
+       "suppcollection"  -> setType "chapter"
+       "suppperiodical"  -> setType "article-journal"
+       "techreport"      -> setType "report"
+       "thesis"          -> setType "thesis"
+       "unpublished"     -> setType "manuscript"
+       "www"             -> setType "webpage"
+       _                 -> setType "no-type"
   getRawField "type" ==> setRawField "genre"
   getField "title" ==> setField "title"
   getField "booktitle" ==> setField "container-title"
