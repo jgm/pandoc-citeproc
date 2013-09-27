@@ -90,6 +90,7 @@ resolveCrossRef isBibtex entries entry =
        Nothing   -> entry
 
 -- transformKey source target key
+-- derived from Appendix C of bibtex manual
 transformKey :: String -> String -> String -> [String]
 transformKey _ _ "crossref"       = []
 transformKey _ _ "xref"           = []
@@ -105,7 +106,45 @@ transformKey _ _ "relatedtype"    = []
 transformKey _ _ "shorthand"      = []
 transformKey _ _ "shorthandintro" = []
 transformKey _ _ "sortkey"        = []
+transformKey x y "author"
+  | x `elem` ["mvbook", "book"] &&
+    y `elem` ["inbook", "bookinbook", "suppbook"] = ["bookauthor"]
+transformKey "mvbook" y z
+  | y `elem` ["book", "inbook", "bookinbook", "suppbook"] = standardTrans z
+transformKey x y z
+  | x `elem` ["mvcollection", "mvreference"] &&
+    y `elem` ["collection", "reference", "incollection", "suppbook"] =
+    standardTrans z
+transformKey "mvproceedings" y z
+  | y `elem` ["proceedings", "inproceedings"] = standardTrans z
+transformKey "book" y z
+  | y `elem` ["inbook", "bookinbook", "suppbook"] = standardTrans z
+transformKey x y z
+  | x `elem` ["collection", "reference"] &&
+    y `elem` ["inbook", "bookinbook", "suppbook"] = standardTrans z
+transformKey "proceedings" "inproceedings" z = standardTrans z
+transformKey "periodical" y z
+  | y `elem` ["article", "suppperiodical"] =
+  case z of
+       "title"          -> ["journaltitle"]
+       "subtitle"       -> ["journalsubtitle"]
+       "shorttitle"     -> []
+       "sorttitle"      -> []
+       "indextitle"     -> []
+       "indexsorttitle" -> []
 transformKey _ _ x                = [x]
+
+standardTrans :: String -> [String]
+standardTrans z =
+  case z of
+       "title"          -> ["maintitle"]
+       "subtitle"       -> ["mainsubtitle"]
+       "titleaddon"     -> ["maintitleaddon"]
+       "shorttitle"     -> []
+       "sorttitle"      -> []
+       "indextitle"     -> []
+       "indexsorttitle" -> []
+       _                -> [z]
 
 type BibM = RWST T () (M.Map String MetaValue) Maybe
 
