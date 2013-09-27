@@ -8,6 +8,7 @@ import Text.BibTeX.Entry
 import Text.BibTeX.Parse hiding (identifier, entry)
 import Text.Parsec.String
 import Text.Parsec hiding (optional)
+import Text.Pandoc.Walk (query)
 import Text.Pandoc
 import qualified Data.Map as M
 import Data.List.Split (splitOn)
@@ -97,6 +98,10 @@ getField f = do
 setField :: String -> MetaValue -> BibM ()
 setField f x = modify $ M.insert f x
 
+appendField :: String -> ([Inline] -> [Inline]) -> MetaValue -> BibM ()
+appendField f fn x = modify $ M.insertWith combine f x
+  where combine new old = MetaInlines $ query (:[]) old ++ fn (query (:[]) new)
+
 notFound :: String -> BibM a
 notFound f = fail $ f ++ " not found"
 
@@ -143,6 +148,8 @@ bibItem m entry = MetaMap $ maybe M.empty fst $ execRWST m entry M.empty
 getEntryType :: BibM String
 getEntryType = asks entryType
 
+infix 7 ==>
+
 (==>) :: BibM a -> (a -> BibM ()) -> BibM ()
 x ==> y = (x >>= y) `mplus` return ()
 
@@ -187,6 +194,9 @@ itemToMetaValue bibtex = bibItem $ do
        _                 -> setType "no-type"
   getRawField "type" ==> setRawField "genre"
   getField "title" ==> setField "title"
+  getField "subtitle" ==> appendField "title" ([Str ":",Space] ++)
+  getField "titleaddon" ==> appendField "title"
+                                 (\x -> [Space,Str "("] ++ x ++ [Str ")"])
   getField "booktitle" ==> setField "container-title"
   getField "series" ==> setField "collection-title"
   getField "pages" ==> setField "page"
@@ -205,8 +215,8 @@ itemToMetaValue bibtex = bibItem $ do
   getField "howpublished" ==> setField "note"
   getField "abstract" ==> setField "abstract"
   unless bibtex $ do
-    getField "addendum" ==> setField "note"
-  getField "annotation" ==> setField "note"
+    getField "addendum" ==> appendField "note" (Space:)
+  getField "annotation" ==> setField "annote"
   getField "year" ==> setSubField "issued" "year"
   getField "month" ==> setSubField "issued" "month"
 
