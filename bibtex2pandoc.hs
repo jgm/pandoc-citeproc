@@ -80,8 +80,32 @@ resolveCrossRef isBibtex entries entry =
                                            [(k,v) | (k,v) <- fields e',
                                             isNothing (lookup k $ fields entry)]
                                         }
-                          | otherwise -> undefined
+                          | otherwise -> entry{ fields = fields entry ++
+                                           [(k',v) | (k,v) <- fields e',
+                                            isNothing (lookup k $ fields entry),
+                                            k' <- transformKey
+                                                   (entryType entry)
+                                                   (entryType e') k]
+                                              }
        Nothing   -> entry
+
+-- transformKey source target key
+transformKey :: String -> String -> String -> [String]
+transformKey _ _ "crossref"       = []
+transformKey _ _ "xref"           = []
+transformKey _ _ "entryset"       = []
+transformKey _ _ "entrysubtype"   = []
+transformKey _ _ "execute"        = []
+transformKey _ _ "label"          = []
+transformKey _ _ "options"        = []
+transformKey _ _ "presort"        = []
+transformKey _ _ "related"        = []
+transformKey _ _ "relatedstring"  = []
+transformKey _ _ "relatedtype"    = []
+transformKey _ _ "shorthand"      = []
+transformKey _ _ "shorthandintro" = []
+transformKey _ _ "sortkey"        = []
+transformKey _ _ x                = [x]
 
 type BibM = RWST T () (M.Map String MetaValue) Maybe
 
