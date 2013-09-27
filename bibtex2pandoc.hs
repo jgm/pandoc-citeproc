@@ -211,6 +211,13 @@ bibItem m entry = MetaMap $ maybe M.empty fst $ execRWST m entry M.empty
 getEntryType :: BibM String
 getEntryType = asks entryType
 
+isPresent :: String -> BibM Bool
+isPresent f = do
+  fs <- asks fields
+  case lookup f fs of
+       Just _   -> return True
+       Nothing  -> return False
+
 infix 7 ==>
 
 (==>) :: BibM a -> (a -> BibM ()) -> BibM ()
@@ -218,9 +225,9 @@ x ==> y = (x >>= y) `mplus` return ()
 
 itemToMetaValue bibtex = bibItem $ do
   getId ==> setRawField "id"
-  et <- getEntryType
+  et <- map toLower `fmap` getEntryType
   let setType = setRawField "type"
-  case map toLower et of
+  case et of
        "article"         -> setType "article-journal"
        "book"            -> setType "book"
        "booklet"         -> setType "pamphlet"
@@ -257,10 +264,13 @@ itemToMetaValue bibtex = bibItem $ do
        _                 -> setType "no-type"
   getRawField "type" ==> setRawField "genre"
   getField "title" ==> setField "title"
-  getField "subtitle" ==> appendField "title" ([Str ":",Space] ++)
-  getField "titleaddon" ==> appendField "title"
-                                 (\x -> [Space,Str "("] ++ x ++ [Str ")"])
-  getField "booktitle" ==> setField "container-title"
+  getField "subtitle" ==> appendField "title" addColon
+  getField "titleaddon" ==> appendField "title" inParens
+  hasMaintitle <- isPresent "maintitle"
+  getField "booktitle" ==> setField (if hasMaintitle &&
+                                        et `elem` ["book","collection","proceedings"]
+                                        then "volume-title"
+                                        else "container-title")
   getField "series" ==> setField "collection-title"
   getField "pages" ==> setField "page"
   getField "volume" ==> setField "volume"
@@ -284,6 +294,11 @@ itemToMetaValue bibtex = bibItem $ do
   getField "month" ==> setSubField "issued" "month"
 
 
+addColon :: [Inline] -> [Inline]
+addColon xs = [Str ":",Space] ++ xs
+
+inParens :: [Inline] -> [Inline]
+inParens xs = [Space, Str "("] ++ xs ++ [Str ")"]
 
 splitByAnd :: [Inline] -> [[Inline]]
 splitByAnd = splitOn [Space, Str "and", Space]
