@@ -5,7 +5,7 @@
 -- probably does not support bibtex accurately
 module Main where
 import Text.BibTeX.Entry
-import Text.BibTeX.Parse hiding (identifier)
+import Text.BibTeX.Parse hiding (identifier, entry)
 import Text.Parsec.String
 import Text.Parsec hiding (optional)
 import Text.Pandoc
@@ -61,17 +61,14 @@ options =
   , Option ['V'] ["version"] (NoArg Version) "show program version"
   ]
 
-data BibState = BibState{ isBibtex  :: Bool
-                        , bibFields :: [(String,String)]
-                        }
-type BibM = RWST BibState () (M.Map String MetaValue) Maybe
+type BibM = RWST T () (M.Map String MetaValue) Maybe
 
 opt :: BibM () -> BibM ()
 opt m = m `mplus` return ()
 
 getField :: String -> BibM MetaValue
 getField f = do
-  fs <- asks bibFields
+  fs <- asks fields
   case lookup f fs of
        Just x  -> return $ latex x
        Nothing -> fail "not found"
@@ -82,9 +79,12 @@ setField f x = modify $ M.insert f x
 notFound :: String -> BibM a
 notFound f = fail $ f ++ " not found"
 
+getId :: BibM String
+getId = asks identifier
+
 getRawField :: String -> BibM String
 getRawField f = do
-  fs <- asks bibFields
+  fs <- asks fields
   case lookup f fs of
        Just x  -> return x
        Nothing -> notFound f
@@ -94,23 +94,20 @@ setRawField f x = modify $ M.insert f (MetaString x)
 
 getAuthorList :: String -> BibM [MetaValue]
 getAuthorList f = do
-  fs <- asks bibFields
+  fs <- asks fields
   case lookup f fs of
        Just x  -> return $ toAuthorList $ latex x
        Nothing -> notFound f
 
-setAuthorList :: String -> [MetaValue] -> BibM ()
-setAuthorList f as = undefined
-
 getLiteralList :: String -> BibM [MetaValue]
 getLiteralList f = do
-  fs <- asks bibFields
+  fs <- asks fields
   case lookup f fs of
        Just x  -> return $ toLiteralList $ latex x
        Nothing -> notFound f
 
-setLiteralList :: String -> [MetaValue] -> BibM ()
-setLiteralList f as = undefined
+setList :: String -> [MetaValue] -> BibM ()
+setList f xs = modify $ M.insert f $ MetaList xs
 
 setSubField :: String -> String -> MetaValue -> BibM ()
 setSubField f k v = do
@@ -119,96 +116,79 @@ setSubField f k v = do
        Just (MetaMap m) -> modify $ M.insert f (MetaMap $ M.insert k v m)
        _ -> modify $ M.insert f (MetaMap $ M.singleton k v)
 
-bibItem :: Bool -> BibM a -> T -> MetaValue
-bibItem bibtex m entry =
-  MetaMap $ maybe M.empty fst
-          $ execRWST m BibState{ isBibtex = bibtex
-                               , bibFields = fields entry } M.empty
+bibItem :: BibM a -> T -> MetaValue
+bibItem m entry = MetaMap $ maybe M.empty fst $ execRWST m entry M.empty
 
-itemToMetaValue bibtex = bibItem bibtex $ do
-  opt $ getField "title" >>= setField "collection-title"
-  opt $ getField "month" >>= setSubField "issued" "month"
+getEntryType :: BibM String
+getEntryType = asks entryType
 
-{-
-itemToMetaValue :: Bool -> T -> MetaValue
-itemToMetaValue isBibtex entry = MetaMap $ M.fromList fs'
-  where getField f = maybeToList $ lookup f fs
-        fs = map (\(k,v) -> (map toLower k, v)) $ fields entry
-        f --> f' = [(f', MetaString x) | x <- getField f]
-        f ==> f' = [(f', latex x) | x <- getField f]
-        f *=> f' = [(f', toAuthorList $ latex as) | as <- getField f]
-        f !=> xs = if null xs
-                      then xs
-                      else [(f, MetaMap $ M.fromList xs)]
-        fs' =
-          [("id", MetaString $ trim $ identifier entry)
-          ,("type", MetaString
-                    $ case map toLower (entryType entry) of
-                           "article"       -> "article-journal"
-                           "book"          -> "book"
-                           "booklet"       -> "pamphlet"
-                           "bookinbook"    -> "book"
-                           "collection"    -> "book"
-                           "electronic"    -> "webpage"
-                           "inbook"        -> "chapter"
-                           "incollection"  -> "chapter"
-                           "inreference "  -> "chapter"
-                           "inproceedings" -> "paper-conference"
-                           "manual"        -> "book"
-                           "mastersthesis" -> "thesis"
-                           "misc"          -> "no-type"
-                           "mvbook"        -> "book"
-                           "mvcollection"  -> "book"
-                           "mvproceedings" -> "book"
-                           "mvreference"   -> "book"
-                           "online"        -> "webpage"
-                           "patent"        -> "patent"
-                           "periodical"    -> "article-journal"
-                           "phdthesis"     -> "thesis"
-                           "proceedings"   -> "book"
-                           "reference"     -> "book"
-                           "report"        -> "report"
-                           "suppbook"      -> "chapter"
-                           "suppcollection" -> "chapter"
-                           "suppperiodical" -> "article-journal"
-                           "techreport"    -> "report"
-                           "thesis"        -> "thesis"
-                           "unpublished"   -> "manuscript"
-                           "www"           -> "webpage"
-                           _               -> "no-type")
-          ] ++ concat
-          [ case entryType entry of
-                 "phdthesis"     -> "genre" --> "Ph.D. thesis"
-                 "mastersthesis" -> "genre" --> "Masters thesis"
-                 _               -> []
-          , "type" ==> "genre"
-          , "title" ==> "title"
-          , "booktitle" ==> "container-title"
-          , "series" ==> "collection-title"
-          , "pages" ==> "page"
-          , "volume" ==> "volume"
-          , "number" ==> "number"
-          , "chapter" ==> "chapter-number"
-          , "edition" ==> "edition"
-          , "note" ==> "note"
-          , "url" --> "url"
-          , "journal" ==> "container-title"
-          , "school" ==> "publisher"
-          , "institution" ==> "publisher"
-          , "publisher" ==> "publisher"
-          , "address" ==> "publisher-place"
-          , "author" *=> "author"
-          , "editor" *=> "editor"
-          , "howpublished" ==> "note"
-          , "abstract" ==> "abstract"
-          , "addendum" ==> "note"
-          , "annotation" ==> "note"
-          , "issued" !=> concat
-             [ "year" ==> "year"
-             , "month" ==> "month"
-             ]
-          ]
--}
+(==>) :: BibM a -> (a -> BibM ()) -> BibM ()
+x ==> y = (x >>= y) `mplus` return ()
+
+itemToMetaValue bibtex = bibItem $ do
+  getId ==> setRawField "id"
+  et <- getEntryType
+  setRawField "type" $ case map toLower et of
+                            "article"         -> "article-journal"
+                            "book"            -> "book"
+                            "booklet"         -> "pamphlet"
+                            "bookinbook"      -> "book"
+                            "collection"      -> "book"
+                            "electronic"      -> "webpage"
+                            "inbook"          -> "chapter"
+                            "incollection"    -> "chapter"
+                            "inreference "    -> "chapter"
+                            "inproceedings"   -> "paper-conference"
+                            "manual"          -> "book"
+                            "mastersthesis"   -> "thesis"
+                            "misc"            -> "no-type"
+                            "mvbook"          -> "book"
+                            "mvcollection"    -> "book"
+                            "mvproceedings"   -> "book"
+                            "mvreference"     -> "book"
+                            "online"          -> "webpage"
+                            "patent"          -> "patent"
+                            "periodical"      -> "article-journal"
+                            "phdthesis"       -> "thesis"
+                            "proceedings"     -> "book"
+                            "reference"       -> "book"
+                            "report"          -> "report"
+                            "suppbook"        -> "chapter"
+                            "suppcollection"  -> "chapter"
+                            "suppperiodical"  -> "article-journal"
+                            "techreport"      -> "report"
+                            "thesis"          -> "thesis"
+                            "unpublished"     -> "manuscript"
+                            "www"             -> "webpage"
+                            _                 -> "no-type"
+  when (et == "phdthesis") $ setRawField "genre" "Ph.D. thesis"
+  when (et == "mastersthesis") $ setRawField "genre" "Masters thesis"
+  getRawField "type" ==> setRawField "genre"
+  getField "title" ==> setField "title"
+  getField "booktitle" ==> setField "container-title"
+  getField "series" ==> setField "collection-title"
+  getField "pages" ==> setField "page"
+  getField "volume" ==> setField "volume"
+  getField "number" ==> setField "number"
+  getField "chapter" ==> setField "chapter-number"
+  getField "edition" ==> setField "edition"
+  getField "note" ==> setField "note"
+  getRawField "url" ==> setRawField "url"
+  getField "journal" ==> setField "container-title"
+  getField "school" ==> setField "publisher"
+  getLiteralList "institution" ==> setList "publisher"
+  getField "address" ==> setField "publisher-place"
+  getAuthorList "author" ==> setList "author"
+  getAuthorList "editor" ==> setList "editor"
+  getField "howpublished" ==> setField "note"
+  getField "abstract" ==> setField "abstract"
+  unless bibtex $ do
+    getField "addendum" ==> setField "note"
+  getField "annotation" ==> setField "note"
+  getField "year" ==> setSubField "issued" "year"
+  getField "month" ==> setSubField "issued" "month"
+
+
 
 splitByAnd :: [Inline] -> [[Inline]]
 splitByAnd = splitOn [Space, Str "and", Space]
