@@ -9,7 +9,6 @@ import Text.BibTeX.Parse hiding (identifier, entry)
 import Text.Parsec.String
 import Text.Parsec hiding (optional, (<|>))
 import Control.Applicative
-import Text.Pandoc.Walk (query)
 import Text.Pandoc
 import qualified Data.Map as M
 import Data.List.Split (splitOn)
@@ -163,7 +162,11 @@ setField f x = modify $ M.insert f x
 
 appendField :: String -> ([Inline] -> [Inline]) -> MetaValue -> BibM ()
 appendField f fn x = modify $ M.insertWith combine f x
-  where combine new old = MetaInlines $ query (:[]) old ++ fn (query (:[]) new)
+  where combine new old = MetaInlines $ toInlines old ++ fn (toInlines new)
+        toInlines (MetaInlines ils) = ils
+        toInlines (MetaBlocks [Para ils]) = ils
+        toInlines (MetaBlocks [Plain ils]) = ils
+        toInlines _ = []
 
 notFound :: String -> BibM a
 notFound f = fail $ f ++ " not found"
