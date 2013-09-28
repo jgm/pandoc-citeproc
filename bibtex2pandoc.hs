@@ -272,32 +272,38 @@ itemToMetaValue bibtex = bibItem $ do
        "www"             -> setType "webpage"
        _                 -> setType "no-type"
   opt $ getRawField "type" >>= setRawField "genre"
-  opt $ getField "title" >>= setField "title" . unTitlecase
-  opt $ getField "subtitle" >>= appendField "title" addColon . unTitlecase
-  opt $ getField "titleaddon" >>= appendField "title" addPeriod . unTitlecase
-  opt $ getField "maintitle" >>= setField "container-title" . unTitlecase
+  hyphenation <- getRawField "hyphenation" <|> return "english"
+  let processTitle = if (map toLower hyphenation) `elem`
+                        ["american","british","canadian","english",
+                         "australian","newzealand","usenglish","ukenglish"]
+                     then unTitlecase
+                     else id
+  opt $ getField "title" >>= setField "title" . processTitle
+  opt $ getField "subtitle" >>= appendField "title" addColon . processTitle
+  opt $ getField "titleaddon" >>= appendField "title" addPeriod . processTitle
+  opt $ getField "maintitle" >>= setField "container-title" . processTitle
   opt $ getField "mainsubtitle" >>=
-        appendField "container-title" addColon . unTitlecase
+        appendField "container-title" addColon . processTitle
   opt $ getField "maintitleaddon" >>=
-             appendField "container-title" addPeriod . unTitlecase
+             appendField "container-title" addPeriod . processTitle
   hasMaintitle <- isPresent "maintitle"
   opt $ getField "booktitle" >>=
              setField (if hasMaintitle &&
                           et `elem` ["inbook","incollection","inproceedings"]
                        then "volume-title"
-                       else "container-title") . unTitlecase
+                       else "container-title") . processTitle
   opt $ getField "booksubtitle" >>=
              appendField (if hasMaintitle &&
                              et `elem` ["inbook","incollection","inproceedings"]
                           then "volume-title"
-                          else "container-title") addColon . unTitlecase
+                          else "container-title") addColon . processTitle
   opt $ getField "booktitleaddon" >>=
              appendField (if hasMaintitle &&
                              et `elem` ["inbook","incollection","inproceedings"]
                           then "volume-title"
-                          else "container-title") addPeriod . unTitlecase
-  opt $ getField "shorttitle" >>= setField "title-short" . unTitlecase
-  opt $ getField "series" >>= setField "collection-title" . unTitlecase
+                          else "container-title") addPeriod . processTitle
+  opt $ getField "shorttitle" >>= setField "title-short" . processTitle
+  opt $ getField "series" >>= setField "collection-title" . processTitle
   opt $ getField "pages" >>= setField "page"
   opt $ getField "volume" >>= setField "volume"
   opt $ getField "number" >>= setField "number"
