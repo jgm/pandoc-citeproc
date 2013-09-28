@@ -240,7 +240,7 @@ itemToMetaValue bibtex = bibItem $ do
        "inproceedings"   -> setType "paper-conference"
        "manual"          -> setType "book"
        "mastersthesis"   -> setType "thesis" >>
-                             setRawField "genre" "Ph.D. thesis"
+                             setRawField "genre" "Master’s thesis"
        "misc"            -> setType "no-type"
        "mvbook"          -> setType "book"
        "mvcollection"    -> setType "book"
@@ -265,12 +265,24 @@ itemToMetaValue bibtex = bibItem $ do
   getRawField "type" ==> setRawField "genre"
   getField "title" ==> setField "title"
   getField "subtitle" ==> appendField "title" addColon
-  getField "titleaddon" ==> appendField "title" inParens
+  getField "titleaddon" ==> appendField "title" addPeriod
+  getField "maintitle" ==> setField "container-title"
+  getField "mainsubtitle" ==> appendField "container-title" addColon
+  getField "maintitleaddon" ==> appendField "container-title" addPeriod
   hasMaintitle <- isPresent "maintitle"
   getField "booktitle" ==> setField (if hasMaintitle &&
-                                        et `elem` ["book","collection","proceedings"]
+                                        et `elem` ["inbook","incollection","inproceedings"]
                                         then "volume-title"
                                         else "container-title")
+  getField "booksubtitle" ==> appendField (if hasMaintitle &&
+                                        et `elem` ["inbook","incollection","inproceedings"]
+                                        then "volume-title"
+                                        else "container-title") addColon
+  getField "booktitleaddon" ==> appendField (if hasMaintitle &&
+                                        et `elem` ["inbook","incollection","inproceedings"]
+                                        then "volume-title"
+                                        else "container-title") addPeriod
+  getField "shorttitle" ==> setField "title-short"
   getField "series" ==> setField "collection-title"
   getField "pages" ==> setField "page"
   getField "volume" ==> setField "volume"
@@ -280,22 +292,52 @@ itemToMetaValue bibtex = bibItem $ do
   getField "note" ==> setField "note"
   getRawField "url" ==> setRawField "url"
   getField "journal" ==> setField "container-title"
+  getField "journaltitle" ==> setField "container-title"
+  getField "journalsubtitle" ==> appendField "container-title" addColon
+  getField "shortjournal" ==> setField "container-title-short"
+  getField "howpublished" ==> setField "publisher"
   getField "school" ==> setField "publisher"
-  getLiteralList "institution" ==> setList "publisher"
+  unless bibtex $ do
+    getLiteralList "institution" ==> setList "publisher"
+  getField "publisher" ==> setField "publisher"
   getField "address" ==> setField "publisher-place"
+  unless bibtex $ do
+    getField "location" ==> setField "publisher-place"
   getAuthorList "author" ==> setList "author"
   getAuthorList "editor" ==> setList "editor"
-  getField "howpublished" ==> setField "note"
   getField "abstract" ==> setField "abstract"
   unless bibtex $ do
     getField "addendum" ==> appendField "note" (Space:)
   getField "annotation" ==> setField "annote"
+  getField "annote" ==> setField "annote"
   getField "year" ==> setSubField "issued" "year"
   getField "month" ==> setSubField "issued" "month"
-
+  getAuthorList "translator" ==> setList "translator"
+  getAuthorList "bookauthor" ==> setList "container-author"
+  getField "abstract" ==> setField "abstract"
+  getField "keywords" ==> setField "keyword"
+  getField "eventdate" ==> setField "event-date"
+  getField "eventtitle" ==> setField "event"
+  getLiteralList "venue" ==> setList "event-place"
+  getRawField "doi" ==> setRawField "DOI"
+  getRawField "isbn" ==> setRawField "ISBN"
+  getRawField "issn" ==> setRawField "ISSN"
+  getField "origdate" ==> setField "original-date"
+  getLiteralList "origlocation" ==> setList "original-publisher-place"
+  getLiteralList "origpublisher" ==> setList "original-publisher"
+  getField "origtitle" ==> setField "original-title"
+  getField "pagetotal" ==> setField "number-of-pages"
+  getField "pubstate" ==> setField "status"
+  getField "urldate" ==> setField "accessed"
+  getField "version" ==> setField "version"
+  getField "volumes" ==> setField "number-of-volumes"
+  getRawField "hyphenation" ==> setRawField "language"
 
 addColon :: [Inline] -> [Inline]
 addColon xs = [Str ":",Space] ++ xs
+
+addPeriod :: [Inline] -> [Inline]
+addPeriod xs = [Str ".",Space] ++ xs
 
 inParens :: [Inline] -> [Inline]
 inParens xs = [Space, Str "("] ++ xs ++ [Str ")"]
