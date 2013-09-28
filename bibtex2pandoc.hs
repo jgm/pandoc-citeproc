@@ -81,11 +81,10 @@ resolveCrossRef isBibtex entries entry =
                                             isNothing (lookup k $ fields entry)]
                                         }
                           | otherwise -> entry{ fields = fields entry ++
-                                           [(k',v) | (k,v) <- fields e',
-                                            isNothing (lookup k $ fields entry),
-                                            k' <- transformKey
-                                                   (entryType entry)
-                                                   (entryType e') k]
+                                          [(k',v) | (k,v) <- fields e',
+                                            k' <- transformKey (entryType e')
+                                                   (entryType entry) k,
+                                           isNothing (lookup k' (fields entry))]
                                               }
        Nothing   -> entry
 
