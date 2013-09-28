@@ -218,6 +218,17 @@ isPresent f = do
        Just _   -> return True
        Nothing  -> return False
 
+unTitlecase :: MetaValue -> MetaValue
+unTitlecase (MetaInlines ils) = MetaInlines $ untc ils
+unTitlecase (MetaBlocks [Para ils]) = MetaBlocks [Para $ untc ils]
+unTitlecase (MetaBlocks [Plain ils]) = MetaBlocks [Para $ untc ils]
+
+untc :: [Inline] -> [Inline]
+untc [] = []
+untc (x:xs) = x : map go xs
+  where go (Str ys)     = Str $ map toLower ys
+        go z            = z
+
 itemToMetaValue bibtex = bibItem $ do
   getId >>= setRawField "id"
   et <- map toLower `fmap` getEntryType
@@ -258,31 +269,32 @@ itemToMetaValue bibtex = bibItem $ do
        "www"             -> setType "webpage"
        _                 -> setType "no-type"
   opt $ getRawField "type" >>= setRawField "genre"
-  opt $ getField "title" >>= setField "title"
-  opt $ getField "subtitle" >>= appendField "title" addColon
-  opt $ getField "titleaddon" >>= appendField "title" addPeriod
-  opt $ getField "maintitle" >>= setField "container-title"
-  opt $ getField "mainsubtitle" >>= appendField "container-title" addColon
+  opt $ getField "title" >>= setField "title" . unTitlecase
+  opt $ getField "subtitle" >>= appendField "title" addColon . unTitlecase
+  opt $ getField "titleaddon" >>= appendField "title" addPeriod . unTitlecase
+  opt $ getField "maintitle" >>= setField "container-title" . unTitlecase
+  opt $ getField "mainsubtitle" >>=
+        appendField "container-title" addColon . unTitlecase
   opt $ getField "maintitleaddon" >>=
-             appendField "container-title" addPeriod
+             appendField "container-title" addPeriod . unTitlecase
   hasMaintitle <- isPresent "maintitle"
   opt $ getField "booktitle" >>=
              setField (if hasMaintitle &&
                           et `elem` ["inbook","incollection","inproceedings"]
                        then "volume-title"
-                       else "container-title")
+                       else "container-title") . unTitlecase
   opt $ getField "booksubtitle" >>=
              appendField (if hasMaintitle &&
                              et `elem` ["inbook","incollection","inproceedings"]
                           then "volume-title"
-                          else "container-title") addColon
+                          else "container-title") addColon . unTitlecase
   opt $ getField "booktitleaddon" >>=
              appendField (if hasMaintitle &&
                              et `elem` ["inbook","incollection","inproceedings"]
                           then "volume-title"
-                          else "container-title") addPeriod
-  opt $ getField "shorttitle" >>= setField "title-short"
-  opt $ getField "series" >>= setField "collection-title"
+                          else "container-title") addPeriod . unTitlecase
+  opt $ getField "shorttitle" >>= setField "title-short" . unTitlecase
+  opt $ getField "series" >>= setField "collection-title" . unTitlecase
   opt $ getField "pages" >>= setField "page"
   opt $ getField "volume" >>= setField "volume"
   opt $ getField "number" >>= setField "number"
