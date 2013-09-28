@@ -373,6 +373,8 @@ toAuthorList (MetaBlocks []) = []
 toAuthorList x = error $ "toAuthorList: " ++ show x
 
 toAuthor :: [Inline] -> MetaValue
+toAuthor [Span ("",[],[]) ils] = -- corporate author
+  MetaMap $ M.singleton "literal" $ MetaInlines ils
 toAuthor ils = MetaMap $ M.fromList $
   [ ("given", MetaList givens)
   , ("family", family)
