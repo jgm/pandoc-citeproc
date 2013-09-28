@@ -121,7 +121,7 @@ transformKey "book" y z
   | y `elem` ["inbook", "bookinbook", "suppbook"] = standardTrans z
 transformKey x y z
   | x `elem` ["collection", "reference"] &&
-    y `elem` ["inbook", "bookinbook", "suppbook"] = standardTrans z
+    y `elem` ["incollection", "inreference", "suppcollection"] = standardTrans z
 transformKey "proceedings" "inproceedings" z = standardTrans z
 transformKey "periodical" y z
   | y `elem` ["article", "suppperiodical"] =
