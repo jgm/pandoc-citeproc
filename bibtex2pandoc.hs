@@ -241,6 +241,69 @@ untc (x:xs) = x : map go xs
   where go (Str ys)     = Str $ map toLower ys
         go z            = z
 
+toLocale :: String -> String
+toLocale "english"    = "en-US" -- "en-EN" unavailable in CSL
+toLocale "USenglish"  = "en-US"
+toLocale "american"   = "en-US"
+toLocale "british"    = "en-GB"
+toLocale "UKenglish"  = "en-GB"
+toLocale "canadian"   = "en-US" -- "en-CA" unavailable in CSL
+toLocale "australian" = "en-GB" -- "en-AU" unavailable in CSL
+toLocale "newzealand" = "en-GB" -- "en-NZ" unavailable in CSL
+toLocale "afrikaans"  = "af-ZA"
+toLocale "arabic"     = "ar-AR"
+toLocale "basque"     = "eu"
+toLocale "bulgarian"  = "bg-BG"
+toLocale "catalan"    = "ca-AD"
+toLocale "croatian"   = "hr-HR"
+toLocale "czech"      = "cs-CZ"
+toLocale "danish"     = "da-DK"
+toLocale "dutch"      = "nl-NL"
+toLocale "estonian"   = "et-EE"
+toLocale "finnish"    = "fi-FI"
+toLocale "canadien"   = "fr-CA"
+toLocale "acadian"    = "fr-CA"
+toLocale "french"     = "fr-FR"
+toLocale "francais"   = "fr-FR"
+toLocale "austrian"   = "de-AT"
+toLocale "naustrian"  = "de-AT"
+toLocale "german"     = "de-DE"
+toLocale "germanb"    = "de-DE"
+toLocale "ngerman"    = "de-DE"
+toLocale "greek"      = "el-GR"
+toLocale "polutonikogreek" = "el-GR"
+toLocale "hebrew"     = "he-IL"
+toLocale "hungarian"  = "hu-HU"
+toLocale "icelandic"  = "is-IS"
+toLocale "italian"    = "it-IT"
+toLocale "japanese"   = "ja-JP"
+toLocale "Khmer"      = "km-KH"
+toLocale "latvian"    = "lv-LV"
+toLocale "lithuanian" = "lt-LT"
+toLocale "magyar"     = "hu-HU"
+toLocale "mongolian"  = "mn-MN"
+toLocale "norsk"      = "nb-NO"
+toLocale "nynorsk"    = "nn-NO"
+toLocale "Persian"    = "fa-IR"
+toLocale "polish"     = "pl-PL"
+toLocale "brazil"     = "pt-BR"
+toLocale "brazilian"  = "pt-BR"
+toLocale "portugues"  = "pt-PT"
+toLocale "portuguese" = "pt-PT"
+toLocale "romanian"   = "ro-RO"
+toLocale "russian"    = "ru-RU"
+toLocale "serbian"    = "sr-RS"
+toLocale "serbianc"   = "sr-RS"
+toLocale "slovak"     = "sk-SK"
+toLocale "slovene"    = "sl-SL"
+toLocale "spanish"    = "es-ES"
+toLocale "swedish"    = "sv-SE"
+toLocale "thai"       = "th-TH"
+toLocale "turkish"    = "tr-TR"
+toLocale "ukrainian"  = "uk-UA"
+toLocale "vietnamese" = "vi-VN"
+toLocale _            = ""  
+
 itemToMetaValue :: Lang -> Bool -> T -> MetaValue
 itemToMetaValue lang bibtex = bibItem $ do
   getId >>= setRawField "id"
@@ -282,6 +345,14 @@ itemToMetaValue lang bibtex = bibItem $ do
        "unpublished"     -> setType "manuscript"
        "www"             -> setType "webpage"
        _                 -> setType "no-type"
+       
+  opt $ do
+    val <- getRawField "entrysubtype"
+    if  et == "article" && val == "magazine" then
+          setType "article-magazine"
+    else
+          return ()
+       
   opt $ getRawField "type" >>= setRawField "genre" . resolveKey lang
   hyphenation <- getRawField "hyphenation" <|> return "english"
   let processTitle = if (map toLower hyphenation) `elem`
@@ -317,7 +388,13 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField "series" >>= setField "collection-title" . processTitle
   opt $ getField "pages" >>= setField "page"
   opt $ getField "volume" >>= setField "volume"
-  opt $ getField "number" >>= setField "number"
+  opt $ getField "number" >>=
+             setField (if et `elem` ["report"]
+                       then "number"
+                       else if et `elem` ["article", "periodical"]
+                       then "issue"
+                       else "collection-number")
+  opt $ getField "issue" >>= appendField "issue" addComma
   opt $ getField "chapter" >>= setField "chapter-number"
   opt $ getField "edition" >>= setField "edition"
   opt $ getField "note" >>= setField "note"
@@ -334,8 +411,36 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField "address" >>= setField "publisher-place"
   unless bibtex $ do
     opt $ getField "location" >>= setField "publisher-place"
+
   opt $ getAuthorList "author" >>= setList "author"
-  opt $ getAuthorList "editor" >>= setList "editor"
+  opt $ do
+    val <- getRawField "editortype"
+    getAuthorList "editor" >>=  setList (
+      case val of 
+      ""             -> "editor"             -- from here on biblatex & CSL
+      "editor"       -> "editor"
+      "compiler"     -> "editor"             -- from here on biblatex only
+      "founder"      -> "editor"
+      "continuator"  -> "editor"
+      "redactor"     -> "editor"
+      "reviser"      -> "editor"
+      "collaborator" -> "editor"
+      "director"     -> "director"           -- from here on biblatex-chicago & CSL
+--    "conductor"    -> ""                   -- from here on biblatex-chicago only
+--    "producer"     -> ""
+--    "none"         -> ""                   -- = performer
+--    ""             -> "editorial-director" -- from here on CSL only
+--    ""             -> "composer"
+--    ""             -> "illustrator"
+--    ""             -> "interviewer"
+--    ""             -> "collection-editor"
+      _              -> "editor")
+
+-- FIXME: add same for editora, editorb, editorc
+
+  opt $ getAuthorList "director" >>= setList "director"
+  -- director from biblatex-apa, which has also producer, writer, execproducer (FIXME?)
+
   opt $ getField "abstract" >>= setField "abstract"
   unless bibtex $ do
     opt $ getField "addendum" >>= appendField "note" (Space:)
@@ -363,10 +468,13 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField "urldate" >>= setField "accessed"
   opt $ getField "version" >>= setField "version"
   opt $ getField "volumes" >>= setField "number-of-volumes"
-  opt $ getRawField "hyphenation" >>= setRawField "language"
+  opt $ getRawField "hyphenation" >>= setRawField "language" . toLocale
 
 addColon :: [Inline] -> [Inline]
 addColon xs = [Str ":",Space] ++ xs
+
+addComma :: [Inline] -> [Inline]
+addComma xs = [Str ",",Space] ++ xs
 
 addPeriod :: [Inline] -> [Inline]
 addPeriod xs = [Str ".",Space] ++ xs
@@ -440,7 +548,7 @@ resolveKey (Lang "en" "US") k =
        "forthcoming"   -> "forthcoming"
        "inpress"       -> "in press"
        "prepublished"  -> "pre-published"
-       "mathesis"      -> "Masters thesis"
+       "mathesis"      -> "Master’s thesis"
        "phdthesis"     -> "PhD thesis"
        "candthesis"    -> "Candidate thesis"
        "techreport"    -> "technical report"
