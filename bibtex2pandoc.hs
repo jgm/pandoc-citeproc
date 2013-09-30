@@ -11,7 +11,7 @@ import Text.Parsec hiding (optional, (<|>))
 import Control.Applicative
 import Text.Pandoc
 import qualified Data.Map as M
-import Data.List.Split (splitOn)
+import Data.List.Split (splitOn, splitWhen)
 import Data.List (intersperse)
 import Data.Maybe
 import Data.Char (toLower, isUpper)
@@ -21,6 +21,7 @@ import System.Exit
 import System.IO (stderr, hPutStrLn)
 import Control.Monad
 import Control.Monad.RWS.Strict
+import System.Environment (getEnvironment)
 
 main :: IO ()
 main = do
@@ -37,6 +38,13 @@ main = do
     putStrLn $ usageInfo header options
     exitWith ExitSuccess
   let isBibtex = Bibtex `elem` flags
+  env <- getEnvironment
+  let lang = case lookup "LANG" env of
+                  Just x  -> case splitWhen (\c -> c == '.' || c == '_') x of
+                                   (w:z:_) -> Lang w z
+                                   [w]     -> Lang w ""
+                                   _       -> Lang "en" "US"
+                  Nothing -> Lang "en" "US"
   bibstring <- case args of
                     (x:_) -> readFile x
                     []    -> getContents
@@ -49,7 +57,8 @@ main = do
                        , writerStandalone = True }
     $ Pandoc (Meta $ M.fromList [
                      ("references" , MetaList
-                                    $ map (itemToMetaValue isBibtex) items)]
+                                    $ map (itemToMetaValue lang isBibtex) items)
+                     ]
              ) []
 
 data Option =
@@ -232,10 +241,12 @@ untc (x:xs) = x : map go xs
   where go (Str ys)     = Str $ map toLower ys
         go z            = z
 
-itemToMetaValue bibtex = bibItem $ do
+itemToMetaValue :: Lang -> Bool -> T -> MetaValue
+itemToMetaValue lang bibtex = bibItem $ do
   getId >>= setRawField "id"
   et <- map toLower `fmap` getEntryType
   let setType = setRawField "type"
+  let lang = Lang "en" "US" -- for now, later might get as parameter
   case et of
        "article"         -> setType "article-journal"
        "book"            -> setType "book"
@@ -271,7 +282,7 @@ itemToMetaValue bibtex = bibItem $ do
        "unpublished"     -> setType "manuscript"
        "www"             -> setType "webpage"
        _                 -> setType "no-type"
-  opt $ getRawField "type" >>= setRawField "genre"
+  opt $ getRawField "type" >>= setRawField "genre" . resolveKey lang
   hyphenation <- getRawField "hyphenation" <|> return "english"
   let processTitle = if (map toLower hyphenation) `elem`
                         ["american","british","canadian","english",
@@ -348,7 +359,7 @@ itemToMetaValue bibtex = bibItem $ do
   opt $ getLiteralList "origpublisher" >>= setList "original-publisher"
   opt $ getField "origtitle" >>= setField "original-title"
   opt $ getField "pagetotal" >>= setField "number-of-pages"
-  opt $ getField "pubstate" >>= setField "status"
+  opt $ getRawField "pubstate" >>= setRawField "status" . resolveKey lang
   opt $ getField "urldate" >>= setField "accessed"
   opt $ getField "version" >>= setField "version"
   opt $ getField "volumes" >>= setField "number-of-volumes"
@@ -418,3 +429,24 @@ latex s = MetaBlocks bs
 
 trim :: String -> String
 trim = unwords . words
+
+data Lang = Lang String String  -- e.g. "en" "US"
+
+resolveKey :: Lang -> String -> String
+resolveKey (Lang "en" "US") k =
+  case k of
+       "inpreparation" -> "in preparation"
+       "submitted"     -> "submitted"
+       "forthcoming"   -> "forthcoming"
+       "inpress"       -> "in press"
+       "prepublished"  -> "pre-published"
+       "mathesis"      -> "Masters thesis"
+       "phdthesis"     -> "PhD thesis"
+       "candthesis"    -> "Candidate thesis"
+       "techreport"    -> "technical report"
+       "resreport"     -> "research report"
+       "software"      -> "computer software"
+       "datacd"        -> "data CD"
+       "audiocd"       -> "audio CD"
+       _               -> k
+resolveKey _ k = resolveKey (Lang "en" "US") k
