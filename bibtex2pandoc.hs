@@ -277,14 +277,13 @@ toLocale "hungarian"  = "hu-HU"
 toLocale "icelandic"  = "is-IS"
 toLocale "italian"    = "it-IT"
 toLocale "japanese"   = "ja-JP"
-toLocale "Khmer"      = "km-KH"
 toLocale "latvian"    = "lv-LV"
 toLocale "lithuanian" = "lt-LT"
 toLocale "magyar"     = "hu-HU"
 toLocale "mongolian"  = "mn-MN"
 toLocale "norsk"      = "nb-NO"
 toLocale "nynorsk"    = "nn-NO"
-toLocale "Persian"    = "fa-IR"
+toLocale "farsi"      = "fa-IR"
 toLocale "polish"     = "pl-PL"
 toLocale "brazil"     = "pt-BR"
 toLocale "brazilian"  = "pt-BR"
@@ -403,45 +402,55 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField "journaltitle" >>= setField "container-title"
   opt $ getField "journalsubtitle" >>= appendField "container-title" addColon
   opt $ getField "shortjournal" >>= setField "container-title-short"
-  opt $ getField "howpublished" >>= setField "publisher"
-  opt $ getField "school" >>= setField "publisher"
-  unless bibtex $ do
-    opt $ getLiteralList "institution" >>= setList "publisher"
-  opt $ getField "publisher" >>= setField "publisher"
+
+--   opt $ getField "school" >>= setField "publisher"
+--   opt $ getField "institution" >>= setField "publisher"
+--   opt $ getField "organization" >>= setField "publisher"
+--   opt $ getField "howpublished" >>= setField "publisher"
+--   opt $ getField "publisher" >>= setField "publisher"
+
+  opt $ getField "school" >>= appendField "publisher" addComma
+  opt $ getField "institution" >>= appendField "publisher" addComma
+  opt $ getField "organization" >>= appendField "publisher" addComma
+  opt $ getField "howpublished" >>= appendField "publisher" addComma
+  opt $ getField "publisher" >>= appendField "publisher" addComma
+
   opt $ getField "address" >>= setField "publisher-place"
   unless bibtex $ do
     opt $ getField "location" >>= setField "publisher-place"
 
   opt $ getAuthorList "author" >>= setList "author"
-  opt $ do
-    val <- getRawField "editortype"
-    getAuthorList "editor" >>=  setList (
-      case val of 
-      ""             -> "editor"             -- from here on biblatex & CSL
-      "editor"       -> "editor"
-      "compiler"     -> "editor"             -- from here on biblatex only
-      "founder"      -> "editor"
-      "continuator"  -> "editor"
-      "redactor"     -> "editor"
-      "reviser"      -> "editor"
-      "collaborator" -> "editor"
-      "director"     -> "director"           -- from here on biblatex-chicago & CSL
---    "conductor"    -> ""                   -- from here on biblatex-chicago only
---    "producer"     -> ""
---    "none"         -> ""                   -- = performer
---    ""             -> "editorial-director" -- from here on CSL only
---    ""             -> "composer"
---    ""             -> "illustrator"
---    ""             -> "interviewer"
---    ""             -> "collection-editor"
-      _              -> "editor")
 
+  hasEditortype <- isPresent "editortype"
+  if hasEditortype then
+    opt $ do
+      val <- getRawField "editortype"
+      getAuthorList "editor" >>=  setList (
+        case val of 
+        "editor"       -> "editor"             -- from here on biblatex & CSL
+        "compiler"     -> "editor"             -- from here on biblatex only
+        "founder"      -> "editor"
+        "continuator"  -> "editor"
+        "redactor"     -> "editor"
+        "reviser"      -> "editor"
+        "collaborator" -> "editor"
+        "director"     -> "director"           -- from here on biblatex-chicago & CSL
+  --    "conductor"    -> ""                   -- from here on biblatex-chicago only
+  --    "producer"     -> ""
+  --    "none"         -> ""                   -- = performer
+  --    ""             -> "editorial-director" -- from here on CSL only
+  --    ""             -> "composer"
+  --    ""             -> "illustrator"
+  --    ""             -> "interviewer"
+  --    ""             -> "collection-editor"
+        _              -> "editor")
+    else opt $ getAuthorList "editor" >>= setList "editor"
+ 
 -- FIXME: add same for editora, editorb, editorc
 
   opt $ getAuthorList "director" >>= setList "director"
   -- director from biblatex-apa, which has also producer, writer, execproducer (FIXME?)
 
-  opt $ getField "abstract" >>= setField "abstract"
   unless bibtex $ do
     opt $ getField "addendum" >>= appendField "note" (Space:)
   opt $ getField "annotation" >>= setField "annote"
@@ -455,9 +464,9 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField "eventdate" >>= setField "event-date"
   opt $ getField "eventtitle" >>= setField "event"
   opt $ getLiteralList "venue" >>= setList "event-place"
-  opt $ getRawField "doi" >>= setRawField "DOI"
-  opt $ getRawField "isbn" >>= setRawField "ISBN"
-  opt $ getRawField "issn" >>= setRawField "ISSN"
+  opt $ getRawField "doi" >>= setRawField "doi"
+  opt $ getRawField "isbn" >>= setRawField "isbn"
+  opt $ getRawField "issn" >>= setRawField "issn"
   opt $ getField "origdate" >>= setField "original-date"
   opt $ getLiteralList "origlocation" >>=
              setList "original-publisher-place"
