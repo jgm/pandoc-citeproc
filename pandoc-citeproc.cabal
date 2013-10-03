@@ -146,7 +146,7 @@ library
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
     build-depends:    containers, directory, mtl, json, utf8-string,
-                      bytestring, filepath, pandoc-types >= 1.12.2, tagsoup,
+                      bytestring, filepath, pandoc-types >= 1.12.2.3, tagsoup,
                       aeson, text, vector, texmath >= 0.6.4
 
     if flag(bibutils)
@@ -192,7 +192,7 @@ executable pandoc-citeproc
     hs-source-dirs:   .
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
-    build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12.2, aeson
+    build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12.2.3, aeson
     default-language: Haskell98
 
 executable biblio2yaml
@@ -209,7 +209,7 @@ test-suite test-pandoc-citeproc
   Main-Is:        test-pandoc-citeproc.hs
   Hs-Source-Dirs: tests
   build-depends:  base >= 4, aeson-pretty, aeson,
-                  pandoc-types >= 1.12.2, pandoc >= 1.12,
+                  pandoc-types >= 1.12.2.3, pandoc >= 1.12,
                   bytestring >= 0.10 && < 0.11,
                   pandoc-citeproc, process, Diff >= 0.3
   default-language: Haskell98
