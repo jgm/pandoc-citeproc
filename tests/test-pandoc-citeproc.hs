@@ -28,7 +28,7 @@ testCase csl = do
   indata <- BL.readFile $ "tests/" ++ csl ++ ".in.json"
   expected <- BL.readFile $ "tests/" ++ csl ++ ".expected.json"
   (ec, result, errout) <- pipeProcess
-                     (Just [("LANG","en_US.UTF-8")])
+                     (Just [("LANG","en_US.UTF-8"),("HOME",".")])
                      "dist/build/pandoc-citeproc/pandoc-citeproc"
                      [] indata
   if ec == ExitSuccess
