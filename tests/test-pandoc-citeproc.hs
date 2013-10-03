@@ -6,10 +6,12 @@ import System.IO
 import Data.Monoid (mempty)
 import Data.Algorithm.Diff
 import Text.Printf
-import Data.ByteString.Lazy.UTF8 (fromString, toString)
 import Data.Aeson (decode)
 import Data.Aeson.Encode.Pretty
 import Text.Pandoc.Definition
+import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Text.Pandoc.UTF8 as UTF8
+import Text.Pandoc.Process (pipeProcess)
 
 main = do
   testCase "chicago-author-date"
@@ -23,22 +25,25 @@ err = hPutStrLn stderr
 testCase :: String -> IO ()
 testCase csl = do
   err $ "TEST: " ++ csl
-  indata <- readFile $ "tests/" ++ csl ++ ".in.json"
-  expected <- readFile $ "tests/" ++ csl ++ ".expected.json"
-  (ec, result, errout) <- readProcessWithExitCode
+  indata <- BL.readFile $ "tests/" ++ csl ++ ".in.json"
+  expected <- BL.readFile $ "tests/" ++ csl ++ ".expected.json"
+  (ec, result, errout) <- pipeProcess
+                     (Just [("LANG","en_US.UTF-8")])
                      "dist/build/pandoc-citeproc/pandoc-citeproc"
                      [] indata
   if ec == ExitSuccess
      then do
        let resultDoc :: Maybe Pandoc
-           resultDoc = decode $ fromString result
+           resultDoc = decode result
        let expectedDoc :: Maybe Pandoc
-           expectedDoc = decode $ fromString expected
-       let result' = maybe [] (lines . toString
-                     . encodePretty' Config{ confIndent = 2, confCompare = compare } )
+           expectedDoc = decode expected
+       let result' = maybe [] (BL.lines
+                     . encodePretty' Config{ confIndent = 2
+                                           , confCompare = compare } )
                      resultDoc
-       let expected' = maybe [] (lines . toString
-                     . encodePretty' Config{ confIndent = 2, confCompare = compare } )
+       let expected' = maybe [] (BL.lines
+                     . encodePretty' Config{ confIndent = 2
+                                           , confCompare = compare } )
                      expectedDoc
        if result' == expected'
           then return ()
@@ -48,15 +53,15 @@ testCase csl = do
             exitWith $ ExitFailure 1
      else do
        err $ "Error status " ++ show ec
-       err errout
+       err $ UTF8.toStringLazy errout
        exitWith ec
 
-showDiff :: (Int,Int) -> [Diff String] -> String
+showDiff :: (Int,Int) -> [Diff BL.ByteString] -> String
 showDiff _ []             = ""
 showDiff (l,r) (First ln : ds) =
-  printf "+%4d " l ++ ln ++ "\n" ++ showDiff (l+1,r) ds
+  printf "+%4d " l ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l+1,r) ds
 showDiff (l,r) (Second ln : ds) =
-  printf "-%4d " r ++ ln ++ "\n" ++ showDiff (l,r+1) ds
+  printf "-%4d " r ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l,r+1) ds
 showDiff (l,r) (Both _ _ : ds) =
   showDiff (l+1,r+1) ds
 
