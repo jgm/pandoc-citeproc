@@ -490,6 +490,13 @@ itemToReference lang bibtex = bib $ do
   isbn' <- getRawField "isbn" <|> return ""
   issn' <- getRawField "issn" <|> return ""
 
+  -- notes
+  annotation' <- getField "annotation" <|> getField "annote" <|> return ""
+  abstract' <- getField "abstract" <|> return ""
+  keywords' <- getField "keywords" <|> return ""
+  note' <- if et == "periodical" then return "" else getField "note" <|> return ""
+  addendum' <- if bibtex then return "" else ((" "++) `fmap` getField "addendum") <|> return ""
+
   return $ emptyReference
          { refId               = id'
          , refType             = reftype
@@ -547,10 +554,10 @@ itemToReference lang bibtex = bib $ do
          -- , section             = undefined -- :: String
          -- , source              = undefined -- :: String
          , genre               = refgenre
-         -- , note                = undefined -- :: String
-         -- , annote              = undefined -- :: String
-         -- , abstract            = undefined -- :: String
-         -- , keyword             = undefined -- :: String
+         , note                = note' ++ addendum'
+         , annote              = annotation'
+         , abstract            = abstract'
+         , keyword             = keywords'
          -- , number              = undefined -- :: String
          -- , references          = undefined -- :: String
          , url                 = url'
@@ -662,14 +669,6 @@ itemToReference lang bibtex = bib $ do
   opt $ getRawField' "type" >>= setRawField "genre" . resolveKey lang
   opt $ getRawField' "pubstate" >>= setRawField "status" . resolveKey lang
 -- note etc.
-  unless (et == "periodical") $ do
-    opt $ getField' "note" >>= setField "note"
-  unless bibtex $ do
-    opt $ getField' "addendum" >>= appendField "note" (Space:)
-  opt $ getField' "annotation" >>= setField "annote"
-  opt $ getField' "annote" >>= setField "annote"
-  opt $ getField' "abstract" >>= setField "abstract"
-  opt $ getField' "keywords" >>= setField "keyword"
 
 addColon :: [Inline] -> [Inline]
 addColon xs = [Str ":",Space] ++ xs
