@@ -26,7 +26,7 @@ import Control.Monad.Reader
 import System.Environment (getEnvironment)
 import qualified Data.Text as T
 import Text.CSL.Reference
-import Text.CSL.Pandoc (blocksToString)
+import Text.CSL.Pandoc (blocksToString, inlinesToString)
 import qualified Data.ByteString as B
 
 main :: IO ()
@@ -209,8 +209,8 @@ getRawField f = do
 getAuthorList :: String -> Bib [Agent]
 getAuthorList f = do
   fs <- asks fields
-  case lookup f fs >>= mapM latex . splitOn " \\and " of
-       Just xs -> return $ map toAuthor xs
+  case lookup f fs >>= latexAuthors of
+       Just xs -> return xs
        Nothing -> notFound f
 
 getLiteralList :: String -> Bib [String]
@@ -220,29 +220,62 @@ getLiteralList f = do
        Just x  -> return $ map trim $ splitOn " \\and " x
        Nothing -> notFound f
 
--- TODO handle corporate names (in span?), nondropping particle,
--- comma suffix
-toAuthor :: String -> Agent
-toAuthor s = Agent { givenName       = givens
-                   , droppingPart    = dropping
-                   , nonDroppingPart = "" -- nondropping
-                   , familyName      = family
-                   , nameSuffix      = "" -- suffix
-                   , literal         = "" -- literal
-                   , commaSuffix     = False -- commaSuffix
-                   }
-  where (xs, ys) = break (==',') s
-        (family, givens, dropping) =
-           case ys of
-                []      -> case reverse (words xs) of
-                                []     -> ("", [], "")
-                                (f:(c:cs):gs)
-                                  | isLower c -> (f, reverse gs, c:cs)
-                                (f:gs) -> (f, reverse gs, "")
-                (_:ys') ->
-                   case words (trim ys') of
-                        ((c:cs):gs) | isLower c -> (xs, gs, c:cs)
-                        gs                      -> (xs, gs, "")
+splitByAnd :: [Inline] -> [[Inline]]
+splitByAnd = splitOn [Space, Str "and", Space]
+
+toAuthorList :: [Block] -> Maybe [Agent]
+toAuthorList [Para xs] =
+  Just $ map toAuthor $ splitByAnd xs
+toAuthorList [Plain xs] = toAuthorList [Para xs]
+toAuthorList x = Nothing
+
+toAuthor :: [Inline] -> Agent
+toAuthor [Span ("",[],[]) ils] = -- corporate author
+    Agent { givenName       = []
+          , droppingPart    = ""
+          , nonDroppingPart = ""
+          , familyName      = ""
+          , nameSuffix      = ""
+          , literal         = maybe "" id $ inlinesToString ils
+          , commaSuffix     = False
+          }
+toAuthor ils =
+    Agent { givenName       = givens
+          , droppingPart    = dropping
+          , nonDroppingPart = nondropping
+          , familyName      = family
+          , nameSuffix      = suffix
+          , literal         = ""
+          , commaSuffix     = isCommaSuffix
+          }
+  where inlinesToString' = maybe "" id . inlinesToString
+        isCommaSuffix = False -- TODO
+        suffix = "" -- TODO
+        dropping = "" -- TODO
+        endsWithComma (Str zs) = not (null zs) && last zs == ','
+        endsWithComma _ = False
+        stripComma xs = case reverse xs of
+                             (',':ys) -> reverse ys
+                             _ -> xs
+        (xs, ys) = break endsWithComma ils
+        (family, givens, nondropping) =
+           case splitOn [Space] ys of
+              ((Str w:ws) : rest) ->
+                  ( inlinesToString' [Str (stripComma w)]
+                  , map inlinesToString' $ if null ws then rest else (ws : rest)
+                  , inlinesToString' xs
+                  )
+              _ -> case reverse xs of
+                        []     -> ("", [], "")
+                        (z:zs) -> let (us,vs) = break startsWithCapital zs
+                                  in  ( inlinesToString' [z]
+                                      , map inlinesToString' $ splitOn [Space] $ reverse vs
+                                      , inlinesToString' $ dropWhile (==Space) $ reverse us
+                                      )
+
+startsWithCapital :: Inline -> Bool
+startsWithCapital (Str (x:_)) = isUpper x
+startsWithCapital _           = False
 
 latex :: String -> Maybe String
 latex s = trim `fmap` blocksToString bs
@@ -250,6 +283,10 @@ latex s = trim `fmap` blocksToString bs
 
 latexTitle :: Lang -> String -> Maybe String
 latexTitle lang s = trim `fmap` blocksToString (unTitlecase bs)
+  where Pandoc _ bs = readLaTeX def s
+
+latexAuthors :: String -> Maybe [Agent]
+latexAuthors s = toAuthorList bs
   where Pandoc _ bs = readLaTeX def s
 
 bib :: Bib Reference -> T -> Maybe Reference
@@ -402,20 +439,22 @@ itemToReference lang bibtex = bib $ do
                           'e':'n':_ -> unTitlecase
                           _         -> id
   author' <- getAuthorList "author" <|> return []
+  containerAuthor' <- getAuthorList "bookauthor" <|> return []
+  translator' <- getAuthorList "translator" <|> return []
   title' <- getTitle lang "title" <|> return ""
   return $ emptyReference
          { refId               = id'
          , refType             = reftype
          , author              = author'
          -- , editor              = undefined -- :: [Agent]
-         -- , translator          = undefined -- :: [Agent]
+         , translator          = translator'
          -- , recipient           = undefined -- :: [Agent]
          -- , interviewer         = undefined -- :: [Agent]
          -- , composer            = undefined -- :: [Agent]
          -- , director            = undefined -- :: [Agent]
          -- , illustrator         = undefined -- :: [Agent]
          -- , originalAuthor      = undefined -- :: [Agent]
-         -- , containerAuthor     = undefined -- :: [Agent]
+         , containerAuthor     = containerAuthor'
          -- , collectionEditor    = undefined -- :: [Agent]
          -- , editorialDirector   = undefined -- :: [Agent]
          -- , reviewedAuthor      = undefined -- :: [Agent]
@@ -487,9 +526,6 @@ itemToReference lang bibtex = bib $ do
 itemToMetaValue :: Lang -> Bool -> T -> MetaValue
 itemToMetaValue lang bibtex = bibItem $ do
 -- author, editor:
-  opt $ getAuthorList' "author" >>= setList "author"
-  opt $ getAuthorList' "bookauthor" >>= setList "container-author"
-  opt $ getAuthorList' "translator" >>= setList "translator"
   hasEditortype <- isPresent "editortype"
   opt $ if hasEditortype then
     do
@@ -668,54 +704,11 @@ addPeriod xs = [Str ".",Space] ++ xs
 inParens :: [Inline] -> [Inline]
 inParens xs = [Space, Str "("] ++ xs ++ [Str ")"]
 
-splitByAnd :: [Inline] -> [[Inline]]
-splitByAnd = splitOn [Space, Str "and", Space]
-
 toLiteralList :: MetaValue -> [MetaValue]
 toLiteralList (MetaBlocks [Para xs]) =
   map MetaInlines $ splitByAnd xs
 toLiteralList (MetaBlocks []) = []
 toLiteralList x = error $ "toLiteralList: " ++ show x
-
-toAuthorList' :: MetaValue -> [MetaValue]
-toAuthorList' (MetaBlocks [Para xs]) =
-  map toAuthor $ splitByAnd xs
-toAuthorList' (MetaBlocks []) = []
-toAuthorList' x = error $ "toAuthorList': " ++ show x
-
-toAuthor :: [Inline] -> MetaValue
-toAuthor [Span ("",[],[]) ils] = -- corporate author
-  MetaMap $ M.singleton "literal" $ MetaInlines ils
-toAuthor ils = MetaMap $ M.fromList $
-  [ ("given", MetaList givens)
-  , ("family", family)
-  ] ++ case particle of
-            MetaInlines [] -> []
-            _              -> [("non-dropping-particle", particle)]
-  where endsWithComma (Str zs) = not (null zs) && last zs == ','
-        endsWithComma _ = False
-        stripComma xs = case reverse xs of
-                             (',':ys) -> reverse ys
-                             _ -> xs
-        (xs, ys) = break endsWithComma ils
-        (family, givens, particle) =
-           case splitOn [Space] ys of
-              ((Str w:ws) : rest) ->
-                  ( MetaInlines [Str (stripComma w)]
-                  , map MetaInlines $ if null ws then rest else (ws : rest)
-                  , MetaInlines xs
-                  )
-              _ -> case reverse xs of
-                        []     -> (MetaInlines [], [], MetaInlines [])
-                        (z:zs) -> let (us,vs) = break startsWithCapital zs
-                                  in  ( MetaInlines [z]
-                                      , map MetaInlines $ splitOn [Space] $ reverse vs
-                                      , MetaInlines $ dropWhile (==Space) $ reverse us
-                                      )
-
-startsWithCapital :: Inline -> Bool
-startsWithCapital (Str (x:_)) = isUpper x
-startsWithCapital _           = False
 
 latex' :: String -> MetaValue
 latex' s = MetaBlocks bs
