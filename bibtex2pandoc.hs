@@ -217,7 +217,7 @@ getLiteralList :: String -> Bib [String]
 getLiteralList f = do
   fs <- asks fields
   case lookup f fs of
-       Just x  -> return $ map trim $ splitOn " \\and " x
+       Just x  -> return $ map trim $ splitOn " and " x
        Nothing -> notFound f
 
 splitByAnd :: [Inline] -> [[Inline]]
