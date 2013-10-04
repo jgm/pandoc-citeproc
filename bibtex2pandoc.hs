@@ -180,8 +180,6 @@ resolveKey (Lang "en" "US") k =
        _               -> k
 resolveKey _ k = resolveKey (Lang "en" "US") k
 
-
-
 type Bib = ReaderT T Maybe
 
 notFound :: String -> Bib a
@@ -191,6 +189,13 @@ getField :: String -> Bib String
 getField f = do
   fs <- asks fields
   case lookup f fs >>= latex of
+       Just x  -> return x
+       Nothing -> fail "not found"
+
+getTitle :: Lang -> String -> Bib String
+getTitle lang f = do
+  fs <- asks fields
+  case lookup f fs >>= latexTitle lang of
        Just x  -> return x
        Nothing -> fail "not found"
 
@@ -240,26 +245,27 @@ toAuthor s = Agent { givenName       = givens
                         gs                      -> (xs, gs, "")
 
 latex :: String -> Maybe String
-latex s = blocksToString bs
-  where Pandoc _ bs = readLaTeX def $ trim s
+latex s = trim `fmap` blocksToString bs
+  where Pandoc _ bs = readLaTeX def s
+
+latexTitle :: Lang -> String -> Maybe String
+latexTitle lang s = trim `fmap` blocksToString (unTitlecase bs)
+  where Pandoc _ bs = readLaTeX def s
 
 bib :: Bib Reference -> T -> Maybe Reference
 bib m entry = runReaderT m entry
 
 -- TODO the untitlecase should apply in the latex conversion phase
-unTitlecase :: String -> String
-unTitlecase s = s -- TODO 
-{-
-unTitlecase (MetaInlines ils) = MetaInlines $ untc ils
-unTitlecase (MetaBlocks [Para ils]) = MetaBlocks [Para $ untc ils]
-unTitlecase (MetaBlocks [Plain ils]) = MetaBlocks [Para $ untc ils]
+unTitlecase :: [Block] -> [Block]
+unTitlecase [Para ils]  = [Para $ untc ils]
+unTitlecase [Plain ils] = [Para $ untc ils]
+unTitlecase xs          = xs
 
 untc :: [Inline] -> [Inline]
 untc [] = []
 untc (x:xs) = x : map go xs
   where go (Str ys)     = Str $ map toLower ys
         go z            = z
--}
 
 toLocale :: String -> String
 toLocale "english"    = "en-US" -- "en-EN" unavailable in CSL
@@ -395,11 +401,12 @@ itemToReference lang bibtex = bib $ do
   let processTitle = case hyphenation of
                           'e':'n':_ -> unTitlecase
                           _         -> id
-  authors <- getAuthorList "author" <|> return []
+  author' <- getAuthorList "author" <|> return []
+  title' <- getTitle lang "title" <|> return ""
   return $ emptyReference
          { refId               = id'
          , refType             = reftype
-         , author              = authors
+         , author              = author'
          -- , editor              = undefined -- :: [Agent]
          -- , translator          = undefined -- :: [Agent]
          -- , recipient           = undefined -- :: [Agent]
@@ -420,7 +427,7 @@ itemToReference lang bibtex = bib $ do
          -- , originalDate        = undefined -- :: [RefDate]
          -- , submitted           = undefined -- :: [RefDate]
 
-         -- , title               = undefined -- :: String
+         , title               = title'
          -- , titleShort          = undefined -- :: String
          -- , reviewedTitle       = undefined -- :: String
          -- , containerTitle      = undefined -- :: String
@@ -550,7 +557,6 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField' "eventdate" >>= setField "event-date"   -- FIXME
   opt $ getField' "origdate" >>= setField "original-date" -- FIXME
 -- titles:
-  opt $ getField' "title" >>= setField "title" . processTitle
   opt $ getField' "subtitle" >>= appendField "title" addColon . processTitle
   opt $ getField' "titleaddon" >>= appendField "title" addPeriod . processTitle
   opt $ getField' "maintitle" >>= setField "container-title" . processTitle
