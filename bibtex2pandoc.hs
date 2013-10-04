@@ -22,6 +22,7 @@ import System.IO (stderr, hPutStrLn)
 import Control.Monad
 import Control.Monad.RWS.Strict
 import System.Environment (getEnvironment)
+import qualified Data.Text as T
 
 main :: IO ()
 main = do
@@ -251,7 +252,7 @@ toLocale "canadian"   = "en-US" -- "en-CA" unavailable in CSL
 toLocale "australian" = "en-GB" -- "en-AU" unavailable in CSL
 toLocale "newzealand" = "en-GB" -- "en-NZ" unavailable in CSL
 toLocale "afrikaans"  = "af-ZA"
-toLocale "arabic"     = "ar-AR"
+toLocale "arabic"     = "ar"
 toLocale "basque"     = "eu"
 toLocale "bulgarian"  = "bg-BG"
 toLocale "catalan"    = "ca-AD"
@@ -301,7 +302,7 @@ toLocale "thai"       = "th-TH"
 toLocale "turkish"    = "tr-TR"
 toLocale "ukrainian"  = "uk-UA"
 toLocale "vietnamese" = "vi-VN"
-toLocale _            = ""  
+toLocale _            = ""
 
 itemToMetaValue :: Lang -> Bool -> T -> MetaValue
 itemToMetaValue lang bibtex = bibItem $ do
@@ -343,22 +344,114 @@ itemToMetaValue lang bibtex = bibItem $ do
        "thesis"          -> setType "thesis"
        "unpublished"     -> setType "manuscript"
        "www"             -> setType "webpage"
+       -- biblatex, "unsupported"
+       "artwork"         -> setType "graphic"
+       "audio"           -> setType "song"              -- for audio *recordings*
+       "commentary"      -> setType "book"
+       "image"           -> setType "graphic"           -- or "figure" ?
+       "jurisdiction"    -> setType "legal_case"
+       "legislation"     -> setType "legislation"       -- or "bill" ?
+       "legal"           -> setType "treaty"
+       "letter"          -> setType "personal_communication"
+       "movie"           -> setType "motion_picture"
+       "music"           -> setType "song"              -- for musical *recordings*
+       "performance"     -> setType "speech"
+       "review"          -> setType "review"            -- or "review-book" ?
+       "software"        -> setType "book"              -- for lack of any better match
+       "standard"        -> setType "legislation"
+       "video"           -> setType "motion_picture"
+       -- biblatex-apa:
+       "data"            -> setType "dataset"
+       "letters"         -> setType "personal_communication"
+       "newsarticle"     -> setType "article-newspaper"
        _                 -> setType "no-type"
-       
+
+-- Use entrysubtype to tweak CSL type:
   opt $ do
     val <- getRawField "entrysubtype"
-    if  et == "article" && val == "magazine" then
-          setType "article-magazine"
-    else
-          return ()
-       
-  opt $ getRawField "type" >>= setRawField "genre" . resolveKey lang
+--    if  (et == "article" || et == "periodical" || et == "suppperiodical") && val == "magazine"
+    if  (et `elem` ["article","periodical","suppperiodical"]) && val == "magazine"
+    then setType "article-magazine"
+    else return ()
+-- hyphenation:
   hyphenation <- getRawField "hyphenation" <|> return "english"
   let processTitle = if (map toLower hyphenation) `elem`
                         ["american","british","canadian","english",
                          "australian","newzealand","usenglish","ukenglish"]
                      then unTitlecase
                      else id
+  opt $ getRawField "hyphenation" >>= setRawField "language" . toLocale
+-- author, editor:
+  opt $ getAuthorList "author" >>= setList "author"
+  opt $ getAuthorList "bookauthor" >>= setList "container-author"
+  opt $ getAuthorList "translator" >>= setList "translator"
+  hasEditortype <- isPresent "editortype"
+  opt $ if hasEditortype then
+    do
+      val <- getRawField "editortype"
+      getAuthorList "editor" >>=  setList (
+        case val of
+        "editor"       -> "editor"             -- from here on biblatex & CSL
+        "compiler"     -> "editor"             -- from here on biblatex only;
+        "founder"      -> "editor"             --   not optimal, but all can
+        "continuator"  -> "editor"             --   somehow be subsumed under
+        "redactor"     -> "editor"             --   "editor"
+        "reviser"      -> "editor"
+        "collaborator" -> "editor"
+        "director"     -> "director"           -- from here on biblatex-chicago & CSL
+  --    "conductor"    -> ""                   -- from here on biblatex-chicago only
+  --    "producer"     -> ""
+  --    "none"         -> ""                   -- meant for performer(s)
+  --    ""             -> "editorial-director" -- from here on CSL only
+  --    ""             -> "composer"
+  --    ""             -> "illustrator"
+  --    ""             -> "interviewer"
+  --    ""             -> "collection-editor"
+        _              -> "editor")
+    else opt $ getAuthorList "editor" >>= setList "editor"
+
+-- FIXME: add same for editora, editorb, editorc
+
+  opt $ getAuthorList "director" >>= setList "director"
+  -- director from biblatex-apa, which has also producer, writer, execproducer (FIXME?)
+-- dates:
+  opt $ getField "year" >>= setSubField "issued" "year"
+  opt $ getField "month" >>= setSubField "issued" "month"
+--  opt $ getField "date" >>= setField "issued" -- FIXME
+  opt $ do
+    dateraw <- getRawField "date"
+    let datelist = T.splitOn (T.pack "-") (T.pack dateraw)
+    let year = T.unpack (datelist !! 0)
+    if length (datelist) > 1
+    then do
+      let month = T.unpack (datelist !! 1)
+      setSubField "issued" "month" (MetaString month)
+      if length (datelist) > 2
+      then do
+        let day = T.unpack (datelist !! 2)
+        setSubField "issued" "day" (MetaString day)
+      else return ()
+    else return ()
+    setSubField "issued" "year" (MetaString year)
+--  opt $ getField "urldate" >>= setField "accessed" -- FIXME
+  opt $ do
+    dateraw <- getRawField "urldate"
+    let datelist = T.splitOn (T.pack "-") (T.pack dateraw)
+    let year = T.unpack (datelist !! 0)
+    if length (datelist) > 1
+    then do
+      let month = T.unpack (datelist !! 1)
+      setSubField "accessed" "month" (MetaString month)
+      if length (datelist) > 2
+      then do
+        let day = T.unpack (datelist !! 2)
+        setSubField "accessed" "day" (MetaString day)
+      else return ()
+    else return ()
+    setSubField "accessed" "year" (MetaString year)
+  opt $ getField "eventdate" >>= setField "event-date"   -- FIXME
+  opt $ getField "origdate" >>= setField "original-date" -- FIXME
+-- titles:
   opt $ getField "title" >>= setField "title" . processTitle
   opt $ getField "subtitle" >>= appendField "title" addColon . processTitle
   opt $ getField "titleaddon" >>= appendField "title" addPeriod . processTitle
@@ -370,39 +463,41 @@ itemToMetaValue lang bibtex = bibItem $ do
   hasMaintitle <- isPresent "maintitle"
   opt $ getField "booktitle" >>=
              setField (if hasMaintitle &&
-                          et `elem` ["inbook","incollection","inproceedings"]
+                          et `elem` ["inbook","incollection","inproceedings","bookinbook"]
                        then "volume-title"
                        else "container-title") . processTitle
   opt $ getField "booksubtitle" >>=
              appendField (if hasMaintitle &&
-                             et `elem` ["inbook","incollection","inproceedings"]
+                             et `elem` ["inbook","incollection","inproceedings","bookinbook"]
                           then "volume-title"
                           else "container-title") addColon . processTitle
   opt $ getField "booktitleaddon" >>=
              appendField (if hasMaintitle &&
-                             et `elem` ["inbook","incollection","inproceedings"]
+                             et `elem` ["inbook","incollection","inproceedings","bookinbook"]
                           then "volume-title"
                           else "container-title") addPeriod . processTitle
   opt $ getField "shorttitle" >>= setField "title-short" . processTitle
-  opt $ getField "series" >>= setField "collection-title" . processTitle
-  opt $ getField "pages" >>= setField "page"
-  opt $ getField "volume" >>= setField "volume"
-  opt $ getField "number" >>=
-             setField (if et `elem` ["report"]
-                       then "number"
-                       else if et `elem` ["article", "periodical"]
-                       then "issue"
-                       else "collection-number")
-  opt $ getField "issue" >>= appendField "issue" addComma
-  opt $ getField "chapter" >>= setField "chapter-number"
-  opt $ getField "edition" >>= setField "edition"
-  opt $ getField "note" >>= setField "note"
-  opt $ getRawField "url" >>= setRawField "url"
+  -- handling of "periodical" to be revised as soon as new "issue-title" variable
+  --   is included into CSL specs
+  -- A biblatex "note" field in @periodical usually contains sth. like "Special issue"
+  -- At least for CMoS, APA, borrowing "genre" for this works reasonably well.
+  opt $ do
+    if  et == "periodical" then do
+      opt $ getField "title" >>= setField "container-title"
+      opt $ getField "issuetitle" >>= setField "title" . processTitle
+      opt $ getField "issuesubtitle" >>= appendField "title" addColon . processTitle
+      opt $ getField "note" >>= appendField "genre" addPeriod . processTitle
+    else return ()
   opt $ getField "journal" >>= setField "container-title"
   opt $ getField "journaltitle" >>= setField "container-title"
   opt $ getField "journalsubtitle" >>= appendField "container-title" addColon
   opt $ getField "shortjournal" >>= setField "container-title-short"
-
+  opt $ getField "series" >>= appendField (if et `elem` ["article","periodical","suppperiodical"]
+                                        then "container-title"
+                                        else "collection-title") addComma
+  opt $ getField "eventtitle" >>= setField "event"
+  opt $ getField "origtitle" >>= setField "original-title"
+-- publisher, location:
 --   opt $ getField "school" >>= setField "publisher"
 --   opt $ getField "institution" >>= setField "publisher"
 --   opt $ getField "organization" >>= setField "publisher"
@@ -418,66 +513,44 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField "address" >>= setField "publisher-place"
   unless bibtex $ do
     opt $ getField "location" >>= setField "publisher-place"
-
-  opt $ getAuthorList "author" >>= setList "author"
-
-  hasEditortype <- isPresent "editortype"
-  if hasEditortype then
-    opt $ do
-      val <- getRawField "editortype"
-      getAuthorList "editor" >>=  setList (
-        case val of 
-        "editor"       -> "editor"             -- from here on biblatex & CSL
-        "compiler"     -> "editor"             -- from here on biblatex only
-        "founder"      -> "editor"
-        "continuator"  -> "editor"
-        "redactor"     -> "editor"
-        "reviser"      -> "editor"
-        "collaborator" -> "editor"
-        "director"     -> "director"           -- from here on biblatex-chicago & CSL
-  --    "conductor"    -> ""                   -- from here on biblatex-chicago only
-  --    "producer"     -> ""
-  --    "none"         -> ""                   -- = performer
-  --    ""             -> "editorial-director" -- from here on CSL only
-  --    ""             -> "composer"
-  --    ""             -> "illustrator"
-  --    ""             -> "interviewer"
-  --    ""             -> "collection-editor"
-        _              -> "editor")
-    else opt $ getAuthorList "editor" >>= setList "editor"
- 
--- FIXME: add same for editora, editorb, editorc
-
-  opt $ getAuthorList "director" >>= setList "director"
-  -- director from biblatex-apa, which has also producer, writer, execproducer (FIXME?)
-
+  opt $ getLiteralList "venue" >>= setList "event-place"
+  opt $ getLiteralList "origlocation" >>=
+             setList "original-publisher-place"
+  opt $ getLiteralList "origpublisher" >>= setList "original-publisher"
+-- numbers, locators etc.:
+  opt $ getField "pages" >>= setField "page"
+  opt $ getField "volume" >>= setField "volume"
+  opt $ getField "number" >>=
+             setField (if et `elem` ["article","periodical","suppperiodical"]
+                       then "issue"
+                       else if et `elem` ["book","collection","proceedings","reference",
+                       "mvbook","mvcollection","mvproceedings","mvreference",
+                       "bookinbook","inbook","incollection","inproceedings","inreference",
+                       "suppbook","suppcollection"]
+                       then "collection-number"
+                       else "number")                     -- "report", "patent", etc.
+  opt $ getField "issue" >>= appendField "issue" addComma
+  opt $ getField "chapter" >>= setField "chapter-number"
+  opt $ getField "edition" >>= setField "edition"
+  opt $ getField "pagetotal" >>= setField "number-of-pages"
+  opt $ getField "volumes" >>= setField "number-of-volumes"
+  opt $ getField "version" >>= setField "version"
+  opt $ getRawField "type" >>= setRawField "genre" . resolveKey lang
+  opt $ getRawField "pubstate" >>= setRawField "status" . resolveKey lang
+-- url, doi, isbn, etc.:
+  opt $ getRawField "url" >>= setRawField "url"
+  opt $ getRawField "doi" >>= setRawField "doi"
+  opt $ getRawField "isbn" >>= setRawField "isbn"
+  opt $ getRawField "issn" >>= setRawField "issn"
+-- note etc.
+  unless (et == "periodical") $ do
+    opt $ getField "note" >>= setField "note"
   unless bibtex $ do
     opt $ getField "addendum" >>= appendField "note" (Space:)
   opt $ getField "annotation" >>= setField "annote"
   opt $ getField "annote" >>= setField "annote"
-  opt $ getField "year" >>= setSubField "issued" "year"
-  opt $ getField "month" >>= setSubField "issued" "month"
-  opt $ getAuthorList "translator" >>= setList "translator"
-  opt $ getAuthorList "bookauthor" >>= setList "container-author"
   opt $ getField "abstract" >>= setField "abstract"
   opt $ getField "keywords" >>= setField "keyword"
-  opt $ getField "eventdate" >>= setField "event-date"
-  opt $ getField "eventtitle" >>= setField "event"
-  opt $ getLiteralList "venue" >>= setList "event-place"
-  opt $ getRawField "doi" >>= setRawField "doi"
-  opt $ getRawField "isbn" >>= setRawField "isbn"
-  opt $ getRawField "issn" >>= setRawField "issn"
-  opt $ getField "origdate" >>= setField "original-date"
-  opt $ getLiteralList "origlocation" >>=
-             setList "original-publisher-place"
-  opt $ getLiteralList "origpublisher" >>= setList "original-publisher"
-  opt $ getField "origtitle" >>= setField "original-title"
-  opt $ getField "pagetotal" >>= setField "number-of-pages"
-  opt $ getRawField "pubstate" >>= setRawField "status" . resolveKey lang
-  opt $ getField "urldate" >>= setField "accessed"
-  opt $ getField "version" >>= setField "version"
-  opt $ getField "volumes" >>= setField "number-of-volumes"
-  opt $ getRawField "hyphenation" >>= setRawField "language" . toLocale
 
 addColon :: [Inline] -> [Inline]
 addColon xs = [Str ":",Space] ++ xs
