@@ -435,9 +435,8 @@ itemToReference lang bibtex = bib $ do
        _                 -> (NoType,"")
   -- hyphenation:
   hyphenation <- toLocale <$> (getRawField "hyphenation" <|> return "english")
-  let processTitle = case hyphenation of
-                          'e':'n':_ -> unTitlecase
-                          _         -> id
+
+  -- authors:
   author' <- getAuthorList "author" <|> return []
   containerAuthor' <- getAuthorList "bookauthor" <|> return []
   translator' <- getAuthorList "translator" <|> return []
@@ -448,9 +447,29 @@ itemToReference lang bibtex = bib $ do
                                   _           -> (editor'', [])
   -- FIXME: add same for editora, editorb, editorc
 
-
-
+  -- titles
+  let processTitle = case hyphenation of
+                          'e':'n':_ -> unTitlecase
+                          _         -> id
   title' <- getTitle lang "title" <|> return ""
+  subtitle' <- (": " ++) `fmap` getTitle lang "subtitle" <|> return ""
+  titleaddon' <- (". " ++) `fmap` getTitle lang "titleaddon" <|> return ""
+  let hasVolumes = et `elem` ["inbook","incollection","inproceedings","bookinbook"]
+  containerTitle' <- getTitle lang "maintitle" <|> getTitle lang "booktitle" <|> return ""
+  containerSubtitle' <- (": " ++) `fmap` getTitle lang "mainsubtitle"
+                       <|> getTitle lang "booksubtitle" <|> return ""
+  containerTitleAddon' <- (". " ++) `fmap` getTitle lang "maintitleaddon"
+                       <|> getTitle lang "booktitleaddon" <|> return ""
+  volumeTitle' <- (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booktitle")
+                       <|> return ""
+  volumeSubtitle' <- (": " ++) `fmap`
+                       (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booksubtitle")
+                       <|> return ""
+  volumeTitleAddon' <- (". " ++) `fmap`
+                       (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booktitleaddon")
+                       <|> return ""
+  shortTitle' <- getTitle lang "shorttitle" <|> return ""
+
   return $ emptyReference
          { refId               = id'
          , refType             = reftype
@@ -475,11 +494,11 @@ itemToReference lang bibtex = bib $ do
          -- , originalDate        = undefined -- :: [RefDate]
          -- , submitted           = undefined -- :: [RefDate]
 
-         , title               = title'
-         -- , titleShort          = undefined -- :: String
+         , title               = title' ++ subtitle' ++ titleaddon'
+         , titleShort          = shortTitle'
          -- , reviewedTitle       = undefined -- :: String
-         -- , containerTitle      = undefined -- :: String
-         -- , collectionTitle     = undefined -- :: String
+         , containerTitle      = containerTitle' ++ containerSubtitle' ++ containerTitleAddon'
+         , collectionTitle     = volumeTitle' ++ volumeSubtitle' ++ volumeTitleAddon'
          -- , containerTitleShort = undefined -- :: String
          -- , collectionNumber    = undefined -- :: String --Int
          -- , originalTitle       = undefined -- :: String
@@ -576,30 +595,6 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField' "eventdate" >>= setField "event-date"   -- FIXME
   opt $ getField' "origdate" >>= setField "original-date" -- FIXME
 -- titles:
-  opt $ getField' "subtitle" >>= appendField "title" addColon . processTitle
-  opt $ getField' "titleaddon" >>= appendField "title" addPeriod . processTitle
-  opt $ getField' "maintitle" >>= setField "container-title" . processTitle
-  opt $ getField' "mainsubtitle" >>=
-        appendField "container-title" addColon . processTitle
-  opt $ getField' "maintitleaddon" >>=
-             appendField "container-title" addPeriod . processTitle
-  hasMaintitle <- isPresent "maintitle"
-  opt $ getField' "booktitle" >>=
-             setField (if hasMaintitle &&
-                          et `elem` ["inbook","incollection","inproceedings","bookinbook"]
-                       then "volume-title"
-                       else "container-title") . processTitle
-  opt $ getField' "booksubtitle" >>=
-             appendField (if hasMaintitle &&
-                             et `elem` ["inbook","incollection","inproceedings","bookinbook"]
-                          then "volume-title"
-                          else "container-title") addColon . processTitle
-  opt $ getField' "booktitleaddon" >>=
-             appendField (if hasMaintitle &&
-                             et `elem` ["inbook","incollection","inproceedings","bookinbook"]
-                          then "volume-title"
-                          else "container-title") addPeriod . processTitle
-  opt $ getField' "shorttitle" >>= setField "title-short" . processTitle
   -- handling of "periodical" to be revised as soon as new "issue-title" variable
   --   is included into CSL specs
   -- A biblatex "note" field in @periodical usually contains sth. like "Special issue"
