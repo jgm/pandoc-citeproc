@@ -11,18 +11,23 @@ import Text.Parsec hiding (optional, (<|>))
 import Control.Applicative
 import Text.Pandoc
 import qualified Data.Map as M
+import Data.Yaml
 import Data.List.Split (splitOn, splitWhen)
-import Data.List (intersperse)
+import Data.List (intersperse, intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper)
+import Data.Char (toLower, isUpper, isLower)
 import System.Console.GetOpt
 import System.Environment
 import System.Exit
 import System.IO (stderr, hPutStrLn)
 import Control.Monad
 import Control.Monad.RWS.Strict
+import Control.Monad.Reader
 import System.Environment (getEnvironment)
 import qualified Data.Text as T
+import Text.CSL.Reference
+import Text.CSL.Pandoc (blocksToString, inlinesToString)
+import qualified Data.ByteString as B
 
 main :: IO ()
 main = do
@@ -53,14 +58,10 @@ main = do
                    Left err -> error (show err)
                    Right xs -> resolveCrossRefs isBibtex
                                   $ map lowercaseFieldNames xs
-  putStrLn
-    $ writeMarkdown def{ writerTemplate = "$titleblock$"
-                       , writerStandalone = True }
-    $ Pandoc (Meta $ M.fromList [
-                     ("references" , MetaList
-                                    $ map (itemToMetaValue lang isBibtex) items)
-                     ]
-             ) []
+  putStrLn "---\nreferences:"
+  B.putStr $ encode
+           $ mapMaybe (itemToReference lang isBibtex) items
+  putStrLn "..."
 
 data Option =
     Help | Version | Bibtex
@@ -155,86 +156,207 @@ standardTrans z =
        "indexsorttitle" -> []
        _                -> [z]
 
-type BibM = RWST T () (M.Map String MetaValue) Maybe
+trim :: String -> String
+trim = unwords . words
 
-opt :: BibM () -> BibM ()
-opt m = m `mplus` return ()
+data Lang = Lang String String  -- e.g. "en" "US"
 
-getField :: String -> BibM MetaValue
-getField f = do
-  fs <- asks fields
-  case lookup f fs of
-       Just x  -> return $ latex x
-       Nothing -> fail "not found"
+resolveKey :: Lang -> String -> String
+resolveKey (Lang "en" "US") k =
+  case k of
+       "inpreparation" -> "in preparation"
+       "submitted"     -> "submitted"
+       "forthcoming"   -> "forthcoming"
+       "inpress"       -> "in press"
+       "prepublished"  -> "pre-published"
+       "mathesis"      -> "Master’s thesis"
+       "phdthesis"     -> "PhD thesis"
+       "candthesis"    -> "Candidate thesis"
+       "techreport"    -> "technical report"
+       "resreport"     -> "research report"
+       "software"      -> "computer software"
+       "datacd"        -> "data CD"
+       "audiocd"       -> "audio CD"
+       _               -> k
+resolveKey _ k = resolveKey (Lang "en" "US") k
 
-setField :: String -> MetaValue -> BibM ()
-setField f x = modify $ M.insert f x
+type Bib = ReaderT T Maybe
 
-appendField :: String -> ([Inline] -> [Inline]) -> MetaValue -> BibM ()
-appendField f fn x = modify $ M.insertWith combine f x
-  where combine new old = MetaInlines $ toInlines old ++ fn (toInlines new)
-        toInlines (MetaInlines ils) = ils
-        toInlines (MetaBlocks [Para ils]) = ils
-        toInlines (MetaBlocks [Plain ils]) = ils
-        toInlines _ = []
-
-notFound :: String -> BibM a
+notFound :: String -> Bib a
 notFound f = fail $ f ++ " not found"
 
-getId :: BibM String
-getId = asks identifier
+getField :: String -> Bib String
+getField f = do
+  fs <- asks fields
+  case lookup f fs >>= latex of
+       Just x  -> return x
+       Nothing -> notFound f
 
-getRawField :: String -> BibM String
+getTitle :: Lang -> String -> Bib String
+getTitle lang f = do
+  fs <- asks fields
+  case lookup f fs >>= latexTitle lang of
+       Just x  -> return x
+       Nothing -> notFound f
+
+getDates :: String -> Bib [RefDate]
+getDates f = do
+  fs <- asks fields
+  case lookup f fs >>= parseDates of
+       Just x  -> return x
+       Nothing -> notFound f
+
+parseDates :: String -> Maybe [RefDate]
+parseDates s = mapM parseDate $ splitOn "/" s
+
+parseDate :: String -> Maybe RefDate
+parseDate s = do
+  let (year', month', day') =
+        case splitOn "-" s of
+             [y]     -> (y, "", "")
+             [y,m]   -> (y, m, "")
+             [y,m,d] -> (y, m, d)
+  return RefDate { year   = year'
+                 , month  = month'
+                 , season = ""
+                 , day    = day'
+                 , other  = ""
+                 , circa  = ""
+                 }
+
+getOldDates :: String -> Bib [RefDate]
+getOldDates prefix = do
+  year' <- getField (prefix ++ "year")
+  month' <- getField (prefix ++ "month") <|> return ""
+  day' <- getField (prefix ++ "day") <|> return ""
+  endyear' <- getField (prefix ++ "endyear") <|> return ""
+  endmonth' <- getField (prefix ++ "endmonth") <|> return ""
+  endday' <- getField (prefix ++ "endday") <|> return ""
+  let start' = RefDate { year   = year'
+                       , month  = month'
+                       , season = ""
+                       , day    = day'
+                       , other  = ""
+                       , circa  = ""
+                       }
+  let end' = if null endyear'
+                then []
+                else [RefDate { year   = endyear'
+                              , month  = endmonth'
+                              , day    = endday'
+                              , season = ""
+                              , other  = ""
+                              , circa  = ""
+                              }]
+  return (start':end')
+
+getRawField :: String -> Bib String
 getRawField f = do
   fs <- asks fields
   case lookup f fs of
        Just x  -> return x
        Nothing -> notFound f
 
-setRawField :: String -> String -> BibM ()
-setRawField f x = modify $ M.insert f (MetaString x)
-
-getAuthorList :: String -> BibM [MetaValue]
+getAuthorList :: String -> Bib [Agent]
 getAuthorList f = do
   fs <- asks fields
-  case lookup f fs of
-       Just x  -> return $ toAuthorList $ latex x
+  case lookup f fs >>= latexAuthors of
+       Just xs -> return xs
        Nothing -> notFound f
 
-getLiteralList :: String -> BibM [MetaValue]
+getLiteralList :: String -> Bib [String]
 getLiteralList f = do
   fs <- asks fields
   case lookup f fs of
-       Just x  -> return $ toLiteralList $ latex x
+       Just x  -> return $ map trim $ splitOn " and " x
        Nothing -> notFound f
 
-setList :: String -> [MetaValue] -> BibM ()
-setList f xs = modify $ M.insert f $ MetaList xs
+splitByAnd :: [Inline] -> [[Inline]]
+splitByAnd = splitOn [Space, Str "and", Space]
 
-setSubField :: String -> String -> MetaValue -> BibM ()
-setSubField f k v = do
-  fs <- get
-  case M.lookup f fs of
-       Just (MetaMap m) -> modify $ M.insert f (MetaMap $ M.insert k v m)
-       _ -> modify $ M.insert f (MetaMap $ M.singleton k v)
+toAuthorList :: [Block] -> Maybe [Agent]
+toAuthorList [Para xs] =
+  Just $ map toAuthor $ splitByAnd xs
+toAuthorList [Plain xs] = toAuthorList [Para xs]
+toAuthorList x = Nothing
 
-bibItem :: BibM a -> T -> MetaValue
-bibItem m entry = MetaMap $ maybe M.empty fst $ execRWST m entry M.empty
+toAuthor :: [Inline] -> Agent
+toAuthor [Str "others"] =
+    Agent { givenName       = []
+          , droppingPart    = ""
+          , nonDroppingPart = ""
+          , familyName      = ""
+          , nameSuffix      = ""
+          , literal         = "others"
+          , commaSuffix     = False
+          }
+toAuthor [Span ("",[],[]) ils] = -- corporate author
+    Agent { givenName       = []
+          , droppingPart    = ""
+          , nonDroppingPart = ""
+          , familyName      = ""
+          , nameSuffix      = ""
+          , literal         = maybe "" id $ inlinesToString ils
+          , commaSuffix     = False
+          }
+toAuthor ils =
+    Agent { givenName       = givens
+          , droppingPart    = dropping
+          , nonDroppingPart = nondropping
+          , familyName      = family
+          , nameSuffix      = suffix
+          , literal         = ""
+          , commaSuffix     = isCommaSuffix
+          }
+  where inlinesToString' = maybe "" id . inlinesToString
+        isCommaSuffix = False -- TODO
+        suffix = "" -- TODO
+        dropping = "" -- TODO
+        endsWithComma (Str zs) = not (null zs) && last zs == ','
+        endsWithComma _ = False
+        stripComma xs = case reverse xs of
+                             (',':ys) -> reverse ys
+                             _ -> xs
+        (xs, ys) = break endsWithComma ils
+        (family, givens, nondropping) =
+           case splitOn [Space] ys of
+              ((Str w:ws) : rest) ->
+                  ( inlinesToString' [Str (stripComma w)]
+                  , map inlinesToString' $ if null ws then rest else (ws : rest)
+                  , inlinesToString' xs
+                  )
+              _ -> case reverse xs of
+                        []     -> ("", [], "")
+                        (z:zs) -> let (us,vs) = break startsWithCapital zs
+                                  in  ( inlinesToString' [z]
+                                      , map inlinesToString' $ splitOn [Space] $ reverse vs
+                                      , inlinesToString' $ dropWhile (==Space) $ reverse us
+                                      )
 
-getEntryType :: BibM String
-getEntryType = asks entryType
+startsWithCapital :: Inline -> Bool
+startsWithCapital (Str (x:_)) = isUpper x
+startsWithCapital _           = False
 
-isPresent :: String -> BibM Bool
-isPresent f = do
-  fs <- asks fields
-  case lookup f fs of
-       Just _   -> return True
-       Nothing  -> return False
+latex :: String -> Maybe String
+latex s = trim `fmap` blocksToString bs
+  where Pandoc _ bs = readLaTeX def s
 
-unTitlecase :: MetaValue -> MetaValue
-unTitlecase (MetaInlines ils) = MetaInlines $ untc ils
-unTitlecase (MetaBlocks [Para ils]) = MetaBlocks [Para $ untc ils]
-unTitlecase (MetaBlocks [Plain ils]) = MetaBlocks [Para $ untc ils]
+latexTitle :: Lang -> String -> Maybe String
+latexTitle lang s = trim `fmap` blocksToString (unTitlecase bs)
+  where Pandoc _ bs = readLaTeX def s
+
+latexAuthors :: String -> Maybe [Agent]
+latexAuthors s = toAuthorList bs
+  where Pandoc _ bs = readLaTeX def s
+
+bib :: Bib Reference -> T -> Maybe Reference
+bib m entry = runReaderT m entry
+
+-- TODO the untitlecase should apply in the latex conversion phase
+unTitlecase :: [Block] -> [Block]
+unTitlecase [Para ils]  = [Para $ untc ils]
+unTitlecase [Plain ils] = [Para $ untc ils]
+unTitlecase xs          = xs
 
 untc :: [Inline] -> [Inline]
 untc [] = []
@@ -304,223 +426,247 @@ toLocale "ukrainian"  = "uk-UA"
 toLocale "vietnamese" = "vi-VN"
 toLocale _            = ""
 
-itemToMetaValue :: Lang -> Bool -> T -> MetaValue
-itemToMetaValue lang bibtex = bibItem $ do
-  getId >>= setRawField "id"
-  et <- map toLower `fmap` getEntryType
-  let setType = setRawField "type"
-  let lang = Lang "en" "US" -- for now, later might get as parameter
-  case et of
-       "article"         -> setType "article-journal"
-       "book"            -> setType "book"
-       "booklet"         -> setType "pamphlet"
-       "bookinbook"      -> setType "book"
-       "collection"      -> setType "book"
-       "electronic"      -> setType "webpage"
-       "inbook"          -> setType "chapter"
-       "incollection"    -> setType "chapter"
-       "inreference "    -> setType "chapter"
-       "inproceedings"   -> setType "paper-conference"
-       "manual"          -> setType "book"
-       "mastersthesis"   -> setType "thesis" >>
-                             setRawField "genre" "Master’s thesis"
-       "misc"            -> setType "no-type"
-       "mvbook"          -> setType "book"
-       "mvcollection"    -> setType "book"
-       "mvproceedings"   -> setType "book"
-       "mvreference"     -> setType "book"
-       "online"          -> setType "webpage"
-       "patent"          -> setType "patent"
-       "periodical"      -> setType "article-journal"
-       "phdthesis"       -> setType "thesis" >>
-                             setRawField "genre" "Ph.D. thesis"
-       "proceedings"     -> setType "book"
-       "reference"       -> setType "book"
-       "report"          -> setType "report"
-       "suppbook"        -> setType "chapter"
-       "suppcollection"  -> setType "chapter"
-       "suppperiodical"  -> setType "article-journal"
-       "techreport"      -> setType "report"
-       "thesis"          -> setType "thesis"
-       "unpublished"     -> setType "manuscript"
-       "www"             -> setType "webpage"
-       -- biblatex, "unsupported"
-       "artwork"         -> setType "graphic"
-       "audio"           -> setType "song"              -- for audio *recordings*
-       "commentary"      -> setType "book"
-       "image"           -> setType "graphic"           -- or "figure" ?
-       "jurisdiction"    -> setType "legal_case"
-       "legislation"     -> setType "legislation"       -- or "bill" ?
-       "legal"           -> setType "treaty"
-       "letter"          -> setType "personal_communication"
-       "movie"           -> setType "motion_picture"
-       "music"           -> setType "song"              -- for musical *recordings*
-       "performance"     -> setType "speech"
-       "review"          -> setType "review"            -- or "review-book" ?
-       "software"        -> setType "book"              -- for lack of any better match
-       "standard"        -> setType "legislation"
-       "video"           -> setType "motion_picture"
+itemToReference :: Lang -> Bool -> T -> Maybe Reference
+itemToReference lang bibtex = bib $ do
+  id' <- asks identifier
+  et <- map toLower `fmap` asks entryType
+  st <- getRawField "entrysubtype" <|> return ""
+  let (reftype, refgenre) = case et of
+       "article"
+         | st == "magazine"  -> (ArticleMagazine,"")
+         | st == "newspaper" -> (ArticleNewspaper,"")
+         | otherwise         -> (ArticleJournal,"")
+       "book"            -> (Book,"")
+       "booklet"         -> (Pamphlet,"")
+       "bookinbook"      -> (Book,"")
+       "collection"      -> (Book,"")
+       "electronic"      -> (Webpage,"")
+       "inbook"          -> (Chapter,"")
+       "incollection"    -> (Chapter,"")
+       "inreference "    -> (Chapter,"")
+       "inproceedings"   -> (PaperConference,"")
+       "manual"          -> (Book,"")
+       "mastersthesis"   -> (Thesis, resolveKey lang "mathesis")
+       "misc"            -> (NoType,"")
+       "mvbook"          -> (Book,"")
+       "mvcollection"    -> (Book,"")
+       "mvproceedings"   -> (Book,"")
+       "mvreference"     -> (Book,"")
+       "online"          -> (Webpage,"")
+       "patent"          -> (Patent,"")
+       "periodical"
+         | st == "magazine"  -> (ArticleMagazine,"")
+         | st == "newspaper" -> (ArticleNewspaper,"")
+         | otherwise         -> (ArticleJournal,"")
+       "phdthesis"       -> (Thesis, resolveKey lang "phdthesis")
+       "proceedings"     -> (Book,"")
+       "reference"       -> (Book,"")
+       "report"          -> (Report,"")
+       "suppbook"        -> (Chapter,"")
+       "suppcollection"  -> (Chapter,"")
+       "suppperiodical"
+         | st == "magazine"  -> (ArticleMagazine,"")
+         | st == "newspaper" -> (ArticleNewspaper,"")
+         | otherwise         -> (ArticleJournal,"")
+       "techreport"      -> (Report,"")
+       "thesis"          -> (Thesis,"")
+       "unpublished"     -> (Manuscript,"")
+       "www"             -> (Webpage,"")
+       -- biblatex, "unsupporEd"
+       "artwork"         -> (Graphic,"")
+       "audio"           -> (Song,"")         -- for audio *recordings*
+       "commentary"      -> (Book,"")
+       "image"           -> (Graphic,"")      -- or "figure" ?
+       "jurisdiction"    -> (LegalCase,"")
+       "legislation"     -> (Legislation,"")  -- or "bill" ?
+       "legal"           -> (Treaty,"")
+       "letter"          -> (PersonalCommunication,"")
+       "movie"           -> (MotionPicture,"")
+       "music"           -> (Song,"")         -- for musical *recordings*
+       "performance"     -> (Speech,"")
+       "review"          -> (Review,"")       -- or "review-book" ?
+       "software"        -> (Book,"")         -- for lack of any better match
+       "standard"        -> (Legislation,"")
+       "video"           -> (MotionPicture,"")
        -- biblatex-apa:
-       "data"            -> setType "dataset"
-       "letters"         -> setType "personal_communication"
-       "newsarticle"     -> setType "article-newspaper"
-       _                 -> setType "no-type"
+       "data"            -> (Dataset,"")
+       "letters"         -> (PersonalCommunication,"")
+       "newsarticle"     -> (ArticleNewspaper,"")
+       _                 -> (NoType,"")
+  -- hyphenation:
+  hyphenation <- toLocale <$> (getRawField "hyphenation" <|> return "english")
 
--- Use entrysubtype to tweak CSL type:
-  opt $ do
-    val <- getRawField "entrysubtype"
---    if  (et == "article" || et == "periodical" || et == "suppperiodical") && val == "magazine"
-    if  (et `elem` ["article","periodical","suppperiodical"]) && val == "magazine"
-    then setType "article-magazine"
-    else return ()
--- hyphenation:
-  hyphenation <- getRawField "hyphenation" <|> return "english"
-  let processTitle = if (map toLower hyphenation) `elem`
-                        ["american","british","canadian","english",
-                         "australian","newzealand","usenglish","ukenglish"]
-                     then unTitlecase
-                     else id
-  opt $ getRawField "hyphenation" >>= setRawField "language" . toLocale
--- author, editor:
-  opt $ getAuthorList "author" >>= setList "author"
-  opt $ getAuthorList "bookauthor" >>= setList "container-author"
-  opt $ getAuthorList "translator" >>= setList "translator"
-  hasEditortype <- isPresent "editortype"
-  opt $ if hasEditortype then
-    do
-      val <- getRawField "editortype"
-      getAuthorList "editor" >>=  setList (
-        case val of
-        "editor"       -> "editor"             -- from here on biblatex & CSL
-        "compiler"     -> "editor"             -- from here on biblatex only;
-        "founder"      -> "editor"             --   not optimal, but all can
-        "continuator"  -> "editor"             --   somehow be subsumed under
-        "redactor"     -> "editor"             --   "editor"
-        "reviser"      -> "editor"
-        "collaborator" -> "editor"
-        "director"     -> "director"           -- from here on biblatex-chicago & CSL
-  --    "conductor"    -> ""                   -- from here on biblatex-chicago only
-  --    "producer"     -> ""
-  --    "none"         -> ""                   -- meant for performer(s)
-  --    ""             -> "editorial-director" -- from here on CSL only
-  --    ""             -> "composer"
-  --    ""             -> "illustrator"
-  --    ""             -> "interviewer"
-  --    ""             -> "collection-editor"
-        _              -> "editor")
-    else opt $ getAuthorList "editor" >>= setList "editor"
+  -- authors:
+  author' <- getAuthorList "author" <|> return []
+  containerAuthor' <- getAuthorList "bookauthor" <|> return []
+  translator' <- getAuthorList "translator" <|> return []
+  editortype <- getRawField "editortype" <|> return ""
+  editor'' <- getAuthorList "editor" <|> return []
+  director'' <- getAuthorList "director" <|> return []
+  let (editor', director') = case editortype of
+                                  "director"  -> ([], editor'')
+                                  _           -> (editor'', director'')
+  -- FIXME: add same for editora, editorb, editorc
 
--- FIXME: add same for editora, editorb, editorc
+  -- titles
+  let processTitle = case hyphenation of
+                          'e':'n':_ -> unTitlecase
+                          _         -> id
+  title' <- getTitle lang "title" <|> return ""
+  subtitle' <- (": " ++) `fmap` getTitle lang "subtitle" <|> return ""
+  titleaddon' <- (". " ++) `fmap` getTitle lang "titleaddon" <|> return ""
+  let hasVolumes = et `elem` ["inbook","incollection","inproceedings","bookinbook"]
+  containerTitle' <- getTitle lang "maintitle" <|> getTitle lang "booktitle"
+                      <|> getTitle lang "journal" <|> getTitle lang "journaltitle" <|> return ""
+  containerSubtitle' <- (": " ++) `fmap` getTitle lang "mainsubtitle"
+                       <|> getTitle lang "booksubtitle" <|> getTitle lang "journalsubtitle"
+                       <|> return ""
+  containerTitleAddon' <- (". " ++) `fmap` getTitle lang "maintitleaddon"
+                       <|> getTitle lang "booktitleaddon" <|> return ""
+  containerTitleShort' <- getTitle lang "booktitleshort" <|> getTitle lang "journaltitleshort"
+                        <|> return ""
+  volumeTitle' <- (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booktitle")
+                       <|> return ""
+  volumeSubtitle' <- (": " ++) `fmap`
+                       (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booksubtitle")
+                       <|> return ""
+  volumeTitleAddon' <- (". " ++) `fmap`
+                       (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booktitleaddon")
+                       <|> return ""
+  shortTitle' <- getTitle lang "shorttitle" <|> return ""
 
-  opt $ getAuthorList "director" >>= setList "director"
-  -- director from biblatex-apa, which has also producer, writer, execproducer (FIXME?)
--- dates:
-  opt $ getField "year" >>= setSubField "issued" "year"
-  opt $ getField "month" >>= setSubField "issued" "month"
---  opt $ getField "date" >>= setField "issued" -- FIXME
-  opt $ do
-    dateraw <- getRawField "date"
-    let datelist = T.splitOn (T.pack "-") (T.pack dateraw)
-    let year = T.unpack (datelist !! 0)
-    if length (datelist) > 1
-    then do
-      let month = T.unpack (datelist !! 1)
-      setSubField "issued" "month" (MetaString month)
-      if length (datelist) > 2
-      then do
-        let day = T.unpack (datelist !! 2)
-        setSubField "issued" "day" (MetaString day)
-      else return ()
-    else return ()
-    setSubField "issued" "year" (MetaString year)
---  opt $ getField "urldate" >>= setField "accessed" -- FIXME
-  opt $ do
-    dateraw <- getRawField "urldate"
-    let datelist = T.splitOn (T.pack "-") (T.pack dateraw)
-    let year = T.unpack (datelist !! 0)
-    if length (datelist) > 1
-    then do
-      let month = T.unpack (datelist !! 1)
-      setSubField "accessed" "month" (MetaString month)
-      if length (datelist) > 2
-      then do
-        let day = T.unpack (datelist !! 2)
-        setSubField "accessed" "day" (MetaString day)
-      else return ()
-    else return ()
-    setSubField "accessed" "year" (MetaString year)
-  opt $ getField "eventdate" >>= setField "event-date"   -- FIXME
-  opt $ getField "origdate" >>= setField "original-date" -- FIXME
--- titles:
-  opt $ getField "title" >>= setField "title" . processTitle
-  opt $ getField "subtitle" >>= appendField "title" addColon . processTitle
-  opt $ getField "titleaddon" >>= appendField "title" addPeriod . processTitle
-  opt $ getField "maintitle" >>= setField "container-title" . processTitle
-  opt $ getField "mainsubtitle" >>=
-        appendField "container-title" addColon . processTitle
-  opt $ getField "maintitleaddon" >>=
-             appendField "container-title" addPeriod . processTitle
-  hasMaintitle <- isPresent "maintitle"
-  opt $ getField "booktitle" >>=
-             setField (if hasMaintitle &&
-                          et `elem` ["inbook","incollection","inproceedings","bookinbook"]
-                       then "volume-title"
-                       else "container-title") . processTitle
-  opt $ getField "booksubtitle" >>=
-             appendField (if hasMaintitle &&
-                             et `elem` ["inbook","incollection","inproceedings","bookinbook"]
-                          then "volume-title"
-                          else "container-title") addColon . processTitle
-  opt $ getField "booktitleaddon" >>=
-             appendField (if hasMaintitle &&
-                             et `elem` ["inbook","incollection","inproceedings","bookinbook"]
-                          then "volume-title"
-                          else "container-title") addPeriod . processTitle
-  opt $ getField "shorttitle" >>= setField "title-short" . processTitle
+  eventTitle' <- getTitle lang "eventtitle" <|> return ""
+  origTitle' <- getTitle lang "origtitle" <|> return ""
+
+{-
+  opt $ getField' "journal" >>= setField "container-title"
+  opt $ getField' "journaltitle" >>= setField "container-title"
+  opt $ getField' "journalsubtitle" >>= appendField "container-title" addColon
+  opt $ getField' "shortjournal" >>= setField "container-title-short"
+  opt $ getField' "series" >>= appendField (if et `elem` ["article","periodical","suppperiodical"]
+                                        then "container-title"
+                                        else "collection-title") addComma
+-}
+
+  -- publisher
+  pubfields <- mapM (\f -> Just `fmap` getField f <|> return Nothing)
+               ["school","institution","organization","howpublished","publisher"]
+  let publisher' = intercalate ", " [p | Just p <- pubfields]
+  origpublisher' <- getField "origpublisher" <|> return ""
+
+-- places
+  venue' <- getField "venue" <|> return ""
+  address' <- getField "address" <|> if bibtex then return "" else getField "location"
+            <|> return ""
+  origLocation' <- getField "origlocation" <|> return ""
+  jurisdiction' <- getField "jurisdiction" <|> return ""
+
+  -- locators
+  pages' <- getField "pages" <|> return ""
+  volume' <- getField "volume" <|> return ""
+  volumes' <- getField "volumes" <|> return ""
+  pagetotal' <- getField "pagetotal" <|> return ""
+  chapter' <- getField "chapter" <|> return ""
+  edition' <- getField "edition" <|> return ""
+  version' <- getField "version" <|> return ""
+
+  -- dates
+  issued' <- getDates "date" <|> getOldDates "" <|> return []
+  eventDate' <- getDates "eventdate" <|> getOldDates "event" <|> return []
+  origDate' <- getDates "origdate" <|> getOldDates "orig" <|> return []
+  accessed' <- getDates "urldate" <|> getOldDates "url" <|> return []
+
+  -- url, doi, isbn, etc.:
+  url' <- getRawField "url" <|> return ""
+  doi' <- getRawField "doi" <|> return ""
+  isbn' <- getRawField "isbn" <|> return ""
+  issn' <- getRawField "issn" <|> return ""
+
+  -- notes
+  annotation' <- getField "annotation" <|> getField "annote" <|> return ""
+  abstract' <- getField "abstract" <|> return ""
+  keywords' <- getField "keywords" <|> return ""
+  note' <- if et == "periodical" then return "" else getField "note" <|> return ""
+  addendum' <- if bibtex then return "" else ((" "++) `fmap` getField "addendum") <|> return ""
+  pubstate' <- resolveKey lang `fmap` getRawField "pubstate" <|> return ""
+
+  return $ emptyReference
+         { refId               = id'
+         , refType             = reftype
+         , author              = author'
+         , editor              = editor'
+         , translator          = translator'
+         -- , recipient           = undefined -- :: [Agent]
+         -- , interviewer         = undefined -- :: [Agent]
+         -- , composer            = undefined -- :: [Agent]
+         , director            = director'
+         -- , illustrator         = undefined -- :: [Agent]
+         -- , originalAuthor      = undefined -- :: [Agent]
+         , containerAuthor     = containerAuthor'
+         -- , collectionEditor    = undefined -- :: [Agent]
+         -- , editorialDirector   = undefined -- :: [Agent]
+         -- , reviewedAuthor      = undefined -- :: [Agent]
+
+         , issued              = issued'
+         , eventDate           = eventDate'
+         , accessed            = accessed'
+         -- , container           = undefined -- :: [RefDate]
+         , originalDate        = origDate'
+         -- , submitted           = undefined -- :: [RefDate]
+         , title               = title' ++ subtitle' ++ titleaddon'
+         , titleShort          = shortTitle'
+         -- , reviewedTitle       = undefined -- :: String
+         , containerTitle      = containerTitle' ++ containerSubtitle' ++ containerTitleAddon'
+         , collectionTitle     = volumeTitle' ++ volumeSubtitle' ++ volumeTitleAddon'
+         , containerTitleShort = containerTitleShort'
+         -- , collectionNumber    = undefined -- :: String --Int
+         , originalTitle       = origTitle'
+         , publisher           = publisher'
+         , originalPublisher   = origpublisher'
+         , publisherPlace      = address'
+         , originalPublisherPlace = origLocation'
+         , jurisdiction        = jurisdiction'
+         , event               = eventTitle'
+         , eventPlace          = venue'
+         , page                = pages'
+         -- , pageFirst           = undefined -- :: String
+         , numberOfPages       = pagetotal'
+         , version             = version'
+         , volume              = volume'
+         , numberOfVolumes     = volumes'
+         -- , issue               = undefined -- :: String
+         , chapterNumber       = chapter'
+         -- , medium              = undefined -- :: String
+         , status              = pubstate'
+         , edition             = edition'
+         -- , section             = undefined -- :: String
+         -- , source              = undefined -- :: String
+         , genre               = refgenre
+         , note                = note' ++ addendum'
+         , annote              = annotation'
+         , abstract            = abstract'
+         , keyword             = keywords'
+         -- , number              = undefined -- :: String
+         , url                 = url'
+         , doi                 = doi'
+         , isbn                = isbn'
+         , issn                = issn'
+         }
+{-
   -- handling of "periodical" to be revised as soon as new "issue-title" variable
   --   is included into CSL specs
   -- A biblatex "note" field in @periodical usually contains sth. like "Special issue"
   -- At least for CMoS, APA, borrowing "genre" for this works reasonably well.
   opt $ do
     if  et == "periodical" then do
-      opt $ getField "title" >>= setField "container-title"
-      opt $ getField "issuetitle" >>= setField "title" . processTitle
-      opt $ getField "issuesubtitle" >>= appendField "title" addColon . processTitle
-      opt $ getField "note" >>= appendField "genre" addPeriod . processTitle
+      opt $ getField' "title" >>= setField "container-title"
+      opt $ getField' "issuetitle" >>= setField "title" . processTitle
+      opt $ getField' "issuesubtitle" >>= appendField "title" addColon . processTitle
+      opt $ getField' "note" >>= appendField "genre" addPeriod . processTitle
     else return ()
-  opt $ getField "journal" >>= setField "container-title"
-  opt $ getField "journaltitle" >>= setField "container-title"
-  opt $ getField "journalsubtitle" >>= appendField "container-title" addColon
-  opt $ getField "shortjournal" >>= setField "container-title-short"
-  opt $ getField "series" >>= appendField (if et `elem` ["article","periodical","suppperiodical"]
-                                        then "container-title"
-                                        else "collection-title") addComma
-  opt $ getField "eventtitle" >>= setField "event"
-  opt $ getField "origtitle" >>= setField "original-title"
--- publisher, location:
---   opt $ getField "school" >>= setField "publisher"
---   opt $ getField "institution" >>= setField "publisher"
---   opt $ getField "organization" >>= setField "publisher"
---   opt $ getField "howpublished" >>= setField "publisher"
---   opt $ getField "publisher" >>= setField "publisher"
 
-  opt $ getField "school" >>= appendField "publisher" addComma
-  opt $ getField "institution" >>= appendField "publisher" addComma
-  opt $ getField "organization" >>= appendField "publisher" addComma
-  opt $ getField "howpublished" >>= appendField "publisher" addComma
-  opt $ getField "publisher" >>= appendField "publisher" addComma
-
-  opt $ getField "address" >>= setField "publisher-place"
-  unless bibtex $ do
-    opt $ getField "location" >>= setField "publisher-place"
-  opt $ getLiteralList "venue" >>= setList "event-place"
-  opt $ getLiteralList "origlocation" >>=
-             setList "original-publisher-place"
-  opt $ getLiteralList "origpublisher" >>= setList "original-publisher"
--- numbers, locators etc.:
-  opt $ getField "pages" >>= setField "page"
-  opt $ getField "volume" >>= setField "volume"
-  opt $ getField "number" >>=
+  -- numbers, locators etc.:
+  opt $ getField' "number" >>=
              setField (if et `elem` ["article","periodical","suppperiodical"]
                        then "issue"
                        else if et `elem` ["book","collection","proceedings","reference",
@@ -529,28 +675,8 @@ itemToMetaValue lang bibtex = bibItem $ do
                        "suppbook","suppcollection"]
                        then "collection-number"
                        else "number")                     -- "report", "patent", etc.
-  opt $ getField "issue" >>= appendField "issue" addComma
-  opt $ getField "chapter" >>= setField "chapter-number"
-  opt $ getField "edition" >>= setField "edition"
-  opt $ getField "pagetotal" >>= setField "number-of-pages"
-  opt $ getField "volumes" >>= setField "number-of-volumes"
-  opt $ getField "version" >>= setField "version"
-  opt $ getRawField "type" >>= setRawField "genre" . resolveKey lang
-  opt $ getRawField "pubstate" >>= setRawField "status" . resolveKey lang
--- url, doi, isbn, etc.:
-  opt $ getRawField "url" >>= setRawField "url"
-  opt $ getRawField "doi" >>= setRawField "doi"
-  opt $ getRawField "isbn" >>= setRawField "isbn"
-  opt $ getRawField "issn" >>= setRawField "issn"
--- note etc.
-  unless (et == "periodical") $ do
-    opt $ getField "note" >>= setField "note"
-  unless bibtex $ do
-    opt $ getField "addendum" >>= appendField "note" (Space:)
-  opt $ getField "annotation" >>= setField "annote"
-  opt $ getField "annote" >>= setField "annote"
-  opt $ getField "abstract" >>= setField "abstract"
-  opt $ getField "keywords" >>= setField "keyword"
+  opt $ getField' "issue" >>= appendField "issue" addComma
+  opt $ getRawField' "type" >>= setRawField "genre" . resolveKey lang
 
 addColon :: [Inline] -> [Inline]
 addColon xs = [Str ":",Space] ++ xs
@@ -564,79 +690,4 @@ addPeriod xs = [Str ".",Space] ++ xs
 inParens :: [Inline] -> [Inline]
 inParens xs = [Space, Str "("] ++ xs ++ [Str ")"]
 
-splitByAnd :: [Inline] -> [[Inline]]
-splitByAnd = splitOn [Space, Str "and", Space]
-
-toLiteralList :: MetaValue -> [MetaValue]
-toLiteralList (MetaBlocks [Para xs]) =
-  map MetaInlines $ splitByAnd xs
-toLiteralList (MetaBlocks []) = []
-toLiteralList x = error $ "toLiteralList: " ++ show x
-
-toAuthorList :: MetaValue -> [MetaValue]
-toAuthorList (MetaBlocks [Para xs]) =
-  map toAuthor $ splitByAnd xs
-toAuthorList (MetaBlocks []) = []
-toAuthorList x = error $ "toAuthorList: " ++ show x
-
-toAuthor :: [Inline] -> MetaValue
-toAuthor [Span ("",[],[]) ils] = -- corporate author
-  MetaMap $ M.singleton "literal" $ MetaInlines ils
-toAuthor ils = MetaMap $ M.fromList $
-  [ ("given", MetaList givens)
-  , ("family", family)
-  ] ++ case particle of
-            MetaInlines [] -> []
-            _              -> [("non-dropping-particle", particle)]
-  where endsWithComma (Str zs) = not (null zs) && last zs == ','
-        endsWithComma _ = False
-        stripComma xs = case reverse xs of
-                             (',':ys) -> reverse ys
-                             _ -> xs
-        (xs, ys) = break endsWithComma ils
-        (family, givens, particle) =
-           case splitOn [Space] ys of
-              ((Str w:ws) : rest) ->
-                  ( MetaInlines [Str (stripComma w)]
-                  , map MetaInlines $ if null ws then rest else (ws : rest)
-                  , MetaInlines xs
-                  )
-              _ -> case reverse xs of
-                        []     -> (MetaInlines [], [], MetaInlines [])
-                        (z:zs) -> let (us,vs) = break startsWithCapital zs
-                                  in  ( MetaInlines [z]
-                                      , map MetaInlines $ splitOn [Space] $ reverse vs
-                                      , MetaInlines $ dropWhile (==Space) $ reverse us
-                                      )
-
-startsWithCapital :: Inline -> Bool
-startsWithCapital (Str (x:_)) = isUpper x
-startsWithCapital _           = False
-
-latex :: String -> MetaValue
-latex s = MetaBlocks bs
-  where Pandoc _ bs = readLaTeX def s
-
-trim :: String -> String
-trim = unwords . words
-
-data Lang = Lang String String  -- e.g. "en" "US"
-
-resolveKey :: Lang -> String -> String
-resolveKey (Lang "en" "US") k =
-  case k of
-       "inpreparation" -> "in preparation"
-       "submitted"     -> "submitted"
-       "forthcoming"   -> "forthcoming"
-       "inpress"       -> "in press"
-       "prepublished"  -> "pre-published"
-       "mathesis"      -> "Master’s thesis"
-       "phdthesis"     -> "PhD thesis"
-       "candthesis"    -> "Candidate thesis"
-       "techreport"    -> "technical report"
-       "resreport"     -> "research report"
-       "software"      -> "computer software"
-       "datacd"        -> "data CD"
-       "audiocd"       -> "audio CD"
-       _               -> k
-resolveKey _ k = resolveKey (Lang "en" "US") k
+-}
