@@ -442,9 +442,10 @@ itemToReference lang bibtex = bib $ do
   translator' <- getAuthorList "translator" <|> return []
   editortype <- getRawField "editortype" <|> return ""
   editor'' <- getAuthorList "editor" <|> return []
+  director'' <- getAuthorList "director" <|> return []
   let (editor', director') = case editortype of
                                   "director"  -> ([], editor'')
-                                  _           -> (editor'', [])
+                                  _           -> (editor'', director'')
   -- FIXME: add same for editora, editorb, editorc
 
   -- titles
@@ -469,6 +470,25 @@ itemToReference lang bibtex = bib $ do
                        (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booktitleaddon")
                        <|> return ""
   shortTitle' <- getTitle lang "shorttitle" <|> return ""
+
+  eventTitle' <- getTitle lang "eventtitle" <|> return ""
+  origTitle' <- getTitle lang "origtitle" <|> return ""
+
+  -- places
+  venue' <- getField "venue" <|> return ""
+  address' <- getField "address" <|> return ""
+
+  -- locators
+  pages' <- getField "pages" <|> return ""
+  volume' <- getField "volume" <|> return ""
+  volumes' <- getField "volumes" <|> return ""
+  pagetotal' <- getField "pagetotal" <|> return ""
+
+  -- url, doi, isbn, etc.:
+  url' <- getRawField "url" <|> return ""
+  doi' <- getRawField "doi" <|> return ""
+  isbn' <- getRawField "isbn" <|> return ""
+  issn' <- getRawField "issn" <|> return ""
 
   return $ emptyReference
          { refId               = id'
@@ -501,24 +521,24 @@ itemToReference lang bibtex = bib $ do
          , collectionTitle     = volumeTitle' ++ volumeSubtitle' ++ volumeTitleAddon'
          -- , containerTitleShort = undefined -- :: String
          -- , collectionNumber    = undefined -- :: String --Int
-         -- , originalTitle       = undefined -- :: String
+         , originalTitle       = origTitle'
          -- , publisher           = undefined -- :: String
          -- , originalPublisher   = undefined -- :: String
-         -- , publisherPlace      = undefined -- :: String
+         , publisherPlace      = address'
          -- , originalPublisherPlace = undefined -- :: String
          -- , authority           = undefined -- :: String
          -- , jurisdiction        = undefined -- :: String
          -- , archive             = undefined -- :: String
          -- , archivePlace        = undefined -- :: String
          -- , archiveLocation     = undefined -- :: String
-         -- , event               = undefined -- :: String
-         -- , eventPlace          = undefined -- :: String
-         -- , page                = undefined -- :: String
+         , event               = eventTitle'
+         , eventPlace          = venue'
+         , page                = pages'
          -- , pageFirst           = undefined -- :: String
-         -- , numberOfPages       = undefined -- :: String
+         , numberOfPages       = pagetotal'
          -- , version             = undefined -- :: String
-         -- , volume              = undefined -- :: String
-         -- , numberOfVolumes     = undefined -- :: String --Int
+         , volume              = volume'
+         , numberOfVolumes     = volumes'
          -- , issue               = undefined -- :: String
          -- , chapterNumber       = undefined -- :: String
          -- , medium              = undefined -- :: String
@@ -533,10 +553,10 @@ itemToReference lang bibtex = bib $ do
          -- , keyword             = undefined -- :: String
          -- , number              = undefined -- :: String
          -- , references          = undefined -- :: String
-         -- , url                 = undefined -- :: String
-         -- , doi                 = undefined -- :: String
-         -- , isbn                = undefined -- :: String
-         -- , issn                = undefined -- :: String
+         , url                 = url'
+         , doi                 = doi'
+         , isbn                = isbn'
+         , issn                = issn'
          -- , pmcid               = undefined -- :: String
          -- , pmid                = undefined -- :: String
          -- , callNumber          = undefined -- :: String
@@ -551,12 +571,6 @@ itemToReference lang bibtex = bib $ do
          --  MISSING: hyphenation :: String
          }
 {-
-itemToMetaValue :: Lang -> Bool -> T -> MetaValue
-itemToMetaValue lang bibtex = bibItem $ do
--- author, editor:
-
-  opt $ getAuthorList' "director" >>= setList "director"
-  -- director from biblatex-apa, which has also producer, writer, execproducer (FIXME?)
 -- dates:
   opt $ getField' "year" >>= setSubField "issued" "year"
   opt $ getField' "month" >>= setSubField "issued" "month"
@@ -613,8 +627,6 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField' "series" >>= appendField (if et `elem` ["article","periodical","suppperiodical"]
                                         then "container-title"
                                         else "collection-title") addComma
-  opt $ getField' "eventtitle" >>= setField "event"
-  opt $ getField' "origtitle" >>= setField "original-title"
 -- publisher, location:
 --   opt $ getField' "school" >>= setField "publisher"
 --   opt $ getField' "institution" >>= setField "publisher"
@@ -628,16 +640,12 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField' "howpublished" >>= appendField "publisher" addComma
   opt $ getField' "publisher" >>= appendField "publisher" addComma
 
-  opt $ getField' "address" >>= setField "publisher-place"
   unless bibtex $ do
     opt $ getField' "location" >>= setField "publisher-place"
-  opt $ getLiteralList' "venue" >>= setList "event-place"
   opt $ getLiteralList' "origlocation" >>=
              setList "original-publisher-place"
   opt $ getLiteralList' "origpublisher" >>= setList "original-publisher"
 -- numbers, locators etc.:
-  opt $ getField' "pages" >>= setField "page"
-  opt $ getField' "volume" >>= setField "volume"
   opt $ getField' "number" >>=
              setField (if et `elem` ["article","periodical","suppperiodical"]
                        then "issue"
@@ -650,16 +658,9 @@ itemToMetaValue lang bibtex = bibItem $ do
   opt $ getField' "issue" >>= appendField "issue" addComma
   opt $ getField' "chapter" >>= setField "chapter-number"
   opt $ getField' "edition" >>= setField "edition"
-  opt $ getField' "pagetotal" >>= setField "number-of-pages"
-  opt $ getField' "volumes" >>= setField "number-of-volumes"
   opt $ getField' "version" >>= setField "version"
   opt $ getRawField' "type" >>= setRawField "genre" . resolveKey lang
   opt $ getRawField' "pubstate" >>= setRawField "status" . resolveKey lang
--- url, doi, isbn, etc.:
-  opt $ getRawField' "url" >>= setRawField "url"
-  opt $ getRawField' "doi" >>= setRawField "doi"
-  opt $ getRawField' "isbn" >>= setRawField "isbn"
-  opt $ getRawField' "issn" >>= setRawField "issn"
 -- note etc.
   unless (et == "periodical") $ do
     opt $ getField' "note" >>= setField "note"
