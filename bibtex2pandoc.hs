@@ -15,7 +15,7 @@ import Data.Yaml
 import Data.List.Split (splitOn, splitWhen)
 import Data.List (intersperse)
 import Data.Maybe
-import Data.Char (toLower, isUpper)
+import Data.Char (toLower, isUpper, isLower)
 import System.Console.GetOpt
 import System.Environment
 import System.Exit
@@ -156,7 +156,36 @@ standardTrans z =
        "indexsorttitle" -> []
        _                -> [z]
 
+trim :: String -> String
+trim = unwords . words
+
+data Lang = Lang String String  -- e.g. "en" "US"
+
+resolveKey :: Lang -> String -> String
+resolveKey (Lang "en" "US") k =
+  case k of
+       "inpreparation" -> "in preparation"
+       "submitted"     -> "submitted"
+       "forthcoming"   -> "forthcoming"
+       "inpress"       -> "in press"
+       "prepublished"  -> "pre-published"
+       "mathesis"      -> "Master’s thesis"
+       "phdthesis"     -> "PhD thesis"
+       "candthesis"    -> "Candidate thesis"
+       "techreport"    -> "technical report"
+       "resreport"     -> "research report"
+       "software"      -> "computer software"
+       "datacd"        -> "data CD"
+       "audiocd"       -> "audio CD"
+       _               -> k
+resolveKey _ k = resolveKey (Lang "en" "US") k
+
+
+
 type Bib = ReaderT T Maybe
+
+notFound :: String -> Bib a
+notFound f = fail $ f ++ " not found"
 
 getField :: String -> Bib String
 getField f = do
@@ -172,91 +201,55 @@ getRawField f = do
        Just x  -> return x
        Nothing -> fail "not found"
 
+getAuthorList :: String -> Bib [Agent]
+getAuthorList f = do
+  fs <- asks fields
+  case lookup f fs >>= mapM latex . splitOn " \\and " of
+       Just xs -> return $ map toAuthor xs
+       Nothing -> notFound f
+
+getLiteralList :: String -> Bib [String]
+getLiteralList f = do
+  fs <- asks fields
+  case lookup f fs of
+       Just x  -> return $ map trim $ splitOn " \\and " x
+       Nothing -> notFound f
+
+-- TODO handle corporate names (in span?), nondropping particle,
+-- comma suffix
+toAuthor :: String -> Agent
+toAuthor s = Agent { givenName       = givens
+                   , droppingPart    = dropping
+                   , nonDroppingPart = "" -- nondropping
+                   , familyName      = family
+                   , nameSuffix      = "" -- suffix
+                   , literal         = "" -- literal
+                   , commaSuffix     = False -- commaSuffix
+                   }
+  where (xs, ys) = break (==',') s
+        (family, givens, dropping) =
+           case ys of
+                []      -> case reverse (words xs) of
+                                []     -> ("", [], "")
+                                (f:(c:cs):gs)
+                                  | isLower c -> (f, reverse gs, c:cs)
+                                (f:gs) -> (f, reverse gs, "")
+                (_:ys') ->
+                   case words (trim ys') of
+                        ((c:cs):gs) | isLower c -> (xs, gs, c:cs)
+                        gs                      -> (xs, gs, "")
+
 latex :: String -> Maybe String
 latex s = blocksToString bs
-  where Pandoc _ bs = readLaTeX def s
-
-
-type BibM = RWST T () (M.Map String MetaValue) Maybe
-
-opt :: BibM () -> BibM ()
-opt m = m `mplus` return ()
-
-getField' :: String -> BibM MetaValue
-getField' f = do
-  fs <- asks fields
-  case lookup f fs of
-       Just x  -> return $ latex' x
-       Nothing -> fail "not found"
-
-setField :: String -> MetaValue -> BibM ()
-setField f x = modify $ M.insert f x
-
-appendField :: String -> ([Inline] -> [Inline]) -> MetaValue -> BibM ()
-appendField f fn x = modify $ M.insertWith combine f x
-  where combine new old = MetaInlines $ toInlines old ++ fn (toInlines new)
-        toInlines (MetaInlines ils) = ils
-        toInlines (MetaBlocks [Para ils]) = ils
-        toInlines (MetaBlocks [Plain ils]) = ils
-        toInlines _ = []
-
-notFound :: String -> BibM a
-notFound f = fail $ f ++ " not found"
-
-getId :: BibM String
-getId = asks identifier
-
-getRawField' :: String -> BibM String
-getRawField' f = do
-  fs <- asks fields
-  case lookup f fs of
-       Just x  -> return x
-       Nothing -> notFound f
-
-setRawField :: String -> String -> BibM ()
-setRawField f x = modify $ M.insert f (MetaString x)
-
-getAuthorList' :: String -> BibM [MetaValue]
-getAuthorList' f = do
-  fs <- asks fields
-  case lookup f fs of
-       Just x  -> return $ toAuthorList $ latex' x
-       Nothing -> notFound f
-
-getLiteralList' :: String -> BibM [MetaValue]
-getLiteralList' f = do
-  fs <- asks fields
-  case lookup f fs of
-       Just x  -> return $ toLiteralList $ latex' x
-       Nothing -> notFound f
-
-setList :: String -> [MetaValue] -> BibM ()
-setList f xs = modify $ M.insert f $ MetaList xs
-
-setSubField :: String -> String -> MetaValue -> BibM ()
-setSubField f k v = do
-  fs <- get
-  case M.lookup f fs of
-       Just (MetaMap m) -> modify $ M.insert f (MetaMap $ M.insert k v m)
-       _ -> modify $ M.insert f (MetaMap $ M.singleton k v)
+  where Pandoc _ bs = readLaTeX def $ trim s
 
 bib :: Bib Reference -> T -> Maybe Reference
 bib m entry = runReaderT m entry
 
-bibItem :: BibM a -> T -> MetaValue
-bibItem m entry = MetaMap $ maybe M.empty fst $ execRWST m entry M.empty
-
-getEntryType :: BibM String
-getEntryType = asks entryType
-
-isPresent :: String -> BibM Bool
-isPresent f = do
-  fs <- asks fields
-  case lookup f fs of
-       Just _   -> return True
-       Nothing  -> return False
-
-unTitlecase :: MetaValue -> MetaValue
+-- TODO the untitlecase should apply in the latex conversion phase
+unTitlecase :: String -> String
+unTitlecase s = s -- TODO 
+{-
 unTitlecase (MetaInlines ils) = MetaInlines $ untc ils
 unTitlecase (MetaBlocks [Para ils]) = MetaBlocks [Para $ untc ils]
 unTitlecase (MetaBlocks [Plain ils]) = MetaBlocks [Para $ untc ils]
@@ -266,6 +259,7 @@ untc [] = []
 untc (x:xs) = x : map go xs
   where go (Str ys)     = Str $ map toLower ys
         go z            = z
+-}
 
 toLocale :: String -> String
 toLocale "english"    = "en-US" -- "en-EN" unavailable in CSL
@@ -401,13 +395,11 @@ itemToReference lang bibtex = bib $ do
   let processTitle = case hyphenation of
                           'e':'n':_ -> unTitlecase
                           _         -> id
-
-
-
+  authors <- getAuthorList "author" <|> return []
   return $ emptyReference
          { refId               = id'
          , refType             = reftype
-         -- , author              = undefined -- :: [Agent]
+         , author              = authors
          -- , editor              = undefined -- :: [Agent]
          -- , translator          = undefined -- :: [Agent]
          -- , recipient           = undefined -- :: [Agent]
@@ -484,84 +476,9 @@ itemToReference lang bibtex = bib $ do
          -- , citationLabel       = undefined --      :: String
          --  MISSING: hyphenation :: String
          }
-
+{-
 itemToMetaValue :: Lang -> Bool -> T -> MetaValue
 itemToMetaValue lang bibtex = bibItem $ do
-  getId >>= setRawField "id"
-  et <- map toLower `fmap` getEntryType
-  let setType = setRawField "type"
-  let lang = Lang "en" "US" -- for now, later might get as parameter
-  case et of
-       "article"         -> setType "article-journal"
-       "book"            -> setType "book"
-       "booklet"         -> setType "pamphlet"
-       "bookinbook"      -> setType "book"
-       "collection"      -> setType "book"
-       "electronic"      -> setType "webpage"
-       "inbook"          -> setType "chapter"
-       "incollection"    -> setType "chapter"
-       "inreference "    -> setType "chapter"
-       "inproceedings"   -> setType "paper-conference"
-       "manual"          -> setType "book"
-       "mastersthesis"   -> setType "thesis" >>
-                             setRawField "genre" "Master’s thesis"
-       "misc"            -> setType "no-type"
-       "mvbook"          -> setType "book"
-       "mvcollection"    -> setType "book"
-       "mvproceedings"   -> setType "book"
-       "mvreference"     -> setType "book"
-       "online"          -> setType "webpage"
-       "patent"          -> setType "patent"
-       "periodical"      -> setType "article-journal"
-       "phdthesis"       -> setType "thesis" >>
-                             setRawField "genre" "Ph.D. thesis"
-       "proceedings"     -> setType "book"
-       "reference"       -> setType "book"
-       "report"          -> setType "report"
-       "suppbook"        -> setType "chapter"
-       "suppcollection"  -> setType "chapter"
-       "suppperiodical"  -> setType "article-journal"
-       "techreport"      -> setType "report"
-       "thesis"          -> setType "thesis"
-       "unpublished"     -> setType "manuscript"
-       "www"             -> setType "webpage"
-       -- biblatex, "unsupported"
-       "artwork"         -> setType "graphic"
-       "audio"           -> setType "song"              -- for audio *recordings*
-       "commentary"      -> setType "book"
-       "image"           -> setType "graphic"           -- or "figure" ?
-       "jurisdiction"    -> setType "legal_case"
-       "legislation"     -> setType "legislation"       -- or "bill" ?
-       "legal"           -> setType "treaty"
-       "letter"          -> setType "personal_communication"
-       "movie"           -> setType "motion_picture"
-       "music"           -> setType "song"              -- for musical *recordings*
-       "performance"     -> setType "speech"
-       "review"          -> setType "review"            -- or "review-book" ?
-       "software"        -> setType "book"              -- for lack of any better match
-       "standard"        -> setType "legislation"
-       "video"           -> setType "motion_picture"
-       -- biblatex-apa:
-       "data"            -> setType "dataset"
-       "letters"         -> setType "personal_communication"
-       "newsarticle"     -> setType "article-newspaper"
-       _                 -> setType "no-type"
-
--- Use entrysubtype to tweak CSL type:
-  opt $ do
-    val <- getRawField' "entrysubtype"
---    if  (et == "article" || et == "periodical" || et == "suppperiodical") && val == "magazine"
-    if  (et `elem` ["article","periodical","suppperiodical"]) && val == "magazine"
-    then setType "article-magazine"
-    else return ()
--- hyphenation:
-  hyphenation <- getRawField' "hyphenation" <|> return "english"
-  let processTitle = if (map toLower hyphenation) `elem`
-                        ["american","british","canadian","english",
-                         "australian","newzealand","usenglish","ukenglish"]
-                     then unTitlecase
-                     else id
-  opt $ getRawField' "hyphenation" >>= setRawField "language" . toLocale
 -- author, editor:
   opt $ getAuthorList' "author" >>= setList "author"
   opt $ getAuthorList' "bookauthor" >>= setList "container-author"
@@ -754,11 +671,11 @@ toLiteralList (MetaBlocks [Para xs]) =
 toLiteralList (MetaBlocks []) = []
 toLiteralList x = error $ "toLiteralList: " ++ show x
 
-toAuthorList :: MetaValue -> [MetaValue]
-toAuthorList (MetaBlocks [Para xs]) =
+toAuthorList' :: MetaValue -> [MetaValue]
+toAuthorList' (MetaBlocks [Para xs]) =
   map toAuthor $ splitByAnd xs
-toAuthorList (MetaBlocks []) = []
-toAuthorList x = error $ "toAuthorList: " ++ show x
+toAuthorList' (MetaBlocks []) = []
+toAuthorList' x = error $ "toAuthorList': " ++ show x
 
 toAuthor :: [Inline] -> MetaValue
 toAuthor [Span ("",[],[]) ils] = -- corporate author
@@ -798,27 +715,81 @@ latex' :: String -> MetaValue
 latex' s = MetaBlocks bs
   where Pandoc _ bs = readLaTeX def s
 
-trim :: String -> String
-trim = unwords . words
 
-data Lang = Lang String String  -- e.g. "en" "US"
+type BibM = RWST T () (M.Map String MetaValue) Maybe
 
-resolveKey :: Lang -> String -> String
-resolveKey (Lang "en" "US") k =
-  case k of
-       "inpreparation" -> "in preparation"
-       "submitted"     -> "submitted"
-       "forthcoming"   -> "forthcoming"
-       "inpress"       -> "in press"
-       "prepublished"  -> "pre-published"
-       "mathesis"      -> "Master’s thesis"
-       "phdthesis"     -> "PhD thesis"
-       "candthesis"    -> "Candidate thesis"
-       "techreport"    -> "technical report"
-       "resreport"     -> "research report"
-       "software"      -> "computer software"
-       "datacd"        -> "data CD"
-       "audiocd"       -> "audio CD"
-       _               -> k
-resolveKey _ k = resolveKey (Lang "en" "US") k
+opt :: BibM () -> BibM ()
+opt m = m `mplus` return ()
 
+getField' :: String -> BibM MetaValue
+getField' f = do
+  fs <- asks fields
+  case lookup f fs of
+       Just x  -> return $ latex' x
+       Nothing -> fail "not found"
+
+setField :: String -> MetaValue -> BibM ()
+setField f x = modify $ M.insert f x
+
+appendField :: String -> ([Inline] -> [Inline]) -> MetaValue -> BibM ()
+appendField f fn x = modify $ M.insertWith combine f x
+  where combine new old = MetaInlines $ toInlines old ++ fn (toInlines new)
+        toInlines (MetaInlines ils) = ils
+        toInlines (MetaBlocks [Para ils]) = ils
+        toInlines (MetaBlocks [Plain ils]) = ils
+        toInlines _ = []
+
+notFound :: String -> BibM a
+notFound f = fail $ f ++ " not found"
+
+getId :: BibM String
+getId = asks identifier
+
+getRawField' :: String -> BibM String
+getRawField' f = do
+  fs <- asks fields
+  case lookup f fs of
+       Just x  -> return x
+       Nothing -> notFound f
+
+setRawField :: String -> String -> BibM ()
+setRawField f x = modify $ M.insert f (MetaString x)
+
+getAuthorList' :: String -> BibM [MetaValue]
+getAuthorList' f = do
+  fs <- asks fields
+  case lookup f fs of
+       Just x  -> return $ toAuthorList' $ latex' x
+       Nothing -> notFound f
+
+getLiteralList' :: String -> BibM [MetaValue]
+getLiteralList' f = do
+  fs <- asks fields
+  case lookup f fs of
+       Just x  -> return $ toLiteralList $ latex' x
+       Nothing -> notFound f
+
+setList :: String -> [MetaValue] -> BibM ()
+setList f xs = modify $ M.insert f $ MetaList xs
+
+setSubField :: String -> String -> MetaValue -> BibM ()
+setSubField f k v = do
+  fs <- get
+  case M.lookup f fs of
+       Just (MetaMap m) -> modify $ M.insert f (MetaMap $ M.insert k v m)
+       _ -> modify $ M.insert f (MetaMap $ M.singleton k v)
+
+bibItem :: BibM a -> T -> MetaValue
+bibItem m entry = MetaMap $ maybe M.empty fst $ execRWST m entry M.empty
+
+getEntryType :: BibM String
+getEntryType = asks entryType
+
+isPresent :: String -> BibM Bool
+isPresent f = do
+  fs <- asks fields
+  case lookup f fs of
+       Just _   -> return True
+       Nothing  -> return False
+
+-}
