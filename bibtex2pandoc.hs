@@ -230,6 +230,15 @@ toAuthorList [Plain xs] = toAuthorList [Para xs]
 toAuthorList x = Nothing
 
 toAuthor :: [Inline] -> Agent
+toAuthor [Str "others"] =
+    Agent { givenName       = []
+          , droppingPart    = ""
+          , nonDroppingPart = ""
+          , familyName      = ""
+          , nameSuffix      = ""
+          , literal         = "others"
+          , commaSuffix     = False
+          }
 toAuthor [Span ("",[],[]) ils] = -- corporate author
     Agent { givenName       = []
           , droppingPart    = ""
