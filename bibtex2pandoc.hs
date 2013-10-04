@@ -441,17 +441,26 @@ itemToReference lang bibtex = bib $ do
   author' <- getAuthorList "author" <|> return []
   containerAuthor' <- getAuthorList "bookauthor" <|> return []
   translator' <- getAuthorList "translator" <|> return []
+  editortype <- getRawField "editortype" <|> return ""
+  editor'' <- getAuthorList "editor" <|> return []
+  let (editor', director') = case editortype of
+                                  "director"  -> ([], editor'')
+                                  _           -> (editor'', [])
+  -- FIXME: add same for editora, editorb, editorc
+
+
+
   title' <- getTitle lang "title" <|> return ""
   return $ emptyReference
          { refId               = id'
          , refType             = reftype
          , author              = author'
-         -- , editor              = undefined -- :: [Agent]
+         , editor              = editor'
          , translator          = translator'
          -- , recipient           = undefined -- :: [Agent]
          -- , interviewer         = undefined -- :: [Agent]
          -- , composer            = undefined -- :: [Agent]
-         -- , director            = undefined -- :: [Agent]
+         , director            = director'
          -- , illustrator         = undefined -- :: [Agent]
          -- , originalAuthor      = undefined -- :: [Agent]
          , containerAuthor     = containerAuthor'
@@ -526,32 +535,6 @@ itemToReference lang bibtex = bib $ do
 itemToMetaValue :: Lang -> Bool -> T -> MetaValue
 itemToMetaValue lang bibtex = bibItem $ do
 -- author, editor:
-  hasEditortype <- isPresent "editortype"
-  opt $ if hasEditortype then
-    do
-      val <- getRawField' "editortype"
-      getAuthorList' "editor" >>=  setList (
-        case val of
-        "editor"       -> "editor"             -- from here on biblatex & CSL
-        "compiler"     -> "editor"             -- from here on biblatex only;
-        "founder"      -> "editor"             --   not optimal, but all can
-        "continuator"  -> "editor"             --   somehow be subsumed under
-        "redactor"     -> "editor"             --   "editor"
-        "reviser"      -> "editor"
-        "collaborator" -> "editor"
-        "director"     -> "director"           -- from here on biblatex-chicago & CSL
-  --    "conductor"    -> ""                   -- from here on biblatex-chicago only
-  --    "producer"     -> ""
-  --    "none"         -> ""                   -- meant for performer(s)
-  --    ""             -> "editorial-director" -- from here on CSL only
-  --    ""             -> "composer"
-  --    ""             -> "illustrator"
-  --    ""             -> "interviewer"
-  --    ""             -> "collection-editor"
-        _              -> "editor")
-    else opt $ getAuthorList' "editor" >>= setList "editor"
-
--- FIXME: add same for editora, editorb, editorc
 
   opt $ getAuthorList' "director" >>= setList "director"
   -- director from biblatex-apa, which has also producer, writer, execproducer (FIXME?)
