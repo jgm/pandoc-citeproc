@@ -190,21 +190,72 @@ getField f = do
   fs <- asks fields
   case lookup f fs >>= latex of
        Just x  -> return x
-       Nothing -> fail "not found"
+       Nothing -> notFound f
 
 getTitle :: Lang -> String -> Bib String
 getTitle lang f = do
   fs <- asks fields
   case lookup f fs >>= latexTitle lang of
        Just x  -> return x
-       Nothing -> fail "not found"
+       Nothing -> notFound f
+
+getDates :: String -> Bib [RefDate]
+getDates f = do
+  fs <- asks fields
+  case lookup f fs >>= parseDates of
+       Just x  -> return x
+       Nothing -> notFound f
+
+parseDates :: String -> Maybe [RefDate]
+parseDates s = mapM parseDate $ splitOn "/" s
+
+parseDate :: String -> Maybe RefDate
+parseDate s = do
+  let (year', month', day') =
+        case splitOn "-" s of
+             [y]     -> (y, "", "")
+             [y,m]   -> (y, m, "")
+             [y,m,d] -> (y, m, d)
+  return RefDate { year   = year'
+                 , month  = month'
+                 , season = ""
+                 , day    = day'
+                 , other  = ""
+                 , circa  = ""
+                 }
+
+getOldDates :: String -> Bib [RefDate]
+getOldDates prefix = do
+  year' <- getField (prefix ++ "year")
+  month' <- getField (prefix ++ "month") <|> return ""
+  day' <- getField (prefix ++ "day") <|> return ""
+  endyear' <- getField (prefix ++ "endyear") <|> return ""
+  endmonth' <- getField (prefix ++ "endmonth") <|> return ""
+  endday' <- getField (prefix ++ "endday") <|> return ""
+  let start' = RefDate { year   = year'
+                       , month  = month'
+                       , season = ""
+                       , day    = day'
+                       , other  = ""
+                       , circa  = ""
+                       }
+  let end' = if null endyear'
+                then []
+                else [RefDate { year   = endyear'
+                              , month  = endmonth'
+                              , day    = endday'
+                              , season = ""
+                              , other  = ""
+                              , circa  = ""
+                              }]
+  return (start':end')
 
 getRawField :: String -> Bib String
 getRawField f = do
   fs <- asks fields
   case lookup f fs of
        Just x  -> return x
-       Nothing -> fail "not found"
+       Nothing -> notFound f
 
 getAuthorList :: String -> Bib [Agent]
 getAuthorList f = do
@@ -493,6 +544,12 @@ itemToReference lang bibtex = bib $ do
   volumes' <- getField "volumes" <|> return ""
   pagetotal' <- getField "pagetotal" <|> return ""
 
+  -- dates
+  issued' <- getDates "date" <|> getOldDates "" <|> return []
+  eventDate' <- getDates "eventdate" <|> getOldDates "event" <|> return []
+  origDate' <- getDates "origdate" <|> getOldDates "orig" <|> return []
+  accessed' <- getDates "urldate" <|> getOldDates "url" <|> return []
+
   -- url, doi, isbn, etc.:
   url' <- getRawField "url" <|> return ""
   doi' <- getRawField "doi" <|> return ""
@@ -523,11 +580,11 @@ itemToReference lang bibtex = bib $ do
          -- , editorialDirector   = undefined -- :: [Agent]
          -- , reviewedAuthor      = undefined -- :: [Agent]
 
-         -- , issued              = undefined -- :: [RefDate]
-         -- , eventDate           = undefined -- :: [RefDate]
-         -- , accessed            = undefined -- :: [RefDate]
+         , issued              = issued'
+         , eventDate           = eventDate'
+         , accessed            = accessed'
          -- , container           = undefined -- :: [RefDate]
-         -- , originalDate        = undefined -- :: [RefDate]
+         , originalDate        = origDate'
          -- , submitted           = undefined -- :: [RefDate]
 
          , title               = title' ++ subtitle' ++ titleaddon'
@@ -587,43 +644,6 @@ itemToReference lang bibtex = bib $ do
          --  MISSING: hyphenation :: String
          }
 {-
--- dates:
-  opt $ getField' "year" >>= setSubField "issued" "year"
-  opt $ getField' "month" >>= setSubField "issued" "month"
---  opt $ getField' "date" >>= setField "issued" -- FIXME
-  opt $ do
-    dateraw <- getRawField' "date"
-    let datelist = T.splitOn (T.pack "-") (T.pack dateraw)
-    let year = T.unpack (datelist !! 0)
-    if length (datelist) > 1
-    then do
-      let month = T.unpack (datelist !! 1)
-      setSubField "issued" "month" (MetaString month)
-      if length (datelist) > 2
-      then do
-        let day = T.unpack (datelist !! 2)
-        setSubField "issued" "day" (MetaString day)
-      else return ()
-    else return ()
-    setSubField "issued" "year" (MetaString year)
---  opt $ getField' "urldate" >>= setField "accessed" -- FIXME
-  opt $ do
-    dateraw <- getRawField' "urldate"
-    let datelist = T.splitOn (T.pack "-") (T.pack dateraw)
-    let year = T.unpack (datelist !! 0)
-    if length (datelist) > 1
-    then do
-      let month = T.unpack (datelist !! 1)
-      setSubField "accessed" "month" (MetaString month)
-      if length (datelist) > 2
-      then do
-        let day = T.unpack (datelist !! 2)
-        setSubField "accessed" "day" (MetaString day)
-      else return ()
-    else return ()
-    setSubField "accessed" "year" (MetaString year)
-  opt $ getField' "eventdate" >>= setField "event-date"   -- FIXME
-  opt $ getField' "origdate" >>= setField "original-date" -- FIXME
 -- titles:
   -- handling of "periodical" to be revised as soon as new "issue-title" variable
   --   is included into CSL specs
