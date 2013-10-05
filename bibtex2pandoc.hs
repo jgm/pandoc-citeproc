@@ -13,7 +13,7 @@ import Text.Pandoc
 import qualified Data.Map as M
 import Data.Yaml
 import Data.List.Split (splitOn, splitWhen)
-import Data.List (intersperse)
+import Data.List (intersperse, intercalate)
 import Data.Maybe
 import Data.Char (toLower, isUpper, isLower)
 import System.Console.GetOpt
@@ -516,11 +516,15 @@ itemToReference lang bibtex = bib $ do
   subtitle' <- (": " ++) `fmap` getTitle lang "subtitle" <|> return ""
   titleaddon' <- (". " ++) `fmap` getTitle lang "titleaddon" <|> return ""
   let hasVolumes = et `elem` ["inbook","incollection","inproceedings","bookinbook"]
-  containerTitle' <- getTitle lang "maintitle" <|> getTitle lang "booktitle" <|> return ""
+  containerTitle' <- getTitle lang "maintitle" <|> getTitle lang "booktitle"
+                      <|> getTitle lang "journal" <|> getTitle lang "journaltitle" <|> return ""
   containerSubtitle' <- (": " ++) `fmap` getTitle lang "mainsubtitle"
-                       <|> getTitle lang "booksubtitle" <|> return ""
+                       <|> getTitle lang "booksubtitle" <|> getTitle lang "journalsubtitle"
+                       <|> return ""
   containerTitleAddon' <- (". " ++) `fmap` getTitle lang "maintitleaddon"
                        <|> getTitle lang "booktitleaddon" <|> return ""
+  containerTitleShort' <- getTitle lang "booktitleshort" <|> getTitle lang "journaltitleshort"
+                        <|> return ""
   volumeTitle' <- (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booktitle")
                        <|> return ""
   volumeSubtitle' <- (": " ++) `fmap`
@@ -534,15 +538,37 @@ itemToReference lang bibtex = bib $ do
   eventTitle' <- getTitle lang "eventtitle" <|> return ""
   origTitle' <- getTitle lang "origtitle" <|> return ""
 
-  -- places
+{-
+  opt $ getField' "journal" >>= setField "container-title"
+  opt $ getField' "journaltitle" >>= setField "container-title"
+  opt $ getField' "journalsubtitle" >>= appendField "container-title" addColon
+  opt $ getField' "shortjournal" >>= setField "container-title-short"
+  opt $ getField' "series" >>= appendField (if et `elem` ["article","periodical","suppperiodical"]
+                                        then "container-title"
+                                        else "collection-title") addComma
+-}
+
+  -- publisher
+  pubfields <- mapM (\f -> Just `fmap` getField f <|> return Nothing)
+               ["school","institution","organization","howpublished","publisher"]
+  let publisher' = intercalate ", " [p | Just p <- pubfields]
+  origpublisher' <- getField "origpublisher" <|> return ""
+
+-- places
   venue' <- getField "venue" <|> return ""
-  address' <- getField "address" <|> return ""
+  address' <- getField "address" <|> if bibtex then return "" else getField "location"
+            <|> return ""
+  origLocation' <- getField "origlocation" <|> return ""
+  jurisdiction' <- getField "jurisdiction" <|> return ""
 
   -- locators
   pages' <- getField "pages" <|> return ""
   volume' <- getField "volume" <|> return ""
   volumes' <- getField "volumes" <|> return ""
   pagetotal' <- getField "pagetotal" <|> return ""
+  chapter' <- getField "chapter" <|> return ""
+  edition' <- getField "edition" <|> return ""
+  version' <- getField "version" <|> return ""
 
   -- dates
   issued' <- getDates "date" <|> getOldDates "" <|> return []
@@ -562,6 +588,7 @@ itemToReference lang bibtex = bib $ do
   keywords' <- getField "keywords" <|> return ""
   note' <- if et == "periodical" then return "" else getField "note" <|> return ""
   addendum' <- if bibtex then return "" else ((" "++) `fmap` getField "addendum") <|> return ""
+  pubstate' <- resolveKey lang `fmap` getRawField "pubstate" <|> return ""
 
   return $ emptyReference
          { refId               = id'
@@ -586,37 +613,32 @@ itemToReference lang bibtex = bib $ do
          -- , container           = undefined -- :: [RefDate]
          , originalDate        = origDate'
          -- , submitted           = undefined -- :: [RefDate]
-
          , title               = title' ++ subtitle' ++ titleaddon'
          , titleShort          = shortTitle'
          -- , reviewedTitle       = undefined -- :: String
          , containerTitle      = containerTitle' ++ containerSubtitle' ++ containerTitleAddon'
          , collectionTitle     = volumeTitle' ++ volumeSubtitle' ++ volumeTitleAddon'
-         -- , containerTitleShort = undefined -- :: String
+         , containerTitleShort = containerTitleShort'
          -- , collectionNumber    = undefined -- :: String --Int
          , originalTitle       = origTitle'
-         -- , publisher           = undefined -- :: String
-         -- , originalPublisher   = undefined -- :: String
+         , publisher           = publisher'
+         , originalPublisher   = origpublisher'
          , publisherPlace      = address'
-         -- , originalPublisherPlace = undefined -- :: String
-         -- , authority           = undefined -- :: String
-         -- , jurisdiction        = undefined -- :: String
-         -- , archive             = undefined -- :: String
-         -- , archivePlace        = undefined -- :: String
-         -- , archiveLocation     = undefined -- :: String
+         , originalPublisherPlace = origLocation'
+         , jurisdiction        = jurisdiction'
          , event               = eventTitle'
          , eventPlace          = venue'
          , page                = pages'
          -- , pageFirst           = undefined -- :: String
          , numberOfPages       = pagetotal'
-         -- , version             = undefined -- :: String
+         , version             = version'
          , volume              = volume'
          , numberOfVolumes     = volumes'
          -- , issue               = undefined -- :: String
-         -- , chapterNumber       = undefined -- :: String
+         , chapterNumber       = chapter'
          -- , medium              = undefined -- :: String
-         -- , status              = undefined -- :: String
-         -- , edition             = undefined -- :: String
+         , status              = pubstate'
+         , edition             = edition'
          -- , section             = undefined -- :: String
          -- , source              = undefined -- :: String
          , genre               = refgenre
@@ -625,26 +647,12 @@ itemToReference lang bibtex = bib $ do
          , abstract            = abstract'
          , keyword             = keywords'
          -- , number              = undefined -- :: String
-         -- , references          = undefined -- :: String
          , url                 = url'
          , doi                 = doi'
          , isbn                = isbn'
          , issn                = issn'
-         -- , pmcid               = undefined -- :: String
-         -- , pmid                = undefined -- :: String
-         -- , callNumber          = undefined -- :: String
-         -- , dimensions          = undefined -- :: String
-         -- , scale               = undefined -- :: String
-         -- , categories          = undefined -- :: [String]
-         -- , language            = undefined -- :: String
-
-         -- , citationNumber      = undefined --      :: CNum
-         -- , firstReferenceNoteNumber = undefined -- :: Int
-         -- , citationLabel       = undefined --      :: String
-         --  MISSING: hyphenation :: String
          }
 {-
--- titles:
   -- handling of "periodical" to be revised as soon as new "issue-title" variable
   --   is included into CSL specs
   -- A biblatex "note" field in @periodical usually contains sth. like "Special issue"
@@ -656,32 +664,8 @@ itemToReference lang bibtex = bib $ do
       opt $ getField' "issuesubtitle" >>= appendField "title" addColon . processTitle
       opt $ getField' "note" >>= appendField "genre" addPeriod . processTitle
     else return ()
-  opt $ getField' "journal" >>= setField "container-title"
-  opt $ getField' "journaltitle" >>= setField "container-title"
-  opt $ getField' "journalsubtitle" >>= appendField "container-title" addColon
-  opt $ getField' "shortjournal" >>= setField "container-title-short"
-  opt $ getField' "series" >>= appendField (if et `elem` ["article","periodical","suppperiodical"]
-                                        then "container-title"
-                                        else "collection-title") addComma
--- publisher, location:
---   opt $ getField' "school" >>= setField "publisher"
---   opt $ getField' "institution" >>= setField "publisher"
---   opt $ getField' "organization" >>= setField "publisher"
---   opt $ getField' "howpublished" >>= setField "publisher"
---   opt $ getField' "publisher" >>= setField "publisher"
 
-  opt $ getField' "school" >>= appendField "publisher" addComma
-  opt $ getField' "institution" >>= appendField "publisher" addComma
-  opt $ getField' "organization" >>= appendField "publisher" addComma
-  opt $ getField' "howpublished" >>= appendField "publisher" addComma
-  opt $ getField' "publisher" >>= appendField "publisher" addComma
-
-  unless bibtex $ do
-    opt $ getField' "location" >>= setField "publisher-place"
-  opt $ getLiteralList' "origlocation" >>=
-             setList "original-publisher-place"
-  opt $ getLiteralList' "origpublisher" >>= setList "original-publisher"
--- numbers, locators etc.:
+  -- numbers, locators etc.:
   opt $ getField' "number" >>=
              setField (if et `elem` ["article","periodical","suppperiodical"]
                        then "issue"
@@ -692,12 +676,7 @@ itemToReference lang bibtex = bib $ do
                        then "collection-number"
                        else "number")                     -- "report", "patent", etc.
   opt $ getField' "issue" >>= appendField "issue" addComma
-  opt $ getField' "chapter" >>= setField "chapter-number"
-  opt $ getField' "edition" >>= setField "edition"
-  opt $ getField' "version" >>= setField "version"
   opt $ getRawField' "type" >>= setRawField "genre" . resolveKey lang
-  opt $ getRawField' "pubstate" >>= setRawField "status" . resolveKey lang
--- note etc.
 
 addColon :: [Inline] -> [Inline]
 addColon xs = [Str ":",Space] ++ xs
