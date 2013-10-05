@@ -1,3 +1,8 @@
+-- TODO:
+-- make inlinesToString switchable
+-- when writing JSON we want current behavior
+-- when writing pandoc YAML we want markdown
+
 -- Experimental:
 -- goes from bibtex to yaml directly, without bibutils
 -- properly parses LaTeX bibtex fields, including math
@@ -323,14 +328,14 @@ toAuthor ils =
               ((Str w:ws) : rest) ->
                   ( inlinesToString' [Str (stripComma w)]
                   , map inlinesToString' $ if null ws then rest else (ws : rest)
-                  , inlinesToString' xs
+                  , trim $ inlinesToString' xs
                   )
               _ -> case reverse xs of
                         []     -> ("", [], "")
                         (z:zs) -> let (us,vs) = break startsWithCapital zs
                                   in  ( inlinesToString' [z]
                                       , map inlinesToString' $ splitOn [Space] $ reverse vs
-                                      , inlinesToString' $ dropWhile (==Space) $ reverse us
+                                      , trim $ inlinesToString' $ dropWhile (==Space) $ reverse us
                                       )
 
 startsWithCapital :: Inline -> Bool
@@ -498,8 +503,7 @@ itemToReference lang bibtex = bib $ do
   reftype' <- resolveKey lang <$> getRawField "type" <|> return ""
 
   -- hyphenation:
-  hyphenation <- toLocale <$>
-                   (getRawField "hyphenation" <|> return "english")
+  hyphenation <- getRawField "hyphenation" <|> return ""
 
   -- authors:
   author' <- getAuthorList "author" <|> return []
@@ -691,5 +695,5 @@ itemToReference lang bibtex = bib $ do
          , doi                 = doi'
          , isbn                = isbn'
          , issn                = issn'
-         , language            = hyphenation
+         , language            = toLocale hyphenation
          }
