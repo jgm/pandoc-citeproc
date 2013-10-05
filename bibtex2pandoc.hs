@@ -342,8 +342,11 @@ latex s = trim `fmap` blocksToString bs
   where Pandoc _ bs = readLaTeX def s
 
 latexTitle :: Lang -> String -> Maybe String
-latexTitle lang s = trim `fmap` blocksToString (unTitlecase bs)
+latexTitle (Lang l _) s = trim `fmap` blocksToString (processTitle bs)
   where Pandoc _ bs = readLaTeX def s
+        processTitle = case l of
+                          'e':'n':_ -> unTitlecase
+                          _         -> id
 
 latexAuthors :: String -> Maybe [Agent]
 latexAuthors s = toAuthorList bs
@@ -352,7 +355,6 @@ latexAuthors s = toAuthorList bs
 bib :: Bib Reference -> T -> Maybe Reference
 bib m entry = runReaderT m entry
 
--- TODO the untitlecase should apply in the latex conversion phase
 unTitlecase :: [Block] -> [Block]
 unTitlecase [Para ils]  = [Para $ untc ils]
 unTitlecase [Plain ils] = [Para $ untc ils]
@@ -512,9 +514,6 @@ itemToReference lang bibtex = bib $ do
   -- FIXME: add same for editora, editorb, editorc
 
   -- titles
-  let processTitle = case hyphenation of
-                          'e':'n':_ -> unTitlecase
-                          _         -> id
   title' <- if et == "periodical"
             then getTitle lang "issuetitle" <|> return ""
             else getTitle lang "title" <|> return ""
@@ -562,7 +561,10 @@ itemToReference lang bibtex = bib $ do
                          >> guard hasVolumes
                          >> getTitle lang "booktitleaddon")
                        <|> return ""
-  shortTitle' <- getTitle lang "shorttitle" <|> return ""
+  shortTitle' <- getTitle lang "shorttitle"
+               <|> if ':' `elem` title'
+                   then return (takeWhile (/=':') title')
+                   else return ""
 
   eventTitle' <- getTitle lang "eventtitle" <|> return ""
   origTitle' <- getTitle lang "origtitle" <|> return ""
@@ -689,4 +691,5 @@ itemToReference lang bibtex = bib $ do
          , doi                 = doi'
          , isbn                = isbn'
          , issn                = issn'
+         , language            = hyphenation
          }
