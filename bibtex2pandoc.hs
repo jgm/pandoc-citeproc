@@ -493,8 +493,11 @@ itemToReference lang bibtex = bib $ do
        "letters"         -> (PersonalCommunication,"")
        "newsarticle"     -> (ArticleNewspaper,"")
        _                 -> (NoType,"")
+  reftype' <- resolveKey lang <$> getRawField "type" <|> return ""
+
   -- hyphenation:
-  hyphenation <- toLocale <$> (getRawField "hyphenation" <|> return "english")
+  hyphenation <- toLocale <$>
+                   (getRawField "hyphenation" <|> return "english")
 
   -- authors:
   author' <- getAuthorList "author" <|> return []
@@ -512,45 +515,62 @@ itemToReference lang bibtex = bib $ do
   let processTitle = case hyphenation of
                           'e':'n':_ -> unTitlecase
                           _         -> id
-  title' <- getTitle lang "title" <|> return ""
-  subtitle' <- (": " ++) `fmap` getTitle lang "subtitle" <|> return ""
-  titleaddon' <- (". " ++) `fmap` getTitle lang "titleaddon" <|> return ""
-  let hasVolumes = et `elem` ["inbook","incollection","inproceedings","bookinbook"]
-  containerTitle' <- getTitle lang "maintitle" <|> getTitle lang "booktitle"
-                      <|> getTitle lang "journal" <|> getTitle lang "journaltitle" <|> return ""
+  title' <- if et == "periodical"
+            then getTitle lang "issuetitle" <|> return ""
+            else getTitle lang "title" <|> return ""
+  subtitle' <- (": " ++) `fmap`
+               (if et == "periodical"
+                then getTitle lang "issuesubtitle"
+                else getTitle lang "subtitle") <|> return ""
+  titleaddon' <- (". " ++) `fmap` getTitle lang "titleaddon"
+               <|> return ""
+  let hasVolumes = et `elem`
+         ["inbook","incollection","inproceedings","bookinbook"]
+  containerTitle' <- if et == "periodical"
+                     then getTitle lang "title"
+                     else mzero
+                  <|> getTitle lang "maintitle"
+                  <|> getTitle lang "booktitle"
+                  <|> getTitle lang "journal"
+                  <|> getTitle lang "journaltitle"
+                  <|> if et `elem` ["article","periodical","suppperiodical"]
+                      then getTitle lang "series" <|> return ""
+                      else return ""
   containerSubtitle' <- (": " ++) `fmap` getTitle lang "mainsubtitle"
-                       <|> getTitle lang "booksubtitle" <|> getTitle lang "journalsubtitle"
+                       <|> getTitle lang "booksubtitle"
+                       <|> getTitle lang "journalsubtitle"
                        <|> return ""
-  containerTitleAddon' <- (". " ++) `fmap` getTitle lang "maintitleaddon"
-                       <|> getTitle lang "booktitleaddon" <|> return ""
-  containerTitleShort' <- getTitle lang "booktitleshort" <|> getTitle lang "journaltitleshort"
+  containerTitleAddon' <- (". " ++) `fmap`
+                            getTitle lang "maintitleaddon"
+                       <|> getTitle lang "booktitleaddon"
+                       <|> return ""
+  containerTitleShort' <- getTitle lang "booktitleshort"
+                        <|> getTitle lang "journaltitleshort"
+                        <|> getTitle lang "shortjournal"
                         <|> return ""
-  volumeTitle' <- (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booktitle")
-                       <|> return ""
-  volumeSubtitle' <- (": " ++) `fmap`
-                       (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booksubtitle")
-                       <|> return ""
+  volumeTitle' <- (getTitle lang "maintitle" >> guard hasVolumes
+                    >> getTitle lang "booktitle")
+                  <|> if et `elem` ["article","periodical","suppperiodical"]
+                      then return ""
+                      else getTitle lang "series" <|> return ""
+  volumeSubtitle' <- (": " ++) `fmap` (getTitle lang "maintitle"
+                      >> guard hasVolumes
+                      >> getTitle lang "booksubtitle")
+                     <|> return ""
   volumeTitleAddon' <- (". " ++) `fmap`
-                       (getTitle lang "maintitle" >> guard hasVolumes >> getTitle lang "booktitleaddon")
+                       (getTitle lang "maintitle"
+                         >> guard hasVolumes
+                         >> getTitle lang "booktitleaddon")
                        <|> return ""
   shortTitle' <- getTitle lang "shorttitle" <|> return ""
 
   eventTitle' <- getTitle lang "eventtitle" <|> return ""
   origTitle' <- getTitle lang "origtitle" <|> return ""
 
-{-
-  opt $ getField' "journal" >>= setField "container-title"
-  opt $ getField' "journaltitle" >>= setField "container-title"
-  opt $ getField' "journalsubtitle" >>= appendField "container-title" addColon
-  opt $ getField' "shortjournal" >>= setField "container-title-short"
-  opt $ getField' "series" >>= appendField (if et `elem` ["article","periodical","suppperiodical"]
-                                        then "container-title"
-                                        else "collection-title") addComma
--}
-
   -- publisher
   pubfields <- mapM (\f -> Just `fmap` getField f <|> return Nothing)
-               ["school","institution","organization","howpublished","publisher"]
+               ["school","institution","organization",
+                "howpublished","publisher"]
   let publisher' = intercalate ", " [p | Just p <- pubfields]
   origpublisher' <- getField "origpublisher" <|> return ""
 
@@ -569,11 +589,20 @@ itemToReference lang bibtex = bib $ do
   chapter' <- getField "chapter" <|> return ""
   edition' <- getField "edition" <|> return ""
   version' <- getField "version" <|> return ""
+  (number', collectionNumber') <- (getField "number" <|> return "") >>= \x ->
+       if et `elem` ["book","collection","proceedings","reference",
+                     "mvbook","mvcollection","mvproceedings", "mvreference",
+                     "bookinbook","inbook", "incollection","inproceedings",
+                     "inreference", "suppbook","suppcollection"]
+       then return ("",x)
+       else return (x,"")
 
   -- dates
   issued' <- getDates "date" <|> getOldDates "" <|> return []
-  eventDate' <- getDates "eventdate" <|> getOldDates "event" <|> return []
-  origDate' <- getDates "origdate" <|> getOldDates "orig" <|> return []
+  eventDate' <- getDates "eventdate" <|> getOldDates "event"
+              <|> return []
+  origDate' <- getDates "origdate" <|> getOldDates "orig"
+              <|> return []
   accessed' <- getDates "urldate" <|> getOldDates "url" <|> return []
 
   -- url, doi, isbn, etc.:
@@ -583,12 +612,19 @@ itemToReference lang bibtex = bib $ do
   issn' <- getRawField "issn" <|> return ""
 
   -- notes
-  annotation' <- getField "annotation" <|> getField "annote" <|> return ""
+  annotation' <- getField "annotation" <|> getField "annote"
+                   <|> return ""
   abstract' <- getField "abstract" <|> return ""
   keywords' <- getField "keywords" <|> return ""
-  note' <- if et == "periodical" then return "" else getField "note" <|> return ""
-  addendum' <- if bibtex then return "" else ((" "++) `fmap` getField "addendum") <|> return ""
-  pubstate' <- resolveKey lang `fmap` getRawField "pubstate" <|> return ""
+  note' <- if et == "periodical"
+           then return ""
+           else (getField "note" <|> return "")
+  addendum' <- if bibtex
+               then return ""
+               else ((" "++) `fmap` getField "addendum")
+                 <|> return ""
+  pubstate' <- resolveKey lang `fmap`
+                   getRawField "pubstate" <|> return ""
 
   return $ emptyReference
          { refId               = id'
@@ -641,53 +677,16 @@ itemToReference lang bibtex = bib $ do
          , edition             = edition'
          -- , section             = undefined -- :: String
          -- , source              = undefined -- :: String
-         , genre               = refgenre
+         , genre               = if null refgenre
+                                    then reftype'
+                                    else refgenre
          , note                = note' ++ addendum'
          , annote              = annotation'
          , abstract            = abstract'
          , keyword             = keywords'
-         -- , number              = undefined -- :: String
+         , number              = number'
          , url                 = url'
          , doi                 = doi'
          , isbn                = isbn'
          , issn                = issn'
          }
-{-
-  -- handling of "periodical" to be revised as soon as new "issue-title" variable
-  --   is included into CSL specs
-  -- A biblatex "note" field in @periodical usually contains sth. like "Special issue"
-  -- At least for CMoS, APA, borrowing "genre" for this works reasonably well.
-  opt $ do
-    if  et == "periodical" then do
-      opt $ getField' "title" >>= setField "container-title"
-      opt $ getField' "issuetitle" >>= setField "title" . processTitle
-      opt $ getField' "issuesubtitle" >>= appendField "title" addColon . processTitle
-      opt $ getField' "note" >>= appendField "genre" addPeriod . processTitle
-    else return ()
-
-  -- numbers, locators etc.:
-  opt $ getField' "number" >>=
-             setField (if et `elem` ["article","periodical","suppperiodical"]
-                       then "issue"
-                       else if et `elem` ["book","collection","proceedings","reference",
-                       "mvbook","mvcollection","mvproceedings","mvreference",
-                       "bookinbook","inbook","incollection","inproceedings","inreference",
-                       "suppbook","suppcollection"]
-                       then "collection-number"
-                       else "number")                     -- "report", "patent", etc.
-  opt $ getField' "issue" >>= appendField "issue" addComma
-  opt $ getRawField' "type" >>= setRawField "genre" . resolveKey lang
-
-addColon :: [Inline] -> [Inline]
-addColon xs = [Str ":",Space] ++ xs
-
-addComma :: [Inline] -> [Inline]
-addComma xs = [Str ",",Space] ++ xs
-
-addPeriod :: [Inline] -> [Inline]
-addPeriod xs = [Str ".",Space] ++ xs
-
-inParens :: [Inline] -> [Inline]
-inParens xs = [Space, Str "("] ++ xs ++ [Str ")"]
-
--}
