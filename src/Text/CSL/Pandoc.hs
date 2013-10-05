@@ -136,7 +136,7 @@ metaValueToJSON blockWriter _ (MetaBlocks bs) = liftM toJSON $ blockWriter bs
 metaValueToJSON _ inlineWriter (MetaInlines bs) = liftM toJSON $ inlineWriter bs
 
 blocksToString :: (Functor m, Monad m) => [Block] -> m String
-blocksToString = fmap (unlines . intersperse "") . mapM go
+blocksToString = fmap (intercalate "\n\n") . mapM go
   where go (Plain xs) = inlinesToString xs
         go (Para xs)  = inlinesToString xs
         go _          = return ""
