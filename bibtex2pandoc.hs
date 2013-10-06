@@ -518,34 +518,33 @@ itemToReference lang bibtex = bib $ do
   -- FIXME: add same for editora, editorb, editorc
 
   -- titles
-  title' <- if et == "periodical"
-            then getTitle lang "issuetitle" <|> return ""
-            else getTitle lang "title" <|> return ""
-  subtitle' <- (": " ++) `fmap`
-               (if et == "periodical"
-                then getTitle lang "issuesubtitle"
-                else getTitle lang "subtitle") <|> return ""
-  titleaddon' <- (". " ++) `fmap` getTitle lang "titleaddon"
-               <|> return ""
+  let isArticle = et `elem` ["article", "periodical", "suppperiodical"]
+  let isPeriodical = et == "periodical"
   let hasVolumes = et `elem`
          ["inbook","incollection","inproceedings","bookinbook"]
-  containerTitle' <- if et == "periodical"
-                     then getTitle lang "title"
-                     else mzero
+  let addColon = fmap (": " ++)
+  let addPeriod = fmap (". " ++)
+  title' <- (guard isPeriodical >> getTitle lang "issuetitle")
+         <|> getTitle lang "title"
+         <|> return ""
+  subtitle' <- addColon ((guard isPeriodical >> getTitle lang "issuesubtitle")
+                <|> getTitle lang "subtitle")
+              <|> return ""
+  titleaddon' <- addPeriod (getTitle lang "titleaddon")
+               <|> return ""
+  containerTitle' <- (guard isPeriodical >> getTitle lang "title")
                   <|> getTitle lang "maintitle"
                   <|> getTitle lang "booktitle"
                   <|> getTitle lang "journal"
                   <|> getTitle lang "journaltitle"
-                  <|> if et `elem` ["article","periodical","suppperiodical"]
-                      then getTitle lang "series" <|> return ""
-                      else return ""
-  containerSubtitle' <- (": " ++) `fmap` getTitle lang "mainsubtitle"
+                  <|> (guard isArticle >> getTitle lang "series")
+                  <|> return ""
+  containerSubtitle' <- addColon (getTitle lang "mainsubtitle"
                        <|> getTitle lang "booksubtitle"
-                       <|> getTitle lang "journalsubtitle"
+                       <|> getTitle lang "journalsubtitle")
                        <|> return ""
-  containerTitleAddon' <- (". " ++) `fmap`
-                            getTitle lang "maintitleaddon"
-                       <|> getTitle lang "booktitleaddon"
+  containerTitleAddon' <- addPeriod (getTitle lang "maintitleaddon"
+                       <|> getTitle lang "booktitleaddon")
                        <|> return ""
   containerTitleShort' <- getTitle lang "booktitleshort"
                         <|> getTitle lang "journaltitleshort"
@@ -553,17 +552,15 @@ itemToReference lang bibtex = bib $ do
                         <|> return ""
   volumeTitle' <- (getTitle lang "maintitle" >> guard hasVolumes
                     >> getTitle lang "booktitle")
-                  <|> if et `elem` ["article","periodical","suppperiodical"]
-                      then return ""
-                      else getTitle lang "series" <|> return ""
-  volumeSubtitle' <- (": " ++) `fmap` (getTitle lang "maintitle"
+                  <|> (guard (not isArticle) >> getTitle lang "series")
+                  <|> return ""
+  volumeSubtitle' <- addColon (getTitle lang "maintitle"
                       >> guard hasVolumes
                       >> getTitle lang "booksubtitle")
                      <|> return ""
-  volumeTitleAddon' <- (". " ++) `fmap`
-                       (getTitle lang "maintitle"
-                         >> guard hasVolumes
-                         >> getTitle lang "booktitleaddon")
+  volumeTitleAddon' <- addPeriod (getTitle lang "maintitle"
+                                   >> guard hasVolumes
+                                   >> getTitle lang "booktitleaddon")
                        <|> return ""
   shortTitle' <- getTitle lang "shorttitle"
                <|> if ':' `elem` title'
