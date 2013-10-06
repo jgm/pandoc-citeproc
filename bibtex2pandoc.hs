@@ -503,7 +503,10 @@ itemToReference lang bibtex = bib $ do
   reftype' <- resolveKey lang <$> getRawField "type" <|> return ""
 
   -- hyphenation:
-  hyphenation <- getRawField "hyphenation" <|> return ""
+  let defaultHyphenation = case lang of
+                                Lang x y -> x ++ "-" ++ y
+  hyphenation <- (toLocale <$> getRawField "hyphenation")
+                <|> return defaultHyphenation
 
   -- authors:
   author' <- getAuthorList "author" <|> return []
@@ -524,51 +527,56 @@ itemToReference lang bibtex = bib $ do
          ["inbook","incollection","inproceedings","bookinbook"]
   let addColon = fmap (": " ++)
   let addPeriod = fmap (". " ++)
-  title' <- (guard isPeriodical >> getTitle lang "issuetitle")
-         <|> getTitle lang "title"
+  let (la, co) = case splitOn "-" hyphenation of
+                      [x]     -> (x, "")
+                      (x:y:_) -> (x, y)
+                      []      -> ("", "")
+  let getTitle' = getTitle (Lang la co)
+  title' <- (guard isPeriodical >> getTitle' "issuetitle")
+         <|> getTitle' "title"
          <|> return ""
-  subtitle' <- addColon ((guard isPeriodical >> getTitle lang "issuesubtitle")
-                <|> getTitle lang "subtitle")
+  subtitle' <- addColon ((guard isPeriodical >> getTitle' "issuesubtitle")
+                <|> getTitle' "subtitle")
               <|> return ""
-  titleaddon' <- addPeriod (getTitle lang "titleaddon")
+  titleaddon' <- addPeriod (getTitle' "titleaddon")
                <|> return ""
-  containerTitle' <- (guard isPeriodical >> getTitle lang "title")
-                  <|> getTitle lang "maintitle"
-                  <|> getTitle lang "booktitle"
-                  <|> getTitle lang "journal"
-                  <|> getTitle lang "journaltitle"
-                  <|> (guard isArticle >> getTitle lang "series")
+  containerTitle' <- (guard isPeriodical >> getTitle' "title")
+                  <|> getTitle' "maintitle"
+                  <|> getTitle' "booktitle"
+                  <|> getTitle' "journal"
+                  <|> getTitle' "journaltitle"
+                  <|> (guard isArticle >> getTitle' "series")
                   <|> return ""
-  containerSubtitle' <- addColon (getTitle lang "mainsubtitle"
-                       <|> getTitle lang "booksubtitle"
-                       <|> getTitle lang "journalsubtitle")
+  containerSubtitle' <- addColon (getTitle' "mainsubtitle"
+                       <|> getTitle' "booksubtitle"
+                       <|> getTitle' "journalsubtitle")
                        <|> return ""
-  containerTitleAddon' <- addPeriod (getTitle lang "maintitleaddon"
-                       <|> getTitle lang "booktitleaddon")
+  containerTitleAddon' <- addPeriod (getTitle' "maintitleaddon"
+                       <|> getTitle' "booktitleaddon")
                        <|> return ""
-  containerTitleShort' <- getTitle lang "booktitleshort"
-                        <|> getTitle lang "journaltitleshort"
-                        <|> getTitle lang "shortjournal"
+  containerTitleShort' <- getTitle' "booktitleshort"
+                        <|> getTitle' "journaltitleshort"
+                        <|> getTitle' "shortjournal"
                         <|> return ""
-  volumeTitle' <- (getTitle lang "maintitle" >> guard hasVolumes
-                    >> getTitle lang "booktitle")
-                  <|> (guard (not isArticle) >> getTitle lang "series")
+  volumeTitle' <- (getTitle' "maintitle" >> guard hasVolumes
+                    >> getTitle' "booktitle")
+                  <|> (guard (not isArticle) >> getTitle' "series")
                   <|> return ""
-  volumeSubtitle' <- addColon (getTitle lang "maintitle"
+  volumeSubtitle' <- addColon (getTitle' "maintitle"
                       >> guard hasVolumes
-                      >> getTitle lang "booksubtitle")
+                      >> getTitle' "booksubtitle")
                      <|> return ""
-  volumeTitleAddon' <- addPeriod (getTitle lang "maintitle"
+  volumeTitleAddon' <- addPeriod (getTitle' "maintitle"
                                    >> guard hasVolumes
-                                   >> getTitle lang "booktitleaddon")
+                                   >> getTitle' "booktitleaddon")
                        <|> return ""
-  shortTitle' <- getTitle lang "shorttitle"
+  shortTitle' <- getTitle' "shorttitle"
                <|> if ':' `elem` title'
                    then return (takeWhile (/=':') title')
                    else return ""
 
-  eventTitle' <- getTitle lang "eventtitle" <|> return ""
-  origTitle' <- getTitle lang "origtitle" <|> return ""
+  eventTitle' <- getTitle' "eventtitle" <|> return ""
+  origTitle' <- getTitle' "origtitle" <|> return ""
 
   -- publisher
   pubfields <- mapM (\f -> Just `fmap` getField f <|> return Nothing)
@@ -696,5 +704,7 @@ itemToReference lang bibtex = bib $ do
          , doi                 = doi'
          , isbn                = isbn'
          , issn                = issn'
-         , language            = toLocale hyphenation
+         , language            = if hyphenation == defaultHyphenation
+                                    then ""
+                                    else hyphenation
          }
