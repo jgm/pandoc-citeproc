@@ -592,13 +592,17 @@ itemToReference lang bibtex = bib $ do
   chapter' <- getField "chapter" <|> return ""
   edition' <- getField "edition" <|> return ""
   version' <- getField "version" <|> return ""
-  (number', collectionNumber') <- (getField "number" <|> return "") >>= \x ->
+  (number', collectionNumber', issue') <-
+     (getField "number" <|> return "") >>= \x ->
        if et `elem` ["book","collection","proceedings","reference",
                      "mvbook","mvcollection","mvproceedings", "mvreference",
                      "bookinbook","inbook", "incollection","inproceedings",
                      "inreference", "suppbook","suppcollection"]
-       then return ("",x)
-       else return (x,"")
+       then return ("",x,"")
+       else if isArticle
+            then (getField "issue" >>= \y -> return ("","",x ++ ", " ++ y))
+               <|> return (x,"","")
+            else return (x,"","")
 
   -- dates
   issued' <- getDates "date" <|> getOldDates "" <|> return []
@@ -658,7 +662,7 @@ itemToReference lang bibtex = bib $ do
          , containerTitle      = containerTitle' ++ containerSubtitle' ++ containerTitleAddon'
          , collectionTitle     = volumeTitle' ++ volumeSubtitle' ++ volumeTitleAddon'
          , containerTitleShort = containerTitleShort'
-         -- , collectionNumber    = undefined -- :: String --Int
+         , collectionNumber    = collectionNumber'
          , originalTitle       = origTitle'
          , publisher           = publisher'
          , originalPublisher   = origpublisher'
@@ -673,7 +677,7 @@ itemToReference lang bibtex = bib $ do
          , version             = version'
          , volume              = volume'
          , numberOfVolumes     = volumes'
-         -- , issue               = undefined -- :: String
+         , issue               = issue'
          , chapterNumber       = chapter'
          -- , medium              = undefined -- :: String
          , status              = pubstate'
