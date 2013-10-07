@@ -68,8 +68,10 @@ disambCitations s bibs cs groups
       needYSuff = filter_        snd  $ zip duplics withNames
 
       newNames :: [CiteData]
-      newNames  = when_ (hasNamesOpt || hasGNameOpt) $ disambAddNames givenNames $ needNames ++
-                  if hasYSuffOpt && givenNames == NoGiven then [] else needYSuff
+      newNames  = if hasNamesOpt
+                  then disambAddNames givenNames $ needNames ++
+                       if hasYSuffOpt && givenNames == NoGiven then [] else needYSuff
+                  else map (\cd -> cd {disambed = collision cd} ) $ needNames ++ needYSuff
 
       newGName :: [NameData]
       newGName  = when_ hasGNameOpt $ concatMap disambAddGivenNames nameDupls
@@ -88,7 +90,8 @@ disambCitations s bibs cs groups
 
       yearSuffs = when_ hasYSuffOpt . generateYearSuffix bibs . query getYearSuffixes $ withYearS
 
-      addNames  = proc (updateContrib givenNames newNames newGName)
+      addGNames = if hasGNameOpt then newGName else []
+      addNames  = proc (updateContrib givenNames newNames addGNames)
       processed = if hasYSuffOpt
                   then proc (updateYearSuffixes yearSuffs) .
                        addNames $ withYearS
@@ -128,16 +131,16 @@ disambAddGivenNames needName = addGName
       addGName = map (\(c,n) -> c { nameDataSolved = if null n then nameCollision c else head n }) disSolved
 
 updateContrib :: GiveNameDisambiguation -> [CiteData] -> [NameData] -> Output -> Output
+updateContrib ByCite [] _ o = o
 updateContrib g c n o
     | OContrib k r s d dd <- o = case filter (key &&& sameAs >>> uncurry (:) >>> elem k) c of
-                                  x:_ | clean (disambData x) == clean (d:dd) ->
-                                          OContrib k r (map processGNames $ disambed x) [] dd
-                                  _ | null c, AllNames <- g -> OContrib k r (map processGNames s) d dd
-                                    | otherwise             -> o
+                                  x:_  -> OContrib k r (processGNames $ disambed x) [] dd
+                                  _ -> if null c
+                                       then OContrib k r (processGNames s) d dd
+                                       else o
     | otherwise = o
     where
-      clean         = if g == NoGiven then proc rmNameHash . proc rmGivenNames else id
-      processGNames = if g /= NoGiven then updateOName n else id
+      processGNames = if g /= NoGiven then proc' (updateOName n) else id
 
 updateOName :: [NameData] -> Output -> Output
 updateOName n o
@@ -201,7 +204,8 @@ rmExtras os
                                       then rmExtras xs
                                       else Output (rmExtras x) f : rmExtras xs
     | OContrib _ _ x _ _ : xs <- os = OContrib [] [] x [] [] : rmExtras xs
-    | OYear        y _ f : xs <- os = OYear y [] f : rmExtras xs
+    | OYear        y _ f : xs <- os = OYear      y  [] f : rmExtras xs
+    | OYearSuf   s _ _ f : xs <- os = OYearSuf s [] [] f : rmExtras xs
     | ODel             _ : xs <- os = rmExtras xs
     | OLoc           _ _ : xs <- os = rmExtras xs
     | x                  : xs <- os = x : rmExtras xs
@@ -225,7 +229,7 @@ getCiteData out
                                             else c {key     = fst y
                                                    ,citYear = snd y}
       contribsQ o
-          | OContrib k _ _ d dd <- o = [CD k [out] d (d:dd) [] [] []]
+          | OContrib k _ s d dd <- o = [CD k s d (d:dd) [] [] []]
           | otherwise                = []
 
 getYears :: Output -> [(String,String)]
@@ -259,7 +263,7 @@ getName = query getName'
 
 generateYearSuffix :: [Reference] -> [(String, [Output])] -> [(String,String)]
 generateYearSuffix refs
-    = concatMap (flip zip suffs) .
+    = flip zip suffs . concat .
       -- sort clashing cites using their position in the sorted bibliography
       getFst . map sort' . map (filter ((/=) 0 . snd)) . map (map getP) .
       -- group clashing cites
@@ -280,7 +284,7 @@ setYearSuffCollision b cs = proc (setYS cs) . (map $ \x -> if hasYearSuf x then 
       setYS c o
           | OYearSuf _ k _ f <- o = OYearSuf [] k (getCollision k c) f
           | otherwise             = o
-      collide = if b then disambed else disambYS
+      collide = if b then collision else disambYS
       getCollision k c = case find ((==) k . key) c of
                            Just x -> if collide x == []
                                      then [OStr (citYear x) emptyFormatting]
