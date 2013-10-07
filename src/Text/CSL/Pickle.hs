@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE PatternGuards, CPP #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Pickle
