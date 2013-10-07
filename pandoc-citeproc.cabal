@@ -138,7 +138,9 @@ library
                       Text.CSL.Style
                       Text.CSL.Input.MODS
                       Text.CSL.Input.Bibutils
+                      Text.CSL.Input.Bibtex
                       Text.CSL.Input.Json
+                      Text.CSL.Input.Pandoc
                       Text.CSL.Output.Pandoc
                       Text.CSL.Output.Plain
     other-modules:    Text.CSL.Data
@@ -147,7 +149,8 @@ library
     ghc-prof-options: -prof -auto-all
     build-depends:    containers, directory, mtl, json, utf8-string,
                       bytestring, filepath, pandoc-types >= 1.12.2.3, tagsoup,
-                      aeson, text, vector, texmath >= 0.6.4
+                      aeson, text, vector, texmath >= 0.6.4, split, bibtex,
+                      yaml >= 0.8, pandoc >= 1.12.0.2
 
     if flag(bibutils)
        build-depends:   hs-bibutils >= 0.3

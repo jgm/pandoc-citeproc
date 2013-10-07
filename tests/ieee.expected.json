@@ -1268,7 +1268,7 @@
                     "Space": []
                   },
                   {
-                    "Str": "Book"
+                    "Str": "book"
                   }
                 ]
               },
@@ -1363,13 +1363,13 @@
                     "Space": []
                   },
                   {
-                    "Str": "Generic"
+                    "Str": "generic"
                   },
                   {
                     "Space": []
                   },
                   {
-                    "Str": "Studies"
+                    "Str": "studies"
                   }
                 ]
               },
@@ -1459,19 +1459,19 @@
                 "Space": []
               },
               {
-                "Str": "Water"
+                "Str": "water"
               },
               {
                 "Space": []
               },
               {
-                "Str": "Is"
+                "Str": "is"
               },
               {
                 "Space": []
               },
               {
-                "Str": "Wet"
+                "Str": "wet"
               },
               {
                 "Str": ","
@@ -1500,7 +1500,7 @@
                     "Space": []
                   },
                   {
-                    "Str": "Book"
+                    "Str": "book"
                   }
                 ]
               },

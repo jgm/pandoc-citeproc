@@ -24,6 +24,7 @@ import Text.CSL.Pickle
 import Text.CSL.Reference
 import Text.CSL.Input.Json
 import Text.CSL.Input.MODS
+import Text.CSL.Input.Bibtex
 import Text.JSON.Generic
 
 #ifdef USE_BIBUTILS
@@ -46,8 +47,8 @@ readBiblioFile :: FilePath -> IO [Reference]
 readBiblioFile f
     = case getExt f of
         ".mods"    -> readBiblioFile' f mods_in
-        ".bib"     -> readBiblioFile' f biblatex_in
-        ".bibtex"  -> readBiblioFile' f bibtex_in
+        ".bib"     -> readBibtexInput False f
+        ".bibtex"  -> readBibtexInput True f
         ".ris"     -> readBiblioFile' f ris_in
         ".enl"     -> readBiblioFile' f endnote_in
         ".xml"     -> readBiblioFile' f endnotexml_in
@@ -64,6 +65,8 @@ readBiblioFile f
     | ".mods"   <- getExt f = readModsCollectionFile f
     | ".json"   <- getExt f = readJsonInput f
     | ".native" <- getExt f = readFile f >>= return . decodeJSON
+    | ".bib"    <- getExt f = readBibtexInput False f
+    | ".bibtex" <- getExt  =  readBibtexInput True f
     | otherwise             = error $ "citeproc: Bibliography format not supported.\n" ++
                                       "citeproc-hs was not compiled with bibutils support."
 #endif
@@ -88,9 +91,9 @@ readBiblioString b s
     | Mods      <- b = return $ readXmlString xpModsCollection (fromString s)
     | Json      <- b = return $ readJsonInputString s
     | Native    <- b = return $ decodeJSON s
+    | Bibtex    <- b = readBibtexInputString True s
+    | BibLatex  <- b = readBibtexInputString False s
 #ifdef USE_BIBUTILS
-    | Bibtex    <- b = go bibtex_in
-    | BibLatex  <- b = go biblatex_in
     | Ris       <- b = go ris_in
     | Endnote   <- b = go endnote_in
     | EndnotXml <- b = go endnotexml_in
