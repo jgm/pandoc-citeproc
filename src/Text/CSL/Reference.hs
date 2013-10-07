@@ -630,8 +630,8 @@ processCites rs cs
             isLocSet = citeLocator c /= ""
 
 setPageFirst :: Reference -> Reference
-setPageFirst r = if ('–' `elem` page r || '-' `elem` page r)
-                 then r { pageFirst = takeWhile (not . flip elem "–-") $ page r}
+setPageFirst r = if ('[_<U+00E2>_][_<U+0080>_][_<U+0093>_]' `elem` page r || '-' `elem` page r)
+    +            then r { pageFirst = takeWhile (not . flip elem "[_<U+00E2>_][_<U+0080>_][_<U+0093>_]-") $ page r}
                  else r
 
 setNearNote :: Style -> [[Cite]] -> [[Cite]]
