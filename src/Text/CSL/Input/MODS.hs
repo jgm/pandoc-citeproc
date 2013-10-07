@@ -44,10 +44,10 @@ xpMods = xpIElem "mods" xpReference
 
 xpReference :: PU Reference
 xpReference
-    = xpWrap ( \ ( ref
+    = xpWrap ( \ ((ref,oref)
                 , (ck,(ty,gn),ti,i,d)
                 ,((au,ed,tr,sp),(re,it,pu',dr),(co,ce,dg,om))
-                ,((di',pg,vl,is),(nu,sc,ch))
+                ,((di',pg,vl,is),(nu,sc,ch,vs))
                 , (di,ac,pu,pp,et)
                 , ((ac',uri),ln,st,no)
                  ) ->
@@ -66,6 +66,7 @@ xpReference
                    , director         = dr `betterThen` director         ref
                    , collectionEditor = ce `betterThen` collectionEditor ref
                    , publisherPlace   = pp `betterThen` publisherPlace   ref
+                   , numberOfVolumes  = vs `betterThen` numberOfVolumes  ref
                    , containerAuthor  = containerAuthor  ref
                    , url              = uri
                    , note             = no
@@ -89,18 +90,23 @@ xpReference
                                            `betterThen` fromAgent dg
                                            `betterThen` fromAgent om
                                            `betterThen` fromAgent sp
+                   , originalDate           = issued         oref
+                   , originalTitle          = title          oref
+                   , originalPublisher      = publisher      oref
+                   , originalPublisherPlace = publisherPlace oref
                    }
-             , \r -> (  r
+             , \r -> ( (emptyReference,emptyReference)
                      , (refId     r,(refType r,genre r), (title r, titleShort r), isbn r, doi r)
                      ,((author    r, editor           r, translator r, director r)
                       ,(recipient r, interviewer      r, emptyAgents,  director r)
                       ,(composer  r, collectionEditor r, emptyAgents, emptyAgents))
                      ,((issued    r, page  r, volume r, issue r)
-                      ,(number    r, section   r, chapterNumber r))
+                      ,(number    r, section   r, chapterNumber r, numberOfVolumes r))
                      , (issued    r, accessed r, emptyAgents, publisherPlace r, edition r)
                      ,((accessed  r, url r),  status r, language r, note r)
                      )) $
-      xp6Tuple (xpDefault emptyReference xpRelatedItem)
+      xp6Tuple (xpPair (xpDefault emptyReference $ xpRelatedItem "host")
+                       (xpDefault emptyReference $ xpRelatedItem "original"))
                (xp5Tuple xpCiteKey xpRefType xpTitle xpIsbn xpDoi)
                 xpAgents xpPart xpOrigin
                (xp4Tuple xpUrl xpLang xpStatus xpNote)
@@ -136,19 +142,23 @@ xpGenre
               (xpPair (xpDefault [] $ xpAttr "authority" xpText) xpText)
               $ xpLift . snd
 
-xpRelatedItem :: PU Reference
-xpRelatedItem
-    = xpIElem "relatedItem" . xpAddFixedAttr "type" "host" $
-      xpWrap ( \( ((ty,gn),ct)
+xpRelatedItem :: String -> PU Reference
+xpRelatedItem t
+    = xpIElem "relatedItem" . xpAddFixedAttr "type" t $
+      xpWrap ( \(((t3l,t3s),(t4l,_))
+                ,((ty,gn),ct)
                 ,((ca,ed,tr,sp),(re,it,pu',dr),(co,ce,dg,om))
-                ,((di,pg,vl,is),(nu,sc,ch))
+                ,((di,pg,vl,is),(nu,sc,ch,vs))
                 , (di',ac,pu,pp,et)
                 , (ln, st)
                 ) ->
                emptyReference { refType             = ty
+                              , title               = fst ct
                               , containerAuthor     = ca
-                              , containerTitle      = fst ct
-                              , containerTitleShort = snd ct
+                              , containerTitle      = if t3l /= [] then t3l else fst ct
+                              , containerTitleShort = if t3s /= [] then t3s else snd ct
+                              , collectionTitle     = t4l
+                              , volumeTitle         = if t3l /= [] then fst ct else []
                               , editor              = ed
                               , edition             = et
                               , translator          = tr
@@ -167,24 +177,33 @@ xpRelatedItem
                               , section             = sc
                               , chapterNumber       = ch
                               , genre               = gn
+                              , numberOfVolumes     = vs
                               , language            = ln
                               , status              = st
                               , publisher           = fromAgent $ pu `betterThen` pu' `betterThen`
                                                                   dg `betterThen` om  `betterThen` sp
 
                               }
-             , \r -> ( ((refType r,genre r), (containerTitle  r, containerTitleShort r))
+             , \r -> (((volumeTitle r,[]),(collectionTitle r,[]))
+                     ,((refType r,genre r), (containerTitle  r, containerTitleShort r))
                      ,((containerAuthor r, editor           r, translator r, director r)
                       ,(recipient       r, interviewer      r, emptyAgents,  director r)
                       ,(composer        r, collectionEditor r, emptyAgents, emptyAgents))
                      ,((issued  r, page  r, volume r, issue r)
-                      ,(number  r, section   r, chapterNumber r))
+                      ,(number  r, section   r, chapterNumber r, numberOfVolumes r))
                      , (issued  r, accessed  r,emptyAgents, publisherPlace r, edition r)
                      , (language r, status r)
                      )) $
-      xp5Tuple (xpPair xpRefType xpTitle)
+      xp6Tuple  xpNestedTitles
+               (xpPair xpRefType xpTitle)
                 xpAgents xpPart xpOrigin
                (xpPair xpLang xpStatus)
+
+xpNestedTitles :: PU ((String, String), (String, String))
+xpNestedTitles
+    = xpDefault (([],[]),([],[])) . getRelated $ xpPair xpTitle (getRelated xpTitle)
+    where
+      getRelated = xpIElem "relatedItem" . xpAddFixedAttr "type" "host"
 
 xpTitle :: PU (String,String)
 xpTitle
@@ -269,21 +288,22 @@ xpNameData
       readg = foldr (\(k,v) xs -> if k == "given"  then v:xs else xs) []
 
 xpPart :: PU (([RefDate],String,String,String)
-             ,(String,String,String))
+             ,(String,String,String,String))
 xpPart
     = xpDefault none . xpIElem "part" .
       xpWrap (readIt none,const []) $ xpList xpDetail
     where
-      none = (([],"","",""),("","",""))
+      none = (([],"","",""),("","","",""))
       readIt r [] = r
-      readIt acc@((d,p,v,i),(n,s,c)) (x:xs)
-          | Date      y <- x = readIt ((y,p,v,i),(n,s,c)) xs
-          | Page      y <- x = readIt ((d,y,v,i),(n,s,c)) xs
-          | Volume    y <- x = readIt ((d,p,y,i),(n,s,c)) xs
-          | Issue     y <- x = readIt ((d,p,v,y),(n,s,c)) xs
-          | Number    y <- x = readIt ((d,p,v,i),(y,s,c)) xs
-          | ChapterNr y <- x = readIt ((d,p,v,i),(n,s,y)) xs
-          | Section   y <- x = readIt ((d,p,v,i),(n,y,c)) xs
+      readIt acc@((d,p,v,i),(n,s,c,vs)) (x:xs)
+          | Date      y <- x = readIt ((y,p,v,i),(n,s,c,vs)) xs
+          | Page      y <- x = readIt ((d,y,v,i),(n,s,c,vs)) xs
+          | Volume    y <- x = readIt ((d,p,y,i),(n,s,c,vs)) xs
+          | Issue     y <- x = readIt ((d,p,v,y),(n,s,c,vs)) xs
+          | Number    y <- x = readIt ((d,p,v,i),(y,s,c,vs)) xs
+          | ChapterNr y <- x = readIt ((d,p,v,i),(n,s,y,vs)) xs
+          | Section   y <- x = readIt ((d,p,v,i),(n,y,c,vs)) xs
+          | NrVols    y <- x = readIt ((d,p,v,i),(n,s,c, y)) xs
           | otherwise        = acc
 
 data Detail
@@ -294,6 +314,7 @@ data Detail
     | Number    String
     | ChapterNr String
     | Section   String
+    | NrVols    String
       deriving ( Eq, Show )
 
 xpDetail :: PU Detail
@@ -303,6 +324,7 @@ xpDetail
       tag _ = 0
       ps = [ xpWrap (Date, const []) $ xpDate
            , xpWrap (Page,     show) $ xpPage
+           , xpWrap (NrVols,   show) $ xpVolumes
            , xpWrap (Volume,   show) $ xp "volume"
            , xpWrap (Issue,    show) $ xp "issue"
            , xpWrap (Number,   show) $ xp "number"
@@ -321,6 +343,11 @@ xpPage
                 xpPair (xpElem "start" xpText)
                        (xpElem "end"   xpText))
                (\(s,e) -> xpLift (s ++ "-" ++ e))
+
+xpVolumes :: PU String
+xpVolumes
+    = xpElemWithAttrValue "extent" "unit" "volumes" $
+      xpElem "total" xpText
 
 xpUrl :: PU ([RefDate],String)
 xpUrl
