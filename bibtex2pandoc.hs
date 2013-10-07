@@ -558,16 +558,14 @@ itemToReference lang bibtex = bib $ do
                         <|> getTitle' "journaltitleshort"
                         <|> getTitle' "shortjournal"
                         <|> return ""
+  seriesTitle' <- (guard (not isArticle) >> getTitle' "series") <|> return ""
   volumeTitle' <- (getTitle' "maintitle" >> guard hasVolumes
                     >> getTitle' "booktitle")
-                  <|> (guard (not isArticle) >> getTitle' "series")
                   <|> return ""
-  volumeSubtitle' <- addColon (getTitle' "maintitle"
-                      >> guard hasVolumes
+  volumeSubtitle' <- addColon (getTitle' "maintitle" >> guard hasVolumes
                       >> getTitle' "booksubtitle")
                      <|> return ""
-  volumeTitleAddon' <- addPeriod (getTitle' "maintitle"
-                                   >> guard hasVolumes
+  volumeTitleAddon' <- addPeriod (getTitle' "maintitle" >> guard hasVolumes
                                    >> getTitle' "booktitleaddon")
                        <|> return ""
   shortTitle' <- getTitle' "shorttitle"
@@ -668,7 +666,8 @@ itemToReference lang bibtex = bib $ do
          , titleShort          = shortTitle'
          -- , reviewedTitle       = undefined -- :: String
          , containerTitle      = containerTitle' ++ containerSubtitle' ++ containerTitleAddon'
-         , collectionTitle     = volumeTitle' ++ volumeSubtitle' ++ volumeTitleAddon'
+         , collectionTitle     = seriesTitle'
+         , volumeTitle         = volumeTitle' ++ volumeSubtitle' ++ volumeTitleAddon'
          , containerTitleShort = containerTitleShort'
          , collectionNumber    = collectionNumber'
          , originalTitle       = origTitle'
