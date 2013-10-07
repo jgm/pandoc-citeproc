@@ -267,6 +267,7 @@ data Reference =
     , titleShort          :: String
     , reviewedTitle       :: String
     , containerTitle      :: String
+    , volumeTitle         :: String
     , collectionTitle     :: String
     , containerTitleShort :: String
     , collectionNumber    :: String --Int
@@ -346,6 +347,7 @@ instance FromJSON Reference where
        v .:? "title-short" .!= "" <*>
        v .:? "reviewed-title" .!= "" <*>
        v .:? "container-title" .!= "" <*>
+       v .:? "volume-title" .!= "" <*>
        v .:? "collection-title" .!= "" <*>
        v .:? "container-title-short" .!= "" <*>
        v .:? "collection-number" .!= "" <*>
@@ -424,6 +426,7 @@ instance ToJSON Reference where
     , "title-short" .= titleShort ref
     , "reviewed-title" .= reviewedTitle ref
     , "container-title" .= containerTitle ref
+    , "volume-title" .= volumeTitle ref
     , "collection-title" .= collectionTitle ref
     , "container-title-short" .= containerTitleShort ref
     , "collection-number" .= collectionNumber ref
@@ -506,6 +509,7 @@ emptyReference =
     , titleShort          = []
     , reviewedTitle       = []
     , containerTitle      = []
+    , volumeTitle         = []
     , collectionTitle     = []
     , containerTitleShort = []
     , collectionNumber    = []
