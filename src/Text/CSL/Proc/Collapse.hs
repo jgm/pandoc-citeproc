@@ -66,6 +66,31 @@ collapseNumber cg
                                                   ] emptyFormatting
                              else map (flip OCitNum f) x
 
+groupCites :: [(Cite, Output)] -> [(Cite, Output)]
+groupCites []     = []
+groupCites (x:xs) = let equal    = filter ((==) (namesOf $ snd x) . namesOf . snd) xs
+                        notequal = filter ((/=) (namesOf $ snd x) . namesOf . snd) xs
+                    in  x : equal ++ groupCites notequal
+    where
+      contribsQ o
+          | OContrib _ _ c _ _ <- o = [c]
+          | otherwise               = []
+      namesOf y = if null (query contribsQ y) then [] else proc rmNameHash . proc rmGivenNames $ head (query contribsQ y)
+
+getYearAndSuf :: Output -> Output
+getYearAndSuf x
+    = case query getOYear x of
+        [] -> noOutputError
+        x' -> Output x' emptyFormatting
+    where
+      getOYear o
+          | OYear    {} : _ <- o = [head o]
+          | OYearSuf {} : _ <- o = [head o]
+          | OPan     {} : _ <- o = [head o]
+          | OLoc     {} : _ <- o = [head o]
+          | ODel _ : OLoc {} : _ <- o = [head o]
+          | otherwise = []
+
 collapseYear :: Style -> String -> CitationGroup -> CitationGroup
 collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
     where
@@ -76,16 +101,6 @@ collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
 
       format []     = []
       format (x:xs) = x : map getYearAndSuf xs
-      getYearAndSuf x = case query getOYear x of
-                          [] -> noOutputError
-                          x' -> Output x' emptyFormatting
-      getOYear o
-          | OYear    {} : _ <- o = [head o]
-          | OYearSuf {} : _ <- o = [head o]
-          | OPan     {} : _ <- o = [head o]
-          | OLoc     {} : _ <- o = [head o]
-          | ODel _ : OLoc {} : _ <- o = [head o]
-          | otherwise = []
 
       isRanged = case ranged of
                    "year-suffix-ranged" -> True
@@ -95,11 +110,16 @@ collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
                       else collapseYearSuf isRanged yearSufDel
 
       rmAffixes x = x {citePrefix = emptyAffix, citeSuffix = emptyAffix}
+      delim = let d' = getOptionVal "cite-group-delimiter" . citOptions . citation $ s
+              -- FIXME: see https://bitbucket.org/bdarcus/citeproc-test/issue/15
+              -- in  if null d' then if null d then ", " else d else d'
+              in  if null d' then ", " else d'
+
       collapsYS a = case a of
                       []  -> (emptyCite, ONull)
                       [x] -> rmAffixes . fst &&& uncurry addCiteAffixes $ x
                       _   -> (,) (rmAffixes $ fst $ head a) . flip Output emptyFormatting .
-                             addDelim d . collapseRange .
+                             addDelim delim . collapseRange .
                              uncurry zip . second format . unzip $ a
 
       doCollapse []     = []
@@ -110,10 +130,10 @@ collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
                              else (a, Output (b : [ODel d          ]) emptyFormatting) : doCollapse xs
 
       contribsQ o
-          | OContrib _ _ c _ _ <- o = [c]
+          | OContrib _ _ c _ _ <- o = [proc' rmNameHash . proc' rmGivenNames $ c]
           | otherwise               = []
       namesOf = query contribsQ
-      process = doCollapse . groupBy (\a b -> namesOf (snd a) == namesOf (snd b))
+      process = doCollapse . groupBy (\a b -> namesOf (snd a) == namesOf (snd b)) . groupCites
 
 collapseYearSuf :: Bool -> String -> [(Cite,Output)] -> [Output]
 collapseYearSuf ranged ysd = process
