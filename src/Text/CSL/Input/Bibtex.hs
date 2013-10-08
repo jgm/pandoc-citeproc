@@ -230,8 +230,12 @@ getLiteralList :: String -> Bib [String]
 getLiteralList f = do
   fs <- asks fields
   case lookup f fs of
-       Just x  -> return $ map trim $ splitOn " and " x
+       Just x  -> return $ mapMaybe latex $ splitOn " and " x
        Nothing -> notFound f
+
+-- separates items with semicolons
+getLiteralList' :: String -> Bib String
+getLiteralList' f = intercalate "; " <$> getLiteralList f
 
 splitByAnd :: [Inline] -> [[Inline]]
 splitByAnd = splitOn [Space, Str "and", Space]
@@ -540,17 +544,23 @@ itemToReference lang bibtex = bib $ do
   origTitle' <- getTitle' "origtitle" <|> return ""
 
   -- publisher
-  pubfields <- mapM (\f -> Just `fmap` getField f <|> return Nothing)
-               ["school","institution","organization",
-                "howpublished","publisher"]
-  let publisher' = intercalate ", " [p | Just p <- pubfields]
+  pubfields <- mapM (\f -> Just `fmap`
+                       (if bibtex then getField f else getLiteralList' f)
+                      <|> return Nothing)
+         ["school","institution","organization", "howpublished","publisher"]
+  let publisher' = intercalate "; " [p | Just p <- pubfields]
   origpublisher' <- getField "origpublisher" <|> return ""
 
 -- places
   venue' <- getField "venue" <|> return ""
-  address' <- getField "address" <|> if bibtex then return "" else getField "location"
-            <|> return ""
-  origLocation' <- getField "origlocation" <|> return ""
+  address' <- (if bibtex
+               then getField "address"
+               else getLiteralList' "address" <|> getLiteralList' "location")
+              <|> return ""
+  origLocation' <- (if bibtex
+                    then getField "origlocation"
+                    else getLiteralList' "origlocation")
+                  <|> return ""
   jurisdiction' <- getField "jurisdiction" <|> return ""
 
   -- locators
