@@ -489,31 +489,37 @@ itemToReference lang bibtex = bib $ do
                       (x:y:_) -> (x, y)
                       []      -> ("", "")
   let getTitle' = getTitle (Lang la co)
-  title' <- (guard isPeriodical >> getTitle' "issuetitle")
-         <|> getTitle' "title"
-         <|> return ""
-  subtitle' <- addColon ((guard isPeriodical >> getTitle' "issuesubtitle")
-                <|> getTitle' "subtitle")
+  title' <- (if isPeriodical then getTitle' "issuetitle" else getTitle' "title")
+           <|> return ""
+  subtitle' <- addColon (if isPeriodical
+                         then getTitle' "issuesubtitle"
+                         else getTitle' "subtitle")
               <|> return ""
-  titleaddon' <- addPeriod (getTitle' "titleaddon")
+  titleaddon' <- addPeriod (if isPeriodical
+                            then getTitle' "issuetitleaddon"
+                            else getTitle' "titleaddon")
                <|> return ""
-  containerTitle' <- (guard isPeriodical >> getTitle' "title")
+  containerTitle' <- (guard isPeriodical >> getField "title")
                   <|> getTitle' "maintitle"
                   <|> getTitle' "booktitle"
-                  <|> getTitle' "journal"
-                  <|> getTitle' "journaltitle"
+                  <|> getField "journal"
+                  <|> getField "journaltitle"
                   <|> (guard isArticle >> getTitle' "series")
                   <|> return ""
-  containerSubtitle' <- addColon (getTitle' "mainsubtitle"
+  containerSubtitle' <- addColon ((guard isPeriodical >> getField "subtitle")
+                       <|> getTitle' "mainsubtitle"
                        <|> getTitle' "booksubtitle"
-                       <|> getTitle' "journalsubtitle")
+                       <|> getField "journalsubtitle")
                        <|> return ""
-  containerTitleAddon' <- addPeriod (getTitle' "maintitleaddon"
+  containerTitleAddon' <- addPeriod (
+                           (guard isPeriodical >> getField "titleaddon")
+                       <|> getTitle' "maintitleaddon"
                        <|> getTitle' "booktitleaddon")
                        <|> return ""
-  containerTitleShort' <- getTitle' "booktitleshort"
-                        <|> getTitle' "journaltitleshort"
-                        <|> getTitle' "shortjournal"
+  containerTitleShort' <- (guard isPeriodical >> getField "shorttitle")
+                        <|> getTitle' "booktitleshort"
+                        <|> getField "journaltitleshort"
+                        <|> getField "shortjournal"
                         <|> return ""
   seriesTitle' <- (guard (not isArticle) >> getTitle' "series") <|> return ""
   volumeTitle' <- (getTitle' "maintitle" >> guard hasVolumes
