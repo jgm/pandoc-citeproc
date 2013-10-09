@@ -40,7 +40,7 @@ type BibParser = Parsec [Char] [(String, String)]
 
 bibEntries :: BibParser [Item]
 bibEntries = many (try (skipMany nonEntry >> bibItem)) <* skipMany nonEntry
-  where nonEntry = bibSkip <|> bibComment <|> bibString
+  where nonEntry = bibSkip <|> bibComment <|> bibPreamble <|> bibString
 
 bibSkip :: BibParser ()
 bibSkip = skipMany1 (satisfy (/='@'))
@@ -49,6 +49,14 @@ bibComment :: BibParser ()
 bibComment = try $ do
   char '@'
   cistring "comment"
+  spaces
+  void inBraces
+  return ()
+
+bibPreamble :: BibParser ()
+bibPreamble = try $ do
+  char '@'
+  cistring "preamble"
   spaces
   void inBraces
   return ()
