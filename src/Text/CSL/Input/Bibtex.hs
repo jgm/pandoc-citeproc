@@ -1,20 +1,23 @@
 module Text.CSL.Input.Bibtex ( readBibtexInput, readBibtexInputString )
 where
 
-import Text.BibTeX.Entry
-import Text.BibTeX.Parse hiding (identifier, entry)
-import Text.Parsec hiding (optional, (<|>))
+import Text.Parsec hiding (optional, (<|>), many)
 import Control.Applicative
 import Text.Pandoc
 import Data.List.Split (splitOn, splitWhen)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper)
+import Data.Char (toLower, isUpper, toUpper)
 import Control.Monad
 import Control.Monad.Reader
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
 import Text.CSL.Input.Pandoc (blocksToString, inlinesToString)
+
+data Item = Item{ identifier :: String
+                , entryType  :: String
+                , fields     :: [(String, String)]
+                }
 
 readBibtexInput :: Bool -> FilePath -> IO [Reference]
 readBibtexInput isBibtex f = readFile f >>= readBibtexInputString isBibtex
@@ -28,20 +31,94 @@ readBibtexInputString isBibtex bibstring = do
                                    [w]     -> Lang w ""
                                    _       -> Lang "en" "US"
                   Nothing -> Lang "en" "US"
-  let items = case parse (skippingLeadingSpace file) "stdin" bibstring of
+  let items = case runParser (bibEntries <* eof) [] "stdin" bibstring of
                    Left err -> error (show err)
-                   Right xs -> resolveCrossRefs isBibtex
-                                  $ map lowercaseFieldNames xs
+                   Right xs -> resolveCrossRefs isBibtex xs
   return $ mapMaybe (itemToReference lang isBibtex) items
 
-lowercaseFieldNames :: T -> T
-lowercaseFieldNames e = e{ fields = [(map toLower f, v) | (f,v) <- fields e] }
+type BibParser = Parsec [Char] [(String, String)]
 
-resolveCrossRefs :: Bool -> [T] -> [T]
+bibEntries :: BibParser [Item]
+bibEntries = many (try (skipMany nonEntry >> bibItem)) <* skipMany nonEntry
+  where nonEntry = bibSkip <|> bibComment <|> bibString
+
+bibSkip :: BibParser ()
+bibSkip = skipMany1 (satisfy (/='@'))
+
+bibComment :: BibParser ()
+bibComment = try $ do
+  char '@'
+  cistring "comment"
+  spaces
+  void inBraces
+  return ()
+
+bibString :: BibParser ()
+bibString = try $ do
+  char '@'
+  cistring "string"
+  spaces
+  void inBraces
+  return ()
+
+inBraces :: BibParser String
+inBraces = try $ do
+  char '{'
+  res <- manyTill
+         (  many1 (noneOf "{}\\")
+        <|> string "\\{"
+        <|> string "\\}"
+        <|> (braced <$> inBraces)) (char '}'
+         )
+  return $ concat res
+
+braced :: String -> String
+braced s = "{" ++ s ++ "}"
+
+inQuotes :: BibParser String
+inQuotes = do
+  char '"'
+  manyTill (satisfy (/='"')) (char '"')
+
+bibItem :: BibParser Item
+bibItem = do
+  char '@'
+  enttype <- map toLower <$> many1 letter
+  spaces
+  char '{'
+  spaces
+  entid <- map toLower <$> many1 (noneOf " \t\n\r,")
+  spaces
+  char ','
+  spaces
+  entfields <- entField `sepEndBy` (char ',')
+  spaces
+  char '}'
+  return $ Item entid enttype entfields
+
+entField :: BibParser (String, String)
+entField = try $ do
+  spaces
+  k <- map toLower <$> many1 letter
+  spaces
+  char '='
+  spaces
+  v <- inQuotes <|> inBraces
+  spaces
+  return (k,v)
+
+cistring :: String -> BibParser String
+cistring [] = return []
+cistring (c:cs) = do
+  xs <- cistring cs
+  x <- (char (toLower c) <|> char (toUpper c))
+  return (x:xs)
+
+resolveCrossRefs :: Bool -> [Item] -> [Item]
 resolveCrossRefs isBibtex entries =
   map (resolveCrossRef isBibtex entries) entries
 
-resolveCrossRef :: Bool -> [T] -> T -> T
+resolveCrossRef :: Bool -> [Item] -> Item -> Item
 resolveCrossRef isBibtex entries entry =
   case lookup "crossref" (fields entry) of
        Just xref -> case [e | e <- entries, identifier e == xref] of
@@ -141,7 +218,7 @@ resolveKey (Lang "en" "US") k =
        _               -> k
 resolveKey _ k = resolveKey (Lang "en" "US") k
 
-type Bib = ReaderT T Maybe
+type Bib = ReaderT Item Maybe
 
 notFound :: String -> Bib a
 notFound f = fail $ f ++ " not found"
@@ -318,7 +395,7 @@ latexAuthors :: String -> Maybe [Agent]
 latexAuthors s = toAuthorList bs
   where Pandoc _ bs = readLaTeX def s
 
-bib :: Bib Reference -> T -> Maybe Reference
+bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = runReaderT m entry
 
 unTitlecase :: [Block] -> [Block]
@@ -394,7 +471,7 @@ toLocale "ukrainian"  = "uk-UA"
 toLocale "vietnamese" = "vi-VN"
 toLocale _            = ""
 
-itemToReference :: Lang -> Bool -> T -> Maybe Reference
+itemToReference :: Lang -> Bool -> Item -> Maybe Reference
 itemToReference lang bibtex = bib $ do
   id' <- asks identifier
   et <- map toLower `fmap` asks entryType
