@@ -23,6 +23,7 @@ import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
 import Text.JSON
 import Text.Pandoc.Definition ( Inline, Target )
+import Data.Char (isPunctuation)
 
 #ifdef UNICODE_COLLATION
 import qualified Data.Text     as T
@@ -226,12 +227,13 @@ instance Ord Sorting where
 
 compare' :: String -> String -> Ordering
 compare' x y
-    = case (head x, head y) of
-        ('-','-') -> comp y x
-        ('-', _ ) -> LT
-        (_  ,'-') -> GT
-        _         -> comp x y
+    = case (x, y) of
+        ('-':_,'-':_) -> comp (dropPunct y) (dropPunct x)
+        ('-':_, _ )   -> LT
+        (_  ,'-':_)   -> GT
+        _             -> comp (dropPunct x) (dropPunct y)
       where
+        dropPunct = dropWhile isPunctuation
 #ifdef UNICODE_COLLATION
         comp a b = T.collate (T.collator T.Current) (T.pack a) (T.pack b)
 #else
