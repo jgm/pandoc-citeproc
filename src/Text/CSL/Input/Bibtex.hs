@@ -58,7 +58,12 @@ bibString = try $ do
   char '@'
   cistring "string"
   spaces
-  void inBraces
+  char '{'
+  spaces
+  entfields <- entField `sepEndBy` (char ',')
+  spaces
+  char '}'
+  updateState $ (entfields ++)
   return ()
 
 inBraces :: BibParser String
@@ -103,15 +108,30 @@ entField = try $ do
   spaces
   char '='
   spaces
-  v <- inQuotes <|> inBraces
+  vs <- (expandString <|> inQuotes <|> inBraces) `sepBy`
+            (try $ spaces >> char '#' >> spaces)
   spaces
-  return (k,v)
+  return (k, concat vs)
+
+ident :: BibParser String
+ident = do
+  c <- letter
+  cs <- many (letter <|> digit <|> char '_')
+  return (c:cs)
+
+expandString :: BibParser String
+expandString = do
+  k <- ident
+  strs <- getState
+  case lookup k strs of
+       Just v  -> return v
+       Nothing -> fail $ "String " ++ k ++ " not defined"
 
 cistring :: String -> BibParser String
 cistring [] = return []
 cistring (c:cs) = do
-  xs <- cistring cs
   x <- (char (toLower c) <|> char (toUpper c))
+  xs <- cistring cs
   return (x:xs)
 
 resolveCrossRefs :: Bool -> [Item] -> [Item]
