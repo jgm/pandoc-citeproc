@@ -79,10 +79,11 @@ inBraces = try $ do
   char '{'
   res <- manyTill
          (  many1 (noneOf "{}\\")
-        <|> string "\\{"
-        <|> string "\\}"
-        <|> (braced <$> inBraces)) (char '}'
-         )
+        <|> (char '\\' >> (  (char '{' >> return "\\{")
+                         <|> (char '}' >> return "\\}")
+                         <|> return "\\"))
+        <|> (braced <$> inBraces)
+         ) (char '}')
   return $ concat res
 
 braced :: String -> String
