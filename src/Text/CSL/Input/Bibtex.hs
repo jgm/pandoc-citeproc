@@ -158,22 +158,23 @@ resolveCrossRefs isBibtex entries =
   map (resolveCrossRef isBibtex entries) entries
 
 resolveCrossRef :: Bool -> [Item] -> Item -> Item
-resolveCrossRef isBibtex entries entry =
-  case lookup "crossref" (fields entry) of
-       Just xref -> case [e | e <- entries, identifier e == xref] of
-                         []     -> entry
-                         (e':_)
-                          | isBibtex -> entry{ fields = fields entry ++
-                                           [(k,v) | (k,v) <- fields e',
-                                            isNothing (lookup k $ fields entry)]
-                                        }
-                          | otherwise -> entry{ fields = fields entry ++
-                                          [(k',v) | (k,v) <- fields e',
-                                            k' <- transformKey (entryType e')
-                                                   (entryType entry) k,
-                                           isNothing (lookup k' (fields entry))]
-                                              }
-       Nothing   -> entry
+resolveCrossRef isBibtex entries entry = foldl go entry (fields entry)
+  where go entry' (key, val) =
+          if key == "crossref" || key == "xdata"
+          then case [e | e <- entries, identifier e == val] of
+                    []     -> entry'
+                    (e':_)
+                     | isBibtex -> entry'{ fields = fields entry' ++
+                                      [(k,v) | (k,v) <- fields e',
+                                       isNothing (lookup k $ fields entry')]
+                                   }
+                     | otherwise -> entry'{ fields = fields entry' ++
+                                     [(k',v) | (k,v) <- fields e',
+                                       k' <- transformKey (entryType e')
+                                              (entryType entry') k,
+                                      isNothing (lookup k' (fields entry'))]
+                                         }
+          else entry'
 
 -- transformKey source target key
 -- derived from Appendix C of bibtex manual
@@ -525,7 +526,8 @@ toLocale _            = ""
 itemToReference :: Lang -> Bool -> Item -> Maybe Reference
 itemToReference lang bibtex = bib $ do
   id' <- asks identifier
-  et <- map toLower `fmap` asks entryType
+  et <- asks entryType
+  guard $ et /= "xdata"
   st <- getRawField "entrysubtype" <|> return ""
   let (reftype, refgenre) = case et of
        "article"
