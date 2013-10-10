@@ -4,10 +4,11 @@ where
 import Text.Parsec hiding (optional, (<|>), many)
 import Control.Applicative
 import Text.Pandoc
-import Data.List.Split (splitOn, splitWhen, wordsBy)
+import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
+                           dropBlanks, split)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper)
+import Data.Char (toLower, isUpper, toUpper, isDigit)
 import Control.Monad
 import Control.Monad.Reader
 import System.Environment (getEnvironment)
@@ -394,9 +395,12 @@ toAuthor ils =
           }
   where commaParts = map words' $ splitWhen (== Str ",") $ separateCommas ils
         words' = wordsBy (== Space)
-        isCapitalized (Str (c:_):_) = isUpper c
-        isCapitalized (Span _ (Str (c:_):_):_) = isUpper c
-        isCapitalized _ = False
+        isCapitalized (Str (c:cs) : rest)
+          | isUpper c = True
+          | isDigit c = isCapitalized (Str cs : rest)
+          | otherwise = False
+        isCapitalized (_:rest) = isCapitalized rest
+        isCapitalized [] = True
         inlinesToString' = maybe "" id . inlinesToString
         nondropping = inlinesToString' $ intercalate [Space] von
         family = inlinesToString' $ intercalate [Space] lastname
@@ -417,12 +421,14 @@ toAuthor ils =
                  (vl:j:f:_) -> (f, vl, j )
                  []         -> ([], [], [])
         (rlast, rvon) = span isCapitalized $ reverse vonlast
-        (von, lastname) = (reverse rvon, reverse rlast)
+        (von, lastname) = case (reverse rvon, reverse rlast) of
+                               (ws@(_:_),[]) -> (init ws, [last ws])
+                               (ws, vs)      -> (ws, vs)
 
 separateCommas :: [Inline] -> [Inline]
 separateCommas [] = []
-separateCommas (Str xs@(_:_) : ys)
-  | last xs == ',' = Str (init xs) : Str "," : separateCommas ys
+separateCommas (Str xs : ys)
+  | ',' `elem` xs = map Str ((split . dropBlanks) (whenElt (==',')) xs) ++ separateCommas ys
 separateCommas (x : ys) = x : separateCommas ys
 
 latex :: String -> Maybe String
