@@ -98,7 +98,7 @@ inQuotes = do
 fieldName :: BibParser String
 fieldName = do
   c <- letter
-  cs <- many1 (letter <|> char '-')
+  cs <- many1 (letter <|> digit <|> oneOf "-_")
   return $ map toLower (c:cs)
 
 bibItem :: BibParser Item
