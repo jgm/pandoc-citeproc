@@ -108,7 +108,7 @@ bibItem = do
   spaces
   char '{'
   spaces
-  entid <- map toLower <$> many1 (noneOf " \t\n\r,")
+  entid <- many1 (noneOf " \t\n\r,")
   spaces
   char ','
   spaces
