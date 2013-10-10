@@ -66,10 +66,10 @@ bibString = try $ do
   spaces
   char '{'
   spaces
-  entfields <- entField `sepEndBy` (char ',')
+  f <- entField
   spaces
   char '}'
-  updateState $ (entfields ++)
+  updateState $ (f:)
   return ()
 
 inBraces :: BibParser String
