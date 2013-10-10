@@ -4,7 +4,7 @@ where
 import Text.Parsec hiding (optional, (<|>), many)
 import Control.Applicative
 import Text.Pandoc
-import Data.List.Split (splitOn, splitWhen)
+import Data.List.Split (splitOn, splitWhen, wordsBy)
 import Data.List (intercalate)
 import Data.Maybe
 import Data.Char (toLower, isUpper, toUpper)
@@ -380,43 +380,50 @@ toAuthor [Span ("",[],[]) ils] = -- corporate author
           , literal         = maybe "" id $ inlinesToString ils
           , commaSuffix     = False
           }
+-- First von Last
+-- von Last, First
+-- von Last, Jr ,First
 toAuthor ils =
     Agent { givenName       = givens
-          , droppingPart    = dropping
+          , droppingPart    = ""
           , nonDroppingPart = nondropping
           , familyName      = family
           , nameSuffix      = suffix
           , literal         = ""
-          , commaSuffix     = isCommaSuffix
+          , commaSuffix     = not (null suffix)
           }
-  where inlinesToString' = maybe "" id . inlinesToString
-        isCommaSuffix = False -- TODO
-        suffix = "" -- TODO
-        dropping = "" -- TODO
-        endsWithComma (Str zs) = not (null zs) && last zs == ','
-        endsWithComma _ = False
-        stripComma zs = case reverse zs of
-                             (',':ws) -> reverse ws
-                             _ -> zs
-        (xs, ys) = break endsWithComma ils
-        (family, givens, nondropping) =
-           case splitOn [Space] ys of
-              ((Str w:ws) : rest) ->
-                  ( inlinesToString' [Str (stripComma w)]
-                  , map inlinesToString' $ if null ws then rest else (ws : rest)
-                  , trim $ inlinesToString' xs
-                  )
-              _ -> case reverse xs of
-                        []     -> ("", [], "")
-                        (z:zs) -> let (us,vs) = break startsWithCapital zs
-                                  in  ( inlinesToString' [z]
-                                      , map inlinesToString' $ splitOn [Space] $ reverse vs
-                                      , trim $ inlinesToString' $ dropWhile (==Space) $ reverse us
-                                      )
+  where commaParts = map words' $ splitWhen (== Str ",") $ separateCommas ils
+        words' = wordsBy (== Space)
+        isCapitalized (Str (c:_):_) = isUpper c
+        isCapitalized (Span _ (Str (c:_):_):_) = isUpper c
+        isCapitalized _ = False
+        inlinesToString' = maybe "" id . inlinesToString
+        nondropping = inlinesToString' $ intercalate [Space] von
+        family = inlinesToString' $ intercalate [Space] lastname
+        suffix = inlinesToString' $ intercalate [Space] jr
+        givens = map inlinesToString' first
+        (first, vonlast, jr) =
+            case commaParts of
+                 --- First is the longest sequence of white-space separated
+                 -- words starting with an uppercase and that is not the
+                 -- whole string. von is the longest sequence of whitespace
+                 -- separated words whose last word starts with lower case
+                 -- and that is not the whole string.
+                 [fvl]      -> let (caps', rest') = span isCapitalized fvl
+                               in  if null rest' && not (null caps')
+                                   then (init caps', [last caps'], [])
+                                   else (caps', rest', [])
+                 [vl,f]     -> (f, vl, [])
+                 (vl:j:f:_) -> (f, vl, j )
+                 []         -> ([], [], [])
+        (rlast, rvon) = span isCapitalized $ reverse vonlast
+        (von, lastname) = (reverse rvon, reverse rlast)
 
-startsWithCapital :: Inline -> Bool
-startsWithCapital (Str (x:_)) = isUpper x
-startsWithCapital _           = False
+separateCommas :: [Inline] -> [Inline]
+separateCommas [] = []
+separateCommas (Str xs@(_:_) : ys)
+  | last xs == ',' = Str (init xs) : Str "," : separateCommas ys
+separateCommas (x : ys) = x : separateCommas ys
 
 latex :: String -> Maybe String
 latex s = trim `fmap` blocksToString bs
