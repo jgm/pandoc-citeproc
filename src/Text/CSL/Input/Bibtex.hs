@@ -763,6 +763,7 @@ itemToReference lang bibtex = bib $ do
       addPeriodSpace x  y = if last x == '.'
                                then x ++ " " ++ y
                                else x ++ ". " ++ y
+  let convertEnDash = map (\c -> if c == '–' then '-' else c)
 
   return $ emptyReference
          { refId               = id'
@@ -803,7 +804,7 @@ itemToReference lang bibtex = bib $ do
          , jurisdiction        = jurisdiction'
          , event               = eventTitle'
          , eventPlace          = venue'
-         , page                = pages'
+         , page                = convertEnDash pages'
          -- , pageFirst           = undefined -- :: String
          , numberOfPages       = pagetotal'
          , version             = version'
