@@ -49,9 +49,7 @@ bibComment :: BibParser ()
 bibComment = try $ do
   char '@'
   cistring "comment"
-  spaces
-  void inBraces
-  return ()
+  skipMany (satisfy (/='\n'))
 
 bibPreamble :: BibParser ()
 bibPreamble = try $ do
