@@ -125,10 +125,13 @@ entField = try $ do
   spaces
   char '='
   spaces
-  vs <- (expandString <|> inQuotes <|> inBraces) `sepBy`
+  vs <- (expandString <|> inQuotes <|> inBraces <|> rawWord) `sepBy`
             (try $ spaces >> char '#' >> spaces)
   spaces
   return (k, concat vs)
+
+rawWord :: BibParser String
+rawWord = many1 alphaNum
 
 ident :: BibParser String
 ident = do
@@ -142,7 +145,7 @@ expandString = do
   strs <- getState
   case lookup k strs of
        Just v  -> return v
-       Nothing -> fail $ "String " ++ k ++ " not defined"
+       Nothing -> return k -- return raw key if not found
 
 cistring :: String -> BibParser String
 cistring [] = return []
