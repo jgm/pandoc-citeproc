@@ -741,6 +741,7 @@ itemToReference lang bibtex = bib $ do
   doi' <- getRawField "doi" <|> return ""
   isbn' <- getRawField "isbn" <|> return ""
   issn' <- getRawField "issn" <|> return ""
+  callNumber' <- getRawField "library" <|> return ""
 
   -- notes
   annotation' <- getField "annotation" <|> getField "annote"
@@ -824,4 +825,5 @@ itemToReference lang bibtex = bib $ do
          , language            = if hyphenation == defaultHyphenation
                                     then ""
                                     else hyphenation
+         , callNumber          = callNumber'
          }
