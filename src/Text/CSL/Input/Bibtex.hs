@@ -336,10 +336,10 @@ getRawField f = do
        Just x  -> return x
        Nothing -> notFound f
 
-getAuthorList :: String -> Bib [Agent]
-getAuthorList f = do
+getAuthorList :: Bool -> String -> Bib [Agent]
+getAuthorList useprefix f = do
   fs <- asks fields
-  case lookup f fs >>= latexAuthors of
+  case lookup f fs >>= latexAuthors useprefix of
        Just xs -> return xs
        Nothing -> notFound f
 
@@ -357,14 +357,14 @@ getLiteralList' f = intercalate "; " <$> getLiteralList f
 splitByAnd :: [Inline] -> [[Inline]]
 splitByAnd = splitOn [Space, Str "and", Space]
 
-toAuthorList :: [Block] -> Maybe [Agent]
-toAuthorList [Para xs] =
-  Just $ map toAuthor $ splitByAnd xs
-toAuthorList [Plain xs] = toAuthorList [Para xs]
-toAuthorList _ = Nothing
+toAuthorList :: Bool -> [Block] -> Maybe [Agent]
+toAuthorList useprefix [Para xs] =
+  Just $ map (toAuthor useprefix) $ splitByAnd xs
+toAuthorList useprefix [Plain xs] = toAuthorList useprefix [Para xs]
+toAuthorList _ _ = Nothing
 
-toAuthor :: [Inline] -> Agent
-toAuthor [Str "others"] =
+toAuthor :: Bool -> [Inline] -> Agent
+toAuthor _ [Str "others"] =
     Agent { givenName       = []
           , droppingPart    = ""
           , nonDroppingPart = ""
@@ -373,7 +373,7 @@ toAuthor [Str "others"] =
           , literal         = "others"
           , commaSuffix     = False
           }
-toAuthor [Span ("",[],[]) ils] = -- corporate author
+toAuthor _ [Span ("",[],[]) ils] = -- corporate author
     Agent { givenName       = []
           , droppingPart    = ""
           , nonDroppingPart = ""
@@ -385,10 +385,10 @@ toAuthor [Span ("",[],[]) ils] = -- corporate author
 -- First von Last
 -- von Last, First
 -- von Last, Jr ,First
-toAuthor ils =
+toAuthor useprefix ils =
     Agent { givenName       = givens
-          , droppingPart    = ""
-          , nonDroppingPart = nondropping
+          , droppingPart    = if useprefix then "" else prefix
+          , nonDroppingPart = if useprefix then prefix else ""
           , familyName      = family
           , nameSuffix      = suffix
           , literal         = ""
@@ -403,7 +403,7 @@ toAuthor ils =
         isCapitalized (_:rest) = isCapitalized rest
         isCapitalized [] = True
         inlinesToString' = maybe "" id . inlinesToString
-        nondropping = inlinesToString' $ intercalate [Space] von
+        prefix = inlinesToString' $ intercalate [Space] von
         family = inlinesToString' $ intercalate [Space] lastname
         suffix = inlinesToString' $ intercalate [Space] jr
         givens = map inlinesToString' first
@@ -443,8 +443,8 @@ latexTitle (Lang l _) s = trim `fmap` blocksToString (processTitle bs)
                           'e':'n':_ -> unTitlecase
                           _         -> id
 
-latexAuthors :: String -> Maybe [Agent]
-latexAuthors s = toAuthorList bs
+latexAuthors :: Bool -> String -> Maybe [Agent]
+latexAuthors useprefix s = toAuthorList useprefix bs
   where Pandoc _ bs = readLaTeX def s
 
 bib :: Bib Reference -> Item -> Maybe Reference
@@ -523,11 +523,20 @@ toLocale "ukrainian"  = "uk-UA"
 toLocale "vietnamese" = "vi-VN"
 toLocale _            = ""
 
+parseOptions :: String -> [(String, String)]
+parseOptions = map breakOpt . splitWhen (==',')
+  where breakOpt x = case break (=='=') x of
+                          (w,v) -> (map toLower $ trim w,
+                                    map toLower $ trim $ drop 1 v)
+
 itemToReference :: Lang -> Bool -> Item -> Maybe Reference
 itemToReference lang bibtex = bib $ do
   id' <- asks identifier
   et <- asks entryType
   guard $ et /= "xdata"
+  opts <- (parseOptions <$> getRawField "options") <|> return []
+  let useprefix = maybe False (=="true") $ lookup "useprefix" opts
+  let getAuthorList' = getAuthorList useprefix
   st <- getRawField "entrysubtype" <|> return ""
   let (reftype, refgenre) = case et of
        "article"
@@ -600,12 +609,12 @@ itemToReference lang bibtex = bib $ do
                 <|> return defaultHyphenation
 
   -- authors:
-  author' <- getAuthorList "author" <|> return []
-  containerAuthor' <- getAuthorList "bookauthor" <|> return []
-  translator' <- getAuthorList "translator" <|> return []
+  author' <- getAuthorList' "author" <|> return []
+  containerAuthor' <- getAuthorList' "bookauthor" <|> return []
+  translator' <- getAuthorList' "translator" <|> return []
   editortype <- getRawField "editortype" <|> return ""
-  editor'' <- getAuthorList "editor" <|> return []
-  director'' <- getAuthorList "director" <|> return []
+  editor'' <- getAuthorList' "editor" <|> return []
+  director'' <- getAuthorList' "director" <|> return []
   let (editor', director') = case editortype of
                                   "director"  -> ([], editor'')
                                   _           -> (editor'', director'')
