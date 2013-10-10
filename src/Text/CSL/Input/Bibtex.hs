@@ -675,7 +675,9 @@ itemToReference lang bibtex = bib $ do
 
   -- publisher
   pubfields <- mapM (\f -> Just `fmap`
-                       (if bibtex then getField f else getLiteralList' f)
+                       (if bibtex || f == "howpublished"
+                        then getField f
+                        else getLiteralList' f)
                       <|> return Nothing)
          ["school","institution","organization", "howpublished","publisher"]
   let publisher' = intercalate "; " [p | Just p <- pubfields]
