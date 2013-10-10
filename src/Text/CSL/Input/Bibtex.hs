@@ -696,13 +696,17 @@ itemToReference lang bibtex = bib $ do
   venue' <- getField "venue" <|> return ""
   address' <- (if bibtex
                then getField "address"
-               else getLiteralList' "address" <|> getLiteralList' "location")
+               else getLiteralList' "address"
+                     <|> (guard (et /= "patent") >>
+                          getLiteralList' "location"))
               <|> return ""
   origLocation' <- (if bibtex
                     then getField "origlocation"
                     else getLiteralList' "origlocation")
                   <|> return ""
-  jurisdiction' <- getField "jurisdiction" <|> return ""
+  jurisdiction' <- if et == "patent"
+                   then resolveKey lang <$> getLiteralList' "location" <|> return ""
+                   else return ""
 
   -- locators
   pages' <- getField "pages" <|> return ""
