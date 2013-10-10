@@ -91,7 +91,9 @@ braced s = "{" ++ s ++ "}"
 inQuotes :: BibParser String
 inQuotes = do
   char '"'
-  manyTill (satisfy (/='"')) (char '"')
+  concat <$> manyTill (try (string "\\\"")
+                     <|> many1 (noneOf "\"\\")
+                     <|> count 1 anyChar) (char '"')
 
 fieldName :: BibParser String
 fieldName = do
