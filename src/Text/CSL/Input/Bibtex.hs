@@ -93,6 +93,12 @@ inQuotes = do
   char '"'
   manyTill (satisfy (/='"')) (char '"')
 
+fieldName :: BibParser String
+fieldName = do
+  c <- letter
+  cs <- many1 (letter <|> char '-')
+  return $ map toLower (c:cs)
+
 bibItem :: BibParser Item
 bibItem = do
   char '@'
@@ -112,7 +118,7 @@ bibItem = do
 entField :: BibParser (String, String)
 entField = try $ do
   spaces
-  k <- map toLower <$> many1 letter
+  k <- fieldName
   spaces
   char '='
   spaces
