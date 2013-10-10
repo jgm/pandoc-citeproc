@@ -753,10 +753,16 @@ itemToReference lang bibtex = bib $ do
            else (getField "note" <|> return "")
   addendum' <- if bibtex
                then return ""
-               else ((" "++) `fmap` getField "addendum")
+               else getField "addendum"
                  <|> return ""
   pubstate' <- resolveKey lang `fmap`
                    getRawField "pubstate" <|> return ""
+
+  let addPeriodSpace "" y = y
+      addPeriodSpace x "" = x
+      addPeriodSpace x  y = if last x == '.'
+                               then x ++ " " ++ y
+                               else x ++ ". " ++ y
 
   return $ emptyReference
          { refId               = id'
@@ -813,7 +819,7 @@ itemToReference lang bibtex = bib $ do
          , genre               = if null refgenre
                                     then reftype'
                                     else refgenre
-         , note                = note' ++ addendum'
+         , note                = addPeriodSpace note' addendum'
          , annote              = annotation'
          , abstract            = abstract'
          , keyword             = keywords'
