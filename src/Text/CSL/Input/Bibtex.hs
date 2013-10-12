@@ -647,7 +647,6 @@ itemToReference lang bibtex = bib $ do
                   <|> getTitle' "booktitle"
                   <|> getField "journal"
                   <|> getField "journaltitle"
-                  <|> (guard isArticle >> getTitle' "series")
                   <|> return ""
   containerSubtitle' <- addColon ((guard isPeriodical >> getField "subtitle")
                        <|> getTitle' "mainsubtitle"
@@ -664,7 +663,7 @@ itemToReference lang bibtex = bib $ do
                         <|> getField "journaltitleshort"
                         <|> getField "shortjournal"
                         <|> return ""
-  seriesTitle' <- (guard (not isArticle) >> getTitle' "series") <|> return ""
+  seriesTitle' <- getTitle' "series" <|> return ""
   volumeTitle' <- (getTitle' "maintitle" >> guard hasVolumes
                     >> getTitle' "booktitle")
                   <|> return ""
@@ -725,7 +724,7 @@ itemToReference lang bibtex = bib $ do
        then return ("",x,"")
        else if isArticle
             then (getField "issue" >>= \y -> return ("","",x ++ ", " ++ y))
-               <|> return (x,"","")
+               <|> return ("","",x)
             else return (x,"","")
 
   -- dates
@@ -791,8 +790,14 @@ itemToReference lang bibtex = bib $ do
          , title               = title' ++ subtitle' ++ titleaddon'
          , titleShort          = shortTitle'
          -- , reviewedTitle       = undefined -- :: String
-         , containerTitle      = containerTitle' ++ containerSubtitle' ++ containerTitleAddon'
-         , collectionTitle     = seriesTitle'
+         , containerTitle      = containerTitle' ++ containerSubtitle'
+                                   ++ containerTitleAddon'
+                                   ++ if isArticle && not (null seriesTitle')
+                                      then if null containerTitle'
+                                              then seriesTitle'
+                                              else ". " ++ seriesTitle'
+                                      else ""
+         , collectionTitle     = if isArticle then "" else seriesTitle'
          , volumeTitle         = volumeTitle' ++ volumeSubtitle' ++ volumeTitleAddon'
          , containerTitleShort = containerTitleShort'
          , collectionNumber    = collectionNumber'
