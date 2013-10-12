@@ -25,7 +25,7 @@ module Text.CSL.Output.Pandoc
     , endWithPunct
     ) where
 
-import Data.Char ( toUpper, toLower )
+import Data.Char ( toUpper, toLower, isPunctuation )
 import Data.Maybe ( fromMaybe )
 
 import Text.CSL.Style
@@ -114,9 +114,12 @@ renderFo sty fo
           | Link s r <- i = Link (map (setCase f) s) r
           | otherwise     = setCase f i
 
-      toCap        s = if s /= []       then toUpper (head s) : tail s else []
-      toTitleCap   s = if isShortWord s then toUpper (head s) : tail s else s
-      isShortWord  s = not $ s `elem` ["a","an","and","as","at","but","by","down","for","from"
+      toCap       [] = []
+      toCap   (x:xs)
+          | isPunctuation x = x : toCap xs
+          | otherwise       = toUpper x : xs
+      toTitleCap   s = if isShortWord s then s else toCap s
+      isShortWord  s = s `elem` ["a","an","and","as","at","but","by","down","for","from"
                                       ,"in","into","nor","of","on","onto","or","over","so"
                                       ,"the","till","to","up","via","with","yet"]
       text_case _ [] = []
