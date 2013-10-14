@@ -523,6 +523,15 @@ toLocale "ukrainian"  = "uk-UA"
 toLocale "vietnamese" = "vi-VN"
 toLocale _            = ""
 
+concatWith :: Char -> [String] -> String
+concatWith sep xs = foldl go "" xs
+  where go :: String -> String -> String
+        go accum "" = accum
+        go accum s  = case reverse accum of
+                           []    -> s
+                           (x:_) | x `elem` "!?.,:;" -> accum ++ " " ++ s
+                                 | otherwise         -> accum ++ [sep, ' '] ++ s
+
 parseOptions :: String -> [(String, String)]
 parseOptions = map breakOpt . splitWhen (==',')
   where breakOpt x = case break (=='=') x of
@@ -625,8 +634,6 @@ itemToReference lang bibtex = bib $ do
   let isPeriodical = et == "periodical"
   let hasVolumes = et `elem`
          ["inbook","incollection","inproceedings","bookinbook"]
-  let addColon = fmap (": " ++)
-  let addPeriod = fmap (". " ++)
   let (la, co) = case splitOn "-" hyphenation of
                       [x]     -> (x, "")
                       (x:y:_) -> (x, y)
@@ -634,13 +641,13 @@ itemToReference lang bibtex = bib $ do
   let getTitle' = getTitle (Lang la co)
   title' <- (if isPeriodical then getTitle' "issuetitle" else getTitle' "title")
            <|> return ""
-  subtitle' <- addColon (if isPeriodical
-                         then getTitle' "issuesubtitle"
-                         else getTitle' "subtitle")
+  subtitle' <- if isPeriodical
+                  then getTitle' "issuesubtitle"
+                  else getTitle' "subtitle"
               <|> return ""
-  titleaddon' <- addPeriod (if isPeriodical
-                            then getTitle' "issuetitleaddon"
-                            else getTitle' "titleaddon")
+  titleaddon' <- if isPeriodical
+                    then getTitle' "issuetitleaddon"
+                    else getTitle' "titleaddon"
                <|> return ""
   containerTitle' <- (guard isPeriodical >> getField "title")
                   <|> getTitle' "maintitle"
@@ -648,15 +655,14 @@ itemToReference lang bibtex = bib $ do
                   <|> getField "journal"
                   <|> getField "journaltitle"
                   <|> return ""
-  containerSubtitle' <- addColon ((guard isPeriodical >> getField "subtitle")
+  containerSubtitle' <- (guard isPeriodical >> getField "subtitle")
                        <|> getTitle' "mainsubtitle"
                        <|> getTitle' "booksubtitle"
-                       <|> getField "journalsubtitle")
+                       <|> getField "journalsubtitle"
                        <|> return ""
-  containerTitleAddon' <- addPeriod (
-                           (guard isPeriodical >> getField "titleaddon")
+  containerTitleAddon' <- (guard isPeriodical >> getField "titleaddon")
                        <|> getTitle' "maintitleaddon"
-                       <|> getTitle' "booktitleaddon")
+                       <|> getTitle' "booktitleaddon"
                        <|> return ""
   containerTitleShort' <- (guard isPeriodical >> getField "shorttitle")
                         <|> getTitle' "booktitleshort"
@@ -667,10 +673,10 @@ itemToReference lang bibtex = bib $ do
   volumeTitle' <- (getTitle' "maintitle" >> guard hasVolumes
                     >> getTitle' "booktitle")
                   <|> return ""
-  volumeSubtitle' <- addColon (getTitle' "maintitle" >> guard hasVolumes
+  volumeSubtitle' <- (getTitle' "maintitle" >> guard hasVolumes
                       >> getTitle' "booksubtitle")
                      <|> return ""
-  volumeTitleAddon' <- addPeriod (getTitle' "maintitle" >> guard hasVolumes
+  volumeTitleAddon' <- (getTitle' "maintitle" >> guard hasVolumes
                                    >> getTitle' "booktitleaddon")
                        <|> return ""
   shortTitle' <- getTitle' "shorttitle"
@@ -757,11 +763,6 @@ itemToReference lang bibtex = bib $ do
   pubstate' <- resolveKey lang `fmap`
                    getRawField "pubstate" <|> return ""
 
-  let addPeriodSpace "" y = y
-      addPeriodSpace x "" = x
-      addPeriodSpace x  y = if last x == '.'
-                               then x ++ " " ++ y
-                               else x ++ ". " ++ y
   let convertEnDash = map (\c -> if c == '–' then '-' else c)
 
   return $ emptyReference
@@ -787,18 +788,25 @@ itemToReference lang bibtex = bib $ do
          -- , container           = undefined -- :: [RefDate]
          , originalDate        = origDate'
          -- , submitted           = undefined -- :: [RefDate]
-         , title               = title' ++ subtitle' ++ titleaddon'
+         , title               = concatWith '.' [
+                                    concatWith ':' [title', subtitle']
+                                  , titleaddon' ]
          , titleShort          = shortTitle'
          -- , reviewedTitle       = undefined -- :: String
-         , containerTitle      = containerTitle' ++ containerSubtitle'
-                                   ++ containerTitleAddon'
+         , containerTitle      = concatWith '.' [
+                                      concatWith ':' [ containerTitle'
+                                                     , containerSubtitle']
+                                    , containerTitleAddon' ]
                                    ++ if isArticle && not (null seriesTitle')
                                       then if null containerTitle'
                                               then seriesTitle'
                                               else ", " ++ seriesTitle'
                                       else ""
          , collectionTitle     = if isArticle then "" else seriesTitle'
-         , volumeTitle         = volumeTitle' ++ volumeSubtitle' ++ volumeTitleAddon'
+         , volumeTitle         = concatWith '.' [
+                                      concatWith ':' [ volumeTitle'
+                                                     , volumeSubtitle']
+                                    , volumeTitleAddon' ]
          , containerTitleShort = containerTitleShort'
          , collectionNumber    = collectionNumber'
          , originalTitle       = origTitle'
@@ -825,7 +833,7 @@ itemToReference lang bibtex = bib $ do
          , genre               = if null refgenre
                                     then reftype'
                                     else refgenre
-         , note                = addPeriodSpace note' addendum'
+         , note                = concatWith '.' [note', addendum']
          , annote              = annotation'
          , abstract            = abstract'
          , keyword             = keywords'
