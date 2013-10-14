@@ -19,6 +19,7 @@ import Control.Applicative ( (<$>) )
 import Control.Monad.State
 import Data.Char
 import Data.List
+import Data.List.Split
 import Data.Maybe
 
 import Text.CSL.Eval.Common
@@ -77,12 +78,18 @@ getDate f = do
 formatDate :: EvalMode -> String -> [CslTerm] -> [DatePart] -> [RefDate] -> [Output]
 formatDate em k tm dp date
     | [d]     <- date = concatMap (formatDatePart False d) dp
-    | (a:b:_) <- date = return . ODate . concat $ (start a b ++ end a b ++ coda b)
+    | (a:b:_) <- date = return . ODate . concat $ doRange a b
     | otherwise       = []
     where
-      start a b = map (formatDatePart False a) . init          . diff a b $ dp
-      end   a b = map (formatDatePart True  a) . return . last . diff a b $ dp
-      coda    b = map (formatDatePart False b) dp
+      splitDate a b = case split (onSublist $ diff a b dp) dp of
+                        [x,y,z] -> (x,y,z)
+                        _       -> error "error in splitting date ranges"
+      doRange   a b = let (x,y,z) = splitDate a b in
+                      map (formatDatePart False  a) x ++
+                      map (formatDatePart False  a) (init y) ++
+                      map (formatDatePart True   a) [last y] ++
+                      map (formatDatePart False  b) y ++
+                      map (formatDatePart False  b) z
       diff  a b = filter (flip elem (diffDate a b) . dpName)
       diffDate (RefDate ya ma sa da _ _)
                (RefDate yb mb sb db _ _) = case () of
