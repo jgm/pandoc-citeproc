@@ -1,5 +1,21 @@
-module Text.CSL.Input.Bibtex ( readBibtexInput, readBibtexInputString )
-where
+{-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Text.CSL.Input.Bibtex
+-- Copyright   :  (c) John MacFarlane
+-- License     :  BSD-style (see LICENSE)
+--
+-- Maintainer  :  John MacFarlane <fiddlosopher@gmail.com>
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+-----------------------------------------------------------------------------
+
+module Text.CSL.Input.Bibtex
+    ( readBibtexInput
+    , readBibtexInputString
+    )
+    where
 
 import Text.Parsec hiding (optional, (<|>), many)
 import Control.Applicative
