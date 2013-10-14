@@ -600,7 +600,7 @@ itemToReference lang bibtex = bib $ do
        "letters"         -> (PersonalCommunication,"")
        "newsarticle"     -> (ArticleNewspaper,"")
        _                 -> (NoType,"")
-  reftype' <- resolveKey lang <$> getRawField "type" <|> return ""
+  reftype' <- resolveKey lang <$> getField "type" <|> return ""
 
   -- hyphenation:
   let defaultHyphenation = case lang of
