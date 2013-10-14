@@ -1,5 +1,21 @@
 {-# LANGUAGE CPP #-}
-module Text.CSL.Data (getLocale, getDefaultCSL) where
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Text.CSL.Data
+-- Copyright   :  (c) John MacFarlane
+-- License     :  BSD-style (see LICENSE)
+--
+-- Maintainer  :  John MacFarlane <fiddlosopher@gmail.com>
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+-----------------------------------------------------------------------------
+
+module Text.CSL.Data
+    ( getLocale
+    , getDefaultCSL
+    , langBase
+    ) where
 
 import System.FilePath ()
 import qualified Data.ByteString.Lazy as L
