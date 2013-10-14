@@ -36,7 +36,7 @@ evalNames skipEdTrans ns nl d
       sb == "editor" && sa == "translator" = do
         aa <- getAgents' sa
         ab <- getAgents' sb
-        if aa == ab
+        if aa /= [] && aa == ab
            then modify (\s -> s { edtrans = True }) >>
                 evalNames True [sa] nl d
            else evalNames True  ns  nl d
@@ -328,7 +328,9 @@ formatLabel f fm p s
     | "page"    <- s = checkPlural
     | "volume"  <- s = checkPlural
     | "ibid"    <- s = format' s p
-    | otherwise      = if isRole s then form (\fm' x -> [OLabel x fm']) id s p else format s p
+    | isRole       s = do a <- getAgents' s
+                          if a /= [] then form (\fm' x -> [OLabel x fm']) id s p else return []
+    | otherwise      = format s p
     where
       isRole = flip elem ["author", "collection-editor", "composer", "container-author"
                          ,"director", "editor", "editorial-director", "editortranslator"
