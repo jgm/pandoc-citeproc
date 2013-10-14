@@ -795,7 +795,7 @@ itemToReference lang bibtex = bib $ do
                                    ++ if isArticle && not (null seriesTitle')
                                       then if null containerTitle'
                                               then seriesTitle'
-                                              else ". " ++ seriesTitle'
+                                              else ", " ++ seriesTitle'
                                       else ""
          , collectionTitle     = if isArticle then "" else seriesTitle'
          , volumeTitle         = volumeTitle' ++ volumeSubtitle' ++ volumeTitleAddon'
