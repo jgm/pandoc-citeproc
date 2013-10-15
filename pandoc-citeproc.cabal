@@ -87,6 +87,8 @@ data-files:         chicago-author-date.csl
                     tests/chicago-author-date.csl
                     tests/ieee.csl
                     tests/mhra.csl
+                    tests/biblio2yaml/biblio.bib
+                    tests/biblio2yaml/biblio.bib.yaml
                     -- documentation
                     README.md
                     LICENSE
@@ -211,7 +213,8 @@ test-suite test-pandoc-citeproc
   Type:           exitcode-stdio-1.0
   Main-Is:        test-pandoc-citeproc.hs
   Hs-Source-Dirs: tests
-  build-depends:  base >= 4, aeson-pretty, aeson,
-                  pandoc-types >= 1.12.2.3, pandoc >= 1.12,
-                  bytestring, pandoc-citeproc, process, Diff >= 0.3
+  build-depends:  base >= 4, aeson-pretty, aeson, directory,
+                  pandoc-types >= 1.12.2.3, pandoc >= 1.12, filepath,
+                  bytestring, pandoc-citeproc, process, Diff >= 0.3,
+                  yaml >= 0.8
   default-language: Haskell98

@@ -1,0 +1,45 @@
+---
+references:
+- publisher-place: Cambridge
+  author:
+    family: Doe
+    given:
+    - John
+  id: item1
+  issued:
+    year: 2005
+  title: First book
+  type: book
+  publisher: Cambridge University Press
+- volume: 6
+  page: 33-34
+  container-title: Journal of Generic Studies
+  author:
+    family: Doe
+    given:
+    - John
+  id: item2
+  issued:
+    year: 2006
+  title: Article
+  type: article-journal
+- publisher-place: Oxford
+  container-title: Third book
+  author:
+  - family: Doe
+    given:
+    - John
+  - family: Roe
+    given:
+    - Jenny
+  id: "пункт3"
+  issued:
+    year: 2007
+  title: Why water is wet
+  type: chapter
+  publisher: Oxford University Press
+  editor:
+    family: Smith
+    given:
+    - Sam
+...

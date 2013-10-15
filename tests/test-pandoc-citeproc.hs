@@ -1,28 +1,35 @@
 module Main where
 import System.Process
 import System.Exit
+import System.Directory
+import System.FilePath
 import Text.Printf
 import System.IO
 import Data.Monoid (mempty)
 import Data.Algorithm.Diff
 import Text.Printf
-import Data.Aeson (decode)
+import qualified Data.Aeson as Aeson
 import Data.Aeson.Encode.Pretty
 import Text.Pandoc.Definition
 import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.ByteString.Char8 as B
 import qualified Text.Pandoc.UTF8 as UTF8
 import Text.Pandoc.Process (pipeProcess)
+import qualified Data.Yaml as Yaml (decode)
 
 main = do
-  testCase "chicago-author-date"
-  testCase "ieee"
-  testCase "mhra"
-  exitWith ExitSuccess
+  citeprocTests <- mapM testCase ["chicago-author-date", "ieee", "mhra"]
+  fs <- filter (\f -> takeExtension f == ".bib")
+           `fmap` getDirectoryContents "tests/biblio2yaml"
+  biblio2yamlTests <- mapM biblio2yamlTest fs
+  if all id citeprocTests && all id biblio2yamlTests
+     then exitWith ExitSuccess
+     else exitWith $ ExitFailure 1
 
 err :: String -> IO ()
 err = hPutStrLn stderr
 
-testCase :: String -> IO ()
+testCase :: String -> IO Bool
 testCase csl = do
   err $ "TEST: " ++ csl
   indata <- BL.readFile $ "tests/" ++ csl ++ ".in.json"
@@ -34,9 +41,9 @@ testCase csl = do
   if ec == ExitSuccess
      then do
        let resultDoc :: Maybe Pandoc
-           resultDoc = decode result
+           resultDoc = Aeson.decode result
        let expectedDoc :: Maybe Pandoc
-           expectedDoc = decode expected
+           expectedDoc = Aeson.decode expected
        let result' = maybe [] (BL.lines
                      . encodePretty' Config{ confIndent = 2
                                            , confCompare = compare } )
@@ -46,15 +53,15 @@ testCase csl = do
                                            , confCompare = compare } )
                      expectedDoc
        if result' == expected'
-          then return ()
+          then return True
           else do
             let diff = getDiff expected' result'
             err $ showDiff (1,1) diff
-            exitWith $ ExitFailure 1
+            return False
      else do
        err $ "Error status " ++ show ec
        err $ UTF8.toStringLazy errout
-       exitWith ec
+       return False
 
 showDiff :: (Int,Int) -> [Diff BL.ByteString] -> String
 showDiff _ []             = ""
@@ -65,3 +72,30 @@ showDiff (l,r) (Second ln : ds) =
 showDiff (l,r) (Both _ _ : ds) =
   showDiff (l+1,r+1) ds
 
+biblio2yamlTest :: String -> IO Bool
+biblio2yamlTest fp = do
+  let bibf = "tests/biblio2yaml/" ++ fp
+  let yamlf = bibf ++ ".yaml"
+  bib <- BL.readFile bibf
+  expected <- BL.readFile yamlf
+  (ec, result, errout) <- pipeProcess
+                     (Just [("LANG","en_US.UTF-8"),("HOME",".")])
+                     "dist/build/biblio2yaml/biblio2yaml"
+                     ["-f","biblatex"] bib
+  if ec == ExitSuccess
+     then do
+       let expected' :: Maybe Aeson.Value
+           expected' = Yaml.decode $ B.concat $ BL.toChunks expected
+       let actual'   :: Maybe Aeson.Value
+           actual' = Yaml.decode $ B.concat $ BL.toChunks result
+       if expected' == actual'
+          then return True
+          else do
+            err $ "biblio2yaml " ++ bibf ++ " did not match " ++ yamlf
+            let diff = getDiff (BL.words expected) (BL.words result)
+            err $ showDiff (1,1) diff
+            return False
+     else do
+       err $ "Error status " ++ show ec
+       err $ UTF8.toStringLazy errout
+       return False
