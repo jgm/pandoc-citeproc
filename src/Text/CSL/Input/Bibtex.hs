@@ -6,8 +6,7 @@
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  John MacFarlane <fiddlosopher@gmail.com>
--- Stability   :  unstable
--- Portability :  unportable
+-- Stability   :  unstable-- Portability :  unportable
 --
 -----------------------------------------------------------------------------
 
@@ -173,23 +172,33 @@ resolveCrossRefs :: Bool -> [Item] -> [Item]
 resolveCrossRefs isBibtex entries =
   map (resolveCrossRef isBibtex entries) entries
 
+splitKeys :: String -> [String]
+splitKeys = wordsBy (\c -> c == ' ' || c == ',')
+
+getXrefFields :: Bool -> Item -> [Item] -> String -> [(String, String)]
+getXrefFields isBibtex baseEntry entries keys = do
+  let keys' = splitKeys keys
+  xrefEntry <- [e | e <- entries, identifier e `elem` keys']
+  (k, v) <- fields xrefEntry
+  if k == "crossref" || k == "xdata"
+     then do
+       xs <- mapM (getXrefFields isBibtex baseEntry entries)
+                   (splitKeys v)
+       (x, y) <- xs
+       return (x, y)
+     else do
+       k' <- if isBibtex
+                then return k
+                else transformKey (entryType xrefEntry) (entryType baseEntry) k
+       guard $ isNothing $ lookup k' $ fields baseEntry
+       return (k',v)
+
 resolveCrossRef :: Bool -> [Item] -> Item -> Item
 resolveCrossRef isBibtex entries entry = foldl go entry (fields entry)
   where go entry' (key, val) =
           if key == "crossref" || key == "xdata"
-          then case [e | e <- entries, identifier e == val] of
-                    []     -> entry'
-                    (e':_)
-                     | isBibtex -> entry'{ fields = fields entry' ++
-                                      [(k,v) | (k,v) <- fields e',
-                                       isNothing (lookup k $ fields entry')]
-                                   }
-                     | otherwise -> entry'{ fields = fields entry' ++
-                                     [(k',v) | (k,v) <- fields e',
-                                       k' <- transformKey (entryType e')
-                                              (entryType entry') k,
-                                      isNothing (lookup k' (fields entry'))]
-                                         }
+          then entry'{ fields = fields entry ++
+                                    getXrefFields isBibtex entry entries val }
           else entry'
 
 -- transformKey source target key
