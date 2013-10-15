@@ -87,8 +87,7 @@ data-files:         chicago-author-date.csl
                     tests/chicago-author-date.csl
                     tests/ieee.csl
                     tests/mhra.csl
-                    tests/biblio2yaml/biblio.bib
-                    tests/biblio2yaml/biblio.bib.yaml
+                    tests/biblio2yaml/basic.bibtex
                     -- documentation
                     README.md
                     LICENSE

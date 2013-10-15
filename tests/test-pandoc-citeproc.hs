@@ -19,7 +19,7 @@ import qualified Data.Yaml as Yaml (decode)
 
 main = do
   citeprocTests <- mapM testCase ["chicago-author-date", "ieee", "mhra"]
-  fs <- filter (\f -> takeExtension f == ".bib")
+  fs <- filter (\f -> takeExtension f `elem` ["bibtex","biblatex"])
            `fmap` getDirectoryContents "tests/biblio2yaml"
   biblio2yamlTests <- mapM biblio2yamlTest fs
   if all id citeprocTests && all id biblio2yamlTests
@@ -74,14 +74,16 @@ showDiff (l,r) (Both _ _ : ds) =
 
 biblio2yamlTest :: String -> IO Bool
 biblio2yamlTest fp = do
-  let bibf = "tests/biblio2yaml/" ++ fp
-  let yamlf = bibf ++ ".yaml"
-  bib <- BL.readFile bibf
-  expected <- BL.readFile yamlf
+  let yamlf = "tests/biblio2yaml/" ++ fp
+  raw <- BL.readFile yamlf
+  let yamlStart = BL.pack "---"
+  let (biblines, yamllines) = break (== yamlStart) $ BL.lines raw
+  let bib = BL.unlines biblines
+  let expected = BL.unlines yamllines
   (ec, result, errout) <- pipeProcess
                      (Just [("LANG","en_US.UTF-8"),("HOME",".")])
                      "dist/build/biblio2yaml/biblio2yaml"
-                     ["-f","biblatex"] bib
+                     ["-f", takeExtension fp] bib
   if ec == ExitSuccess
      then do
        let expected' :: Maybe Aeson.Value
@@ -91,7 +93,7 @@ biblio2yamlTest fp = do
        if expected' == actual'
           then return True
           else do
-            err $ "biblio2yaml " ++ bibf ++ " did not match " ++ yamlf
+            err $ "FAILED: " ++ yamlf
             let diff = getDiff (BL.words expected) (BL.words result)
             err $ showDiff (1,1) diff
             return False
