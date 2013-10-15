@@ -670,9 +670,7 @@ itemToReference lang bibtex = bib $ do
                   then getTitle' "issuesubtitle"
                   else getTitle' "subtitle"
               <|> return ""
-  titleaddon' <- if isPeriodical
-                    then getTitle' "issuetitleaddon"
-                    else getTitle' "titleaddon"
+  titleaddon' <- getTitle' "titleaddon"
                <|> return ""
   containerTitle' <- (guard isPeriodical >> getField "title")
                   <|> getTitle' "maintitle"
