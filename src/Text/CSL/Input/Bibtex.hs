@@ -774,7 +774,8 @@ itemToReference lang bibtex = bib $ do
 
   -- url, doi, isbn, etc.:
   url' <- getRawField "url" <|> return ""
-  doi' <- getRawField "doi" <|> return ""
+  -- the doi: prefix causes citeproc-hs to create a link
+  doi' <- (("doi:" ++) <$> getRawField "doi") <|> return ""
   isbn' <- getRawField "isbn" <|> return ""
   issn' <- getRawField "issn" <|> return ""
   callNumber' <- getRawField "library" <|> return ""
