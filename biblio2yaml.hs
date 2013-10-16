@@ -1,5 +1,7 @@
 module Main where
 import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
+import Text.CSL.Reference (Reference(refId))
+import Data.List (group, sort)
 import Data.Char (chr, toLower)
 import Data.Monoid
 import Data.Yaml
@@ -43,8 +45,14 @@ main = do
        Nothing  -> do
          hPutStrLn stderr $ usageInfo ("Unknown format\n" ++ header) options
          exitWith $ ExitFailure 3
-       Just f   -> readBiblioString f bibstring >>=
+       Just f   -> readBiblioString f bibstring >>= warnDuplicateKeys >>=
                      outputYamlBlock . unescapeTags . encode
+
+warnDuplicateKeys :: [Reference] -> IO [Reference]
+warnDuplicateKeys refs = mapM_ warnDup dupKeys >> return refs
+  where warnDup k = hPutStrLn stderr $ "biblio2yaml: duplicate key " ++ k
+        allKeys   = map refId refs
+        dupKeys   = [x | (x:_:_) <- group (sort allKeys)]
 
 outputYamlBlock :: B.ByteString -> IO ()
 outputYamlBlock contents = do
