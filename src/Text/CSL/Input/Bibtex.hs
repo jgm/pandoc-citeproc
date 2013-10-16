@@ -372,7 +372,7 @@ getLiteralList :: String -> Bib [String]
 getLiteralList f = do
   fs <- asks fields
   case lookup f fs of
-       Just x  -> return $ mapMaybe latex $ splitOn " and " x
+       Just x  -> latex' x >>= toLiteralList
        Nothing -> notFound f
 
 -- separates items with semicolons
@@ -382,11 +382,17 @@ getLiteralList' f = intercalate "; " <$> getLiteralList f
 splitByAnd :: [Inline] -> [[Inline]]
 splitByAnd = splitOn [Space, Str "and", Space]
 
-toAuthorList :: Bool -> [Block] -> Maybe [Agent]
+toLiteralList :: (Functor m, MonadPlus m) => [Block] -> m [String]
+toLiteralList [Para xs] =
+  mapM inlinesToString $ splitByAnd xs
+toLiteralList [Plain xs] = toLiteralList [Para xs]
+toLiteralList _ = mzero
+
+toAuthorList :: MonadPlus m => Bool -> [Block] -> m [Agent]
 toAuthorList useprefix [Para xs] =
-  Just $ map (toAuthor useprefix) $ splitByAnd xs
+  return $ map (toAuthor useprefix) $ splitByAnd xs
 toAuthorList useprefix [Plain xs] = toAuthorList useprefix [Para xs]
-toAuthorList _ _ = Nothing
+toAuthorList _ _ = mzero
 
 toAuthor :: Bool -> [Inline] -> Agent
 toAuthor _ [Str "others"] =
@@ -457,18 +463,21 @@ separateCommas (Str xs : ys)
   | ',' `elem` xs = map Str ((split . dropBlanks) (whenElt (==',')) xs) ++ separateCommas ys
 separateCommas (x : ys) = x : separateCommas ys
 
-latex :: String -> Maybe String
-latex s = trim `fmap` blocksToString bs
+latex' :: (MonadPlus m, Functor m) => String -> m [Block]
+latex' s = return bs
   where Pandoc _ bs = readLaTeX def s
 
-latexTitle :: Lang -> String -> Maybe String
+latex :: (MonadPlus m, Functor m) => String -> m String
+latex s = latex' (trim s) >>= blocksToString
+
+latexTitle :: (MonadPlus m, Functor m) => Lang -> String -> m String
 latexTitle (Lang l _) s = trim `fmap` blocksToString (processTitle bs)
   where Pandoc _ bs = readLaTeX def s
         processTitle = case l of
                           'e':'n':_ -> unTitlecase
                           _         -> id
 
-latexAuthors :: Bool -> String -> Maybe [Agent]
+latexAuthors :: MonadPlus m => Bool -> String -> m [Agent]
 latexAuthors useprefix s = toAuthorList useprefix bs
   where Pandoc _ bs = readLaTeX def s
 
