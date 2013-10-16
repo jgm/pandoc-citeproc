@@ -750,7 +750,8 @@ itemToReference lang bibtex = bib $ do
                      "inreference", "suppbook","suppcollection"]
        then return ("",x,"")
        else if isArticle
-            then (getField "issue" >>= \y -> return ("","",x ++ ", " ++ y))
+            then (getField "issue" >>= \y ->
+                                    return ("","",concatWith ',' [x,y]))
                <|> return ("","",x)
             else return (x,"","")
 
