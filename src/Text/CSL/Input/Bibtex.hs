@@ -664,11 +664,9 @@ itemToReference lang bibtex = bib $ do
                       (x:y:_) -> (x, y)
                       []      -> ("", "")
   let getTitle' = getTitle (Lang la co)
-  title' <- (if isPeriodical then getTitle' "issuetitle" else getTitle' "title")
+  title' <- getTitle' (if isPeriodical then "issuetitle" else "title")
            <|> return ""
-  subtitle' <- if isPeriodical
-                  then getTitle' "issuesubtitle"
-                  else getTitle' "subtitle"
+  subtitle' <- getTitle' (if isPeriodical then "issuesubtitle" else "subtitle")
               <|> return ""
   titleaddon' <- getTitle' "titleaddon"
                <|> return ""
