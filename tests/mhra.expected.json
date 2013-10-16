@@ -2,455 +2,455 @@
   {
     "unMeta": {
       "csl": {
-        "val": [
+        "v": [
           {
-            "val": "tests/mhra.csl",
-            "tag": "Str"
+            "v": "tests/mhra.csl",
+            "t": "Str"
           }
         ],
-        "tag": "MetaInlines"
+        "t": "MetaInlines"
       },
       "references": {
-        "val": [
+        "v": [
           {
-            "val": {
+            "v": {
               "title": {
-                "val": [
+                "v": [
                   {
-                    "val": "First",
-                    "tag": "Str"
+                    "v": "First",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Book",
-                    "tag": "Str"
+                    "v": "Book",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "id": {
-                "val": [
+                "v": [
                   {
-                    "val": "item1",
-                    "tag": "Str"
+                    "v": "item1",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "issued": {
-                "val": {
+                "v": {
                   "year": {
-                    "val": "2005",
-                    "tag": "MetaString"
+                    "v": "2005",
+                    "t": "MetaString"
                   }
                 },
-                "tag": "MetaMap"
+                "t": "MetaMap"
               },
               "author": {
-                "val": {
+                "v": {
                   "given": {
-                    "val": [
+                    "v": [
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "John",
-                            "tag": "Str"
+                            "v": "John",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "MetaInlines"
+                        "t": "MetaInlines"
                       }
                     ],
-                    "tag": "MetaList"
+                    "t": "MetaList"
                   },
                   "family": {
-                    "val": [
+                    "v": [
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "MetaInlines"
+                    "t": "MetaInlines"
                   }
                 },
-                "tag": "MetaMap"
+                "t": "MetaMap"
               },
               "publisher": {
-                "val": [
+                "v": [
                   {
-                    "val": "Cambridge",
-                    "tag": "Str"
+                    "v": "Cambridge",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "University",
-                    "tag": "Str"
+                    "v": "University",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Press",
-                    "tag": "Str"
+                    "v": "Press",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "type": {
-                "val": [
+                "v": [
                   {
-                    "val": "book",
-                    "tag": "Str"
+                    "v": "book",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "publisher-place": {
-                "val": [
+                "v": [
                   {
-                    "val": "Cambridge",
-                    "tag": "Str"
+                    "v": "Cambridge",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               }
             },
-            "tag": "MetaMap"
+            "t": "MetaMap"
           },
           {
-            "val": {
+            "v": {
               "page": {
-                "val": [
+                "v": [
                   {
-                    "val": "33-34",
-                    "tag": "Str"
+                    "v": "33-34",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "title": {
-                "val": [
+                "v": [
                   {
-                    "val": "Article",
-                    "tag": "Str"
+                    "v": "Article",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "volume": {
-                "val": "6",
-                "tag": "MetaString"
+                "v": "6",
+                "t": "MetaString"
               },
               "id": {
-                "val": [
+                "v": [
                   {
-                    "val": "item2",
-                    "tag": "Str"
+                    "v": "item2",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "issued": {
-                "val": {
+                "v": {
                   "year": {
-                    "val": "2006",
-                    "tag": "MetaString"
+                    "v": "2006",
+                    "t": "MetaString"
                   }
                 },
-                "tag": "MetaMap"
+                "t": "MetaMap"
               },
               "author": {
-                "val": {
+                "v": {
                   "given": {
-                    "val": [
+                    "v": [
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "John",
-                            "tag": "Str"
+                            "v": "John",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "MetaInlines"
+                        "t": "MetaInlines"
                       }
                     ],
-                    "tag": "MetaList"
+                    "t": "MetaList"
                   },
                   "family": {
-                    "val": [
+                    "v": [
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "MetaInlines"
+                    "t": "MetaInlines"
                   }
                 },
-                "tag": "MetaMap"
+                "t": "MetaMap"
               },
               "container-title": {
-                "val": [
+                "v": [
                   {
-                    "val": "Journal",
-                    "tag": "Str"
+                    "v": "Journal",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "of",
-                    "tag": "Str"
+                    "v": "of",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Generic",
-                    "tag": "Str"
+                    "v": "Generic",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Studies",
-                    "tag": "Str"
+                    "v": "Studies",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "type": {
-                "val": [
+                "v": [
                   {
-                    "val": "article-journal",
-                    "tag": "Str"
+                    "v": "article-journal",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               }
             },
-            "tag": "MetaMap"
+            "t": "MetaMap"
           },
           {
-            "val": {
+            "v": {
               "title": {
-                "val": [
+                "v": [
                   {
-                    "val": "Why",
-                    "tag": "Str"
+                    "v": "Why",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Water",
-                    "tag": "Str"
+                    "v": "Water",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Is",
-                    "tag": "Str"
+                    "v": "Is",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Wet",
-                    "tag": "Str"
+                    "v": "Wet",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "id": {
-                "val": [
+                "v": [
                   {
-                    "val": "пункт3",
-                    "tag": "Str"
+                    "v": "пункт3",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "issued": {
-                "val": {
+                "v": {
                   "year": {
-                    "val": "2007",
-                    "tag": "MetaString"
+                    "v": "2007",
+                    "t": "MetaString"
                   }
                 },
-                "tag": "MetaMap"
+                "t": "MetaMap"
               },
               "author": {
-                "val": [
+                "v": [
                   {
-                    "val": {
+                    "v": {
                       "given": {
-                        "val": [
+                        "v": [
                           {
-                            "val": [
+                            "v": [
                               {
-                                "val": "John",
-                                "tag": "Str"
+                                "v": "John",
+                                "t": "Str"
                               }
                             ],
-                            "tag": "MetaInlines"
+                            "t": "MetaInlines"
                           }
                         ],
-                        "tag": "MetaList"
+                        "t": "MetaList"
                       },
                       "family": {
-                        "val": [
+                        "v": [
                           {
-                            "val": "Doe",
-                            "tag": "Str"
+                            "v": "Doe",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "MetaInlines"
+                        "t": "MetaInlines"
                       }
                     },
-                    "tag": "MetaMap"
+                    "t": "MetaMap"
                   },
                   {
-                    "val": {
+                    "v": {
                       "given": {
-                        "val": [
+                        "v": [
                           {
-                            "val": [
+                            "v": [
                               {
-                                "val": "Jenny",
-                                "tag": "Str"
+                                "v": "Jenny",
+                                "t": "Str"
                               }
                             ],
-                            "tag": "MetaInlines"
+                            "t": "MetaInlines"
                           }
                         ],
-                        "tag": "MetaList"
+                        "t": "MetaList"
                       },
                       "family": {
-                        "val": [
+                        "v": [
                           {
-                            "val": "Roe",
-                            "tag": "Str"
+                            "v": "Roe",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "MetaInlines"
+                        "t": "MetaInlines"
                       }
                     },
-                    "tag": "MetaMap"
+                    "t": "MetaMap"
                   }
                 ],
-                "tag": "MetaList"
+                "t": "MetaList"
               },
               "container-title": {
-                "val": [
+                "v": [
                   {
-                    "val": "Third",
-                    "tag": "Str"
+                    "v": "Third",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Book",
-                    "tag": "Str"
+                    "v": "Book",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "editor": {
-                "val": {
+                "v": {
                   "given": {
-                    "val": [
+                    "v": [
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "Sam",
-                            "tag": "Str"
+                            "v": "Sam",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "MetaInlines"
+                        "t": "MetaInlines"
                       }
                     ],
-                    "tag": "MetaList"
+                    "t": "MetaList"
                   },
                   "family": {
-                    "val": [
+                    "v": [
                       {
-                        "val": "Smith",
-                        "tag": "Str"
+                        "v": "Smith",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "MetaInlines"
+                    "t": "MetaInlines"
                   }
                 },
-                "tag": "MetaMap"
+                "t": "MetaMap"
               },
               "publisher": {
-                "val": [
+                "v": [
                   {
-                    "val": "Oxford",
-                    "tag": "Str"
+                    "v": "Oxford",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "University",
-                    "tag": "Str"
+                    "v": "University",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Press",
-                    "tag": "Str"
+                    "v": "Press",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "type": {
-                "val": [
+                "v": [
                   {
-                    "val": "chapter",
-                    "tag": "Str"
+                    "v": "chapter",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               },
               "publisher-place": {
-                "val": [
+                "v": [
                   {
-                    "val": "Oxford",
-                    "tag": "Str"
+                    "v": "Oxford",
+                    "t": "Str"
                   }
                 ],
-                "tag": "MetaInlines"
+                "t": "MetaInlines"
               }
             },
-            "tag": "MetaMap"
+            "t": "MetaMap"
           }
         ],
-        "tag": "MetaList"
+        "t": "MetaList"
       }
     }
   },
   [
     {
-      "val": [
+      "v": [
         1,
         [
           "pandoc-with-citeproc-hs",
@@ -459,33 +459,33 @@
         ],
         [
           {
-            "val": "Pandoc",
-            "tag": "Str"
+            "v": "Pandoc",
+            "t": "Str"
           },
           {
-            "val": [],
-            "tag": "Space"
+            "v": [],
+            "t": "Space"
           },
           {
-            "val": "with",
-            "tag": "Str"
+            "v": "with",
+            "t": "Str"
           },
           {
-            "val": [],
-            "tag": "Space"
+            "v": [],
+            "t": "Space"
           },
           {
-            "val": "citeproc-hs",
-            "tag": "Str"
+            "v": "citeproc-hs",
+            "t": "Str"
           }
         ]
       ],
-      "tag": "Header"
+      "t": "Header"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "nonexistent",
@@ -493,19 +493,19 @@
                 "citationHash": 1,
                 "citationPrefix": [],
                 "citationMode": {
-                  "val": [],
-                  "tag": "NormalCitation"
+                  "v": [],
+                  "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": [
+                        "v": [
                           [
                             "",
                             [
@@ -520,35 +520,35 @@
                           ],
                           [
                             {
-                              "val": [
+                              "v": [
                                 {
-                                  "val": "???",
-                                  "tag": "Str"
+                                  "v": "???",
+                                  "t": "Str"
                                 }
                               ],
-                              "tag": "Strong"
+                              "t": "Strong"
                             }
                           ]
                         ],
-                        "tag": "Span"
+                        "t": "Span"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "nonexistent",
@@ -556,19 +556,19 @@
                 "citationHash": 2,
                 "citationPrefix": [],
                 "citationMode": {
-                  "val": [],
-                  "tag": "AuthorInText"
+                  "v": [],
+                  "t": "AuthorInText"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": [
+                        "v": [
                           [
                             "",
                             [
@@ -578,35 +578,35 @@
                           ],
                           [
                             {
-                              "val": [
+                              "v": [
                                 {
-                                  "val": "???",
-                                  "tag": "Str"
+                                  "v": "???",
+                                  "t": "Str"
                                 }
                               ],
-                              "tag": "Strong"
+                              "t": "Strong"
                             }
                           ]
                         ],
-                        "tag": "Span"
+                        "t": "Span"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "item1",
@@ -614,385 +614,385 @@
                 "citationHash": 3,
                 "citationPrefix": [],
                 "citationMode": {
-                  "val": [],
-                  "tag": "AuthorInText"
+                  "v": [],
+                  "t": "AuthorInText"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": "John",
-                "tag": "Str"
+                "v": "John",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Doe",
-                "tag": "Str"
+                "v": "Doe",
+                "t": "Str"
               },
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "(",
-                        "tag": "Str"
+                        "v": "(",
+                        "t": "Str"
                       },
                       {
-                        "val": "Cambridge:",
-                        "tag": "Str"
+                        "v": "Cambridge:",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Cambridge",
-                        "tag": "Str"
+                        "v": "Cambridge",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "University",
-                        "tag": "Str"
+                        "v": "University",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Press,",
-                        "tag": "Str"
+                        "v": "Press,",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "2005",
-                        "tag": "Str"
+                        "v": "2005",
+                        "t": "Str"
                       },
                       {
-                        "val": ")",
-                        "tag": "Str"
+                        "v": ")",
+                        "t": "Str"
                       },
                       {
-                        "val": ".",
-                        "tag": "Str"
+                        "v": ".",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "says",
-          "tag": "Str"
+          "v": "says",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "blah.",
-          "tag": "Str"
+          "v": "blah.",
+          "t": "Str"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "val": "p.",
-                    "tag": "Str"
+                    "v": "p.",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "30",
-                    "tag": "Str"
+                    "v": "30",
+                    "t": "Str"
                   }
                 ],
                 "citationHash": 4,
                 "citationPrefix": [],
                 "citationMode": {
-                  "val": [],
-                  "tag": "AuthorInText"
+                  "v": [],
+                  "t": "AuthorInText"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": "Doe",
-                "tag": "Str"
+                "v": "Doe",
+                "t": "Str"
               },
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "p.",
-                        "tag": "Str"
+                        "v": "p.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "30",
-                        "tag": "Str"
+                        "v": "30",
+                        "t": "Str"
                       },
                       {
-                        "val": ".",
-                        "tag": "Str"
+                        "v": ".",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "says",
-          "tag": "Str"
+          "v": "says",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "blah.",
-          "tag": "Str"
+          "v": "blah.",
+          "t": "Str"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "val": "p.",
-                    "tag": "Str"
+                    "v": "p.",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "30,",
-                    "tag": "Str"
+                    "v": "30,",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "with",
-                    "tag": "Str"
+                    "v": "with",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "suffix",
-                    "tag": "Str"
+                    "v": "suffix",
+                    "t": "Str"
                   }
                 ],
                 "citationHash": 5,
                 "citationPrefix": [],
                 "citationMode": {
-                  "val": [],
-                  "tag": "AuthorInText"
+                  "v": [],
+                  "t": "AuthorInText"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": "Doe",
-                "tag": "Str"
+                "v": "Doe",
+                "t": "Str"
               },
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "p.",
-                        "tag": "Str"
+                        "v": "p.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "30",
-                        "tag": "Str"
+                        "v": "30",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "with",
-                        "tag": "Str"
+                        "v": "with",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "suffix",
-                        "tag": "Str"
+                        "v": "suffix",
+                        "t": "Str"
                       },
                       {
-                        "val": ".",
-                        "tag": "Str"
+                        "v": ".",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "says",
-          "tag": "Str"
+          "v": "says",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "blah.",
-          "tag": "Str"
+          "v": "blah.",
+          "t": "Str"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "item1",
@@ -1000,8 +1000,8 @@
                 "citationHash": 6,
                 "citationPrefix": [],
                 "citationMode": {
-                  "val": [],
-                  "tag": "AuthorInText"
+                  "v": [],
+                  "t": "AuthorInText"
                 },
                 "citationNoteNum": 0
               },
@@ -1009,27 +1009,27 @@
                 "citationId": "item2",
                 "citationSuffix": [
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "p.",
-                    "tag": "Str"
+                    "v": "p.",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "30",
-                    "tag": "Str"
+                    "v": "30",
+                    "t": "Str"
                   }
                 ],
                 "citationHash": 7,
                 "citationPrefix": [],
                 "citationMode": {
-                  "val": [],
-                  "tag": "SuppressAuthor"
+                  "v": [],
+                  "t": "SuppressAuthor"
                 },
                 "citationNoteNum": 0
               },
@@ -1039,587 +1039,587 @@
                 "citationHash": 8,
                 "citationPrefix": [
                   {
-                    "val": "see",
-                    "tag": "Str"
+                    "v": "see",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "also",
-                    "tag": "Str"
+                    "v": "also",
+                    "t": "Str"
                   }
                 ],
                 "citationMode": {
-                  "val": [],
-                  "tag": "NormalCitation"
+                  "v": [],
+                  "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": "Doe",
-                "tag": "Str"
+                "v": "Doe",
+                "t": "Str"
               },
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": ";",
-                        "tag": "Str"
+                        "v": ";",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "‘",
-                        "tag": "Str"
+                        "v": "‘",
+                        "t": "Str"
                       },
                       {
-                        "val": "Article",
-                        "tag": "Str"
+                        "v": "Article",
+                        "t": "Str"
                       },
                       {
-                        "val": "’",
-                        "tag": "Str"
+                        "v": "’",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "Journal",
-                            "tag": "Str"
+                            "v": "Journal",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "of",
-                            "tag": "Str"
+                            "v": "of",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Generic",
-                            "tag": "Str"
+                            "v": "Generic",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Studies",
-                            "tag": "Str"
+                            "v": "Studies",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "6",
-                        "tag": "Str"
+                        "v": "6",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "(",
-                        "tag": "Str"
+                        "v": "(",
+                        "t": "Str"
                       },
                       {
-                        "val": "2006",
-                        "tag": "Str"
+                        "v": "2006",
+                        "t": "Str"
                       },
                       {
-                        "val": ")",
-                        "tag": "Str"
+                        "v": ")",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "33–34",
-                        "tag": "Str"
+                        "v": "33–34",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "(",
-                        "tag": "Str"
+                        "v": "(",
+                        "t": "Str"
                       },
                       {
-                        "val": "p.",
-                        "tag": "Str"
+                        "v": "p.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "30",
-                        "tag": "Str"
+                        "v": "30",
+                        "t": "Str"
                       },
                       {
-                        "val": ")",
-                        "tag": "Str"
+                        "v": ")",
+                        "t": "Str"
                       },
                       {
-                        "val": ";",
-                        "tag": "Str"
+                        "v": ";",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "see",
-                        "tag": "Str"
+                        "v": "see",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "also",
-                        "tag": "Str"
+                        "v": "also",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "John",
-                        "tag": "Str"
+                        "v": "John",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "a",
-                        "tag": "Str"
+                        "v": "a",
+                        "t": "Str"
                       },
                       {
-                        "val": "n",
-                        "tag": "Str"
+                        "v": "n",
+                        "t": "Str"
                       },
                       {
-                        "val": "d",
-                        "tag": "Str"
+                        "v": "d",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Jenny",
-                        "tag": "Str"
+                        "v": "Jenny",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Roe",
-                        "tag": "Str"
+                        "v": "Roe",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "‘",
-                        "tag": "Str"
+                        "v": "‘",
+                        "t": "Str"
                       },
                       {
-                        "val": "Why",
-                        "tag": "Str"
+                        "v": "Why",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Water",
-                        "tag": "Str"
+                        "v": "Water",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Is",
-                        "tag": "Str"
+                        "v": "Is",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Wet",
-                        "tag": "Str"
+                        "v": "Wet",
+                        "t": "Str"
                       },
                       {
-                        "val": "’",
-                        "tag": "Str"
+                        "v": "’",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "in",
-                        "tag": "Str"
+                        "v": "in",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "Third",
-                            "tag": "Str"
+                            "v": "Third",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "ed.",
-                        "tag": "Str"
+                        "v": "ed.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "by",
-                        "tag": "Str"
+                        "v": "by",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Sam",
-                        "tag": "Str"
+                        "v": "Sam",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Smith",
-                        "tag": "Str"
+                        "v": "Smith",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "(",
-                        "tag": "Str"
+                        "v": "(",
+                        "t": "Str"
                       },
                       {
-                        "val": "Oxford:",
-                        "tag": "Str"
+                        "v": "Oxford:",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Oxford",
-                        "tag": "Str"
+                        "v": "Oxford",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "University",
-                        "tag": "Str"
+                        "v": "University",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Press,",
-                        "tag": "Str"
+                        "v": "Press,",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "2007",
-                        "tag": "Str"
+                        "v": "2007",
+                        "t": "Str"
                       },
                       {
-                        "val": ")",
-                        "tag": "Str"
+                        "v": ")",
+                        "t": "Str"
                       },
                       {
-                        "val": ".",
-                        "tag": "Str"
+                        "v": ".",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "says",
-          "tag": "Str"
+          "v": "says",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "blah.",
-          "tag": "Str"
+          "v": "blah.",
+          "t": "Str"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": "In",
-          "tag": "Str"
+          "v": "In",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "a",
-          "tag": "Str"
+          "v": "a",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "note.",
-          "tag": "Str"
+          "v": "note.",
+          "t": "Str"
         },
         {
-          "val": [
+          "v": [
             {
-              "val": [
+              "v": [
                 {
-                  "val": [
+                  "v": [
                     [
                       {
                         "citationId": "пункт3",
                         "citationSuffix": [
                           {
-                            "val": "p.",
-                            "tag": "Str"
+                            "v": "p.",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "12",
-                            "tag": "Str"
+                            "v": "12",
+                            "t": "Str"
                           }
                         ],
                         "citationHash": 9,
                         "citationPrefix": [],
                         "citationMode": {
-                          "val": [],
-                          "tag": "AuthorInText"
+                          "v": [],
+                          "t": "AuthorInText"
                         },
                         "citationNoteNum": 0
                       }
                     ],
                     [
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "and",
-                        "tag": "Str"
+                        "v": "and",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Roe",
-                        "tag": "Str"
+                        "v": "Roe",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "p.",
-                        "tag": "Str"
+                        "v": "p.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "12",
-                        "tag": "Str"
+                        "v": "12",
+                        "t": "Str"
                       },
                       {
-                        "val": "",
-                        "tag": "Str"
+                        "v": "",
+                        "t": "Str"
                       }
                     ]
                   ],
-                  "tag": "Cite"
+                  "t": "Cite"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "and",
-                  "tag": "Str"
+                  "v": "and",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "a",
-                  "tag": "Str"
+                  "v": "a",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "citation",
-                  "tag": "Str"
+                  "v": "citation",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "without",
-                  "tag": "Str"
+                  "v": "without",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "locators",
-                  "tag": "Str"
+                  "v": "locators",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": [
+                  "v": [
                     [
                       {
                         "citationId": "пункт3",
@@ -1627,121 +1627,121 @@
                         "citationHash": 10,
                         "citationPrefix": [],
                         "citationMode": {
-                          "val": [],
-                          "tag": "NormalCitation"
+                          "v": [],
+                          "t": "NormalCitation"
                         },
                         "citationNoteNum": 0
                       }
                     ],
                     [
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "a",
-                        "tag": "Str"
+                        "v": "a",
+                        "t": "Str"
                       },
                       {
-                        "val": "n",
-                        "tag": "Str"
+                        "v": "n",
+                        "t": "Str"
                       },
                       {
-                        "val": "d",
-                        "tag": "Str"
+                        "v": "d",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Roe",
-                        "tag": "Str"
+                        "v": "Roe",
+                        "t": "Str"
                       },
                       {
-                        "val": "",
-                        "tag": "Str"
+                        "v": "",
+                        "t": "Str"
                       }
                     ]
                   ],
-                  "tag": "Cite"
+                  "t": "Cite"
                 },
                 {
-                  "val": ".",
-                  "tag": "Str"
+                  "v": ".",
+                  "t": "Str"
                 }
               ],
-              "tag": "Para"
+              "t": "Para"
             }
           ],
-          "tag": "Note"
+          "t": "Note"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": "A",
-          "tag": "Str"
+          "v": "A",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "citation",
-          "tag": "Str"
+          "v": "citation",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "group",
-          "tag": "Str"
+          "v": "group",
+          "t": "Str"
         },
         {
-          "val": ".",
-          "tag": "Str"
+          "v": ".",
+          "t": "Str"
         },
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "chap.",
-                    "tag": "Str"
+                    "v": "chap.",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "3",
-                    "tag": "Str"
+                    "v": "3",
+                    "t": "Str"
                   }
                 ],
                 "citationHash": 11,
                 "citationPrefix": [
                   {
-                    "val": "see",
-                    "tag": "Str"
+                    "v": "see",
+                    "t": "Str"
                   }
                 ],
                 "citationMode": {
-                  "val": [],
-                  "tag": "NormalCitation"
+                  "v": [],
+                  "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
               },
@@ -1749,420 +1749,420 @@
                 "citationId": "пункт3",
                 "citationSuffix": [
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "p.",
-                    "tag": "Str"
+                    "v": "p.",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "34-35",
-                    "tag": "Str"
+                    "v": "34-35",
+                    "t": "Str"
                   }
                 ],
                 "citationHash": 12,
                 "citationPrefix": [
                   {
-                    "val": "also",
-                    "tag": "Str"
+                    "v": "also",
+                    "t": "Str"
                   }
                 ],
                 "citationMode": {
-                  "val": [],
-                  "tag": "NormalCitation"
+                  "v": [],
+                  "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": "See",
-                        "tag": "Str"
+                        "v": "See",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "chap.",
-                        "tag": "Str"
+                        "v": "chap.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "3",
-                        "tag": "Str"
+                        "v": "3",
+                        "t": "Str"
                       },
                       {
-                        "val": ";",
-                        "tag": "Str"
+                        "v": ";",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "also",
-                        "tag": "Str"
+                        "v": "also",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "a",
-                        "tag": "Str"
+                        "v": "a",
+                        "t": "Str"
                       },
                       {
-                        "val": "n",
-                        "tag": "Str"
+                        "v": "n",
+                        "t": "Str"
                       },
                       {
-                        "val": "d",
-                        "tag": "Str"
+                        "v": "d",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Roe",
-                        "tag": "Str"
+                        "v": "Roe",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "pp.",
-                        "tag": "Str"
+                        "v": "pp.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "34–35",
-                        "tag": "Str"
+                        "v": "34–35",
+                        "t": "Str"
                       },
                       {
-                        "val": ".",
-                        "tag": "Str"
+                        "v": ".",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         },
         {
-          "val": "",
-          "tag": "Str"
+          "v": "",
+          "t": "Str"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": "Another",
-          "tag": "Str"
+          "v": "Another",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "one",
-          "tag": "Str"
+          "v": "one",
+          "t": "Str"
         },
         {
-          "val": ".",
-          "tag": "Str"
+          "v": ".",
+          "t": "Str"
         },
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "p.",
-                    "tag": "Str"
+                    "v": "p.",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "34-35",
-                    "tag": "Str"
+                    "v": "34-35",
+                    "t": "Str"
                   }
                 ],
                 "citationHash": 13,
                 "citationPrefix": [
                   {
-                    "val": "see",
-                    "tag": "Str"
+                    "v": "see",
+                    "t": "Str"
                   }
                 ],
                 "citationMode": {
-                  "val": [],
-                  "tag": "NormalCitation"
+                  "v": [],
+                  "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": "See",
-                        "tag": "Str"
+                        "v": "See",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "pp.",
-                        "tag": "Str"
+                        "v": "pp.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "34–35",
-                        "tag": "Str"
+                        "v": "34–35",
+                        "t": "Str"
                       },
                       {
-                        "val": ".",
-                        "tag": "Str"
+                        "v": ".",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         },
         {
-          "val": "",
-          "tag": "Str"
+          "v": "",
+          "t": "Str"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": "And",
-          "tag": "Str"
+          "v": "And",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "another",
-          "tag": "Str"
+          "v": "another",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "one",
-          "tag": "Str"
+          "v": "one",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "in",
-          "tag": "Str"
+          "v": "in",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "a",
-          "tag": "Str"
+          "v": "a",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "note.",
-          "tag": "Str"
+          "v": "note.",
+          "t": "Str"
         },
         {
-          "val": [
+          "v": [
             {
-              "val": [
+              "v": [
                 {
-                  "val": "Some",
-                  "tag": "Str"
+                  "v": "Some",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "citations",
-                  "tag": "Str"
+                  "v": "citations",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": [
+                  "v": [
                     [
                       {
                         "citationId": "item1",
                         "citationSuffix": [
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "chap.",
-                            "tag": "Str"
+                            "v": "chap.",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "3",
-                            "tag": "Str"
+                            "v": "3",
+                            "t": "Str"
                           }
                         ],
                         "citationHash": 14,
                         "citationPrefix": [
                           {
-                            "val": "see",
-                            "tag": "Str"
+                            "v": "see",
+                            "t": "Str"
                           }
                         ],
                         "citationMode": {
-                          "val": [],
-                          "tag": "NormalCitation"
+                          "v": [],
+                          "t": "NormalCitation"
                         },
                         "citationNoteNum": 0
                       },
@@ -2172,8 +2172,8 @@
                         "citationHash": 15,
                         "citationPrefix": [],
                         "citationMode": {
-                          "val": [],
-                          "tag": "NormalCitation"
+                          "v": [],
+                          "t": "NormalCitation"
                         },
                         "citationNoteNum": 0
                       },
@@ -2183,609 +2183,609 @@
                         "citationHash": 16,
                         "citationPrefix": [],
                         "citationMode": {
-                          "val": [],
-                          "tag": "NormalCitation"
+                          "v": [],
+                          "t": "NormalCitation"
                         },
                         "citationNoteNum": 0
                       }
                     ],
                     [
                       {
-                        "val": "see",
-                        "tag": "Str"
+                        "v": "see",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "chap.",
-                        "tag": "Str"
+                        "v": "chap.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "3",
-                        "tag": "Str"
+                        "v": "3",
+                        "t": "Str"
                       },
                       {
-                        "val": ";",
-                        "tag": "Str"
+                        "v": ";",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "a",
-                        "tag": "Str"
+                        "v": "a",
+                        "t": "Str"
                       },
                       {
-                        "val": "n",
-                        "tag": "Str"
+                        "v": "n",
+                        "t": "Str"
                       },
                       {
-                        "val": "d",
-                        "tag": "Str"
+                        "v": "d",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Roe",
-                        "tag": "Str"
+                        "v": "Roe",
+                        "t": "Str"
                       },
                       {
-                        "val": ";",
-                        "tag": "Str"
+                        "v": ";",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "‘Article’",
-                        "tag": "Str"
+                        "v": "‘Article’",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "33–34",
-                        "tag": "Str"
+                        "v": "33–34",
+                        "t": "Str"
                       },
                       {
-                        "val": "",
-                        "tag": "Str"
+                        "v": "",
+                        "t": "Str"
                       }
                     ]
                   ],
-                  "tag": "Cite"
+                  "t": "Cite"
                 },
                 {
-                  "val": ".",
-                  "tag": "Str"
+                  "v": ".",
+                  "t": "Str"
                 }
               ],
-              "tag": "Para"
+              "t": "Para"
             }
           ],
-          "tag": "Note"
+          "t": "Note"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": "Citation",
-          "tag": "Str"
+          "v": "Citation",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "with",
-          "tag": "Str"
+          "v": "with",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "a",
-          "tag": "Str"
+          "v": "a",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "suffix",
-          "tag": "Str"
+          "v": "suffix",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "and",
-          "tag": "Str"
+          "v": "and",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "locator",
-          "tag": "Str"
+          "v": "locator",
+          "t": "Str"
         },
         {
-          "val": ".",
-          "tag": "Str"
+          "v": ".",
+          "t": "Str"
         },
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "pp.",
-                    "tag": "Str"
+                    "v": "pp.",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "33,",
-                    "tag": "Str"
+                    "v": "33,",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "35-37,",
-                    "tag": "Str"
+                    "v": "35-37,",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "and",
-                    "tag": "Str"
+                    "v": "and",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "nowhere",
-                    "tag": "Str"
+                    "v": "nowhere",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "else",
-                    "tag": "Str"
+                    "v": "else",
+                    "t": "Str"
                   }
                 ],
                 "citationHash": 17,
                 "citationPrefix": [],
                 "citationMode": {
-                  "val": [],
-                  "tag": "NormalCitation"
+                  "v": [],
+                  "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "pp.",
-                        "tag": "Str"
+                        "v": "pp.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "33,",
-                        "tag": "Str"
+                        "v": "33,",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "35–37",
-                        "tag": "Str"
+                        "v": "35–37",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "and",
-                        "tag": "Str"
+                        "v": "and",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "nowhere",
-                        "tag": "Str"
+                        "v": "nowhere",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "else",
-                        "tag": "Str"
+                        "v": "else",
+                        "t": "Str"
                       },
                       {
-                        "val": ".",
-                        "tag": "Str"
+                        "v": ".",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         },
         {
-          "val": "",
-          "tag": "Str"
+          "v": "",
+          "t": "Str"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": "Citation",
-          "tag": "Str"
+          "v": "Citation",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "with",
-          "tag": "Str"
+          "v": "with",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "suffix",
-          "tag": "Str"
+          "v": "suffix",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "only",
-          "tag": "Str"
+          "v": "only",
+          "t": "Str"
         },
         {
-          "val": ".",
-          "tag": "Str"
+          "v": ".",
+          "t": "Str"
         },
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "and",
-                    "tag": "Str"
+                    "v": "and",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "nowhere",
-                    "tag": "Str"
+                    "v": "nowhere",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "else",
-                    "tag": "Str"
+                    "v": "else",
+                    "t": "Str"
                   }
                 ],
                 "citationHash": 18,
                 "citationPrefix": [],
                 "citationMode": {
-                  "val": [],
-                  "tag": "NormalCitation"
+                  "v": [],
+                  "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "and",
-                        "tag": "Str"
+                        "v": "and",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "nowhere",
-                        "tag": "Str"
+                        "v": "nowhere",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "else",
-                        "tag": "Str"
+                        "v": "else",
+                        "t": "Str"
                       },
                       {
-                        "val": ".",
-                        "tag": "Str"
+                        "v": ".",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         },
         {
-          "val": "",
-          "tag": "Str"
+          "v": "",
+          "t": "Str"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": "Now",
-          "tag": "Str"
+          "v": "Now",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "some",
-          "tag": "Str"
+          "v": "some",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "modifiers.",
-          "tag": "Str"
+          "v": "modifiers.",
+          "t": "Str"
         },
         {
-          "val": [
+          "v": [
             {
-              "val": [
+              "v": [
                 {
-                  "val": "Like",
-                  "tag": "Str"
+                  "v": "Like",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "a",
-                  "tag": "Str"
+                  "v": "a",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "citation",
-                  "tag": "Str"
+                  "v": "citation",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "without",
-                  "tag": "Str"
+                  "v": "without",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "author:",
-                  "tag": "Str"
+                  "v": "author:",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": [
+                  "v": [
                     [
                       {
                         "citationId": "item1",
@@ -2793,359 +2793,359 @@
                         "citationHash": 19,
                         "citationPrefix": [],
                         "citationMode": {
-                          "val": [],
-                          "tag": "SuppressAuthor"
+                          "v": [],
+                          "t": "SuppressAuthor"
                         },
                         "citationNoteNum": 0
                       }
                     ],
                     [
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": "",
-                        "tag": "Str"
+                        "v": "",
+                        "t": "Str"
                       }
                     ]
                   ],
-                  "tag": "Cite"
+                  "t": "Cite"
                 },
                 {
-                  "val": ",",
-                  "tag": "Str"
+                  "v": ",",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "and",
-                  "tag": "Str"
+                  "v": "and",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "now",
-                  "tag": "Str"
+                  "v": "now",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "Doe",
-                  "tag": "Str"
+                  "v": "Doe",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "with",
-                  "tag": "Str"
+                  "v": "with",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "a",
-                  "tag": "Str"
+                  "v": "a",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": "locator",
-                  "tag": "Str"
+                  "v": "locator",
+                  "t": "Str"
                 },
                 {
-                  "val": [],
-                  "tag": "Space"
+                  "v": [],
+                  "t": "Space"
                 },
                 {
-                  "val": [
+                  "v": [
                     [
                       {
                         "citationId": "item2",
                         "citationSuffix": [
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "p.",
-                            "tag": "Str"
+                            "v": "p.",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "44",
-                            "tag": "Str"
+                            "v": "44",
+                            "t": "Str"
                           }
                         ],
                         "citationHash": 20,
                         "citationPrefix": [],
                         "citationMode": {
-                          "val": [],
-                          "tag": "SuppressAuthor"
+                          "v": [],
+                          "t": "SuppressAuthor"
                         },
                         "citationNoteNum": 0
                       }
                     ],
                     [
                       {
-                        "val": "‘",
-                        "tag": "Str"
+                        "v": "‘",
+                        "t": "Str"
                       },
                       {
-                        "val": "Article",
-                        "tag": "Str"
+                        "v": "Article",
+                        "t": "Str"
                       },
                       {
-                        "val": "’",
-                        "tag": "Str"
+                        "v": "’",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "33–34",
-                        "tag": "Str"
+                        "v": "33–34",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "(",
-                        "tag": "Str"
+                        "v": "(",
+                        "t": "Str"
                       },
                       {
-                        "val": "p.",
-                        "tag": "Str"
+                        "v": "p.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "44",
-                        "tag": "Str"
+                        "v": "44",
+                        "t": "Str"
                       },
                       {
-                        "val": ")",
-                        "tag": "Str"
+                        "v": ")",
+                        "t": "Str"
                       },
                       {
-                        "val": "",
-                        "tag": "Str"
+                        "v": "",
+                        "t": "Str"
                       }
                     ]
                   ],
-                  "tag": "Cite"
+                  "t": "Cite"
                 },
                 {
-                  "val": ".",
-                  "tag": "Str"
+                  "v": ".",
+                  "t": "Str"
                 }
               ],
-              "tag": "Para"
+              "t": "Para"
             }
           ],
-          "tag": "Note"
+          "t": "Note"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         {
-          "val": "With",
-          "tag": "Str"
+          "v": "With",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "some",
-          "tag": "Str"
+          "v": "some",
+          "t": "Str"
         },
         {
-          "val": [],
-          "tag": "Space"
+          "v": [],
+          "t": "Space"
         },
         {
-          "val": "markup",
-          "tag": "Str"
+          "v": "markup",
+          "t": "Str"
         },
         {
-          "val": ".",
-          "tag": "Str"
+          "v": ".",
+          "t": "Str"
         },
         {
-          "val": [
+          "v": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "p.",
-                    "tag": "Str"
+                    "v": "p.",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": "32",
-                        "tag": "Str"
+                        "v": "32",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Strong"
+                    "t": "Strong"
                   }
                 ],
                 "citationHash": 21,
                 "citationPrefix": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": "see",
-                        "tag": "Str"
+                        "v": "see",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Emph"
+                    "t": "Emph"
                   }
                 ],
                 "citationMode": {
-                  "val": [],
-                  "tag": "NormalCitation"
+                  "v": [],
+                  "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
               }
             ],
             [
               {
-                "val": [
+                "v": [
                   {
-                    "val": [
+                    "v": [
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "See",
-                            "tag": "Str"
+                            "v": "See",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "Doe",
-                        "tag": "Str"
+                        "v": "Doe",
+                        "t": "Str"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": [
+                        "v": [
                           {
-                            "val": "First",
-                            "tag": "Str"
+                            "v": "First",
+                            "t": "Str"
                           },
                           {
-                            "val": [],
-                            "tag": "Space"
+                            "v": [],
+                            "t": "Space"
                           },
                           {
-                            "val": "Book",
-                            "tag": "Str"
+                            "v": "Book",
+                            "t": "Str"
                           }
                         ],
-                        "tag": "Emph"
+                        "t": "Emph"
                       },
                       {
-                        "val": ",",
-                        "tag": "Str"
+                        "v": ",",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "p.",
-                        "tag": "Str"
+                        "v": "p.",
+                        "t": "Str"
                       },
                       {
-                        "val": [],
-                        "tag": "Space"
+                        "v": [],
+                        "t": "Space"
                       },
                       {
-                        "val": "32",
-                        "tag": "Str"
+                        "v": "32",
+                        "t": "Str"
                       },
                       {
-                        "val": ".",
-                        "tag": "Str"
+                        "v": ".",
+                        "t": "Str"
                       }
                     ],
-                    "tag": "Para"
+                    "t": "Para"
                   }
                 ],
-                "tag": "Note"
+                "t": "Note"
               }
             ]
           ],
-          "tag": "Cite"
+          "t": "Cite"
         },
         {
-          "val": "",
-          "tag": "Str"
+          "v": "",
+          "t": "Str"
         }
       ],
-      "tag": "Para"
+      "t": "Para"
     },
     {
-      "val": [
+      "v": [
         [
           "",
           [
@@ -3155,7 +3155,7 @@
         ],
         [
           {
-            "val": [
+            "v": [
               1,
               [
                 "references",
@@ -3164,366 +3164,366 @@
               ],
               [
                 {
-                  "val": "References",
-                  "tag": "Str"
+                  "v": "References",
+                  "t": "Str"
                 }
               ]
             ],
-            "tag": "Header"
+            "t": "Header"
           },
           {
-            "val": [
+            "v": [
               {
-                "val": "Doe,",
-                "tag": "Str"
+                "v": "Doe,",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "John,",
-                "tag": "Str"
+                "v": "John,",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "‘Article’,",
-                "tag": "Str"
+                "v": "‘Article’,",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": [
+                "v": [
                   {
-                    "val": "Journal",
-                    "tag": "Str"
+                    "v": "Journal",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "of",
-                    "tag": "Str"
+                    "v": "of",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Generic",
-                    "tag": "Str"
+                    "v": "Generic",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Studies",
-                    "tag": "Str"
+                    "v": "Studies",
+                    "t": "Str"
                   }
                 ],
-                "tag": "Emph"
+                "t": "Emph"
               },
               {
-                "val": ",",
-                "tag": "Str"
+                "v": ",",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "6",
-                "tag": "Str"
+                "v": "6",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "(2006),",
-                "tag": "Str"
+                "v": "(2006),",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "33–34",
-                "tag": "Str"
+                "v": "33–34",
+                "t": "Str"
               },
               {
-                "val": ".",
-                "tag": "Str"
+                "v": ".",
+                "t": "Str"
               }
             ],
-            "tag": "Para"
+            "t": "Para"
           },
           {
-            "val": [
+            "v": [
               {
-                "val": "---,",
-                "tag": "Str"
+                "v": "---,",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": [
+                "v": [
                   {
-                    "val": "First",
-                    "tag": "Str"
+                    "v": "First",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Book",
-                    "tag": "Str"
+                    "v": "Book",
+                    "t": "Str"
                   }
                 ],
-                "tag": "Emph"
+                "t": "Emph"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "(Cambridge:",
-                "tag": "Str"
+                "v": "(Cambridge:",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Cambridge",
-                "tag": "Str"
+                "v": "Cambridge",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "University",
-                "tag": "Str"
+                "v": "University",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Press,",
-                "tag": "Str"
+                "v": "Press,",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "2005)",
-                "tag": "Str"
+                "v": "2005)",
+                "t": "Str"
               },
               {
-                "val": ".",
-                "tag": "Str"
+                "v": ".",
+                "t": "Str"
               }
             ],
-            "tag": "Para"
+            "t": "Para"
           },
           {
-            "val": [
+            "v": [
               {
-                "val": "Doe,",
-                "tag": "Str"
+                "v": "Doe,",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "John,",
-                "tag": "Str"
+                "v": "John,",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "and",
-                "tag": "Str"
+                "v": "and",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Jenny",
-                "tag": "Str"
+                "v": "Jenny",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Roe,",
-                "tag": "Str"
+                "v": "Roe,",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "‘Why",
-                "tag": "Str"
+                "v": "‘Why",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Water",
-                "tag": "Str"
+                "v": "Water",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Is",
-                "tag": "Str"
+                "v": "Is",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Wet’,",
-                "tag": "Str"
+                "v": "Wet’,",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "in",
-                "tag": "Str"
+                "v": "in",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": [
+                "v": [
                   {
-                    "val": "Third",
-                    "tag": "Str"
+                    "v": "Third",
+                    "t": "Str"
                   },
                   {
-                    "val": [],
-                    "tag": "Space"
+                    "v": [],
+                    "t": "Space"
                   },
                   {
-                    "val": "Book",
-                    "tag": "Str"
+                    "v": "Book",
+                    "t": "Str"
                   }
                 ],
-                "tag": "Emph"
+                "t": "Emph"
               },
               {
-                "val": ",",
-                "tag": "Str"
+                "v": ",",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "ed.",
-                "tag": "Str"
+                "v": "ed.",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "by",
-                "tag": "Str"
+                "v": "by",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Sam",
-                "tag": "Str"
+                "v": "Sam",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Smith",
-                "tag": "Str"
+                "v": "Smith",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "(Oxford:",
-                "tag": "Str"
+                "v": "(Oxford:",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Oxford",
-                "tag": "Str"
+                "v": "Oxford",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "University",
-                "tag": "Str"
+                "v": "University",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "Press,",
-                "tag": "Str"
+                "v": "Press,",
+                "t": "Str"
               },
               {
-                "val": [],
-                "tag": "Space"
+                "v": [],
+                "t": "Space"
               },
               {
-                "val": "2007)",
-                "tag": "Str"
+                "v": "2007)",
+                "t": "Str"
               },
               {
-                "val": ".",
-                "tag": "Str"
+                "v": ".",
+                "t": "Str"
               }
             ],
-            "tag": "Para"
+            "t": "Para"
           }
         ]
       ],
-      "tag": "Div"
+      "t": "Div"
     }
   ]
 ]
