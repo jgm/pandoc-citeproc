@@ -2,355 +2,455 @@
   {
     "unMeta": {
       "csl": {
-        "MetaInlines": [
+        "val": [
           {
-            "Str": "tests/mhra.csl"
+            "val": "tests/mhra.csl",
+            "tag": "Str"
           }
-        ]
+        ],
+        "tag": "MetaInlines"
       },
       "references": {
-        "MetaList": [
+        "val": [
           {
-            "MetaMap": {
-              "author": {
-                "MetaMap": {
-                  "family": {
-                    "MetaInlines": [
-                      {
-                        "Str": "Doe"
-                      }
-                    ]
-                  },
-                  "given": {
-                    "MetaList": [
-                      {
-                        "MetaInlines": [
-                          {
-                            "Str": "John"
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                }
-              },
+            "val": {
               "title": {
-                "MetaInlines": [
+                "val": [
                   {
-                    "Str": "First"
+                    "val": "First",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "Book"
+                    "val": "Book",
+                    "tag": "Str"
                   }
-                ]
+                ],
+                "tag": "MetaInlines"
               },
               "id": {
-                "MetaInlines": [
+                "val": [
                   {
-                    "Str": "item1"
+                    "val": "item1",
+                    "tag": "Str"
                   }
-                ]
+                ],
+                "tag": "MetaInlines"
               },
               "issued": {
-                "MetaMap": {
+                "val": {
                   "year": {
-                    "MetaString": "2005"
+                    "val": "2005",
+                    "tag": "MetaString"
                   }
-                }
+                },
+                "tag": "MetaMap"
+              },
+              "author": {
+                "val": {
+                  "given": {
+                    "val": [
+                      {
+                        "val": [
+                          {
+                            "val": "John",
+                            "tag": "Str"
+                          }
+                        ],
+                        "tag": "MetaInlines"
+                      }
+                    ],
+                    "tag": "MetaList"
+                  },
+                  "family": {
+                    "val": [
+                      {
+                        "val": "Doe",
+                        "tag": "Str"
+                      }
+                    ],
+                    "tag": "MetaInlines"
+                  }
+                },
+                "tag": "MetaMap"
               },
               "publisher": {
-                "MetaInlines": [
+                "val": [
                   {
-                    "Str": "Cambridge"
+                    "val": "Cambridge",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "University"
+                    "val": "University",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "Press"
+                    "val": "Press",
+                    "tag": "Str"
                   }
-                ]
+                ],
+                "tag": "MetaInlines"
               },
               "type": {
-                "MetaInlines": [
+                "val": [
                   {
-                    "Str": "book"
+                    "val": "book",
+                    "tag": "Str"
                   }
-                ]
+                ],
+                "tag": "MetaInlines"
               },
               "publisher-place": {
-                "MetaInlines": [
+                "val": [
                   {
-                    "Str": "Cambridge"
+                    "val": "Cambridge",
+                    "tag": "Str"
                   }
-                ]
+                ],
+                "tag": "MetaInlines"
               }
-            }
+            },
+            "tag": "MetaMap"
           },
           {
-            "MetaMap": {
-              "author": {
-                "MetaMap": {
-                  "family": {
-                    "MetaInlines": [
-                      {
-                        "Str": "Doe"
-                      }
-                    ]
-                  },
-                  "given": {
-                    "MetaList": [
-                      {
-                        "MetaInlines": [
-                          {
-                            "Str": "John"
-                          }
-                        ]
-                      }
-                    ]
+            "val": {
+              "page": {
+                "val": [
+                  {
+                    "val": "33-34",
+                    "tag": "Str"
                   }
-                }
+                ],
+                "tag": "MetaInlines"
               },
               "title": {
-                "MetaInlines": [
+                "val": [
                   {
-                    "Str": "Article"
+                    "val": "Article",
+                    "tag": "Str"
                   }
-                ]
-              },
-              "page": {
-                "MetaInlines": [
-                  {
-                    "Str": "33-34"
-                  }
-                ]
-              },
-              "id": {
-                "MetaInlines": [
-                  {
-                    "Str": "item2"
-                  }
-                ]
-              },
-              "issued": {
-                "MetaMap": {
-                  "year": {
-                    "MetaString": "2006"
-                  }
-                }
-              },
-              "type": {
-                "MetaInlines": [
-                  {
-                    "Str": "article-journal"
-                  }
-                ]
+                ],
+                "tag": "MetaInlines"
               },
               "volume": {
-                "MetaString": "6"
-              },
-              "container-title": {
-                "MetaInlines": [
-                  {
-                    "Str": "Journal"
-                  },
-                  {
-                    "Space": []
-                  },
-                  {
-                    "Str": "of"
-                  },
-                  {
-                    "Space": []
-                  },
-                  {
-                    "Str": "Generic"
-                  },
-                  {
-                    "Space": []
-                  },
-                  {
-                    "Str": "Studies"
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "MetaMap": {
-              "author": {
-                "MetaList": [
-                  {
-                    "MetaMap": {
-                      "family": {
-                        "MetaInlines": [
-                          {
-                            "Str": "Doe"
-                          }
-                        ]
-                      },
-                      "given": {
-                        "MetaList": [
-                          {
-                            "MetaInlines": [
-                              {
-                                "Str": "John"
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    }
-                  },
-                  {
-                    "MetaMap": {
-                      "family": {
-                        "MetaInlines": [
-                          {
-                            "Str": "Roe"
-                          }
-                        ]
-                      },
-                      "given": {
-                        "MetaList": [
-                          {
-                            "MetaInlines": [
-                              {
-                                "Str": "Jenny"
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    }
-                  }
-                ]
-              },
-              "editor": {
-                "MetaMap": {
-                  "family": {
-                    "MetaInlines": [
-                      {
-                        "Str": "Smith"
-                      }
-                    ]
-                  },
-                  "given": {
-                    "MetaList": [
-                      {
-                        "MetaInlines": [
-                          {
-                            "Str": "Sam"
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                }
-              },
-              "title": {
-                "MetaInlines": [
-                  {
-                    "Str": "Why"
-                  },
-                  {
-                    "Space": []
-                  },
-                  {
-                    "Str": "Water"
-                  },
-                  {
-                    "Space": []
-                  },
-                  {
-                    "Str": "Is"
-                  },
-                  {
-                    "Space": []
-                  },
-                  {
-                    "Str": "Wet"
-                  }
-                ]
+                "val": "6",
+                "tag": "MetaString"
               },
               "id": {
-                "MetaInlines": [
+                "val": [
                   {
-                    "Str": "пункт3"
+                    "val": "item2",
+                    "tag": "Str"
                   }
-                ]
+                ],
+                "tag": "MetaInlines"
               },
               "issued": {
-                "MetaMap": {
+                "val": {
                   "year": {
-                    "MetaString": "2007"
+                    "val": "2006",
+                    "tag": "MetaString"
                   }
-                }
+                },
+                "tag": "MetaMap"
               },
-              "publisher": {
-                "MetaInlines": [
-                  {
-                    "Str": "Oxford"
+              "author": {
+                "val": {
+                  "given": {
+                    "val": [
+                      {
+                        "val": [
+                          {
+                            "val": "John",
+                            "tag": "Str"
+                          }
+                        ],
+                        "tag": "MetaInlines"
+                      }
+                    ],
+                    "tag": "MetaList"
                   },
-                  {
-                    "Space": []
-                  },
-                  {
-                    "Str": "University"
-                  },
-                  {
-                    "Space": []
-                  },
-                  {
-                    "Str": "Press"
+                  "family": {
+                    "val": [
+                      {
+                        "val": "Doe",
+                        "tag": "Str"
+                      }
+                    ],
+                    "tag": "MetaInlines"
                   }
-                ]
-              },
-              "type": {
-                "MetaInlines": [
-                  {
-                    "Str": "chapter"
-                  }
-                ]
-              },
-              "publisher-place": {
-                "MetaInlines": [
-                  {
-                    "Str": "Oxford"
-                  }
-                ]
+                },
+                "tag": "MetaMap"
               },
               "container-title": {
-                "MetaInlines": [
+                "val": [
                   {
-                    "Str": "Third"
+                    "val": "Journal",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "Book"
+                    "val": "of",
+                    "tag": "Str"
+                  },
+                  {
+                    "val": [],
+                    "tag": "Space"
+                  },
+                  {
+                    "val": "Generic",
+                    "tag": "Str"
+                  },
+                  {
+                    "val": [],
+                    "tag": "Space"
+                  },
+                  {
+                    "val": "Studies",
+                    "tag": "Str"
                   }
-                ]
+                ],
+                "tag": "MetaInlines"
+              },
+              "type": {
+                "val": [
+                  {
+                    "val": "article-journal",
+                    "tag": "Str"
+                  }
+                ],
+                "tag": "MetaInlines"
               }
-            }
+            },
+            "tag": "MetaMap"
+          },
+          {
+            "val": {
+              "title": {
+                "val": [
+                  {
+                    "val": "Why",
+                    "tag": "Str"
+                  },
+                  {
+                    "val": [],
+                    "tag": "Space"
+                  },
+                  {
+                    "val": "Water",
+                    "tag": "Str"
+                  },
+                  {
+                    "val": [],
+                    "tag": "Space"
+                  },
+                  {
+                    "val": "Is",
+                    "tag": "Str"
+                  },
+                  {
+                    "val": [],
+                    "tag": "Space"
+                  },
+                  {
+                    "val": "Wet",
+                    "tag": "Str"
+                  }
+                ],
+                "tag": "MetaInlines"
+              },
+              "id": {
+                "val": [
+                  {
+                    "val": "пункт3",
+                    "tag": "Str"
+                  }
+                ],
+                "tag": "MetaInlines"
+              },
+              "issued": {
+                "val": {
+                  "year": {
+                    "val": "2007",
+                    "tag": "MetaString"
+                  }
+                },
+                "tag": "MetaMap"
+              },
+              "author": {
+                "val": [
+                  {
+                    "val": {
+                      "given": {
+                        "val": [
+                          {
+                            "val": [
+                              {
+                                "val": "John",
+                                "tag": "Str"
+                              }
+                            ],
+                            "tag": "MetaInlines"
+                          }
+                        ],
+                        "tag": "MetaList"
+                      },
+                      "family": {
+                        "val": [
+                          {
+                            "val": "Doe",
+                            "tag": "Str"
+                          }
+                        ],
+                        "tag": "MetaInlines"
+                      }
+                    },
+                    "tag": "MetaMap"
+                  },
+                  {
+                    "val": {
+                      "given": {
+                        "val": [
+                          {
+                            "val": [
+                              {
+                                "val": "Jenny",
+                                "tag": "Str"
+                              }
+                            ],
+                            "tag": "MetaInlines"
+                          }
+                        ],
+                        "tag": "MetaList"
+                      },
+                      "family": {
+                        "val": [
+                          {
+                            "val": "Roe",
+                            "tag": "Str"
+                          }
+                        ],
+                        "tag": "MetaInlines"
+                      }
+                    },
+                    "tag": "MetaMap"
+                  }
+                ],
+                "tag": "MetaList"
+              },
+              "container-title": {
+                "val": [
+                  {
+                    "val": "Third",
+                    "tag": "Str"
+                  },
+                  {
+                    "val": [],
+                    "tag": "Space"
+                  },
+                  {
+                    "val": "Book",
+                    "tag": "Str"
+                  }
+                ],
+                "tag": "MetaInlines"
+              },
+              "editor": {
+                "val": {
+                  "given": {
+                    "val": [
+                      {
+                        "val": [
+                          {
+                            "val": "Sam",
+                            "tag": "Str"
+                          }
+                        ],
+                        "tag": "MetaInlines"
+                      }
+                    ],
+                    "tag": "MetaList"
+                  },
+                  "family": {
+                    "val": [
+                      {
+                        "val": "Smith",
+                        "tag": "Str"
+                      }
+                    ],
+                    "tag": "MetaInlines"
+                  }
+                },
+                "tag": "MetaMap"
+              },
+              "publisher": {
+                "val": [
+                  {
+                    "val": "Oxford",
+                    "tag": "Str"
+                  },
+                  {
+                    "val": [],
+                    "tag": "Space"
+                  },
+                  {
+                    "val": "University",
+                    "tag": "Str"
+                  },
+                  {
+                    "val": [],
+                    "tag": "Space"
+                  },
+                  {
+                    "val": "Press",
+                    "tag": "Str"
+                  }
+                ],
+                "tag": "MetaInlines"
+              },
+              "type": {
+                "val": [
+                  {
+                    "val": "chapter",
+                    "tag": "Str"
+                  }
+                ],
+                "tag": "MetaInlines"
+              },
+              "publisher-place": {
+                "val": [
+                  {
+                    "val": "Oxford",
+                    "tag": "Str"
+                  }
+                ],
+                "tag": "MetaInlines"
+              }
+            },
+            "tag": "MetaMap"
           }
-        ]
+        ],
+        "tag": "MetaList"
       }
     }
   },
   [
     {
-      "Header": [
+      "val": [
         1,
         [
           "pandoc-with-citeproc-hs",
@@ -359,1078 +459,1346 @@
         ],
         [
           {
-            "Str": "Pandoc"
+            "val": "Pandoc",
+            "tag": "Str"
           },
           {
-            "Space": []
+            "val": [],
+            "tag": "Space"
           },
           {
-            "Str": "with"
+            "val": "with",
+            "tag": "Str"
           },
           {
-            "Space": []
+            "val": [],
+            "tag": "Space"
           },
           {
-            "Str": "citeproc-hs"
+            "val": "citeproc-hs",
+            "tag": "Str"
           }
         ]
-      ]
+      ],
+      "tag": "Header"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "nonexistent",
                 "citationSuffix": [],
                 "citationHash": 0,
-                "citationMode": {
-                  "NormalCitation": []
-                },
                 "citationPrefix": [],
-                "citationId": "nonexistent"
+                "citationMode": {
+                  "val": [],
+                  "tag": "NormalCitation"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "nonexistent",
                 "citationSuffix": [],
                 "citationHash": 0,
-                "citationMode": {
-                  "AuthorInText": []
-                },
                 "citationPrefix": [],
-                "citationId": "nonexistent"
+                "citationMode": {
+                  "val": [],
+                  "tag": "AuthorInText"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "item1",
                 "citationSuffix": [],
                 "citationHash": 0,
-                "citationMode": {
-                  "AuthorInText": []
-                },
                 "citationPrefix": [],
-                "citationId": "item1"
+                "citationMode": {
+                  "val": [],
+                  "tag": "AuthorInText"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "says"
+          "val": "says",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "blah."
+          "val": "blah.",
+          "tag": "Str"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "Str": "p."
+                    "val": "p.",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "30"
+                    "val": "30",
+                    "tag": "Str"
                   }
                 ],
                 "citationHash": 0,
-                "citationMode": {
-                  "AuthorInText": []
-                },
                 "citationPrefix": [],
-                "citationId": "item1"
+                "citationMode": {
+                  "val": [],
+                  "tag": "AuthorInText"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "says"
+          "val": "says",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "blah."
+          "val": "blah.",
+          "tag": "Str"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "Str": "p."
+                    "val": "p.",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "30,"
+                    "val": "30,",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "with"
+                    "val": "with",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "suffix"
+                    "val": "suffix",
+                    "tag": "Str"
                   }
                 ],
                 "citationHash": 0,
-                "citationMode": {
-                  "AuthorInText": []
-                },
                 "citationPrefix": [],
-                "citationId": "item1"
+                "citationMode": {
+                  "val": [],
+                  "tag": "AuthorInText"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "says"
+          "val": "says",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "blah."
+          "val": "blah.",
+          "tag": "Str"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "item1",
                 "citationSuffix": [],
                 "citationHash": 0,
-                "citationMode": {
-                  "AuthorInText": []
-                },
                 "citationPrefix": [],
-                "citationId": "item1"
+                "citationMode": {
+                  "val": [],
+                  "tag": "AuthorInText"
+                },
+                "citationNoteNum": 0
               },
               {
-                "citationNoteNum": 0,
+                "citationId": "item2",
                 "citationSuffix": [
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "p."
+                    "val": "p.",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "30"
+                    "val": "30",
+                    "tag": "Str"
                   }
                 ],
                 "citationHash": 0,
-                "citationMode": {
-                  "SuppressAuthor": []
-                },
                 "citationPrefix": [],
-                "citationId": "item2"
+                "citationMode": {
+                  "val": [],
+                  "tag": "SuppressAuthor"
+                },
+                "citationNoteNum": 0
               },
               {
-                "citationNoteNum": 0,
+                "citationId": "пункт3",
                 "citationSuffix": [],
                 "citationHash": 0,
-                "citationMode": {
-                  "NormalCitation": []
-                },
                 "citationPrefix": [
                   {
-                    "Str": "see"
+                    "val": "see",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "also"
+                    "val": "also",
+                    "tag": "Str"
                   }
                 ],
-                "citationId": "пункт3"
+                "citationMode": {
+                  "val": [],
+                  "tag": "NormalCitation"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "says"
+          "val": "says",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "blah."
+          "val": "blah.",
+          "tag": "Str"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Str": "In"
+          "val": "In",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "a"
+          "val": "a",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "note."
+          "val": "note.",
+          "tag": "Str"
         },
         {
-          "Note": [
+          "val": [
             {
-              "Para": [
+              "val": [
                 {
-                  "Cite": [
+                  "val": [
                     [
                       {
-                        "citationNoteNum": 0,
+                        "citationId": "пункт3",
                         "citationSuffix": [
                           {
-                            "Str": "p."
+                            "val": "p.",
+                            "tag": "Str"
                           },
                           {
-                            "Space": []
+                            "val": [],
+                            "tag": "Space"
                           },
                           {
-                            "Str": "12"
+                            "val": "12",
+                            "tag": "Str"
                           }
                         ],
                         "citationHash": 0,
-                        "citationMode": {
-                          "AuthorInText": []
-                        },
                         "citationPrefix": [],
-                        "citationId": "пункт3"
+                        "citationMode": {
+                          "val": [],
+                          "tag": "AuthorInText"
+                        },
+                        "citationNoteNum": 0
                       }
                     ],
                     [
                       {
-                        "Str": "???"
+                        "val": "???",
+                        "tag": "Str"
                       }
                     ]
-                  ]
+                  ],
+                  "tag": "Cite"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "and"
+                  "val": "and",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "a"
+                  "val": "a",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "citation"
+                  "val": "citation",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "without"
+                  "val": "without",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "locators"
+                  "val": "locators",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Cite": [
+                  "val": [
                     [
                       {
-                        "citationNoteNum": 0,
+                        "citationId": "пункт3",
                         "citationSuffix": [],
                         "citationHash": 0,
-                        "citationMode": {
-                          "NormalCitation": []
-                        },
                         "citationPrefix": [],
-                        "citationId": "пункт3"
+                        "citationMode": {
+                          "val": [],
+                          "tag": "NormalCitation"
+                        },
+                        "citationNoteNum": 0
                       }
                     ],
                     [
                       {
-                        "Str": "???"
+                        "val": "???",
+                        "tag": "Str"
                       }
                     ]
-                  ]
+                  ],
+                  "tag": "Cite"
                 },
                 {
-                  "Str": "."
+                  "val": ".",
+                  "tag": "Str"
                 }
-              ]
+              ],
+              "tag": "Para"
             }
-          ]
+          ],
+          "tag": "Note"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Str": "A"
+          "val": "A",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "citation"
+          "val": "citation",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "group"
+          "val": "group",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "chap."
+                    "val": "chap.",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "3"
+                    "val": "3",
+                    "tag": "Str"
                   }
                 ],
                 "citationHash": 0,
-                "citationMode": {
-                  "NormalCitation": []
-                },
                 "citationPrefix": [
                   {
-                    "Str": "see"
+                    "val": "see",
+                    "tag": "Str"
                   }
                 ],
-                "citationId": "item1"
+                "citationMode": {
+                  "val": [],
+                  "tag": "NormalCitation"
+                },
+                "citationNoteNum": 0
               },
               {
-                "citationNoteNum": 0,
+                "citationId": "пункт3",
                 "citationSuffix": [
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "p."
+                    "val": "p.",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "34-35"
+                    "val": "34-35",
+                    "tag": "Str"
                   }
                 ],
                 "citationHash": 0,
-                "citationMode": {
-                  "NormalCitation": []
-                },
                 "citationPrefix": [
                   {
-                    "Str": "also"
+                    "val": "also",
+                    "tag": "Str"
                   }
                 ],
-                "citationId": "пункт3"
+                "citationMode": {
+                  "val": [],
+                  "tag": "NormalCitation"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         },
         {
-          "Str": "."
+          "val": ".",
+          "tag": "Str"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Str": "Another"
+          "val": "Another",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "one"
+          "val": "one",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "p."
+                    "val": "p.",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "34-35"
+                    "val": "34-35",
+                    "tag": "Str"
                   }
                 ],
                 "citationHash": 0,
-                "citationMode": {
-                  "NormalCitation": []
-                },
                 "citationPrefix": [
                   {
-                    "Str": "see"
+                    "val": "see",
+                    "tag": "Str"
                   }
                 ],
-                "citationId": "item1"
+                "citationMode": {
+                  "val": [],
+                  "tag": "NormalCitation"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         },
         {
-          "Str": "."
+          "val": ".",
+          "tag": "Str"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Str": "And"
+          "val": "And",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "another"
+          "val": "another",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "one"
+          "val": "one",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "in"
+          "val": "in",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "a"
+          "val": "a",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "note."
+          "val": "note.",
+          "tag": "Str"
         },
         {
-          "Note": [
+          "val": [
             {
-              "Para": [
+              "val": [
                 {
-                  "Str": "Some"
+                  "val": "Some",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "citations"
+                  "val": "citations",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Cite": [
+                  "val": [
                     [
                       {
-                        "citationNoteNum": 0,
+                        "citationId": "item1",
                         "citationSuffix": [
                           {
-                            "Space": []
+                            "val": [],
+                            "tag": "Space"
                           },
                           {
-                            "Str": "chap."
+                            "val": "chap.",
+                            "tag": "Str"
                           },
                           {
-                            "Space": []
+                            "val": [],
+                            "tag": "Space"
                           },
                           {
-                            "Str": "3"
+                            "val": "3",
+                            "tag": "Str"
                           }
                         ],
                         "citationHash": 0,
-                        "citationMode": {
-                          "NormalCitation": []
-                        },
                         "citationPrefix": [
                           {
-                            "Str": "see"
+                            "val": "see",
+                            "tag": "Str"
                           }
                         ],
-                        "citationId": "item1"
+                        "citationMode": {
+                          "val": [],
+                          "tag": "NormalCitation"
+                        },
+                        "citationNoteNum": 0
                       },
                       {
-                        "citationNoteNum": 0,
+                        "citationId": "пункт3",
                         "citationSuffix": [],
                         "citationHash": 0,
-                        "citationMode": {
-                          "NormalCitation": []
-                        },
                         "citationPrefix": [],
-                        "citationId": "пункт3"
+                        "citationMode": {
+                          "val": [],
+                          "tag": "NormalCitation"
+                        },
+                        "citationNoteNum": 0
                       },
                       {
-                        "citationNoteNum": 0,
+                        "citationId": "item2",
                         "citationSuffix": [],
                         "citationHash": 0,
-                        "citationMode": {
-                          "NormalCitation": []
-                        },
                         "citationPrefix": [],
-                        "citationId": "item2"
+                        "citationMode": {
+                          "val": [],
+                          "tag": "NormalCitation"
+                        },
+                        "citationNoteNum": 0
                       }
                     ],
                     [
                       {
-                        "Str": "???"
+                        "val": "???",
+                        "tag": "Str"
                       }
                     ]
-                  ]
+                  ],
+                  "tag": "Cite"
                 },
                 {
-                  "Str": "."
+                  "val": ".",
+                  "tag": "Str"
                 }
-              ]
+              ],
+              "tag": "Para"
             }
-          ]
+          ],
+          "tag": "Note"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Str": "Citation"
+          "val": "Citation",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "with"
+          "val": "with",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "a"
+          "val": "a",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "suffix"
+          "val": "suffix",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "and"
+          "val": "and",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "locator"
+          "val": "locator",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "pp."
+                    "val": "pp.",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "33,"
+                    "val": "33,",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "35-37,"
+                    "val": "35-37,",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "and"
+                    "val": "and",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "nowhere"
+                    "val": "nowhere",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "else"
+                    "val": "else",
+                    "tag": "Str"
                   }
                 ],
                 "citationHash": 0,
-                "citationMode": {
-                  "NormalCitation": []
-                },
                 "citationPrefix": [],
-                "citationId": "item1"
+                "citationMode": {
+                  "val": [],
+                  "tag": "NormalCitation"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         },
         {
-          "Str": "."
+          "val": ".",
+          "tag": "Str"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Str": "Citation"
+          "val": "Citation",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "with"
+          "val": "with",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "suffix"
+          "val": "suffix",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "only"
+          "val": "only",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "and"
+                    "val": "and",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "nowhere"
+                    "val": "nowhere",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "else"
+                    "val": "else",
+                    "tag": "Str"
                   }
                 ],
                 "citationHash": 0,
-                "citationMode": {
-                  "NormalCitation": []
-                },
                 "citationPrefix": [],
-                "citationId": "item1"
+                "citationMode": {
+                  "val": [],
+                  "tag": "NormalCitation"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         },
         {
-          "Str": "."
+          "val": ".",
+          "tag": "Str"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Str": "Now"
+          "val": "Now",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "some"
+          "val": "some",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "modifiers."
+          "val": "modifiers.",
+          "tag": "Str"
         },
         {
-          "Note": [
+          "val": [
             {
-              "Para": [
+              "val": [
                 {
-                  "Str": "Like"
+                  "val": "Like",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "a"
+                  "val": "a",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "citation"
+                  "val": "citation",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "without"
+                  "val": "without",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "author:"
+                  "val": "author:",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Cite": [
+                  "val": [
                     [
                       {
-                        "citationNoteNum": 0,
+                        "citationId": "item1",
                         "citationSuffix": [],
                         "citationHash": 0,
-                        "citationMode": {
-                          "SuppressAuthor": []
-                        },
                         "citationPrefix": [],
-                        "citationId": "item1"
+                        "citationMode": {
+                          "val": [],
+                          "tag": "SuppressAuthor"
+                        },
+                        "citationNoteNum": 0
                       }
                     ],
                     [
                       {
-                        "Str": "???"
+                        "val": "???",
+                        "tag": "Str"
                       }
                     ]
-                  ]
+                  ],
+                  "tag": "Cite"
                 },
                 {
-                  "Str": ","
+                  "val": ",",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "and"
+                  "val": "and",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "now"
+                  "val": "now",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "Doe"
+                  "val": "Doe",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "with"
+                  "val": "with",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "a"
+                  "val": "a",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Str": "locator"
+                  "val": "locator",
+                  "tag": "Str"
                 },
                 {
-                  "Space": []
+                  "val": [],
+                  "tag": "Space"
                 },
                 {
-                  "Cite": [
+                  "val": [
                     [
                       {
-                        "citationNoteNum": 0,
+                        "citationId": "item2",
                         "citationSuffix": [
                           {
-                            "Space": []
+                            "val": [],
+                            "tag": "Space"
                           },
                           {
-                            "Str": "p."
+                            "val": "p.",
+                            "tag": "Str"
                           },
                           {
-                            "Space": []
+                            "val": [],
+                            "tag": "Space"
                           },
                           {
-                            "Str": "44"
+                            "val": "44",
+                            "tag": "Str"
                           }
                         ],
                         "citationHash": 0,
-                        "citationMode": {
-                          "SuppressAuthor": []
-                        },
                         "citationPrefix": [],
-                        "citationId": "item2"
+                        "citationMode": {
+                          "val": [],
+                          "tag": "SuppressAuthor"
+                        },
+                        "citationNoteNum": 0
                       }
                     ],
                     [
                       {
-                        "Str": "???"
+                        "val": "???",
+                        "tag": "Str"
                       }
                     ]
-                  ]
+                  ],
+                  "tag": "Cite"
                 },
                 {
-                  "Str": "."
+                  "val": ".",
+                  "tag": "Str"
                 }
-              ]
+              ],
+              "tag": "Para"
             }
-          ]
+          ],
+          "tag": "Note"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Para": [
+      "val": [
         {
-          "Str": "With"
+          "val": "With",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "some"
+          "val": "some",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Str": "markup"
+          "val": "markup",
+          "tag": "Str"
         },
         {
-          "Space": []
+          "val": [],
+          "tag": "Space"
         },
         {
-          "Cite": [
+          "val": [
             [
               {
-                "citationNoteNum": 0,
+                "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Str": "p."
+                    "val": "p.",
+                    "tag": "Str"
                   },
                   {
-                    "Space": []
+                    "val": [],
+                    "tag": "Space"
                   },
                   {
-                    "Strong": [
+                    "val": [
                       {
-                        "Str": "32"
+                        "val": "32",
+                        "tag": "Str"
                       }
-                    ]
+                    ],
+                    "tag": "Strong"
                   }
                 ],
                 "citationHash": 0,
-                "citationMode": {
-                  "NormalCitation": []
-                },
                 "citationPrefix": [
                   {
-                    "Emph": [
+                    "val": [
                       {
-                        "Str": "see"
+                        "val": "see",
+                        "tag": "Str"
                       }
-                    ]
+                    ],
+                    "tag": "Emph"
                   }
                 ],
-                "citationId": "item1"
+                "citationMode": {
+                  "val": [],
+                  "tag": "NormalCitation"
+                },
+                "citationNoteNum": 0
               }
             ],
             [
               {
-                "Str": "???"
+                "val": "???",
+                "tag": "Str"
               }
             ]
-          ]
+          ],
+          "tag": "Cite"
         },
         {
-          "Str": "."
+          "val": ".",
+          "tag": "Str"
         }
-      ]
+      ],
+      "tag": "Para"
     },
     {
-      "Header": [
+      "val": [
         1,
         [
           "references",
@@ -1439,10 +1807,12 @@
         ],
         [
           {
-            "Str": "References"
+            "val": "References",
+            "tag": "Str"
           }
         ]
-      ]
+      ],
+      "tag": "Header"
     }
   ]
 ]
