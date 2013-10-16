@@ -19,7 +19,7 @@ import qualified Data.Yaml as Yaml (decode)
 
 main = do
   citeprocTests <- mapM testCase ["chicago-author-date", "ieee", "mhra"]
-  fs <- filter (\f -> takeExtension f `elem` ["bibtex","biblatex"])
+  fs <- filter (\f -> takeExtension f `elem` [".bibtex",".biblatex"])
            `fmap` getDirectoryContents "tests/biblio2yaml"
   biblio2yamlTests <- mapM biblio2yamlTest fs
   if all id citeprocTests && all id biblio2yamlTests
@@ -83,7 +83,7 @@ biblio2yamlTest fp = do
   (ec, result, errout) <- pipeProcess
                      (Just [("LANG","en_US.UTF-8"),("HOME",".")])
                      "dist/build/biblio2yaml/biblio2yaml"
-                     ["-f", takeExtension fp] bib
+                     ["-f", drop 1 $ takeExtension fp] bib
   if ec == ExitSuccess
      then do
        let expected' :: Maybe Aeson.Value

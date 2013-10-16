@@ -88,6 +88,8 @@ data-files:         chicago-author-date.csl
                     tests/ieee.csl
                     tests/mhra.csl
                     tests/biblio2yaml/basic.bibtex
+                    tests/biblio2yaml/article.biblatex
+                    tests/biblio2yaml/test-case-conversion.biblatex
                     -- documentation
                     README.md
                     LICENSE
