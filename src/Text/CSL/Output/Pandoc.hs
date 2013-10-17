@@ -124,7 +124,7 @@ renderFo sty fo
                                       ,"the","till","to","up","via","with","yet"]
       text_case _ [] = []
       text_case fm a@(i:is)
-          | noCase fm                         = [escape "nocase" a]
+          | noCase fm                         = [Span ("",["nocase"],[]) a]
           | "lowercase"        <- textCase fm = map (setCase' $ map toLower) a
           | "uppercase"        <- textCase fm = map (setCase' $ map toUpper) a
           | "capitalize-all"   <- textCase fm = map (setCase  $ unwords . map toCap      . words) a
