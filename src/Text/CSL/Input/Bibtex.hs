@@ -495,9 +495,12 @@ untc :: [Inline] -> [Inline]
 untc [] = []
 untc (x:xs) = x : map go xs
   where go (Str ys)     = Str $ map toLower ys
-        go (Span _ (Str (y:ys) : zs))
-          | isLower y   = Span ("",["nocase"],[]) (Str (y:ys) : zs)
+        go (Span _ ys)
+          | hasLowercaseWord ys = Span ("",["nocase"],[]) ys
         go z            = z
+        hasLowercaseWord = any isLowercaseWord
+        isLowercaseWord (Str (y:_)) = isLower y
+        isLowercaseWord _           = False
 
 toLocale :: String -> String
 toLocale "english"    = "en-US" -- "en-EN" unavailable in CSL
