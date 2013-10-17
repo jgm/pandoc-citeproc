@@ -94,15 +94,14 @@ instance FromJSON Agent where
   parseJSON _ = mzero
 
 instance ToJSON Agent where
-  toJSON agent = object' [
+  toJSON agent = object' $ [
       "given" .= givenName agent
     , "dropping-particle" .= droppingPart agent
     , "non-dropping-particle" .= nonDroppingPart agent
     , "family" .= familyName agent
     , "suffix" .= nameSuffix agent
     , "literal" .= literal agent
-    , "comma-suffix" .= commaSuffix agent
-    ]
+    ] ++ ["comma-suffix" .= commaSuffix agent | not (null (nameSuffix agent))]
 
 instance FromJSON [Agent] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
@@ -660,7 +659,6 @@ object' = object . filter (not . isempty)
         isempty (_, String t) = T.null t
         isempty ("first-reference-note-number", Aeson.Number n) = n == 0
         isempty ("citation-number", Aeson.Number n) = n == 0
-        isempty ("comma-suffix", Bool b) = not b
         isempty (_, _)        = False
 
 safeRead :: (Monad m, Read a) => String -> m a
