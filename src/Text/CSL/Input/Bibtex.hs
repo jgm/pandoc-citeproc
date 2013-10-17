@@ -361,10 +361,10 @@ getRawField f = do
        Just x  -> return x
        Nothing -> notFound f
 
-getAuthorList :: Bool -> String -> Bib [Agent]
-getAuthorList useprefix f = do
+getAuthorList :: Options -> String -> Bib [Agent]
+getAuthorList opts  f = do
   fs <- asks fields
-  case lookup f fs >>= latexAuthors useprefix of
+  case lookup f fs >>= latexAuthors opts of
        Just xs -> return xs
        Nothing -> notFound f
 
@@ -388,13 +388,13 @@ toLiteralList [Para xs] =
 toLiteralList [Plain xs] = toLiteralList [Para xs]
 toLiteralList _ = mzero
 
-toAuthorList :: MonadPlus m => Bool -> [Block] -> m [Agent]
-toAuthorList useprefix [Para xs] =
-  return $ map (toAuthor useprefix) $ splitByAnd xs
-toAuthorList useprefix [Plain xs] = toAuthorList useprefix [Para xs]
+toAuthorList :: MonadPlus m => Options -> [Block] -> m [Agent]
+toAuthorList opts [Para xs] =
+  return $ map (toAuthor opts) $ splitByAnd xs
+toAuthorList opts [Plain xs] = toAuthorList opts [Para xs]
 toAuthorList _ _ = mzero
 
-toAuthor :: Bool -> [Inline] -> Agent
+toAuthor :: Options -> [Inline] -> Agent
 toAuthor _ [Str "others"] =
     Agent { givenName       = []
           , droppingPart    = ""
@@ -416,7 +416,7 @@ toAuthor _ [Span ("",[],[]) ils] = -- corporate author
 -- First von Last
 -- von Last, First
 -- von Last, Jr ,First
-toAuthor useprefix ils =
+toAuthor opts ils =
     Agent { givenName       = givens
           , droppingPart    = if useprefix then "" else prefix
           , nonDroppingPart = if useprefix then prefix else ""
@@ -425,7 +425,8 @@ toAuthor useprefix ils =
           , literal         = ""
           , commaSuffix     = not (null suffix)
           }
-  where commaParts = map words' $ splitWhen (== Str ",") $ separateCommas ils
+  where useprefix = maybe False (== "true") $ lookup "useprefix" opts
+        commaParts = map words' $ splitWhen (== Str ",") $ separateCommas ils
         words' = wordsBy (== Space)
         isCapitalized (Str (c:cs) : rest)
           | isUpper c = True
@@ -477,8 +478,8 @@ latexTitle (Lang l _) s = trim `fmap` blocksToString (processTitle bs)
                           'e':'n':_ -> unTitlecase
                           _         -> id
 
-latexAuthors :: MonadPlus m => Bool -> String -> m [Agent]
-latexAuthors useprefix s = toAuthorList useprefix bs
+latexAuthors :: MonadPlus m => Options -> String -> m [Agent]
+latexAuthors opts s = toAuthorList opts bs
   where Pandoc _ bs = readLaTeX def s
 
 bib :: Bib Reference -> Item -> Maybe Reference
@@ -566,7 +567,9 @@ concatWith sep xs = foldl go "" xs
                            (x:_) | x `elem` "!?.,:;" -> accum ++ " " ++ s
                                  | otherwise         -> accum ++ [sep, ' '] ++ s
 
-parseOptions :: String -> [(String, String)]
+type Options = [(String, String)]
+
+parseOptions :: String -> Options
 parseOptions = map breakOpt . splitWhen (==',')
   where breakOpt x = case break (=='=') x of
                           (w,v) -> (map toLower $ trim w,
@@ -578,8 +581,7 @@ itemToReference lang bibtex = bib $ do
   et <- asks entryType
   guard $ et /= "xdata"
   opts <- (parseOptions <$> getRawField "options") <|> return []
-  let useprefix = maybe False (=="true") $ lookup "useprefix" opts
-  let getAuthorList' = getAuthorList useprefix
+  let getAuthorList' = getAuthorList opts
   st <- getRawField "entrysubtype" <|> return ""
   let (reftype, refgenre) = case et of
        "article"
