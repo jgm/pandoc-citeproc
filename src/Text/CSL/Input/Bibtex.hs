@@ -23,7 +23,7 @@ import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
                            dropBlanks, split)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper, isDigit)
+import Data.Char (toLower, isUpper, toUpper, isDigit, isLower)
 import Control.Monad
 import Control.Monad.Reader
 import System.Environment (getEnvironment)
@@ -495,6 +495,8 @@ untc :: [Inline] -> [Inline]
 untc [] = []
 untc (x:xs) = x : map go xs
   where go (Str ys)     = Str $ map toLower ys
+        go (Span _ (Str (y:ys) : zs))
+          | isLower y   = Span ("",["nocase"],[]) (Str (y:ys) : zs)
         go z            = z
 
 toLocale :: String -> String

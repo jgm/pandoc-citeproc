@@ -27,11 +27,9 @@ inlinesToString = fmap mconcat . mapM go
         go (Image xs _)     = inlinesToString xs
         go (RawInline f xs) | f == Format "citeproc"
                             = return xs
-        go (Span _ xs)      = do
-           s <- inlinesToString xs
-           return $ case s of
-                    (c:_) | isLower c -> inTag "span" [("class","nocase")] s
-                    _                 -> s
+        go (Span ("",[],[]) xs) = inlinesToString xs
+        go (Span (_,classes,_) xs) =
+           inTag "span" [("class",unwords classes)] <$> inlinesToString xs
         go (Note _)         = return ""
         go (LineBreak)      = return " "
         go (Math _ xs)      = do
