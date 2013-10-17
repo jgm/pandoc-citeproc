@@ -46,18 +46,19 @@ readBiblioFile :: FilePath -> IO [Reference]
 #ifdef USE_BIBUTILS
 readBiblioFile f
     = case getExt f of
-        ".mods"    -> readBiblioFile' f mods_in
-        ".bib"     -> readBibtexInput False f
-        ".bibtex"  -> readBibtexInput True f
-        ".ris"     -> readBiblioFile' f ris_in
-        ".enl"     -> readBiblioFile' f endnote_in
-        ".xml"     -> readBiblioFile' f endnotexml_in
-        ".wos"     -> readBiblioFile' f isi_in
-        ".medline" -> readBiblioFile' f medline_in
-        ".copac"   -> readBiblioFile' f copac_in
-        ".json"    -> readJsonInput f
-        ".native"  -> readFile f >>= return . decodeJSON
-        _          -> error $ "citeproc: the format of the bibliographic database could not be recognized\n" ++
+        ".mods"     -> readBiblioFile' f mods_in
+        ".bib"      -> readBibtexInput False f
+        ".bibtex"   -> readBibtexInput True f
+        ".biblatex" -> readBibtexInput False f
+        ".ris"      -> readBiblioFile' f ris_in
+        ".enl"      -> readBiblioFile' f endnote_in
+        ".xml"      -> readBiblioFile' f endnotexml_in
+        ".wos"      -> readBiblioFile' f isi_in
+        ".medline"  -> readBiblioFile' f medline_in
+        ".copac"    -> readBiblioFile' f copac_in
+        ".json"     -> readJsonInput f
+        ".native"   -> readFile f >>= return . decodeJSON
+        _           -> error $ "citeproc: the format of the bibliographic database could not be recognized\n" ++
                               "using the file extension."
 
 #else
