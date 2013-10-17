@@ -874,8 +874,6 @@ itemToReference lang bibtex = bib $ do
          , doi                 = doi'
          , isbn                = isbn'
          , issn                = issn'
-         , language            = if hyphenation == defaultHyphenation
-                                    then ""
-                                    else hyphenation
+         , language            = hyphenation
          , callNumber          = callNumber'
          }

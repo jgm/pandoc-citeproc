@@ -128,7 +128,7 @@ references:
     family: Translator
   url: http://foo.bar.baz/
   type: article-journal
-  doi: 10.1086/520976
+  doi: doi:10.1086/520976
   language: en-US
 ...
 

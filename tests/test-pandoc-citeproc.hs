@@ -86,15 +86,23 @@ biblio2yamlTest fp = do
                      ["-f", drop 1 $ takeExtension fp] bib
   if ec == ExitSuccess
      then do
-       let expected' :: Maybe Aeson.Value
-           expected' = Yaml.decode $ B.concat $ BL.toChunks expected
-       let actual'   :: Maybe Aeson.Value
-           actual' = Yaml.decode $ B.concat $ BL.toChunks result
-       if expected' == actual'
+       let expectedDoc :: Maybe Aeson.Value
+           expectedDoc = Yaml.decode $ B.concat $ BL.toChunks expected
+       let resultDoc   :: Maybe Aeson.Value
+           resultDoc   = Yaml.decode $ B.concat $ BL.toChunks result
+       let result' = maybe [] (BL.lines
+                     . encodePretty' Config{ confIndent = 2
+                                           , confCompare = compare } )
+                     resultDoc
+       let expected' = maybe [] (BL.lines
+                     . encodePretty' Config{ confIndent = 2
+                                           , confCompare = compare } )
+                     expectedDoc
+       if expected' == result'
           then return True
           else do
             err $ "FAILED: " ++ yamlf
-            let diff = getDiff (BL.words expected) (BL.words result)
+            let diff = getDiff expected' result'
             err $ showDiff (1,1) diff
             return False
      else do
