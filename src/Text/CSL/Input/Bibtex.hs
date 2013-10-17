@@ -423,9 +423,10 @@ toAuthor opts ils =
           , familyName      = family
           , nameSuffix      = suffix
           , literal         = ""
-          , commaSuffix     = not (null suffix)
+          , commaSuffix     = usecomma
           }
   where useprefix = maybe False (== "true") $ lookup "useprefix" opts
+        usecomma = maybe False (== "true") $ lookup "juniorcomma" opts
         commaParts = map words' $ splitWhen (== Str ",") $ separateCommas ils
         words' = wordsBy (== Space)
         isCapitalized (Str (c:cs) : rest)
