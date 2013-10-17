@@ -649,7 +649,7 @@ itemToReference lang bibtex = bib $ do
   let defaultHyphenation = case lang of
                                 Lang x y -> x ++ "-" ++ y
   hyphenation <- (toLocale <$> getRawField "hyphenation")
-                <|> return defaultHyphenation
+                <|> return ""
 
   -- authors:
   author' <- getAuthorList' "author" <|> return []
@@ -668,7 +668,10 @@ itemToReference lang bibtex = bib $ do
   let isPeriodical = et == "periodical"
   let hasVolumes = et `elem`
          ["inbook","incollection","inproceedings","bookinbook"]
-  let (la, co) = case splitOn "-" hyphenation of
+  let hyphenation' = if null hyphenation
+                     then defaultHyphenation
+                     else hyphenation
+  let (la, co) = case splitOn "-" hyphenation' of
                       [x]     -> (x, "")
                       (x:y:_) -> (x, y)
                       []      -> ("", "")
@@ -682,8 +685,8 @@ itemToReference lang bibtex = bib $ do
   containerTitle' <- (guard isPeriodical >> getField "title")
                   <|> getTitle' "maintitle"
                   <|> getTitle' "booktitle"
-                  <|> getField "journal"
                   <|> getField "journaltitle"
+                  <|> getField "journal"
                   <|> return ""
   containerSubtitle' <- (guard isPeriodical >> getField "subtitle")
                        <|> getTitle' "mainsubtitle"
