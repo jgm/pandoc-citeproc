@@ -55,7 +55,7 @@ testCase csl = do
        if result' == expected'
           then err "PASSED" >> return True
           else do
-            err "FAILED"
+            err $ "FAILED (-expected, +actual)"
             let diff = getDiff expected' result'
             err $ showDiff (1,1) diff
             return False
@@ -68,9 +68,9 @@ testCase csl = do
 showDiff :: (Int,Int) -> [Diff BL.ByteString] -> String
 showDiff _ []             = ""
 showDiff (l,r) (First ln : ds) =
-  printf "+%4d " l ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l+1,r) ds
+  printf "-%4d " l ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l+1,r) ds
 showDiff (l,r) (Second ln : ds) =
-  printf "-%4d " r ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l,r+1) ds
+  printf "+%4d " r ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l,r+1) ds
 showDiff (l,r) (Both _ _ : ds) =
   showDiff (l+1,r+1) ds
 
@@ -104,7 +104,7 @@ biblio2yamlTest fp = do
        if expected' == result'
           then err "PASSED" >> return True
           else do
-            err $ "FAILED"
+            err $ "FAILED (-expected, +actual)"
             let diff = getDiff expected' result'
             err $ showDiff (1,1) diff
             return False
