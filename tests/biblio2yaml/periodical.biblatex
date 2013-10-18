@@ -1,0 +1,24 @@
+@comment{excerpt from http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/examples/biblatex-examples.bib
+
+@periodical{jcg,
+	Annotation = {This is a \texttt{periodical} entry with an \texttt{issn} field.},
+	Issn = {0097-8493},
+	Issuetitle = {Semantic {3D} Media and Content},
+	Number = 4,
+	Title = {Computers and Graphics},
+	Volume = 35,
+	Year = 2011}
+
+---
+references:
+- annote: This is a periodical entry with an issn field.
+  issn: 0097-8493
+  issue: 4
+  title: Semantic 3D media and content
+  volume: 35
+  id: jcg
+  issued:
+    year: 2011
+  container-title: Computers and Graphics
+  type: article-journal
+...

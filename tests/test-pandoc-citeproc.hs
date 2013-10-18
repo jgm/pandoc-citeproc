@@ -31,7 +31,7 @@ err = hPutStrLn stderr
 
 testCase :: String -> IO Bool
 testCase csl = do
-  err $ "TEST: " ++ csl
+  hPutStr stderr $ "[" ++ csl ++ ".in.json] "
   indata <- BL.readFile $ "tests/" ++ csl ++ ".in.json"
   expected <- BL.readFile $ "tests/" ++ csl ++ ".expected.json"
   (ec, result, errout) <- pipeProcess
@@ -53,12 +53,14 @@ testCase csl = do
                                            , confCompare = compare } )
                      expectedDoc
        if result' == expected'
-          then return True
+          then err "PASSED" >> return True
           else do
+            err "FAILED"
             let diff = getDiff expected' result'
             err $ showDiff (1,1) diff
             return False
      else do
+       err "ERROR"
        err $ "Error status " ++ show ec
        err $ UTF8.toStringLazy errout
        return False
@@ -74,6 +76,7 @@ showDiff (l,r) (Both _ _ : ds) =
 
 biblio2yamlTest :: String -> IO Bool
 biblio2yamlTest fp = do
+  hPutStr stderr $ "[biblio2yaml/" ++ fp ++ "] "
   let yamlf = "tests/biblio2yaml/" ++ fp
   raw <- BL.readFile yamlf
   let yamlStart = BL.pack "---"
@@ -99,13 +102,14 @@ biblio2yamlTest fp = do
                                            , confCompare = compare } )
                      expectedDoc
        if expected' == result'
-          then return True
+          then err "PASSED" >> return True
           else do
-            err $ "FAILED: " ++ yamlf
+            err $ "FAILED"
             let diff = getDiff expected' result'
             err $ showDiff (1,1) diff
             return False
      else do
+       err "ERROR"
        err $ "Error status " ++ show ec
        err $ UTF8.toStringLazy errout
        return False

@@ -1,0 +1,98 @@
+@comment{adapted from http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/examples/biblatex-examples.bib}
+
+@string{cup = {Cambridge University Press}}
+
+@inproceedings{moraux,
+	Annotation = {This is a typical \texttt{inproceedings} entry. Note the \texttt{booksubtitle}, \texttt{shorttitle}, \texttt{indextitle}, and \texttt{indexsorttitle} fields. Also note the \texttt{eventdate} field.},
+	Author = {Moraux, Paul},
+	Booktitle = {Aristotle on Mind and the Senses},
+	Booktitleaddon = {Proceedings of the Seventh Symposium Aristotelicum},
+	Date = 1979,
+	Editor = {Lloyd, G. E. R. and Owen, G. E. L.},
+	Eventdate = 1975,
+	Hyphenation = {french},
+	Indexsorttitle = {De Anima dans la tradition grecque},
+	Indextitle = {\emph{De Anima} dans la tradition grècque, Le},
+	Keywords = {secondary},
+	Location = {Cambridge},
+	Pages = {281-324},
+	Publisher = cup,
+	Shorttitle = {\emph{De Anima} dans la tradition grècque},
+	Subtitle = {Quelques aspects de l'interpretation du traité, de Theophraste à Themistius},
+	Title = {Le \emph{De Anima} dans la tradition grècque}}
+
+@inproceedings{salam,
+	Author = {Salam, Abdus},
+	Booksubtitle = {Relativistic groups and analyticity},
+	Booktitle = {Elementary particle theory},
+	Booktitleaddon = {Proceedings of the Eighth {Nobel} Symposium},
+	Date = 1968,
+	Editor = {Svartholm, Nils},
+	Eventdate = {1968-05-19/1968-05-25},
+	Location = {Stockholm},
+	Pages = {367-377},
+	Publisher = {Almquist \& Wiksell},
+	Title = {Weak and Electromagnetic Interactions},
+	Venue = {Aspenäsgarden, Lerum}}
+---
+references:
+- title-short: "<i>De Anima</i> dans la tradition grècque"
+  annote: This is a typical inproceedings entry. Note the booksubtitle, shorttitle,
+    indextitle, and indexsorttitle fields. Also note the eventdate field.
+  keyword: secondary
+  page: 281-324
+  title: "Le <i>De Anima</i> dans la tradition grècque: Quelques aspects de l’interpretation
+    du traité, de Theophraste à Themistius"
+  event-date:
+    year: 1975
+  id: moraux
+  issued:
+    year: 1979
+  author:
+    given:
+    - Paul
+    family: Moraux
+  container-title: Aristotle on Mind and the Senses. Proceedings of the Seventh Symposium
+    Aristotelicum
+  editor:
+  - given:
+    - G.
+    - E.
+    - R.
+    family: Lloyd
+  - given:
+    - G.
+    - E.
+    - L.
+    family: Owen
+  publisher: Cambridge University Press
+  type: paper-conference
+  publisher-place: Cambridge
+  language: fr-FR
+- page: 367-377
+  title: Weak and electromagnetic interactions
+  event-date:
+  - day: 19
+    month: 05
+    year: 1968
+  - day: 25
+    month: 05
+    year: 1968
+  id: salam
+  issued:
+    year: 1968
+  author:
+    given:
+    - Abdus
+    family: Salam
+  container-title: ! 'Elementary particle theory: Relativistic groups and analyticity.
+    Proceedings of the eighth Nobel symposium'
+  editor:
+    given:
+    - Nils
+    family: Svartholm
+  publisher: Almquist & Wiksell
+  type: paper-conference
+  publisher-place: Stockholm
+  event-place: Aspenäsgarden, Lerum
+...

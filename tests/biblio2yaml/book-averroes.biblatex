@@ -1,0 +1,128 @@
+@comment{
+adapted from http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/examples/biblatex-examples.bib
+
+@book{averroes/bland,
+	Annotation = {A \texttt{book} entry with a \texttt{series} and a \texttt{number}. Note the concatenation of the \texttt{editor} and \texttt{translator} fields as well as the \texttt{indextitle} field},
+	Author = {Averroes},
+	Date = 1982,
+	Editor = {Bland, Kalman P.},
+	Hyphenation = {american},
+	Indextitle = {Epistle on the Possibility of Conjunction, The},
+	Keywords = {primary},
+	Location = {New York},
+	Number = 7,
+	Publisher = {Jewish Theological Seminary of America},
+	Series = {{Moreshet: Studies in Jewish History, Literature and Thought}},
+	Shorttitle = {Possibility of Conjunction},
+	Title = {The Epistle on the Possibility of Conjunction with the Active Intellect by {Ibn Rushd} with the Commentary of {Moses Narboni}},
+	Translator = {Bland, Kalman P.}}
+
+@book{averroes/hannes,
+	Annotation = {An annotated edition. Note the concatenation of the \texttt{editor}, \texttt{translator}, and \texttt{annotator} fields. Also note the \texttt{shorttitle}, \texttt{indextitle}, \texttt{sorttitle}, and \texttt{indexsorttitle} fields},
+	Annotator = {Hannes, Ludwig},
+	Author = {Averroes},
+	Date = 1892,
+	Editor = {Hannes, Ludwig},
+	Hyphenation = {german},
+	Indexsorttitle = {Uber die Moglichkeit der Conjunktion},
+	Indextitle = {Über die Möglichkeit der Conjunktion},
+	Keywords = {primary},
+	Location = {Halle an der Saale},
+	Publisher = {C.~A. Kaemmerer},
+	Shorttitle = {Über die Möglichkeit der Conjunktion},
+	Sorttitle = {Uber die Moglichkeit der Conjunktion},
+	Title = {Des Averroës Abhandlung: \mkbibquote{Über die Möglichkeit der Conjunktion} oder \mkbibquote{Über den materiellen Intellekt}},
+	Translator = {Hannes, Ludwig}}
+
+@book{averroes/hercz,
+	Annotation = {A \texttt{book} entry. Note the concatenation of the \texttt{editor} and \texttt{translator} fields as well as the \texttt{indextitle} and \texttt{indexsorttitle} fields},
+	Author = {Averroes},
+	Date = 1869,
+	Editor = {Hercz, J.},
+	Hyphenation = {german},
+	Indexsorttitle = {Drei Abhandlungen uber die Conjunction},
+	Indextitle = {Drei Abhandlungen über die Conjunction},
+	Keywords = {primary},
+	Location = {Berlin},
+	Publisher = {S.~Hermann},
+	Shorttitle = {Drei Abhandlungen},
+	Subtitle = {Von Averroes (Vater und Sohn), aus dem Arabischen übersetzt von Samuel Ibn Tibbon},
+	Title = {Drei Abhandlungen über die Conjunction des separaten Intellects mit dem Menschen},
+	Translator = {Hercz, J.}}
+---
+references:
+- title-short: Possibility of conjunction
+  annote: A book entry with a series and a number. Note the concatenation of the editor
+    and translator fields as well as the indextitle field
+  keyword: primary
+  title: The epistle on the possibility of conjunction with the active intellect by
+    Ibn Rushd with the commentary of Moses Narboni
+  id: averroes/bland
+  issued:
+    year: 1982
+  author:
+    family: Averroes
+  editor:
+    given:
+    - Kalman
+    - P.
+    family: Bland
+  translator:
+    given:
+    - Kalman
+    - P.
+    family: Bland
+  publisher: Jewish Theological Seminary of America
+  collection-title: ! 'Moreshet: Studies in Jewish History, Literature and Thought'
+  type: book
+  publisher-place: New York
+  collection-number: 7
+  language: en-US
+- title-short: "Über die Möglichkeit der Conjunktion"
+  annote: An annotated edition. Note the concatenation of the editor, translator,
+    and annotator fields. Also note the shorttitle, indextitle, sorttitle, and indexsorttitle
+    fields
+  keyword: primary
+  title: "Des Averroës Abhandlung: “Über die Möglichkeit der Conjunktion” oder “Über den materiellen Intellekt”"
+  id: averroes/hannes
+  issued:
+    year: 1892
+  author:
+    family: Averroes
+  editor:
+    given:
+    - Ludwig
+    family: Hannes
+  translator:
+    given:
+    - Ludwig
+    family: Hannes
+  publisher: "C. A. Kaemmerer"
+  type: book
+  publisher-place: Halle an der Saale
+  language: de-DE
+- title-short: Drei Abhandlungen
+  annote: A book entry. Note the concatenation of the editor and translator fields
+    as well as the indextitle and indexsorttitle fields
+  keyword: primary
+  title: "Drei Abhandlungen über die Conjunction des separaten Intellects mit
+    dem Menschen: Von Averroes (Vater und Sohn), aus dem Arabischen übersetzt von
+    Samuel Ibn Tibbon"
+  id: averroes/hercz
+  issued:
+    year: 1869
+  author:
+    family: Averroes
+  editor:
+    given:
+    - J.
+    family: Hercz
+  translator:
+    given:
+    - J.
+    family: Hercz
+  publisher: "S. Hermann"
+  type: book
+  publisher-place: Berlin
+  language: de-DE
+...

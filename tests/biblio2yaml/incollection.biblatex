@@ -1,0 +1,131 @@
+@comment{adapted from http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/examples/biblatex-examples.bib}
+
+@string{hup = {Harvard University Press}}
+
+@incollection{brandt,
+	Annotation = {An \texttt{incollection} entry with a \texttt{series} and a \texttt{number}. Note the format of the printed name and compare the \texttt{useprefix} option in the \texttt{options} field as well as \texttt{vangennep}. Also note the \texttt{indextitle, and \texttt{indexsorttitle} fields}},
+	Author = {von Brandt, Ahasver and Hoffmann, Erich},
+	Booktitle = {Europa im Hoch- und Spätmittelalter},
+	Date = 1987,
+	Editor = {Seibt, Ferdinand},
+	Hyphenation = {german},
+	Indexsorttitle = {Nordischen Lander von der Mitte des 11. Jahrhunderts bis 1448},
+	Indextitle = {Nordischen Länder von der Mitte des 11.~Jahrhunderts bis 1448, Die},
+	Location = {Stuttgart},
+	Number = 2,
+	Options = {useprefix=false},
+	Pages = {884-917},
+	Publisher = {Klett-Cotta},
+	Series = {Handbuch der europäischen Geschichte},
+	Shorttitle = {Die nordischen Länder},
+	Title = {Die nordischen Länder von der Mitte des 11.~Jahrhunderts bis 1448}}
+
+@incollection{hyman,
+	Annotation = {An \texttt{incollection} entry with a \texttt{series} and \texttt{number} field},
+	Author = {Hyman, Arthur},
+	Booktitle = {Studies in {Aristotle}},
+	Date = 1981,
+	Editor = {O'Meara, Dominic J.},
+	Hyphenation = {american},
+	Indextitle = {Aristotle's Theory of the Intellect},
+	Keywords = {secondary},
+	Location = {Washington, D.C.},
+	Number = 9,
+	Pages = {161-191},
+	Publisher = {The Catholic University of America Press},
+	Series = {Studies in Philosophy and the History of Philosophy},
+	Shorttitle = {Aristotle's Theory of the Intellect},
+	Title = {Aristotle's Theory of the Intellect and its Interpretation by {Averroes}}}
+
+@incollection{pines,
+	Annotation = {A typical \texttt{incollection} entry. Note the \texttt{indextitle} field},
+	Author = {Pines, Shlomo},
+	Booktitle = {Studies in Medieval {Jewish} History and Literature},
+	Date = 1979,
+	Editor = {Twersky, Isadore},
+	Hyphenation = {american},
+	Indextitle = {Limitations of Human Knowledge According to Al-Farabi, ibn Bajja, and Maimonides, The},
+	Keywords = {secondary},
+	Location = {Cambridge, Mass.},
+	Pages = {82-109},
+	Publisher = hup,
+	Shorttitle = {Limitations of Human Knowledge},
+	Title = {The Limitations of Human Knowledge According to {Al-Farabi}, {ibn Bajja}, and {Maimonides}}}
+
+---
+references:
+- title-short: Die nordischen Länder
+  annote: An incollection entry with a series and a number. Note the format of the
+    printed name and compare the useprefix option in the options field as well as
+    vangennep. Also note the indextitle, and indexsorttitle fields
+  page: 884-917
+  title: "Die nordischen Länder von der Mitte des 11. Jahrhunderts bis 1448"
+  id: brandt
+  issued:
+    year: 1987
+  author:
+  - given:
+    - Ahasver
+    dropping-particle: von
+    family: Brandt
+  - given:
+    - Erich
+    family: Hoffmann
+  container-title: "Europa im Hoch- und Spätmittelalter"
+  editor:
+    given:
+    - Ferdinand
+    family: Seibt
+  publisher: Klett-Cotta
+  collection-title: "Handbuch der europäischen Geschichte"
+  type: chapter
+  publisher-place: Stuttgart
+  collection-number: 2
+  language: de-DE
+- title-short: "Aristotle’s theory of the intellect"
+  annote: An incollection entry with a series and number field
+  keyword: secondary
+  page: 161-191
+  title: "Aristotle’s theory of the intellect and its interpretation by Averroes"
+  id: hyman
+  issued:
+    year: 1981
+  author:
+    given:
+    - Arthur
+    family: Hyman
+  container-title: Studies in Aristotle
+  editor:
+    given:
+    - Dominic
+    - J.
+    family: "O’Meara"
+  publisher: The Catholic University of America Press
+  collection-title: Studies in philosophy and the history of philosophy
+  type: chapter
+  publisher-place: Washington, D.C.
+  collection-number: 9
+  language: en-US
+- title-short: Limitations of human knowledge
+  annote: A typical incollection entry. Note the indextitle field
+  keyword: secondary
+  page: 82-109
+  title: The limitations of human knowledge according to Al-Farabi, ibn Bajja, and
+    Maimonides
+  id: pines
+  issued:
+    year: 1979
+  author:
+    given:
+    - Shlomo
+    family: Pines
+  container-title: Studies in medieval Jewish history and literature
+  editor:
+    given:
+    - Isadore
+    family: Twersky
+  publisher: Harvard University Press
+  type: chapter
+  publisher-place: Cambridge, Mass.
+  language: en-US
+...

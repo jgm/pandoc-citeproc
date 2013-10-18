@@ -1,0 +1,97 @@
+
+@comment{adapted from http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/examples/biblatex-examples.bib}
+
+
+@string{hup = {Harvard University Press}}
+
+
+@incollection{westfahl:space,
+	Annotation = {A cross-referenced article from a \texttt{collection}. This is an \texttt{incollection} entry with a \texttt{crossref} field. Note the \texttt{subtitle} and \texttt{indextitle} fields},
+	Author = {Westfahl, Gary},
+	Crossref = {westfahl:frontier},
+	Hyphenation = {american},
+	Indextitle = {True Frontier, The},
+	Pages = {55-65},
+	Subtitle = {Confronting and Avoiding the Realities of Space in {American} Science Fiction Films},
+	Title = {The True Frontier}}
+
+@incollection{gaonkar:in,
+	Author = {Gaonkar, Dilip Parameshwar},
+	Booktitle = {Alternative Modernities},
+	Date = 2001,
+	Editor = {Gaonkar, Dilip Parameshwar},
+	Isbn = {0-822-32714-7},
+	Location = {Durham and London},
+	Pages = {1-23},
+	Publisher = {Duke University Press},
+	Title = {On Alternative Modernities}}
+
+@collection{westfahl:frontier,
+	Annotation = {This is a \texttt{collection} entry. Note the format of the \texttt{location} field as well as the \texttt{subtitle} and \texttt{booksubtitle} fields},
+	Booksubtitle = {The Frontier Theme in Science Fiction},
+	Booktitle = {Space and Beyond},
+	Date = 2000,
+	Editor = {Westfahl, Gary},
+	Hyphenation = {american},
+	Location = {Westport, Conn. and London},
+	Publisher = {Greenwood},
+	Subtitle = {The Frontier Theme in Science Fiction},
+	Title = {Space and Beyond}}
+---
+references:
+- annote: A cross-referenced article from a collection. This is an incollection entry
+    with a crossref field. Note the subtitle and indextitle fields
+  page: 55-65
+  title: ! 'The true frontier: Confronting and avoiding the realities of space in
+    American science fiction films'
+  id: westfahl:space
+  issued:
+    year: 2000
+  author:
+    given:
+    - Gary
+    family: Westfahl
+  container-title: ! 'Space and beyond: The frontier theme in science fiction'
+  editor:
+    given:
+    - Gary
+    family: Westfahl
+  publisher: Greenwood
+  type: chapter
+  publisher-place: Westport, Conn.; London
+  language: en-US
+- page: 1-23
+  title: On alternative modernities
+  id: gaonkar:in
+  issued:
+    year: 2001
+  author:
+    given:
+    - Dilip
+    - Parameshwar
+    family: Gaonkar
+  container-title: Alternative modernities
+  editor:
+    given:
+    - Dilip
+    - Parameshwar
+    family: Gaonkar
+  publisher: Duke University Press
+  isbn: 0-822-32714-7
+  type: chapter
+  publisher-place: Durham; London
+- annote: This is a collection entry. Note the format of the location field as well
+    as the subtitle and booksubtitle fields
+  title: ! 'Space and beyond: The frontier theme in science fiction'
+  id: westfahl:frontier
+  issued:
+    year: 2000
+  editor:
+    given:
+    - Gary
+    family: Westfahl
+  publisher: Greenwood
+  type: book
+  publisher-place: Westport, Conn.; London
+  language: en-US
+...
