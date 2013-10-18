@@ -751,6 +751,7 @@ itemToReference lang bibtex = bib $ do
   -- locators
   pages' <- getField "pages" <|> return ""
   volume' <- getField "volume" <|> return ""
+  part' <- getField "part" <|> return ""
   volumes' <- getField "volumes" <|> return ""
   pagetotal' <- getField "pagetotal" <|> return ""
   chapter' <- getField "chapter" <|> return ""
@@ -858,7 +859,8 @@ itemToReference lang bibtex = bib $ do
          -- , pageFirst           = undefined -- :: String
          , numberOfPages       = pagetotal'
          , version             = version'
-         , volume              = volume'
+         , volume              = intercalate "." $ filter (not . null)
+                                     [volume',part']
          , numberOfVolumes     = volumes'
          , issue               = issue'
          , chapterNumber       = chapter'
