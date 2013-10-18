@@ -147,15 +147,9 @@ entField = try $ do
 rawWord :: BibParser String
 rawWord = many1 alphaNum
 
-ident :: BibParser String
-ident = do
-  c <- letter
-  cs <- many (letter <|> digit <|> char '_')
-  return (c:cs)
-
 expandString :: BibParser String
 expandString = do
-  k <- ident
+  k <- fieldName
   strs <- getState
   case lookup k strs of
        Just v  -> return v
