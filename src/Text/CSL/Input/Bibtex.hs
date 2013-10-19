@@ -23,7 +23,7 @@ import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
                            dropBlanks, split)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper, isLetter, isDigit, isLower)
+import Data.Char (toLower, isUpper, toUpper, isDigit, isLower)
 import Control.Monad
 import Control.Monad.Reader
 import System.Environment (getEnvironment)
