@@ -38,11 +38,16 @@ processCites style refs doc =
       cits_map   = M.fromList $ zip grps (citations result)
       biblioList = map (renderPandoc' style) (bibliography result)
       Pandoc m b = bottomUp mvPunct . deNote .
-                       topDown (processCite style cits_map) $ doc'
+                     topDown (processCite style cits_map) $ doc'
       (bs, lastb) = case reverse b of
                          x@(Header _ _ _) : xs -> (reverse xs, [x])
                          _                     -> (b,  [])
-  in  Pandoc m $ bs ++ [Div ("",["references"],[]) (lastb ++ biblioList)]
+  in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
+               $ bs ++ [Div ("",["references"],[]) (lastb ++ biblioList)]
+
+removeNocaseSpans :: Inline -> [Inline]
+removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs
+removeNocaseSpans x = [x]
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  The style filename is derived from
