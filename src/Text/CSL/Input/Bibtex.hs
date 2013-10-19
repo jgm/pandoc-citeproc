@@ -23,7 +23,7 @@ import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
                            dropBlanks, split)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper, isDigit, isLower)
+import Data.Char (toLower, isUpper, toUpper, isDigit, isLower, isPunctuation)
 import Control.Monad
 import Control.Monad.Reader
 import System.Environment (getEnvironment)
@@ -482,14 +482,17 @@ bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = runReaderT m entry
 
 unTitlecase :: [Block] -> [Block]
-unTitlecase [Para ils]  = [Para $ untc $ splitStrWhen (== '-') ils]
-unTitlecase [Plain ils] = [Para $ untc $ splitStrWhen (== '-') ils]
+unTitlecase [Para ils]  = [Para $ untc $ splitStrWhen isPunctuation ils]
+unTitlecase [Plain ils] = [Para $ untc $ splitStrWhen isPunctuation ils]
 unTitlecase xs          = xs
 
 untc :: [Inline] -> [Inline]
 untc [] = []
 untc (x:xs) = x : map go xs
   where go (Str (y:ys)) | isUpper y = Str $ toLower y : ys
+        go (Quoted qt ys) = Quoted qt $ map go ys
+        go (Emph ys)   = Emph $ map go ys
+        go (Strong ys) = Strong $ map go ys
         go (Span _ ys)
           | hasLowercaseWord ys = Span ("",["nocase"],[]) ys
         go z            = z
