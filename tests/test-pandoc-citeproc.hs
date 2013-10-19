@@ -22,6 +22,11 @@ main = do
   fs <- filter (\f -> takeExtension f `elem` [".bibtex",".biblatex"])
            `fmap` getDirectoryContents "tests/biblio2yaml"
   biblio2yamlTests <- mapM biblio2yamlTest fs
+  let allTests = citeprocTests ++ biblio2yamlTests
+  let numTests = length allTests
+  let passingTests = length $ filter (== True) allTests
+  err $ "Passed " ++ show passingTests ++ " out of " ++ show numTests ++
+        " tests."
   if all id citeprocTests && all id biblio2yamlTests
      then exitWith ExitSuccess
      else exitWith $ ExitFailure 1
