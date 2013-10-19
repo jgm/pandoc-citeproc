@@ -76,8 +76,8 @@ showDiff (l,r) (First ln : ds) =
   printf "-%4d " l ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l+1,r) ds
 showDiff (l,r) (Second ln : ds) =
   printf "+%4d " r ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l,r+1) ds
-showDiff (l,r) (Both _ _ : ds) =
-  showDiff (l+1,r+1) ds
+showDiff (l,r) (Both ln _ : ds) =
+  printf " %4d " r ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l+1,r+1) ds
 
 biblio2yamlTest :: String -> IO Bool
 biblio2yamlTest fp = do
