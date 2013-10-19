@@ -882,12 +882,10 @@ itemToReference lang bibtex = bib $ do
                                               else ", " ++ seriesTitle'
                                          else ""
          , collectionTitle     = if isArticle then "" else seriesTitle'
-         , volumeTitle         = if volumeTitle' == containerTitle'
-                                 then ""
-                                 else concatWith '.' [
-                                        concatWith ':' [ volumeTitle'
-                                                       , volumeSubtitle']
-                                      , volumeTitleAddon' ]
+         , volumeTitle         = concatWith '.' [
+                                      concatWith ':' [ volumeTitle'
+                                                     , volumeSubtitle']
+                                    , volumeTitleAddon' ]
          , containerTitleShort = containerTitleShort'
          , collectionNumber    = collectionNumber'
          , originalTitle       = origTitle'
