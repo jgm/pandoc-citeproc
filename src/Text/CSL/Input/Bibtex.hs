@@ -870,15 +870,17 @@ itemToReference lang bibtex = bib $ do
                                   , titleaddon' ]
          , titleShort          = shortTitle'
          -- , reviewedTitle       = undefined -- :: String
-         , containerTitle      = concatWith '.' [
-                                      concatWith ':' [ containerTitle'
-                                                     , containerSubtitle']
-                                    , containerTitleAddon' ]
-                                   ++ if isArticle && not (null seriesTitle')
-                                      then if null containerTitle'
+         , containerTitle      = if containerTitle' == title'
+                                 then ""
+                                 else concatWith '.' [
+                                        concatWith ':' [ containerTitle'
+                                                       , containerSubtitle']
+                                      , containerTitleAddon' ]
+                                      ++ if isArticle && not (null seriesTitle')
+                                         then if null containerTitle'
                                               then seriesTitle'
                                               else ", " ++ seriesTitle'
-                                      else ""
+                                         else ""
          , collectionTitle     = if isArticle then "" else seriesTitle'
          , volumeTitle         = if volumeTitle' == containerTitle'
                                  then ""
