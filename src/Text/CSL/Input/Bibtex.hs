@@ -23,7 +23,7 @@ import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
                            dropBlanks, split)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper, isDigit, isLower)
+import Data.Char (toLower, isUpper, toUpper, isLetter, isDigit, isLower)
 import Control.Monad
 import Control.Monad.Reader
 import System.Environment (getEnvironment)
@@ -304,12 +304,12 @@ getDates f = do
        Nothing -> notFound f
 
 parseDates :: String -> Maybe [RefDate]
-parseDates s = mapM parseDate $ splitOn "/" s
+parseDates s = mapM parseDate $ splitWhen (=='/') s
 
 parseDate :: String -> Maybe RefDate
 parseDate s = do
   let (year', month', day') =
-        case splitOn "-" s of
+        case splitWhen (== '-') s of
              [y]     -> (y, "", "")
              [y,m]   -> (y, m, "")
              [y,m,d] -> (y, m, d)
@@ -421,7 +421,8 @@ toAuthor opts ils =
           }
   where useprefix = maybe False (== "true") $ lookup "useprefix" opts
         usecomma = maybe False (== "true") $ lookup "juniorcomma" opts
-        commaParts = map words' $ splitWhen (== Str ",") $ separateCommas ils
+        commaParts = map words' $ splitWhen (== Str ",")
+                                $ splitStrWhen (== ',') ils
         words' = wordsBy (== Space)
         isCapitalized (Str (c:cs) : rest)
           | isUpper c = True
@@ -453,11 +454,11 @@ toAuthor opts ils =
                                (ws@(_:_),[]) -> (init ws, [last ws])
                                (ws, vs)      -> (ws, vs)
 
-separateCommas :: [Inline] -> [Inline]
-separateCommas [] = []
-separateCommas (Str xs : ys)
-  | ',' `elem` xs = map Str ((split . dropBlanks) (whenElt (==',')) xs) ++ separateCommas ys
-separateCommas (x : ys) = x : separateCommas ys
+splitStrWhen :: (Char -> Bool) -> [Inline] -> [Inline]
+splitStrWhen _ [] = []
+splitStrWhen p (Str xs : ys)
+  | any p xs = map Str ((split . dropBlanks) (whenElt p) xs) ++ splitStrWhen p ys
+splitStrWhen p (x : ys) = x : splitStrWhen p ys
 
 latex' :: (MonadPlus m, Functor m) => String -> m [Block]
 latex' s = return bs
@@ -481,14 +482,14 @@ bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = runReaderT m entry
 
 unTitlecase :: [Block] -> [Block]
-unTitlecase [Para ils]  = [Para $ untc ils]
-unTitlecase [Plain ils] = [Para $ untc ils]
+unTitlecase [Para ils]  = [Para $ untc $ splitStrWhen (== '-') ils]
+unTitlecase [Plain ils] = [Para $ untc $ splitStrWhen (== '-') ils]
 unTitlecase xs          = xs
 
 untc :: [Inline] -> [Inline]
 untc [] = []
 untc (x:xs) = x : map go xs
-  where go (Str ys)     = Str $ map toLower ys
+  where go (Str (y:ys)) | isUpper y = Str $ toLower y : ys
         go (Span _ ys)
           | hasLowercaseWord ys = Span ("",["nocase"],[]) ys
         go z            = z
@@ -673,7 +674,7 @@ itemToReference lang bibtex = bib $ do
   let hyphenation' = if null hyphenation
                      then defaultHyphenation
                      else hyphenation
-  let (la, co) = case splitOn "-" hyphenation' of
+  let (la, co) = case splitWhen (== '-') hyphenation' of
                       [x]     -> (x, "")
                       (x:y:_) -> (x, y)
                       []      -> ("", "")
