@@ -685,6 +685,10 @@ itemToReference lang bibtex = bib $ do
        _                 -> (NoType,"")
   reftype' <- resolveKey lang <$> getField "type" <|> return ""
 
+  let isContainer = et `elem` ["book","collection","proceedings","reference",
+                     "mvbook","mvcollection","mvproceedings", "mvreference",
+                     "suppbook","suppcollection"]
+
   -- hyphenation:
   let defaultHyphenation = case lang of
                                 Lang x y -> x ++ "-" ++ y
@@ -722,27 +726,6 @@ itemToReference lang bibtex = bib $ do
               <|> return ""
   titleaddon' <- getTitle' "titleaddon"
                <|> return ""
-  containerTitle' <- (guard isPeriodical >> getField "title")
-                  <|> getTitle' "maintitle"
-                  <|> getTitle' "booktitle"
-                  <|> getField "journaltitle"
-                  <|> getField "journal"
-                  <|> return ""
-  containerSubtitle' <- (guard isPeriodical >> getField "subtitle")
-                       <|> getTitle' "mainsubtitle"
-                       <|> getTitle' "booksubtitle"
-                       <|> getField "journalsubtitle"
-                       <|> return ""
-  containerTitleAddon' <- (guard isPeriodical >> getField "titleaddon")
-                       <|> getTitle' "maintitleaddon"
-                       <|> getTitle' "booktitleaddon"
-                       <|> return ""
-  containerTitleShort' <- (guard isPeriodical >> getField "shorttitle")
-                        <|> getTitle' "booktitleshort"
-                        <|> getField "journaltitleshort"
-                        <|> getField "shortjournal"
-                        <|> return ""
-  seriesTitle' <- resolveKey lang <$> getTitle' "series" <|> return ""
   volumeTitle' <- (getTitle' "maintitle" >> guard hasVolumes
                     >> getTitle' "booktitle")
                   <|> return ""
@@ -752,6 +735,33 @@ itemToReference lang bibtex = bib $ do
   volumeTitleAddon' <- (getTitle' "maintitle" >> guard hasVolumes
                                    >> getTitle' "booktitleaddon")
                        <|> return ""
+  containerTitle' <- (guard isPeriodical >> getField "title")
+                  <|> getTitle' "maintitle"
+                  <|> (guard (not isContainer) >>
+                       guard (null volumeTitle') >> getTitle' "booktitle")
+                  <|> getField "journaltitle"
+                  <|> getField "journal"
+                  <|> return ""
+  containerSubtitle' <- (guard isPeriodical >> getField "subtitle")
+                       <|> getTitle' "mainsubtitle"
+                       <|> (guard (not isContainer) >>
+                            guard (null volumeSubtitle') >>
+                             getTitle' "booksubtitle")
+                       <|> getField "journalsubtitle"
+                       <|> return ""
+  containerTitleAddon' <- (guard isPeriodical >> getField "titleaddon")
+                       <|> getTitle' "maintitleaddon"
+                       <|> (guard (not isContainer) >>
+                            guard (null volumeTitleAddon') >>
+                             getTitle' "booktitleaddon")
+                       <|> return ""
+  containerTitleShort' <- (guard isPeriodical >> getField "shorttitle")
+                        <|> (guard (not isContainer) >>
+                             getTitle' "booktitleshort")
+                        <|> getField "journaltitleshort"
+                        <|> getField "shortjournal"
+                        <|> return ""
+  seriesTitle' <- resolveKey lang <$> getTitle' "series" <|> return ""
   shortTitle' <- getTitle' "shorttitle"
                <|> if ':' `elem` title'
                    then return (takeWhile (/=':') title')
