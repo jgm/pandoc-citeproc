@@ -274,6 +274,24 @@ resolveKey (Lang "en" "US") k =
        "software"      -> "computer software"
        "datacd"        -> "data CD"
        "audiocd"       -> "audio CD"
+       "patent"        -> "patent"
+       "patentde"      -> "German patent"
+       "patenteu"      -> "European patent"
+       "patentfr"      -> "French patent"
+       "patentuk"      -> "British patent"
+       "patentus"      -> "U.S. patent"
+       "patreq"        -> "patent request"
+       "patreqde"      -> "German patent request"
+       "patreqeu"      -> "European patent request"
+       "patreqfr"      -> "French patent request"
+       "patrequk"      -> "British patent request"
+       "patrequs"      -> "U.S. patent request"
+       "countryde"     -> "Germany"
+       "countryeu"     -> "European Union"
+       "countryep"     -> "European Union"
+       "countryfr"     -> "France"
+       "countryuk"     -> "United Kingdom"
+       "countryus"     -> "United States of America"
        _               -> k
 resolveKey _ k = resolveKey (Lang "en" "US") k
 
@@ -764,7 +782,8 @@ itemToReference lang bibtex = bib $ do
                     else getLiteralList' "origlocation")
                   <|> return ""
   jurisdiction' <- if et == "patent"
-                   then resolveKey lang <$> getLiteralList' "location" <|> return ""
+                   then ((intercalate "; " . map (resolveKey lang)) <$>
+                           getLiteralList "location") <|> return ""
                    else return ""
 
   -- locators
