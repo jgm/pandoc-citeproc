@@ -2,18 +2,18 @@
   {
     "unMeta": {
       "csl": {
-        "v": [
+        "c": [
           {
-            "v": "tests/chicago-author-date.csl",
+            "c": "tests/chicago-author-date.csl",
             "t": "Str"
           }
         ],
         "t": "MetaInlines"
       },
       "bibliography": {
-        "v": [
+        "c": [
           {
-            "v": "tests/biblio.bib",
+            "c": "tests/biblio.bib",
             "t": "Str"
           }
         ],
@@ -23,7 +23,7 @@
   },
   [
     {
-      "v": [
+      "c": [
         1,
         [
           "pandoc-with-citeproc-hs",
@@ -32,23 +32,23 @@
         ],
         [
           {
-            "v": "Pandoc",
+            "c": "Pandoc",
             "t": "Str"
           },
           {
-            "v": [],
+            "c": [],
             "t": "Space"
           },
           {
-            "v": "with",
+            "c": "with",
             "t": "Str"
           },
           {
-            "v": [],
+            "c": [],
             "t": "Space"
           },
           {
-            "v": "citeproc-hs",
+            "c": "citeproc-hs",
             "t": "Str"
           }
         ]
@@ -56,9 +56,9 @@
       "t": "Header"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "nonexistent",
@@ -66,7 +66,7 @@
                 "citationHash": 1,
                 "citationPrefix": [],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
@@ -74,11 +74,11 @@
             ],
             [
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": [
+                "c": [
                   [
                     "",
                     [
@@ -93,9 +93,9 @@
                   ],
                   [
                     {
-                      "v": [
+                      "c": [
                         {
-                          "v": "???",
+                          "c": "???",
                           "t": "Str"
                         }
                       ],
@@ -106,7 +106,7 @@
                 "t": "Span"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -117,9 +117,9 @@
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "nonexistent",
@@ -127,7 +127,7 @@
                 "citationHash": 2,
                 "citationPrefix": [],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "AuthorInText"
                 },
                 "citationNoteNum": 0
@@ -135,15 +135,15 @@
             ],
             [
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": [
+                "c": [
                   [
                     "",
                     [
@@ -158,9 +158,9 @@
                   ],
                   [
                     {
-                      "v": [
+                      "c": [
                         {
-                          "v": "???",
+                          "c": "???",
                           "t": "Str"
                         }
                       ],
@@ -171,7 +171,7 @@
                 "t": "Span"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -182,9 +182,9 @@
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "item1",
@@ -192,7 +192,7 @@
                 "citationHash": 3,
                 "citationPrefix": [],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "AuthorInText"
                 },
                 "citationNoteNum": 0
@@ -200,23 +200,23 @@
             ],
             [
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": "2005",
+                "c": "2005",
                 "t": "Str"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -224,49 +224,49 @@
           "t": "Cite"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "says",
+          "c": "says",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "blah.",
+          "c": "blah.",
           "t": "Str"
         }
       ],
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "v": "p.",
+                    "c": "p.",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "30",
+                    "c": "30",
                     "t": "Str"
                   }
                 ],
                 "citationHash": 4,
                 "citationPrefix": [],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "AuthorInText"
                 },
                 "citationNoteNum": 0
@@ -274,35 +274,35 @@
             ],
             [
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": "2005",
+                "c": "2005",
                 "t": "Str"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "30",
+                "c": "30",
                 "t": "Str"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -310,65 +310,65 @@
           "t": "Cite"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "says",
+          "c": "says",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "blah.",
+          "c": "blah.",
           "t": "Str"
         }
       ],
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "v": "p.",
+                    "c": "p.",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "30,",
+                    "c": "30,",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "with",
+                    "c": "with",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "suffix",
+                    "c": "suffix",
                     "t": "Str"
                   }
                 ],
                 "citationHash": 5,
                 "citationPrefix": [],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "AuthorInText"
                 },
                 "citationNoteNum": 0
@@ -376,55 +376,55 @@
             ],
             [
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": "2005",
+                "c": "2005",
                 "t": "Str"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "30",
+                "c": "30",
                 "t": "Str"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "with",
+                "c": "with",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "suffix",
+                "c": "suffix",
                 "t": "Str"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -432,28 +432,28 @@
           "t": "Cite"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "says",
+          "c": "says",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "blah.",
+          "c": "blah.",
           "t": "Str"
         }
       ],
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "item1",
@@ -461,7 +461,7 @@
                 "citationHash": 6,
                 "citationPrefix": [],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "AuthorInText"
                 },
                 "citationNoteNum": 0
@@ -470,26 +470,26 @@
                 "citationId": "item2",
                 "citationSuffix": [
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "p.",
+                    "c": "p.",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "30",
+                    "c": "30",
                     "t": "Str"
                   }
                 ],
                 "citationHash": 7,
                 "citationPrefix": [],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "SuppressAuthor"
                 },
                 "citationNoteNum": 0
@@ -500,20 +500,20 @@
                 "citationHash": 8,
                 "citationPrefix": [
                   {
-                    "v": "see",
+                    "c": "see",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "also",
+                    "c": "also",
                     "t": "Str"
                   }
                 ],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
@@ -521,107 +521,107 @@
             ],
             [
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": "2005",
+                "c": "2005",
                 "t": "Str"
               },
               {
-                "v": ";",
+                "c": ";",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2006",
+                "c": "2006",
                 "t": "Str"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "30",
+                "c": "30",
                 "t": "Str"
               },
               {
-                "v": ";",
+                "c": ";",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "see",
+                "c": "see",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "also",
+                "c": "also",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "a",
+                "c": "a",
                 "t": "Str"
               },
               {
-                "v": "n",
+                "c": "n",
                 "t": "Str"
               },
               {
-                "v": "d",
+                "c": "d",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Roe",
+                "c": "Roe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2007",
+                "c": "2007",
                 "t": "Str"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -629,73 +629,73 @@
           "t": "Cite"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "says",
+          "c": "says",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "blah.",
+          "c": "blah.",
           "t": "Str"
         }
       ],
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": "In",
+          "c": "In",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "a",
+          "c": "a",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "note.",
+          "c": "note.",
           "t": "Str"
         },
         {
-          "v": [
+          "c": [
             {
-              "v": [
+              "c": [
                 {
-                  "v": [
+                  "c": [
                     [
                       {
                         "citationId": "пункт3",
                         "citationSuffix": [
                           {
-                            "v": "p.",
+                            "c": "p.",
                             "t": "Str"
                           },
                           {
-                            "v": [],
+                            "c": [],
                             "t": "Space"
                           },
                           {
-                            "v": "12",
+                            "c": "12",
                             "t": "Str"
                           }
                         ],
                         "citationHash": 9,
                         "citationPrefix": [],
                         "citationMode": {
-                          "v": [],
+                          "c": [],
                           "t": "AuthorInText"
                         },
                         "citationNoteNum": 0
@@ -703,51 +703,51 @@
                     ],
                     [
                       {
-                        "v": "Doe",
+                        "c": "Doe",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "and",
+                        "c": "and",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "Roe",
+                        "c": "Roe",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "(",
+                        "c": "(",
                         "t": "Str"
                       },
                       {
-                        "v": "2007",
+                        "c": "2007",
                         "t": "Str"
                       },
                       {
-                        "v": ",",
+                        "c": ",",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "12",
+                        "c": "12",
                         "t": "Str"
                       },
                       {
-                        "v": ")",
+                        "c": ")",
                         "t": "Str"
                       }
                     ]
@@ -755,51 +755,51 @@
                   "t": "Cite"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "and",
+                  "c": "and",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "a",
+                  "c": "a",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "citation",
+                  "c": "citation",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "without",
+                  "c": "without",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "locators",
+                  "c": "locators",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": [
+                  "c": [
                     [
                       {
                         "citationId": "пункт3",
@@ -807,7 +807,7 @@
                         "citationHash": 10,
                         "citationPrefix": [],
                         "citationMode": {
-                          "v": [],
+                          "c": [],
                           "t": "NormalCitation"
                         },
                         "citationNoteNum": 0
@@ -815,47 +815,47 @@
                     ],
                     [
                       {
-                        "v": "(",
+                        "c": "(",
                         "t": "Str"
                       },
                       {
-                        "v": "Doe",
+                        "c": "Doe",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "a",
+                        "c": "a",
                         "t": "Str"
                       },
                       {
-                        "v": "n",
+                        "c": "n",
                         "t": "Str"
                       },
                       {
-                        "v": "d",
+                        "c": "d",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "Roe",
+                        "c": "Roe",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "2007",
+                        "c": "2007",
                         "t": "Str"
                       },
                       {
-                        "v": ")",
+                        "c": ")",
                         "t": "Str"
                       }
                     ]
@@ -863,7 +863,7 @@
                   "t": "Cite"
                 },
                 {
-                  "v": ".",
+                  "c": ".",
                   "t": "Str"
                 }
               ],
@@ -876,63 +876,63 @@
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": "A",
+          "c": "A",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "citation",
+          "c": "citation",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "group",
+          "c": "group",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "chap.",
+                    "c": "chap.",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "3",
+                    "c": "3",
                     "t": "Str"
                   }
                 ],
                 "citationHash": 11,
                 "citationPrefix": [
                   {
-                    "v": "see",
+                    "c": "see",
                     "t": "Str"
                   }
                 ],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
@@ -941,31 +941,31 @@
                 "citationId": "пункт3",
                 "citationSuffix": [
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "p.",
+                    "c": "p.",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "34-35",
+                    "c": "34-35",
                     "t": "Str"
                   }
                 ],
                 "citationHash": 12,
                 "citationPrefix": [
                   {
-                    "v": "also",
+                    "c": "also",
                     "t": "Str"
                   }
                 ],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
@@ -973,115 +973,115 @@
             ],
             [
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": "see",
+                "c": "see",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2005",
+                "c": "2005",
                 "t": "Str"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "chap.",
+                "c": "chap.",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "3",
+                "c": "3",
                 "t": "Str"
               },
               {
-                "v": ";",
+                "c": ";",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "also",
+                "c": "also",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "a",
+                "c": "a",
                 "t": "Str"
               },
               {
-                "v": "n",
+                "c": "n",
                 "t": "Str"
               },
               {
-                "v": "d",
+                "c": "d",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Roe",
+                "c": "Roe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2007",
+                "c": "2007",
                 "t": "Str"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "34–35",
+                "c": "34–35",
                 "t": "Str"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -1089,62 +1089,62 @@
           "t": "Cite"
         },
         {
-          "v": ".",
+          "c": ".",
           "t": "Str"
         }
       ],
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": "Another",
+          "c": "Another",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "one",
+          "c": "one",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "p.",
+                    "c": "p.",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "34-35",
+                    "c": "34-35",
                     "t": "Str"
                   }
                 ],
                 "citationHash": 13,
                 "citationPrefix": [
                   {
-                    "v": "see",
+                    "c": "see",
                     "t": "Str"
                   }
                 ],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
@@ -1152,43 +1152,43 @@
             ],
             [
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": "see",
+                "c": "see",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2005",
+                "c": "2005",
                 "t": "Str"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "34–35",
+                "c": "34–35",
                 "t": "Str"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -1196,110 +1196,110 @@
           "t": "Cite"
         },
         {
-          "v": ".",
+          "c": ".",
           "t": "Str"
         }
       ],
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": "And",
+          "c": "And",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "another",
+          "c": "another",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "one",
+          "c": "one",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "in",
+          "c": "in",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "a",
+          "c": "a",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "note.",
+          "c": "note.",
           "t": "Str"
         },
         {
-          "v": [
+          "c": [
             {
-              "v": [
+              "c": [
                 {
-                  "v": "Some",
+                  "c": "Some",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "citations",
+                  "c": "citations",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": [
+                  "c": [
                     [
                       {
                         "citationId": "item1",
                         "citationSuffix": [
                           {
-                            "v": [],
+                            "c": [],
                             "t": "Space"
                           },
                           {
-                            "v": "chap.",
+                            "c": "chap.",
                             "t": "Str"
                           },
                           {
-                            "v": [],
+                            "c": [],
                             "t": "Space"
                           },
                           {
-                            "v": "3",
+                            "c": "3",
                             "t": "Str"
                           }
                         ],
                         "citationHash": 14,
                         "citationPrefix": [
                           {
-                            "v": "see",
+                            "c": "see",
                             "t": "Str"
                           }
                         ],
                         "citationMode": {
-                          "v": [],
+                          "c": [],
                           "t": "NormalCitation"
                         },
                         "citationNoteNum": 0
@@ -1310,7 +1310,7 @@
                         "citationHash": 15,
                         "citationPrefix": [],
                         "citationMode": {
-                          "v": [],
+                          "c": [],
                           "t": "NormalCitation"
                         },
                         "citationNoteNum": 0
@@ -1321,7 +1321,7 @@
                         "citationHash": 16,
                         "citationPrefix": [],
                         "citationMode": {
-                          "v": [],
+                          "c": [],
                           "t": "NormalCitation"
                         },
                         "citationNoteNum": 0
@@ -1329,115 +1329,115 @@
                     ],
                     [
                       {
-                        "v": "(",
+                        "c": "(",
                         "t": "Str"
                       },
                       {
-                        "v": "see",
+                        "c": "see",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "Doe",
+                        "c": "Doe",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "2005",
+                        "c": "2005",
                         "t": "Str"
                       },
                       {
-                        "v": ",",
+                        "c": ",",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "chap.",
+                        "c": "chap.",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "3",
+                        "c": "3",
                         "t": "Str"
                       },
                       {
-                        "v": ";",
+                        "c": ";",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "Doe",
+                        "c": "Doe",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "a",
+                        "c": "a",
                         "t": "Str"
                       },
                       {
-                        "v": "n",
+                        "c": "n",
                         "t": "Str"
                       },
                       {
-                        "v": "d",
+                        "c": "d",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "Roe",
+                        "c": "Roe",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "2007",
+                        "c": "2007",
                         "t": "Str"
                       },
                       {
-                        "v": ";",
+                        "c": ";",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "Doe",
+                        "c": "Doe",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "2006",
+                        "c": "2006",
                         "t": "Str"
                       },
                       {
-                        "v": ")",
+                        "c": ")",
                         "t": "Str"
                       }
                     ]
@@ -1445,7 +1445,7 @@
                   "t": "Cite"
                 },
                 {
-                  "v": ".",
+                  "c": ".",
                   "t": "Str"
                 }
               ],
@@ -1458,114 +1458,114 @@
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": "Citation",
+          "c": "Citation",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "with",
+          "c": "with",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "a",
+          "c": "a",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "suffix",
+          "c": "suffix",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "and",
+          "c": "and",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "locator",
+          "c": "locator",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "pp.",
+                    "c": "pp.",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "33,",
+                    "c": "33,",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "35-37,",
+                    "c": "35-37,",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "and",
+                    "c": "and",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "nowhere",
+                    "c": "nowhere",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "else",
+                    "c": "else",
                     "t": "Str"
                   }
                 ],
                 "citationHash": 17,
                 "citationPrefix": [],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
@@ -1573,71 +1573,71 @@
             ],
             [
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2005",
+                "c": "2005",
                 "t": "Str"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "33,",
+                "c": "33,",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "35–37",
+                "c": "35–37",
                 "t": "Str"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "and",
+                "c": "and",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "nowhere",
+                "c": "nowhere",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "else",
+                "c": "else",
                 "t": "Str"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -1645,81 +1645,81 @@
           "t": "Cite"
         },
         {
-          "v": ".",
+          "c": ".",
           "t": "Str"
         }
       ],
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": "Citation",
+          "c": "Citation",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "with",
+          "c": "with",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "suffix",
+          "c": "suffix",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "only",
+          "c": "only",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "and",
+                    "c": "and",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "nowhere",
+                    "c": "nowhere",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "else",
+                    "c": "else",
                     "t": "Str"
                   }
                 ],
                 "citationHash": 18,
                 "citationPrefix": [],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
@@ -1727,47 +1727,47 @@
             ],
             [
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2005",
+                "c": "2005",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "and",
+                "c": "and",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "nowhere",
+                "c": "nowhere",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "else",
+                "c": "else",
                 "t": "Str"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -1775,80 +1775,80 @@
           "t": "Cite"
         },
         {
-          "v": ".",
+          "c": ".",
           "t": "Str"
         }
       ],
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": "Now",
+          "c": "Now",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "some",
+          "c": "some",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "modifiers.",
+          "c": "modifiers.",
           "t": "Str"
         },
         {
-          "v": [
+          "c": [
             {
-              "v": [
+              "c": [
                 {
-                  "v": "Like",
+                  "c": "Like",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "a",
+                  "c": "a",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "citation",
+                  "c": "citation",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "without",
+                  "c": "without",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "author:",
+                  "c": "author:",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": [
+                  "c": [
                     [
                       {
                         "citationId": "item1",
@@ -1856,7 +1856,7 @@
                         "citationHash": 19,
                         "citationPrefix": [],
                         "citationMode": {
-                          "v": [],
+                          "c": [],
                           "t": "SuppressAuthor"
                         },
                         "citationNoteNum": 0
@@ -1864,15 +1864,15 @@
                     ],
                     [
                       {
-                        "v": "(",
+                        "c": "(",
                         "t": "Str"
                       },
                       {
-                        "v": "2005",
+                        "c": "2005",
                         "t": "Str"
                       },
                       {
-                        "v": ")",
+                        "c": ")",
                         "t": "Str"
                       }
                     ]
@@ -1880,88 +1880,88 @@
                   "t": "Cite"
                 },
                 {
-                  "v": ",",
+                  "c": ",",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "and",
+                  "c": "and",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "now",
+                  "c": "now",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "Doe",
+                  "c": "Doe",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "with",
+                  "c": "with",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "a",
+                  "c": "a",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": "locator",
+                  "c": "locator",
                   "t": "Str"
                 },
                 {
-                  "v": [],
+                  "c": [],
                   "t": "Space"
                 },
                 {
-                  "v": [
+                  "c": [
                     [
                       {
                         "citationId": "item2",
                         "citationSuffix": [
                           {
-                            "v": [],
+                            "c": [],
                             "t": "Space"
                           },
                           {
-                            "v": "p.",
+                            "c": "p.",
                             "t": "Str"
                           },
                           {
-                            "v": [],
+                            "c": [],
                             "t": "Space"
                           },
                           {
-                            "v": "44",
+                            "c": "44",
                             "t": "Str"
                           }
                         ],
                         "citationHash": 20,
                         "citationPrefix": [],
                         "citationMode": {
-                          "v": [],
+                          "c": [],
                           "t": "SuppressAuthor"
                         },
                         "citationNoteNum": 0
@@ -1969,27 +1969,27 @@
                     ],
                     [
                       {
-                        "v": "(",
+                        "c": "(",
                         "t": "Str"
                       },
                       {
-                        "v": "2006",
+                        "c": "2006",
                         "t": "Str"
                       },
                       {
-                        "v": ",",
+                        "c": ",",
                         "t": "Str"
                       },
                       {
-                        "v": [],
+                        "c": [],
                         "t": "Space"
                       },
                       {
-                        "v": "44",
+                        "c": "44",
                         "t": "Str"
                       },
                       {
-                        "v": ")",
+                        "c": ")",
                         "t": "Str"
                       }
                     ]
@@ -1997,7 +1997,7 @@
                   "t": "Cite"
                 },
                 {
-                  "v": ".",
+                  "c": ".",
                   "t": "Str"
                 }
               ],
@@ -2010,53 +2010,53 @@
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         {
-          "v": "With",
+          "c": "With",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "some",
+          "c": "some",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": "markup",
+          "c": "markup",
           "t": "Str"
         },
         {
-          "v": [],
+          "c": [],
           "t": "Space"
         },
         {
-          "v": [
+          "c": [
             [
               {
                 "citationId": "item1",
                 "citationSuffix": [
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "p.",
+                    "c": "p.",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": [
+                    "c": [
                       {
-                        "v": "32",
+                        "c": "32",
                         "t": "Str"
                       }
                     ],
@@ -2066,9 +2066,9 @@
                 "citationHash": 21,
                 "citationPrefix": [
                   {
-                    "v": [
+                    "c": [
                       {
-                        "v": "see",
+                        "c": "see",
                         "t": "Str"
                       }
                     ],
@@ -2076,7 +2076,7 @@
                   }
                 ],
                 "citationMode": {
-                  "v": [],
+                  "c": [],
                   "t": "NormalCitation"
                 },
                 "citationNoteNum": 0
@@ -2084,48 +2084,48 @@
             ],
             [
               {
-                "v": "(",
+                "c": "(",
                 "t": "Str"
               },
               {
-                "v": [
+                "c": [
                   {
-                    "v": "see",
+                    "c": "see",
                     "t": "Str"
                   }
                 ],
                 "t": "Emph"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Doe",
+                "c": "Doe",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2005",
+                "c": "2005",
                 "t": "Str"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "32",
+                "c": "32",
                 "t": "Str"
               },
               {
-                "v": ")",
+                "c": ")",
                 "t": "Str"
               }
             ]
@@ -2133,14 +2133,14 @@
           "t": "Cite"
         },
         {
-          "v": ".",
+          "c": ".",
           "t": "Str"
         }
       ],
       "t": "Para"
     },
     {
-      "v": [
+      "c": [
         [
           "",
           [
@@ -2150,7 +2150,7 @@
         ],
         [
           {
-            "v": [
+            "c": [
               1,
               [
                 "references",
@@ -2159,7 +2159,7 @@
               ],
               [
                 {
-                  "v": "References",
+                  "c": "References",
                   "t": "Str"
                 }
               ]
@@ -2167,382 +2167,382 @@
             "t": "Header"
           },
           {
-            "v": [
+            "c": [
               {
-                "v": "Doe,",
+                "c": "Doe,",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "John.",
+                "c": "John.",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2005.",
+                "c": "2005.",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": [
+                "c": [
                   {
-                    "v": "First",
+                    "c": "First",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "Book",
+                    "c": "Book",
                     "t": "Str"
                   }
                 ],
                 "t": "Emph"
               },
               {
-                "v": ".",
+                "c": ".",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Cambridge:",
+                "c": "Cambridge:",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Cambridge",
+                "c": "Cambridge",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "University",
+                "c": "University",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Press",
+                "c": "Press",
                 "t": "Str"
               },
               {
-                "v": ".",
+                "c": ".",
                 "t": "Str"
               }
             ],
             "t": "Para"
           },
           {
-            "v": [
+            "c": [
               {
-                "v": "———.",
+                "c": "———.",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2006.",
+                "c": "2006.",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "“",
+                "c": "“",
                 "t": "Str"
               },
               {
-                "v": "Article",
+                "c": "Article",
                 "t": "Str"
               },
               {
-                "v": ".",
+                "c": ".",
                 "t": "Str"
               },
               {
-                "v": "”",
+                "c": "”",
                 "t": "Str"
               },
               {
-                "v": "",
+                "c": "",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": [
+                "c": [
                   {
-                    "v": "Journal",
+                    "c": "Journal",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "of",
+                    "c": "of",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "Generic",
+                    "c": "Generic",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "Studies",
+                    "c": "Studies",
                     "t": "Str"
                   }
                 ],
                 "t": "Emph"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "6:",
+                "c": "6:",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "33–34",
+                "c": "33–34",
                 "t": "Str"
               },
               {
-                "v": ".",
+                "c": ".",
                 "t": "Str"
               }
             ],
             "t": "Para"
           },
           {
-            "v": [
+            "c": [
               {
-                "v": "Doe,",
+                "c": "Doe,",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "John,",
+                "c": "John,",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "and",
+                "c": "and",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Jenny",
+                "c": "Jenny",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Roe.",
+                "c": "Roe.",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "2007.",
+                "c": "2007.",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "“",
+                "c": "“",
                 "t": "Str"
               },
               {
-                "v": "Why",
+                "c": "Why",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Water",
+                "c": "Water",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Is",
+                "c": "Is",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Wet",
+                "c": "Wet",
                 "t": "Str"
               },
               {
-                "v": ".",
+                "c": ".",
                 "t": "Str"
               },
               {
-                "v": "”",
+                "c": "”",
                 "t": "Str"
               },
               {
-                "v": "",
+                "c": "",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "In",
+                "c": "In",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": [
+                "c": [
                   {
-                    "v": "Third",
+                    "c": "Third",
                     "t": "Str"
                   },
                   {
-                    "v": [],
+                    "c": [],
                     "t": "Space"
                   },
                   {
-                    "v": "Book",
+                    "c": "Book",
                     "t": "Str"
                   }
                 ],
                 "t": "Emph"
               },
               {
-                "v": ",",
+                "c": ",",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "edited",
+                "c": "edited",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "by",
+                "c": "by",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Sam",
+                "c": "Sam",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Smith.",
+                "c": "Smith.",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Oxford:",
+                "c": "Oxford:",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Oxford",
+                "c": "Oxford",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "University",
+                "c": "University",
                 "t": "Str"
               },
               {
-                "v": [],
+                "c": [],
                 "t": "Space"
               },
               {
-                "v": "Press",
+                "c": "Press",
                 "t": "Str"
               },
               {
-                "v": ".",
+                "c": ".",
                 "t": "Str"
               }
             ],
