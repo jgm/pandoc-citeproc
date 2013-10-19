@@ -292,6 +292,8 @@ resolveKey (Lang "en" "US") k =
        "countryfr"     -> "France"
        "countryuk"     -> "United Kingdom"
        "countryus"     -> "United States of America"
+       "newseries"     -> "new series"
+       "oldseries"     -> "old series"
        _               -> k
 resolveKey _ k = resolveKey (Lang "en" "US") k
 
@@ -741,7 +743,7 @@ itemToReference lang bibtex = bib $ do
                         <|> getField "journaltitleshort"
                         <|> getField "shortjournal"
                         <|> return ""
-  seriesTitle' <- getTitle' "series" <|> return ""
+  seriesTitle' <- resolveKey lang <$> getTitle' "series" <|> return ""
   volumeTitle' <- (getTitle' "maintitle" >> guard hasVolumes
                     >> getTitle' "booktitle")
                   <|> return ""
