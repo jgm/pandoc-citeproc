@@ -1,6 +1,7 @@
 module Text.CSL.Input.Pandoc (blocksToString, inlinesToString)
 where
 import Text.Pandoc
+import Text.Pandoc.Shared (trim)
 import Text.TeXMath (texMathToPandoc, DisplayType(..))
 import Control.Applicative
 import Data.List (intercalate)
@@ -25,8 +26,9 @@ inlinesToString = fmap mconcat . mapM go
         go (Code _ xs)      = return xs
         go (Link xs _)      = inlinesToString xs
         go (Image xs _)     = inlinesToString xs
-        go (RawInline f xs) | f == Format "citeproc"
-                            = return xs
+        go (RawInline f xs)
+          | f == Format "citeproc" = return xs
+          | f == Format "latex"    = inlinesToString $ parseRawLaTeX xs
         go (Span ("",[],[]) xs) = inlinesToString xs
         go (Span (_,classes,_) xs) =
            inTag "span" [("class",unwords classes)] <$> inlinesToString xs
@@ -43,6 +45,19 @@ inlinesToString = fmap mconcat . mapM go
         go (Quoted SingleQuote xs) = surround '‘' '’' <$> inlinesToString xs
         go (Quoted DoubleQuote xs) = surround '“' '”' <$> inlinesToString xs
         go _                = return ""
+
+parseRawLaTeX :: String -> [Inline]
+parseRawLaTeX ('\\':xs) =
+  case readLaTeX def{readerParseRaw = True} contents of
+       Pandoc _ [Para ys]  -> f command ys
+       Pandoc _ [Plain ys] -> f command ys
+       _                   -> []
+   where (command', contents') = break (=='{') xs
+         command  = trim command'
+         contents = drop 1 $ reverse $ drop 1 $ reverse contents'
+         f "mkbibquote" ils = [Quoted DoubleQuote ils]
+         f _            ils = [Span nullAttr ils]
+parseRawLaTeX _ = []
 
 surround :: Char -> Char -> String -> String
 surround beg end s = beg : s ++ [end]
