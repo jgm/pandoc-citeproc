@@ -277,6 +277,21 @@ resolveKey (Lang "en" "US") k =
        _               -> k
 resolveKey _ k = resolveKey (Lang "en" "US") k
 
+parseMonth :: String -> String
+parseMonth "jan" = "1"
+parseMonth "feb" = "2"
+parseMonth "mar" = "3"
+parseMonth "apr" = "4"
+parseMonth "may" = "5"
+parseMonth "jun" = "6"
+parseMonth "jul" = "7"
+parseMonth "aug" = "8"
+parseMonth "sep" = "9"
+parseMonth "oct" = "10"
+parseMonth "nov" = "11"
+parseMonth "dec" = "12"
+parseMonth x     = x
+
 type Bib = ReaderT Item Maybe
 
 notFound :: String -> Bib a
@@ -325,7 +340,7 @@ parseDate s = do
 getOldDates :: String -> Bib [RefDate]
 getOldDates prefix = do
   year' <- getField (prefix ++ "year")
-  month' <- getField (prefix ++ "month") <|> return ""
+  month' <- (parseMonth <$> getField (prefix ++ "month")) <|> return ""
   day' <- getField (prefix ++ "day") <|> return ""
   endyear' <- getField (prefix ++ "endyear") <|> return ""
   endmonth' <- getField (prefix ++ "endmonth") <|> return ""
