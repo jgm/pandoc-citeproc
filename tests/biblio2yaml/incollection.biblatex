@@ -110,8 +110,7 @@ references:
   annote: A typical incollection entry. Note the indextitle field
   keyword: secondary
   page: 82-109
-  title: The limitations of human knowledge according to Al-Farabi, ibn Bajja, and
-    Maimonides
+  title: 'The limitations of human knowledge according to Al-Farabi, <span class="nocase">ibn Bajja</span>, and Maimonides'
   id: pines
   issued:
     year: 1979
