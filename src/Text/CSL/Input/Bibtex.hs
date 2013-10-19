@@ -497,21 +497,20 @@ splitStrWhen p (x : ys) = x : splitStrWhen p ys
 
 latex' :: (MonadPlus m, Functor m) => String -> m [Block]
 latex' s = return bs
-  where Pandoc _ bs = readLaTeX def s
+  where Pandoc _ bs = readLaTeX def{readerParseRaw = True} s
 
 latex :: (MonadPlus m, Functor m) => String -> m String
 latex s = latex' (trim s) >>= blocksToString
 
 latexTitle :: (MonadPlus m, Functor m) => Lang -> String -> m String
-latexTitle (Lang l _) s = trim `fmap` blocksToString (processTitle bs)
-  where Pandoc _ bs = readLaTeX def s
-        processTitle = case l of
+latexTitle (Lang l _) s =
+  trim `fmap` (latex' s >>= blocksToString . processTitle)
+  where processTitle = case l of
                           'e':'n':_ -> unTitlecase
                           _         -> id
 
-latexAuthors :: MonadPlus m => Options -> String -> m [Agent]
-latexAuthors opts s = toAuthorList opts bs
-  where Pandoc _ bs = readLaTeX def s
+latexAuthors :: (MonadPlus m, Functor m) => Options -> String -> m [Agent]
+latexAuthors opts s = latex' s >>= toAuthorList opts
 
 bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = runReaderT m entry
