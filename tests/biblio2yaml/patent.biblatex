@@ -156,7 +156,7 @@ references:
 - annote: This is a patent entry with a holder field. Note the format of the type
     and date fields in the database file. Compare almendro, laufenberg, and kowalik
   genre: U.S. patent
-  title: High-Speed digital-to-RF converter
+  title: High-speed digital-to-RF converter
   id: sorace
   issued:
     day: 16
