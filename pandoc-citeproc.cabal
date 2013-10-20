@@ -173,7 +173,7 @@ library
     build-depends:    containers, directory, mtl, json, utf8-string,
                       bytestring, filepath, pandoc-types >= 1.12.3, tagsoup,
                       aeson, text, vector, texmath >= 0.6.4, split,
-                      yaml >= 0.8, pandoc >= 1.12.0.2
+                      yaml >= 0.8, pandoc >= 1.12.1
 
     if flag(bibutils)
        build-depends:   hs-bibutils >= 0.3
@@ -235,7 +235,7 @@ test-suite test-pandoc-citeproc
   Main-Is:        test-pandoc-citeproc.hs
   Hs-Source-Dirs: tests
   build-depends:  base >= 4, aeson-pretty, aeson, directory,
-                  pandoc-types >= 1.12.3, pandoc >= 1.12, filepath,
+                  pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
                   bytestring, pandoc-citeproc, process, Diff >= 0.3,
                   yaml >= 0.8
   default-language: Haskell98
