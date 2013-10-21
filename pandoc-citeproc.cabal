@@ -110,6 +110,8 @@ data-files:         chicago-author-date.csl
                     tests/biblio2yaml/thesis.biblatex
                     tests/biblio2yaml/title-and-shorttitle.biblatex
                     tests/biblio2yaml/test-case-conversion.biblatex
+                    tests/biblio2yaml/crossref-inbook-mvbook.biblatex
+                    tests/biblio2yaml/crossref-nested.biblatex
                     -- documentation
                     README.md
                     LICENSE

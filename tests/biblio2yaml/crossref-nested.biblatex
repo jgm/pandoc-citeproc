@@ -1,0 +1,103 @@
+@comment{
+
+Nested crossreferences (see biber manual v 1.7)
+
+}
+
+@bookinbook{bookinbook-1,
+    Crossref = {book-1},
+    Title = {Macbeth [title field of bookinbook-1]},
+    Chapter = {7},
+    Pages = {100-200},
+}
+
+@inbook{inbook-1,
+    Crossref = {book-1},
+    Title = {Macbeth [title field of inbook-1]},
+    Chapter = {7},
+    Pages = {100-200},
+}
+
+@book{book-1,
+    Crossref = {mvbook-1},
+    Date = {1975},
+    Title = {Tragedies [title field of book-1]},
+    Volume = {3}
+}
+
+@mvbook{mvbook-1,
+    Author = {Shakespeare},
+    Date = {1970/1980},
+    Title = {Collected Works [title field of mvbook-1]},
+    Location = {Location},
+    Publisher = {Publisher},
+    Volumes = {4}
+}
+
+---
+references:
+
+- chapter-number: 7
+  page: 100-200
+  title: Macbeth [title field of bookinbook-1]
+  volume-title: Tragedies [title field of book-1]
+  container-title: Collected works [title field of mvbook-1]
+  volume: 3
+  id: bookinbook-1
+  issued:
+  - year: 1975
+  author:
+    family: Shakespeare
+  container-author:
+    family: Shakespeare
+  number-of-volumes: 4
+  publisher: Publisher
+  type: book
+  publisher-place: Location
+
+- title: Macbeth [title field of inbook-1]
+  volume-title: Tragedies [title field of book-1]
+  container-title: Collected works [title field of mvbook-1]
+  author:
+    family: Shakespeare
+  container-author:
+    family: Shakespeare
+  volume: 3
+  chapter-number: 7
+  page: 100-200
+  id: inbook-1
+  issued:
+  - year: 1975
+  number-of-volumes: 4
+  publisher: Publisher
+  type: chapter
+  publisher-place: Location
+
+- title: Tragedies [title field of book-1]
+  container-title: Collected works [title field of mvbook-1]
+  author:
+    family: Shakespeare
+  container-author:
+    family: Shakespeare
+  volume: 3
+  id: book-1
+  issued:
+    year: 1975
+  number-of-volumes: 4
+  publisher: Publisher
+  type: book
+  publisher-place: Location
+
+- title: Collected works [title field of mvbook-1]
+  author:
+    family: Shakespeare
+  id: mvbook-1
+  issued:
+  - year: 1970
+  - year: 1980
+  number-of-volumes: 4
+  publisher: Publisher
+  type: book
+  publisher-place: Location
+...
+
