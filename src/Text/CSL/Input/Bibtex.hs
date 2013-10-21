@@ -222,6 +222,10 @@ transformKey _ _ "sortkey"        = []
 transformKey x y "author"
   | x `elem` ["mvbook", "book"] &&
     y `elem` ["inbook", "bookinbook", "suppbook"] = ["bookauthor", "author"]
+-- note: this next clause is not in the biblatex manual, but it makes
+-- sense in the context of CSL conversion:
+transformKey x y "author"
+  | x == "mvbook" && y == "book" = ["bookauthor", "author"]
 transformKey "mvbook" y z
   | y `elem` ["book", "inbook", "bookinbook", "suppbook"] = standardTrans z
 transformKey x y z
