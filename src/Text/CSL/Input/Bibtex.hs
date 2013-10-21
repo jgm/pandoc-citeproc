@@ -23,7 +23,8 @@ import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
                            dropBlanks, split)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper, isDigit, isLower, isPunctuation)
+import Data.Char (toLower, isUpper, toUpper, isDigit, isLower, isAlphaNum,
+                  isPunctuation)
 import Control.Monad
 import Control.Monad.Reader
 import System.Environment (getEnvironment)
@@ -116,6 +117,9 @@ fieldName = do
   cs <- many1 (letter <|> digit <|> oneOf "-_")
   return $ map toLower (c:cs)
 
+isBibtexKeyChar :: Char -> Bool
+isBibtexKeyChar c = isAlphaNum c || c `elem` ".:;?!`'()/*@_+=-[]*"
+
 bibItem :: BibParser Item
 bibItem = do
   char '@'
@@ -123,7 +127,7 @@ bibItem = do
   spaces
   char '{'
   spaces
-  entid <- many1 (noneOf " \t\n\r,")
+  entid <- many1 (satisfy isBibtexKeyChar)
   spaces
   char ','
   spaces
