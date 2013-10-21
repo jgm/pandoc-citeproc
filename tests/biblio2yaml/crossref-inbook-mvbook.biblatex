@@ -30,11 +30,11 @@ references:
   title: Macbeth [title field of inbook-1]
   container-title: Collected works [title field of mvbook-1]
   author:
-  family: Shakespeare
+    family: Shakespeare
   container-author:
-  family: Shakespeare
+    family: Shakespeare
   issued:
-  year: 1975
+    year: 1975
   volume: 3
   chapter-number: 7
   page: 100-200
@@ -46,7 +46,7 @@ references:
   id: mvbook-1
   title: Collected works [title field of mvbook-1]
   author:
-  family: Shakespeare
+    family: Shakespeare
   issued:
   - year: 1970
   - year: 1980
