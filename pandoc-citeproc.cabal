@@ -238,6 +238,6 @@ test-suite test-pandoc-citeproc
   Hs-Source-Dirs: tests
   build-depends:  base >= 4, aeson-pretty, aeson, directory,
                   pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
-                  bytestring, pandoc-citeproc, process, Diff >= 0.3,
+                  bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8
   default-language: Haskell98

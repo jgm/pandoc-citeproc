@@ -6,7 +6,8 @@ import System.FilePath
 import Text.Printf
 import System.IO
 import Data.Monoid (mempty)
-import Data.Algorithm.Diff
+import System.IO.Temp (withSystemTempDirectory)
+import System.Process (rawSystem)
 import Text.Printf
 import qualified Data.Aeson as Aeson
 import Data.Aeson.Encode.Pretty
@@ -49,20 +50,19 @@ testCase csl = do
            resultDoc = Aeson.decode result
        let expectedDoc :: Maybe Pandoc
            expectedDoc = Aeson.decode expected
-       let result' = maybe [] (BL.lines
-                     . encodePretty' Config{ confIndent = 2
+       let result' = maybe BL.empty
+                     ( encodePretty' Config{ confIndent = 2
                                            , confCompare = compare } )
                      resultDoc
-       let expected' = maybe [] (BL.lines
-                     . encodePretty' Config{ confIndent = 2
-                                           , confCompare = compare } )
-                     expectedDoc
+       let expected' = maybe BL.empty
+                       ( encodePretty' Config{ confIndent = 2
+                                             , confCompare = compare } )
+                       expectedDoc
        if result' == expected'
           then err "PASSED" >> return True
           else do
-            err $ "FAILED (-expected, +actual)"
-            let diff = getDiff expected' result'
-            err $ showDiff (1,1) diff
+            err $ "FAILED"
+            showDiff expected' result'
             return False
      else do
        err "ERROR"
@@ -70,14 +70,17 @@ testCase csl = do
        err $ UTF8.toStringLazy errout
        return False
 
-showDiff :: (Int,Int) -> [Diff BL.ByteString] -> String
-showDiff _ []             = ""
-showDiff (l,r) (First ln : ds) =
-  printf "-%4d " l ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l+1,r) ds
-showDiff (l,r) (Second ln : ds) =
-  printf "+%4d " r ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l,r+1) ds
-showDiff (l,r) (Both ln _ : ds) =
-  printf " %4d " r ++ (UTF8.toStringLazy ln) ++ "\n" ++ showDiff (l+1,r+1) ds
+showDiff :: BL.ByteString -> BL.ByteString -> IO ()
+showDiff expected' result' =
+  withSystemTempDirectory "test-pandoc-citeproc-XXX" $ \fp -> do
+    let expectedf = fp </> "expected"
+    let actualf   = fp </> "actual"
+    BL.writeFile expectedf expected'
+    BL.writeFile actualf result'
+    oldDir <- getCurrentDirectory
+    setCurrentDirectory fp
+    rawSystem "diff" ["-u","expected","actual"]
+    setCurrentDirectory oldDir
 
 biblio2yamlTest :: String -> IO Bool
 biblio2yamlTest fp = do
@@ -98,20 +101,19 @@ biblio2yamlTest fp = do
            expectedDoc = Yaml.decode $ B.concat $ BL.toChunks expected
        let resultDoc   :: Maybe Aeson.Value
            resultDoc   = Yaml.decode $ B.concat $ BL.toChunks result
-       let result' = maybe [] (BL.lines
-                     . encodePretty' Config{ confIndent = 2
+       let result' = maybe BL.empty
+                     ( encodePretty' Config{ confIndent = 2
                                            , confCompare = compare } )
                      resultDoc
-       let expected' = maybe [] (BL.lines
-                     . encodePretty' Config{ confIndent = 2
+       let expected' = maybe BL.empty
+                     ( encodePretty' Config{ confIndent = 2
                                            , confCompare = compare } )
                      expectedDoc
        if expected' == result'
           then err "PASSED" >> return True
           else do
-            err $ "FAILED (-expected, +actual)"
-            let diff = getDiff expected' result'
-            err $ showDiff (1,1) diff
+            err $ "FAILED"
+            showDiff expected' result'
             return False
      else do
        err "ERROR"
