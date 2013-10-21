@@ -198,6 +198,7 @@ resolveCrossRef isBibtex entries entry = foldl go entry (fields entry)
 -- transformKey source target key
 -- derived from Appendix C of bibtex manual
 transformKey :: String -> String -> String -> [String]
+transformKey _ _ "ids"            = []
 transformKey _ _ "crossref"       = []
 transformKey _ _ "xref"           = []
 transformKey _ _ "entryset"       = []
@@ -207,6 +208,7 @@ transformKey _ _ "label"          = []
 transformKey _ _ "options"        = []
 transformKey _ _ "presort"        = []
 transformKey _ _ "related"        = []
+transformKey _ _ "relatedoptions" = []
 transformKey _ _ "relatedstring"  = []
 transformKey _ _ "relatedtype"    = []
 transformKey _ _ "shorthand"      = []
@@ -214,21 +216,21 @@ transformKey _ _ "shorthandintro" = []
 transformKey _ _ "sortkey"        = []
 transformKey x y "author"
   | x `elem` ["mvbook", "book"] &&
-    y `elem` ["inbook", "bookinbook", "suppbook"] = ["bookauthor"]
+    y `elem` ["inbook", "bookinbook", "suppbook"] = ["bookauthor", "author"]
 transformKey "mvbook" y z
   | y `elem` ["book", "inbook", "bookinbook", "suppbook"] = standardTrans z
 transformKey x y z
   | x `elem` ["mvcollection", "mvreference"] &&
-    y `elem` ["collection", "reference", "incollection", "suppbook"] =
-    standardTrans z
+    y `elem` ["collection", "reference", "incollection", "inreference",
+               "suppcollection"] = standardTrans z
 transformKey "mvproceedings" y z
   | y `elem` ["proceedings", "inproceedings"] = standardTrans z
 transformKey "book" y z
-  | y `elem` ["inbook", "bookinbook", "suppbook"] = standardTrans z
+  | y `elem` ["inbook", "bookinbook", "suppbook"] = bookTrans z
 transformKey x y z
   | x `elem` ["collection", "reference"] &&
-    y `elem` ["incollection", "inreference", "suppcollection"] = standardTrans z
-transformKey "proceedings" "inproceedings" z = standardTrans z
+    y `elem` ["incollection", "inreference", "suppcollection"] = bookTrans z
+transformKey "proceedings" "inproceedings" z = bookTrans z
 transformKey "periodical" y z
   | y `elem` ["article", "suppperiodical"] =
   case z of
@@ -247,6 +249,18 @@ standardTrans z =
        "title"          -> ["maintitle"]
        "subtitle"       -> ["mainsubtitle"]
        "titleaddon"     -> ["maintitleaddon"]
+       "shorttitle"     -> []
+       "sorttitle"      -> []
+       "indextitle"     -> []
+       "indexsorttitle" -> []
+       _                -> [z]
+
+bookTrans :: String -> [String]
+bookTrans z =
+  case z of
+       "title"          -> ["booktitle"]
+       "subtitle"       -> ["booksubtitle"]
+       "titleaddon"     -> ["booktitleaddon"]
        "shorttitle"     -> []
        "sorttitle"      -> []
        "indextitle"     -> []
