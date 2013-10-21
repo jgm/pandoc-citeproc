@@ -179,6 +179,7 @@ getXrefFields isBibtex baseEntry entries keys = do
        xs <- mapM (getXrefFields isBibtex baseEntry entries)
                    (splitKeys v)
        (x, y) <- xs
+       guard $ isNothing $ lookup x $ fields xrefEntry
        return (x, y)
      else do
        k' <- if isBibtex
@@ -191,7 +192,7 @@ resolveCrossRef :: Bool -> [Item] -> Item -> Item
 resolveCrossRef isBibtex entries entry = foldl go entry (fields entry)
   where go entry' (key, val) =
           if key == "crossref" || key == "xdata"
-          then entry'{ fields = fields entry ++
+          then entry'{ fields = fields entry' ++
                                     getXrefFields isBibtex entry entries val }
           else entry'
 

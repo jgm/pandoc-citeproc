@@ -45,7 +45,7 @@ references:
   volume: 3
   id: bookinbook-1
   issued:
-  - year: 1975
+    year: 1975
   author:
     family: Shakespeare
   container-author:
@@ -67,7 +67,7 @@ references:
   page: 100-200
   id: inbook-1
   issued:
-  - year: 1975
+    year: 1975
   number-of-volumes: 4
   publisher: Publisher
   type: chapter
