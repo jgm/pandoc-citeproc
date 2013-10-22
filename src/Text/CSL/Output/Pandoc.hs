@@ -31,6 +31,7 @@ import Data.Maybe ( fromMaybe )
 import Text.CSL.Style
 import Text.CSL.Output.Plain
 import Text.Pandoc.Definition
+import Text.Pandoc.XML (fromEntities)
 
 -- | With a 'Style' and the formatted output generate a 'String' in
 -- the native 'Pandoc' formats (i.e. immediately readable by pandoc).
@@ -156,7 +157,7 @@ renderFo sty fo
       escape s x = Link x (s,s) -- we use a link to store some data
 
 toStr :: String -> [Inline]
-toStr = toStr' . entityToChar
+toStr = toStr' . fromEntities
     where
       toStr' s
           |'«':' ':xs <- s = toStr' ("«\8239" ++ xs)
@@ -271,7 +272,7 @@ convertQuoted :: Style -> [Inline] -> [Inline]
 convertQuoted s = convertQuoted'
     where
       locale = let l = styleLocale s in case l of [x] -> x; _   -> Locale [] [] [] [] []
-      getQuote  x y = entityToChar . termSingular . fromMaybe newTerm {termSingular = x} .
+      getQuote  x y = fromEntities . termSingular . fromMaybe newTerm {termSingular = x} .
                       findTerm y Long . localeTerms $ locale
       doubleQuotesO = getQuote "\"" "open-quote"
       doubleQuotesC = getQuote "\"" "close-quote"

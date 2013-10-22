@@ -20,14 +20,11 @@ module Text.CSL.Output.Plain
     , (<+>)
     , (<>)
     , capitalize
-    , entityToChar
     , head'
     , tail'
     ) where
 
-import Control.Arrow ( (&&&) )
 import Data.Char
-
 import Text.CSL.Style
 
 -- | Render the 'FormattedOutput' into a plain text string.
@@ -84,21 +81,6 @@ sa <> sb
 
 capitalize :: String -> String
 capitalize s = if s /= [] then toUpper (head s) : tail s else []
-
-entityToChar :: String -> String
-entityToChar s
-    | '&':'#':xs <- s = uncurry (:) $ parseEntity xs
-    | x      :xs <- s = x : entityToChar xs
-    | otherwise       = []
-    where
-      parseEntity  = chr . readNum . takeWhile (/= ';') &&&
-                     entityToChar . tail' . dropWhile (/= ';')
-
-readNum :: String -> Int
-readNum ('x': n) = readNum $ "0x" ++ n
-readNum       n  = case readsPrec 1 n of
-                     [(x,[])] -> x
-                     _        -> error $ "Invalid character entity:" ++ n
 
 head' :: [a] -> [a]
 head' = take 1
