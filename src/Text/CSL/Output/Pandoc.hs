@@ -102,7 +102,7 @@ renderFo sty fo
       toPandoc f i = addSuffix f $ toStr (prefix f) ++
                      (quote f . format f . proc cleanStrict $ i)
       format     f = font_variant f . font f . text_case f
-      rest      xs = procList xs $ render sty
+      rest      xs = render sty xs
       quote    f i = if i /= [] && quotes f /= NoQuote
                      then if quotes f == NativeQuote
                           then [escape "inquote"   . valign f $ i]

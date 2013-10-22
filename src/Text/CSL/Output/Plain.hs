@@ -16,7 +16,6 @@
 module Text.CSL.Output.Plain
     ( renderPlain
     , renderPlainStrict
-    , procList
     , (<+>)
     , (<>)
     , capitalize
@@ -47,25 +46,22 @@ render b fo
     | (FO     fm xs) <- fo = prefix fm <++> format fm (trim $ rest xs) <++> suffix fm
     | otherwise            = []
     where
-      rest  xs  = procList xs $ concatM (render b)
+      rest  xs  = concatM (render b) xs
 
       trim      = if b then id   else unwords . words
       (<++>)    = if b then (++) else (<>)
       concatM f = foldr (<++>) [] . map f
 
       quote  f s = if s /= [] && quotes f /= NoQuote then "\"" ++ s ++ "\"" else s
-      capital  s = toUpper (head s) : (tail s)
       format f s = quote f . text_case f $ s
 
       text_case fm s
-          | "capitalize-first" <- textCase fm = procList s capital
-          | "capitalize-all"   <- textCase fm = procList s $ unwords . map capital . words
+          | "capitalize-first" <- textCase fm = capitalize s
+          | "capitalize-all"   <- textCase fm = unwords . map capitalize . words
+                                                $ s
           | "lowercase"        <- textCase fm = map toLower s
           | "uppercase"        <- textCase fm = map toUpper s
           | otherwise = s
-
-procList :: Eq a => [a] -> ([a] -> [b]) -> [b]
-procList  s f = if s /= [] then f s else []
 
 (<+>) :: String -> String -> String
 [] <+> ss = ss
@@ -80,7 +76,8 @@ sa <> sb
     | otherwise        = sa ++ sb
 
 capitalize :: String -> String
-capitalize s = if s /= [] then toUpper (head s) : tail s else []
+capitalize [] = []
+capitalize (c:cs) = toUpper c : cs
 
 head' :: [a] -> [a]
 head' = take 1
