@@ -7,6 +7,7 @@ module Text.CSL.Pandoc (processCites, processCites',
 import Text.CSL.Parser (parseCSL')
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk
+import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
 import Control.Applicative ((<|>))
@@ -80,15 +81,6 @@ toPath :: MetaValue -> Maybe String
 toPath (MetaString s) = Just s
 toPath (MetaInlines ils) = Just $ stringify ils
 toPath _ = Nothing
-
-stringify :: [Inline] -> String
-stringify = query getStr
-  where getStr (Str x)    = x
-        getStr Space      = " "
-        getStr (Code _ x) = x
-        getStr (Math _ x) = x
-        getStr LineBreak  = " "
-        getStr _          = ""
 
 getBibRefs :: MetaValue -> IO [Reference]
 getBibRefs (MetaList xs) = concat `fmap` mapM getBibRefs xs
