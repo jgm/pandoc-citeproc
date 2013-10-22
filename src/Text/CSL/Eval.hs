@@ -120,7 +120,7 @@ evalElement el
                            case e of
                              Names rs [Name NotSet fm'' [] [] []] fm' d' []
                                  -> let nfm = mergeFM fm'' $ mergeFM fm' fm in
-                                    evalElement $ Names rs ns nfm (d' `betterThen` d) []
+                                    evalElement $ Names rs ns nfm (d' `betterThan` d) []
                              _   -> evalElement e
 
       tryGroup l = if hasVar l

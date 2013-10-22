@@ -20,7 +20,7 @@ import Text.CSL.Eval ( split )
 import Text.CSL.Output.Plain ( (<+>), tail' )
 import Text.CSL.Pickle
 import Text.CSL.Reference
-import Text.CSL.Style ( betterThen )
+import Text.CSL.Style ( betterThan )
 import qualified Data.ByteString.Lazy as B
 import Data.Char ( isDigit, isLower )
 import qualified Data.Map as M
@@ -51,45 +51,45 @@ xpReference
                 , (di,ac,pu,pp,et)
                 , ((ac',uri),ln,st,no)
                  ) ->
-               ref { refId            = ck `betterThen` take 10 (concat . words $ fst ti)
+               ref { refId            = ck `betterThan` take 10 (concat . words $ fst ti)
                    , refType          = if ty /= NoType then ty else
                                         if refType ref == Book then Chapter else refType ref
                    , title            = fst ti
                    , titleShort       = snd ti
                    , author           = au
-                   , editor           = ed `betterThen` editor           ref
-                   , edition          = et `betterThen` edition          ref
-                   , translator       = tr `betterThen` translator       ref
-                   , recipient        = re `betterThen` recipient        ref
-                   , interviewer      = it `betterThen` interviewer      ref
-                   , composer         = co `betterThen` composer         ref
-                   , director         = dr `betterThen` director         ref
-                   , collectionEditor = ce `betterThen` collectionEditor ref
-                   , publisherPlace   = pp `betterThen` publisherPlace   ref
-                   , numberOfVolumes  = vs `betterThen` numberOfVolumes  ref
+                   , editor           = ed `betterThan` editor           ref
+                   , edition          = et `betterThan` edition          ref
+                   , translator       = tr `betterThan` translator       ref
+                   , recipient        = re `betterThan` recipient        ref
+                   , interviewer      = it `betterThan` interviewer      ref
+                   , composer         = co `betterThan` composer         ref
+                   , director         = dr `betterThan` director         ref
+                   , collectionEditor = ce `betterThan` collectionEditor ref
+                   , publisherPlace   = pp `betterThan` publisherPlace   ref
+                   , numberOfVolumes  = vs `betterThan` numberOfVolumes  ref
                    , containerAuthor  = containerAuthor  ref
                    , url              = uri
                    , note             = no
                    , isbn             = i
                    , doi              = d
-                   , genre            = genre         ref `betterThen` gn
-                   , issued           = issued        ref `betterThen` di `betterThen` di'
-                   , accessed         = accessed      ref `betterThen` ac `betterThen` ac'
-                   , page             = page          ref `betterThen` pg
-                   , volume           = volume        ref `betterThen` vl
-                   , issue            = issue         ref `betterThen` is  `betterThen`
-                                        number        ref `betterThen` nu
-                   , number           = number        ref `betterThen` nu
-                   , section          = section       ref `betterThen` sc
-                   , chapterNumber    = chapterNumber ref `betterThen` ch
-                   , language         = language      ref `betterThen` ln
-                   , status           = status        ref `betterThen` st
+                   , genre            = genre         ref `betterThan` gn
+                   , issued           = issued        ref `betterThan` di `betterThan` di'
+                   , accessed         = accessed      ref `betterThan` ac `betterThan` ac'
+                   , page             = page          ref `betterThan` pg
+                   , volume           = volume        ref `betterThan` vl
+                   , issue            = issue         ref `betterThan` is  `betterThan`
+                                        number        ref `betterThan` nu
+                   , number           = number        ref `betterThan` nu
+                   , section          = section       ref `betterThan` sc
+                   , chapterNumber    = chapterNumber ref `betterThan` ch
+                   , language         = language      ref `betterThan` ln
+                   , status           = status        ref `betterThan` st
                    , publisher        = fromAgent pu
-                                           `betterThen` publisher ref
-                                           `betterThen` fromAgent pu'
-                                           `betterThen` fromAgent dg
-                                           `betterThen` fromAgent om
-                                           `betterThen` fromAgent sp
+                                           `betterThan` publisher ref
+                                           `betterThan` fromAgent pu'
+                                           `betterThan` fromAgent dg
+                                           `betterThan` fromAgent om
+                                           `betterThan` fromAgent sp
                    , originalDate           = issued         oref
                    , originalTitle          = title          oref
                    , originalPublisher      = publisher      oref
@@ -168,11 +168,11 @@ xpRelatedItem t
                               , composer            = co
                               , director            = dr
                               , collectionEditor    = ce
-                              , issued              = di `betterThen` di'
+                              , issued              = di `betterThan` di'
                               , accessed            = ac
                               , page                = pg
                               , volume              = vl
-                              , issue               = is `betterThen` nu
+                              , issue               = is `betterThan` nu
                               , number              = nu
                               , section             = sc
                               , chapterNumber       = ch
@@ -180,8 +180,8 @@ xpRelatedItem t
                               , numberOfVolumes     = vs
                               , language            = ln
                               , status              = st
-                              , publisher           = fromAgent $ pu `betterThen` pu' `betterThen`
-                                                                  dg `betterThen` om  `betterThen` sp
+                              , publisher           = fromAgent $ pu `betterThan` pu' `betterThan`
+                                                                  dg `betterThan` om  `betterThan` sp
 
                               }
              , \r -> (((volumeTitle r,[]),(collectionTitle r,[]))

@@ -95,9 +95,9 @@ collapseYear :: Style -> String -> CitationGroup -> CitationGroup
 collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
     where
       styleYSD    = getOptionVal "year-suffix-delimiter"    . citOptions . citation $ s
-      yearSufDel  = styleYSD `betterThen` (layDelim . citLayout . citation $ s)
+      yearSufDel  = styleYSD `betterThan` (layDelim . citLayout . citation $ s)
       afterCD     = getOptionVal "after-collapse-delimiter" . citOptions . citation $ s
-      afterColDel = afterCD  `betterThen` d
+      afterColDel = afterCD  `betterThan` d
 
       format []     = []
       format (x:xs) = x : map getYearAndSuf xs

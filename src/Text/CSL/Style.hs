@@ -347,16 +347,16 @@ unsetAffixes f = f {prefix = [], suffix = []}
 mergeFM :: Formatting -> Formatting -> Formatting
 mergeFM (Formatting aa ab ac ad ae af ag ah ai aj ak al am an)
         (Formatting ba bb bc bd be bf bg bh bi bj bk bl bm bn) =
-                   Formatting (ba `betterThen` aa)
-                              (bb `betterThen` ab)
-                              (bc `betterThen` ac)
-                              (bd `betterThen` ad)
-                              (be `betterThen` ae)
-                              (bf `betterThen` af)
-                              (bg `betterThen` ag)
-                              (bh `betterThen` ah)
-                              (bi `betterThen` ai)
-                              (bj `betterThen` aj)
+                   Formatting (ba `betterThan` aa)
+                              (bb `betterThan` ab)
+                              (bc `betterThan` ac)
+                              (bd `betterThan` ad)
+                              (be `betterThan` ae)
+                              (bf `betterThan` af)
+                              (bg `betterThan` ag)
+                              (bh `betterThan` ah)
+                              (bi `betterThan` ai)
+                              (bj `betterThan` aj)
                               (if bk == NoQuote then ak else bk)
                               (bl || al)
                               (bm || am)
@@ -609,5 +609,6 @@ hasYearSuf = not . null . query getYearSuf
               | OYearSuf _ _ _ _ <- o = ["a"]
               | otherwise             = []
 
-betterThen :: Eq a => [a] -> [a] -> [a]
-betterThen a b = if a == [] then b else a
+betterThan :: [a] -> [a] -> [a]
+betterThan [] b = b
+betterThan a  _ = a
