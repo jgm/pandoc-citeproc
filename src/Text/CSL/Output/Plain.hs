@@ -101,7 +101,7 @@ readNum       n  = case readsPrec 1 n of
                      _        -> error $ "Invalid character entity:" ++ n
 
 head' :: [a] -> [a]
-head' = foldr (\x _ -> [x]) []
+head' = take 1
 
 tail' :: Eq a => [a] -> [a]
-tail' x = if x /= [] then tail x else []
+tail' = drop 1
