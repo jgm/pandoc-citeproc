@@ -17,7 +17,7 @@ module Text.CSL.Output.Plain
     ( renderPlain
     , renderPlainStrict
     , (<+>)
-    , (<>)
+    , (<^>)
     , capitalize
     , head'
     , tail'
@@ -49,7 +49,7 @@ render noClean fo =
       rest  xs  = concatM (render noClean) xs
 
       trim      = if noClean then id   else unwords . words
-      (<++>)    = if noClean then (++) else (<>)
+      (<++>)    = if noClean then (++) else (<^>)
       concatM f = foldr (<++>) [] . map f
 
       quote  f s = if null s || quotes f == NoQuote
@@ -70,12 +70,14 @@ render noClean fo =
 s  <+> [] = s
 s  <+> ss = s ++ " " ++ ss
 
-(<>) :: String -> String -> String
-sa <> sb
-    | sa /= [], (s:xs) <- sb
-    , last sa == s
-    , s `elem` ";:,. " = sa ++ xs
-    | otherwise        = sa ++ sb
+-- | Conjoin strings, avoiding repeated punctuation.
+(<^>) :: String -> String -> String
+[] <^> sb         = sb
+sa <^> []         = sa
+sa <^> (s:xs)
+  | s `elem` ";:,. "
+  , last sa == s = sa ++ xs
+sa <^> sb         = sa ++ sb
 
 capitalize :: String -> String
 capitalize [] = []

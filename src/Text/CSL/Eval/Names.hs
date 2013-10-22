@@ -23,7 +23,7 @@ import Data.Maybe ( isJust )
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
-import Text.CSL.Output.Plain ( (<>) )
+import Text.CSL.Output.Plain ( (<^>) )
 import Text.CSL.Parser ( toRead )
 import Text.CSL.Reference
 import Text.CSL.Style
@@ -154,11 +154,11 @@ formatNames ea del p s as n
           | otherwise = concatMap (formatName m True  f fm os np) . take i $ as
       delim t os d x
           | "always" <- getOptionVal "delimiter-precedes-last" os
-          , length x == 2 = addDelim d (init x) ++ ODel (d <> andStr t os) : [last x]
+          , length x == 2 = addDelim d (init x) ++ ODel (d <^> andStr t os) : [last x]
           | length x == 2 = addDelim d (init x) ++ ODel (andStr'   t d os) : [last x]
           | "never" <- getOptionVal "delimiter-precedes-last" os
           , length x >  2 = addDelim d (init x) ++ ODel (andStr'   t d os) : [last x]
-          | length x >  2 = addDelim d (init x) ++ ODel (d <> andStr t os) : [last x]
+          | length x >  2 = addDelim d (init x) ++ ODel (d <^> andStr t os) : [last x]
           | otherwise     = addDelim d x
       andStr t os
           | "text"   <- getOptionVal "and" os = " " ++ t ++ " "
