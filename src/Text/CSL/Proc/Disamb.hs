@@ -78,7 +78,7 @@ disambCitations s bibs cs groups
       -- \"disambiguate\" condition set to 'True'
       reEval      = let chk = if hasYSuffOpt then filter ((==) [] . citYear) else id
                     in  chk needYSuff
-      reEvaluated = if or (query hasIfDis s) && reEval /= []
+      reEvaluated = if or (query hasIfDis s) && not (null reEval)
                     then map (uncurry $ reEvaluate s reEval) $ zip refs groups
                     else groups
 
@@ -166,9 +166,8 @@ reEvaluate (Style {citation = ct, csMacros = ms , styleLocale = lo,
 -- disambiguation strategies have failed. To be used with the generic
 -- 'query' function.
 hasIfDis :: IfThen -> [Bool]
-hasIfDis o
-    | IfThen (Condition {disambiguation = d}) _ _ <- o = [d /= []]
-    | otherwise                                        = [False  ]
+hasIfDis (IfThen (Condition {disambiguation = (_:_)}) _ _) = [True]
+hasIfDis _                                                 = [False]
 
 -- | Get the list of disambiguation options set in the 'Style' for
 -- citations.
@@ -333,12 +332,12 @@ disambiguate l
 --
 -- > same [1,2,1] = [True,False,True]
 same :: Eq a => [a] -> [Bool]
-same [] = []
-same l
-    = map (flip elem dupl) l
+same l = map (`elem` dupl) l
     where
       dupl = catMaybes . snd . macc [] $ l
-      macc = mapAccumL $ \a x -> if x `elem` a then (a,Just x) else (x:a,Nothing)
+      macc = mapAccumL $ \a x -> if x `elem` a
+                                 then (a,Just x)
+                                 else (x:a,Nothing)
 
 hasDuplicates :: Eq a => [a] -> Bool
 hasDuplicates = or . same
