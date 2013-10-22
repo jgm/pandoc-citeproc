@@ -313,6 +313,7 @@ initInline (i:[])
     | SmallCaps   is <- i = return $ SmallCaps   (initInline is)
     | Strikeout   is <- i = return $ Strikeout   (initInline is)
     | Link      is t <- i = return $ Link        (initInline is) t
+    | Span at     is <- i = return $ Span at     (initInline is)
     | otherwise           = []
     where
       init' s = if s /= [] then init s else []
@@ -343,6 +344,7 @@ mapHeadInline f (i:xs)
     | SmallCaps   is <- i = SmallCaps   (mapHeadInline f is)   : xs
     | Strikeout   is <- i = Strikeout   (mapHeadInline f is)   : xs
     | Link      is t <- i = Link        (mapHeadInline f is) t : xs
+    | Span     at is <- i = Span at     (mapHeadInline f is)   : xs
     | otherwise           = i : xs
 
 getInline :: Inline -> [Inline]
@@ -355,4 +357,5 @@ getInline i
     | Quoted _    is <- i = is
     | SmallCaps   is <- i = is
     | Link      is _ <- i = is
+    | Span _      is <- i = is
     | otherwise           = []
