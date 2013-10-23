@@ -1,5 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, PatternGuards, OverloadedStrings,
-  DeriveDataTypeable, ExistentialQuantification, FlexibleInstances #-}
+  DeriveDataTypeable, ExistentialQuantification, FlexibleInstances,
+  ScopedTypeVariables #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Reference
@@ -138,7 +139,12 @@ instance FromJSON RefDate where
           Success [y]     -> return $ RefDate y "" "" "" "" ""
           Success [y,m]   -> return $ RefDate y m "" "" "" ""
           Success [y,m,d] -> return $ RefDate y m "" d "" ""
-          Error e         -> fail $ "Could not parse RefDate: " ++ e
+          Error e         ->
+             case fromJSON (Array v) of  -- try parsing as numbers
+                  Success [y' :: Int]-> return $ RefDate (show y') "" "" "" "" ""
+                  Success [y',m']    -> return $ RefDate (show y') (show m') "" "" "" ""
+                  Success [y',m',d'] -> return $ RefDate (show y') (show m') "" (show d') "" ""
+                  _                  -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
   parseJSON (Object v) = RefDate <$>
               v .#? "year" .!= "" <*>
