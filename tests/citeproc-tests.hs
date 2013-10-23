@@ -4,7 +4,7 @@ import System.Exit
 import Data.Aeson
 import System.FilePath
 import System.Directory
-import Data.List (intercalate)
+import Data.List (intercalate, sort)
 import qualified Data.Vector as V
 import qualified Data.Map as M
 import qualified Data.Text as T
@@ -119,27 +119,27 @@ testDir = "." </> "citeproc-test" </> "processor-tests" </> "machines"
 
 runTest :: FilePath -> IO TestResult
 runTest path = do
-  putStr path
+  putStrLn path
   raw <- BL.readFile path
-  let testCase = either (error . ("\n"++)) id $ eitherDecode raw
+  let testCase = either error id $ eitherDecode raw
   let procOpts = ProcOpts (testBibopts testCase)
   let style    = (testCsl testCase) {
                         styleAbbrevs = testAbbreviations testCase }
   let refs     = testReferences testCase
   let cites    = testCitations testCase ++ testCitationItems testCase
+  let cites'   = if null cites
+                    then map (\ref -> [emptyCite{ citeId = refId ref}]) refs
+                    else cites
   let expected = testResult testCase
   let mode     = testMode testCase
 
   let result   = intercalate "\n" $ map (renderPlainStrict) $
                  (case mode of {CitationMode -> citations; _ -> bibliography})
-                 $ citeproc procOpts style refs cites
+                 $ citeproc procOpts style refs cites'
   if result == expected
-     then do
-       putStrLn " [PASSED]"
-       return Passed
+     then return Passed
      else do
-       putStrLn $ "[FAILED]"
-       putStrLn "EXPECTED:"
+       putStrLn $ "FAILED! EXPECTED:"
        putStrLn expected
        putStrLn "GOT:"
        putStrLn result
@@ -147,7 +147,7 @@ runTest path = do
 
 main :: IO ()
 main = do
-  testFiles <- (map (testDir </>) .
+  testFiles <- (map (testDir </>) . sort .
                 filter (\f -> takeExtension f == ".json"))
               <$> getDirectoryContents testDir
   results <- mapM runTest testFiles
