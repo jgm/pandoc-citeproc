@@ -130,7 +130,13 @@ data RefDate =
             } deriving ( Show, Read, Eq, Typeable, Data )
 
 instance FromJSON RefDate where
-  parseJSON (Object v) = RefDate <$>
+  parseJSON (Object v) = do
+    dateParts <- v .:? "date-parts"
+    case dateParts of
+       Just [y]     -> return $ RefDate y "" "" "" "" ""
+       Just [y,m]   -> return $ RefDate y m "" "" "" ""
+       Just [y,m,d] -> return $ RefDate y m "" d "" ""
+       _ -> RefDate <$>
               v .:? "year" .!= "" <*>
               v .:? "month" .!= "" <*>
               v .:? "season" .!= "" <*>
