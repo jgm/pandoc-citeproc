@@ -22,7 +22,7 @@ import Data.Generics
 import Data.Aeson hiding (Value)
 import qualified Data.Aeson as Aeson
 import Data.Aeson.Types (Parser, Pair)
-import Control.Applicative ((<$>),(<*>))
+import Control.Applicative ((<$>), (<*>), (<|>), pure)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Vector as V
@@ -84,7 +84,7 @@ instance Show Agent where
 
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
-              v .:? "given" .!= [] <*>
+              (v .: "given" <|> ((:[]) <$> v .: "given") <|> pure []) <*>
               v .:?  "dropping-particle" .!= "" <*>
               v .:? "non-dropping-particle" .!= "" <*>
               v .:? "family" .!= "" <*>
@@ -130,6 +130,12 @@ data RefDate =
             } deriving ( Show, Read, Eq, Typeable, Data )
 
 instance FromJSON RefDate where
+  parseJSON (Array v) =
+     case fromJSON (Array v) of
+          Success [y]     -> return $ RefDate y "" "" "" "" ""
+          Success [y,m]   -> return $ RefDate y m "" "" "" ""
+          Success [y,m,d] -> return $ RefDate y m "" d "" ""
+          _               -> mzero
   parseJSON (Object v) = RefDate <$>
               v .:? "year" .!= "" <*>
               v .:? "month" .!= "" <*>
@@ -151,7 +157,11 @@ instance ToJSON RefDate where
 
 instance FromJSON [RefDate] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
-  parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
+  parseJSON (Object v) = do
+    dateParts <- v .:? "date-parts"
+    case dateParts of
+         Just (Array xs) -> mapM parseJSON $ V.toList xs
+         _               -> (:[]) `fmap` parseJSON (Object v)
   parseJSON x          = parseJSON x >>= mkRefDate
 
 instance ToJSON [RefDate] where
