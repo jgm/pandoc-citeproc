@@ -26,7 +26,6 @@ import Control.Applicative ((<$>), (<*>), (<|>), pure)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Vector as V
-import Control.Monad
 import Data.Char (toUpper, isSpace, toLower, isUpper, isLower, isDigit)
 
 import Text.CSL.Style
@@ -91,7 +90,7 @@ instance FromJSON Agent where
               v .:? "suffix" .!= "" <*>
               v .:? "literal" .!= "" <*>
               v .:? "comma-suffix" .!= False
-  parseJSON _ = mzero
+  parseJSON _ = fail "Could not parse Agent"
 
 instance ToJSON Agent where
   toJSON agent = object' $ [
@@ -107,7 +106,7 @@ instance FromJSON [Agent] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
   parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
   parseJSON (String t) = parseJSON (String t) >>= mkAgent
-  parseJSON _ = mzero
+  parseJSON _ = fail "Could not parse [Agent]"
 
 instance ToJSON [Agent] where
   toJSON [x] = toJSON x
@@ -117,7 +116,7 @@ mkAgent :: Text -> Parser [Agent]
 mkAgent t =
   case reverse (words $ T.unpack t) of
        (x:ys) -> return [Agent (reverse ys) [] [] x [] [] False]
-       []     -> mzero
+       []     -> fail "Empty text cannot produce [Agent]"
 
 
 data RefDate =
@@ -135,7 +134,8 @@ instance FromJSON RefDate where
           Success [y]     -> return $ RefDate y "" "" "" "" ""
           Success [y,m]   -> return $ RefDate y m "" "" "" ""
           Success [y,m,d] -> return $ RefDate y m "" d "" ""
-          _               -> mzero
+          Error e         -> fail $ "Could not parse RefDate: " ++ e
+          _               -> fail "Could not parse RefDate"
   parseJSON (Object v) = RefDate <$>
               v .:? "year" .!= "" <*>
               v .:? "month" .!= "" <*>
@@ -143,7 +143,7 @@ instance FromJSON RefDate where
               v .:? "day" .!= "" <*>
               v .:? "other" .!= "" <*>
               v .:? "circa" .!= ""
-  parseJSON _ = mzero
+  parseJSON _ = fail "Could not parse RefDate"
 
 instance ToJSON RefDate where
   toJSON refdate = object' [
@@ -224,7 +224,7 @@ instance FromJSON RefType where
             | otherwise     = []
           capitalize (x:xs) = toUpper x : xs
           capitalize     [] = []
-  parseJSON _ = mzero
+  parseJSON _ = fail "Could not parse RefType"
 
 instance ToJSON RefType where
   toJSON reftype = toJSON (uncamelize $ uncapitalize $ show reftype)
@@ -240,7 +240,7 @@ newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, 
 instance FromJSON CNum where
   parseJSON x = case fromJSON x of
                      Success n -> return $ CNum n
-                     _         -> mzero
+                     _         -> fail "Could not parse CNum"
 
 instance ToJSON CNum where
   toJSON (CNum n) = toJSON n
@@ -406,7 +406,7 @@ instance FromJSON Reference where
        v .:? "citation-number" .!= CNum 0 <*>
        v .:? "first-reference-note-number" .!= 1 <*>
        v .:? "citation-label" .!= ""
-  parseJSON _ = mzero
+  parseJSON _ = fail "Could not parse Reference"
 
 instance ToJSON Reference where
   toJSON ref = object' [
