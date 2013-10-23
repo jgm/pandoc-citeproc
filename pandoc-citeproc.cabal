@@ -168,8 +168,8 @@ library
                       Text.CSL.Input.Pandoc
                       Text.CSL.Output.Pandoc
                       Text.CSL.Output.Plain
-    other-modules:    Text.CSL.Data
-                      Paths_pandoc_citeproc
+                      Text.CSL.Data
+    other-modules:    Paths_pandoc_citeproc
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
     ghc-prof-options: -prof -auto-all
     build-depends:    containers, directory, mtl, json, utf8-string,
