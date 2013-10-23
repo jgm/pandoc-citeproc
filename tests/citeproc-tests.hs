@@ -5,6 +5,7 @@ import Data.Aeson
 import System.FilePath
 import System.Directory
 import Data.List (intercalate)
+import qualified Data.Vector as V
 import qualified Data.Map as M
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
@@ -62,7 +63,7 @@ instance FromJSON [Abbrev] where
                                       (M.Map String
                                          (M.Map String String))) ->
                        return $ M.toList $ M.map M.toList m
-                     _ -> mzero
+                     _ -> return []
 
 instance FromJSON Affix where
   parseJSON (String s) = pure $ PlainText (T.unpack s)
@@ -88,13 +89,20 @@ newtype WrapCitations =
 
 instance FromJSON WrapCitations where
   parseJSON (Array v) = do
-    let cits = fromJSON (Array v)
-    case cits of
+    case fromJSON (Array v) of
          Success []      -> return $ WrapCitations []
          Success [c,_,_] -> WrapCitations <$>
                               (c .: "citationItems" >>= parseJSON)
          _               -> mzero
   parseJSON _ = return $ WrapCitations []
+
+instance FromJSON [Reference] where
+  parseJSON (Array v) = mapM parseJSON $ V.toList v
+  parseJSON _ = return []
+
+instance FromJSON [[Cite]] where
+  parseJSON (Array v) = mapM parseJSON $ V.toList v
+  parseJSON _ = return []
 
 instance FromJSON Style where
   parseJSON (String s) = return $ unsafePerformIO $ parseCSL'
@@ -113,7 +121,7 @@ runTest :: FilePath -> IO TestResult
 runTest path = do
   putStr path
   raw <- BL.readFile path
-  let testCase = maybe (error "Could not read!") id $ decode raw
+  let testCase = either (error . ("\n"++)) id $ eitherDecode raw
   let procOpts = ProcOpts (testBibopts testCase)
   let style    = (testCsl testCase) {
                         styleAbbrevs = testAbbreviations testCase }
