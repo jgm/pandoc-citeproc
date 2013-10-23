@@ -20,7 +20,7 @@ import System.IO.Unsafe
 data TestCase = TestCase{
     testMode          :: Mode        -- mode
   , testBibopts       :: BibOpts     -- bibsection
-  , testCitations     :: Citations   -- citations
+  , testCitations     :: [CiteObject] -- citations
   , testCitationItems :: Citations   -- citation-items
   , testCsl           :: Style       -- csl
   , testAbbreviations :: [Abbrev]    -- abbreviations
@@ -33,7 +33,7 @@ data Mode = CitationMode | BibliographyMode deriving Show
 instance FromJSON Mode where
   parseJSON (String "citation")     = return CitationMode
   parseJSON (String "bibliography") = return BibliographyMode
-  parseJSON _                       = mzero
+  parseJSON _                       = fail "Unknown mode"
 
 instance FromJSON BibOpts where
   parseJSON (Object v) = do
@@ -49,13 +49,13 @@ instance FromJSON TestCase where
   parseJSON (Object v) = TestCase <$>
               v .:  "mode" <*>
               v .:? "bibsection" .!= Select [] [] <*>
-              (unWrapCitations <$> (v .:? "citations" .!= WrapCitations [])) <*>
+              v .:? "citations" .!= [] <*>
               v .:? "citation_items" .!= [] <*>
               v .:  "csl" <*>
-              v .:?  "abbreviations" .!= [] <*>
-              v .:? "input" .!= [] <*>
-              v .: "result"
-  parseJSON _ = mzero
+              v .:? "abbreviations" .!= [] <*>
+              v .:  "input" <*>
+              v .:  "result"
+  parseJSON _ = fail "Could not parse test case"
 
 instance FromJSON [Abbrev] where
   parseJSON x = case fromJSON x of
@@ -67,7 +67,7 @@ instance FromJSON [Abbrev] where
 
 instance FromJSON Affix where
   parseJSON (String s) = pure $ PlainText (T.unpack s)
-  parseJSON _          = mzero
+  parseJSON _          = fail "Could not parse affix"
 
 instance FromJSON Cite where
   parseJSON (Object v) = Cite <$>
@@ -82,21 +82,21 @@ instance FromJSON Cite where
               v .:? "author-in-text" .!= False <*>
               v .:? "suppress-author" .!= False <*>
               v .:? "cite-hash" .!= 0
-  parseJSON _ = mzero
+  parseJSON _ = fail "Could not parse Cite"
 
-newtype WrapCitations =
-        WrapCitations { unWrapCitations :: Citations } deriving Show
+newtype CiteObject =
+        CiteObject { unCiteObject :: [Cite] } deriving Show
 
-instance FromJSON WrapCitations where
-  parseJSON (Array v) = do
+instance FromJSON CiteObject where
+  parseJSON (Array v) =
     case fromJSON (Array v) of
-         Success []      -> return $ WrapCitations []
-         Success [c,_,_] -> WrapCitations <$>
-                              (c .: "citationItems" >>= parseJSON)
-         _               -> mzero
-  parseJSON _ = return $ WrapCitations []
+         Success [Object x, Array _, Array _] ->
+                            CiteObject <$> x .: "citationItems"
+         Error e         -> fail $ "Could not parse CiteObject: " ++ e
+         x               -> fail $ "Could not parse CiteObject" ++ show x
+  parseJSON x = fail $ "Could not parse CiteObject " ++ show x
 
-instance FromJSON [Reference] where
+instance FromJSON [CiteObject] where
   parseJSON (Array v) = mapM parseJSON $ V.toList v
   parseJSON _ = return []
 
@@ -107,7 +107,7 @@ instance FromJSON [[Cite]] where
 instance FromJSON Style where
   parseJSON (String s) = return $ unsafePerformIO $ parseCSL'
                          $ BL.fromChunks [T.encodeUtf8 s]
-  parseJSON _ = mzero
+  parseJSON _ = fail "Could not parse Style"
 
 data TestResult =
   Passed | Failed{ expectedValue :: String
@@ -126,7 +126,7 @@ runTest path = do
   let style    = (testCsl testCase) {
                         styleAbbrevs = testAbbreviations testCase }
   let refs     = testReferences testCase
-  let cites    = testCitations testCase ++ testCitationItems testCase
+  let cites    = map unCiteObject (testCitations testCase) ++ testCitationItems testCase
   let cites'   = if null cites
                     then map (\ref -> [emptyCite{ citeId = refId ref}]) refs
                     else cites
