@@ -1,7 +1,8 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
-    ScopedTypeVariables#-}
+    ScopedTypeVariables #-}
 import System.Exit
 import Data.Aeson
+import Data.Aeson.Types (Parser)
 import System.FilePath
 import System.Directory
 import Data.List (intercalate, sort)
@@ -10,6 +11,7 @@ import qualified Data.Map as M
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Text.CSL.Style
+import Text.CSL.Reference
 import Text.CSL.Parser (parseCSL')
 import Text.CSL
 import Control.Monad
@@ -36,14 +38,28 @@ instance FromJSON Mode where
   parseJSON (String "bibliography-header") = return BibliographyHeaderMode
   parseJSON _                       = fail "Unknown mode"
 
+newtype FieldVal = FieldVal{
+                      unFieldVal :: (String, String)
+                    } deriving Show
+
+instance FromJSON FieldVal where
+  parseJSON (Object v) = do
+    x <- v .: "field"
+    y <- v .: "value"
+    return $ FieldVal (x,y)
+  parseJSON _ = fail "Could not parse FieldVal"
+
 instance FromJSON BibOpts where
   parseJSON (Object v) = do
     quash <- v .:? "quash".!= []
-    (v .: "select" >>= \x -> return $ Select x quash)
+    let quash' = map unFieldVal quash
+    (v .: "select" >>= \x -> return $ Select (map unFieldVal x) quash')
      <|>
-     (v .: "include" >>= \x -> return $ Include x quash)
+     (v .: "include" >>= \x -> return $ Include (map unFieldVal x) quash')
      <|>
-     (v .: "exclude" >>= \x -> return $ Exclude x quash)
+     (v .: "exclude" >>= \x -> return $ Exclude (map unFieldVal x) quash')
+     <|>
+     return (Select [] quash')
   parseJSON _ = return $ Select [] []
 
 instance FromJSON TestCase where
@@ -72,13 +88,13 @@ instance FromJSON Affix where
 
 instance FromJSON Cite where
   parseJSON (Object v) = Cite <$>
-              v .: "id" <*>
+              v .#: "id" <*>
               v .:? "prefix" .!= PlainText "" <*>
               v .:? "suffix" .!= PlainText "" <*>
-              v .:? "label" .!= "" <*>
-              (v .: "locator"  <|> (show :: Int -> String) <$> (v .: "locator") <|> pure "") <*>
-              v .:? "note-number" .!= "" <*>
-              v .:? "position" .!= "" <*>
+              v .#? "label" .!= "" <*>
+              v .#? "locator"  .!= "" <*>
+              v .#? "note-number" .!= "" <*>
+              v .#? "position" .!= "" <*>
               v .:? "near-note" .!= False <*>
               v .:? "author-in-text" .!= False <*>
               v .:? "suppress-author" .!= False <*>
@@ -140,7 +156,7 @@ runTest path = do
          putStrLn $ "SKIPPING mode = bibliography-header"
          return Skipped
        _ -> do
-         let result   = intercalate "\n" $ map (renderPlainStrict) $
+         let result   = intercalate "\n" $ map (renderPlain) $
                         (case mode of {CitationMode -> citations; _ -> bibliography})
                         $ citeproc procOpts style refs cites'
          if result == expected
