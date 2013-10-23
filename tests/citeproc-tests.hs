@@ -28,11 +28,12 @@ data TestCase = TestCase{
   , testResult        :: String      -- result
   } deriving (Show)
 
-data Mode = CitationMode | BibliographyMode deriving Show
+data Mode = CitationMode | BibliographyMode | BibliographyHeaderMode deriving Show
 
 instance FromJSON Mode where
   parseJSON (String "citation")     = return CitationMode
   parseJSON (String "bibliography") = return BibliographyMode
+  parseJSON (String "bibliography-header") = return BibliographyHeaderMode
   parseJSON _                       = fail "Unknown mode"
 
 instance FromJSON BibOpts where
@@ -110,8 +111,10 @@ instance FromJSON Style where
   parseJSON _ = fail "Could not parse Style"
 
 data TestResult =
-  Passed | Failed{ expectedValue :: String
-                 , actualValue   :: String }
+    Passed
+  | Skipped
+  | Failed{ expectedValue :: String
+          , actualValue   :: String }
   deriving (Show)
 
 testDir :: FilePath
@@ -132,18 +135,22 @@ runTest path = do
                     else cites
   let expected = testResult testCase
   let mode     = testMode testCase
-
-  let result   = intercalate "\n" $ map (renderPlainStrict) $
-                 (case mode of {CitationMode -> citations; _ -> bibliography})
-                 $ citeproc procOpts style refs cites'
-  if result == expected
-     then return Passed
-     else do
-       putStrLn $ "FAILED! EXPECTED:"
-       putStrLn expected
-       putStrLn "GOT:"
-       putStrLn result
-       return $ Failed expected result
+  case mode of
+       BibliographyHeaderMode  -> do
+         putStrLn $ "SKIPPING mode = bibliography-header"
+         return Skipped
+       _ -> do
+         let result   = intercalate "\n" $ map (renderPlainStrict) $
+                        (case mode of {CitationMode -> citations; _ -> bibliography})
+                        $ citeproc procOpts style refs cites'
+         if result == expected
+            then return Passed
+            else do
+              putStrLn $ "FAILED! EXPECTED:"
+              putStrLn expected
+              putStrLn "GOT:"
+              putStrLn result
+              return $ Failed expected result
 
 main :: IO ()
 main = do
