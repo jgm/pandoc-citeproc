@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
     ScopedTypeVariables#-}
+import System.Exit
 import Data.Aeson
+import System.FilePath
+import System.Directory
 import Data.List (intercalate)
 import qualified Data.Map as M
 import qualified Data.Text as T
@@ -103,11 +106,12 @@ data TestResult =
                  , actualValue   :: String }
   deriving (Show)
 
-testPath :: FilePath
-testPath = "citeproc-test/processor-tests/machines/variables_ShortForm.json"
+testDir :: FilePath
+testDir = "." </> "citeproc-test" </> "processor-tests" </> "machines"
 
 runTest :: FilePath -> IO TestResult
 runTest path = do
+  putStr path
   raw <- BL.readFile path
   let testCase = maybe (error "Could not read!") id $ decode raw
   let procOpts = ProcOpts (testBibopts testCase)
@@ -122,9 +126,27 @@ runTest path = do
                  (case mode of {CitationMode -> citations; _ -> bibliography})
                  $ citeproc procOpts style refs cites
   if result == expected
-     then return Passed
-     else return $ Failed expected result
+     then do
+       putStrLn " [PASSED]"
+       return Passed
+     else do
+       putStrLn $ "[FAILED]"
+       putStrLn "EXPECTED:"
+       putStrLn expected
+       putStrLn "GOT:"
+       putStrLn result
+       return $ Failed expected result
 
 main :: IO ()
 main = do
-  runTest testPath >>= print
+  testFiles <- (map (testDir </>) .
+                filter (\f -> takeExtension f == ".json"))
+              <$> getDirectoryContents testDir
+  results <- mapM runTest testFiles
+  let isPass Passed = True
+      isPass _      = False
+  let numpasses = length $ filter isPass results
+  let numfailures = length $ filter (not . isPass) results
+  exitWith $ if numfailures == 0
+                then ExitSuccess
+                else ExitFailure numfailures
