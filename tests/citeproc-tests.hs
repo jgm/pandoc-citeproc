@@ -75,7 +75,7 @@ instance FromJSON Cite where
               v .:? "prefix" .!= PlainText "" <*>
               v .:? "suffix" .!= PlainText "" <*>
               v .:? "label" .!= "" <*>
-              v .:? "locator" .!= "" <*>
+              (v .: "locator"  <|> (show :: Int -> String) <$> (v .: "locator") <|> pure "") <*>
               v .:? "note-number" .!= "" <*>
               v .:? "position" .!= "" <*>
               v .:? "near-note" .!= False <*>
