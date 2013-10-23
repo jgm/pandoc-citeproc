@@ -59,6 +59,9 @@ fromValue (Value a) = cast a
 (.#?) :: Object -> Text -> Parser (Maybe String)
 x .#? y = (x .: y) <|> (fmap (show :: Int -> String) <$> (x .:? y))
 
+(.#:) :: Object -> Text -> Parser String
+x .#: y = (x .: y) <|> ((show :: Int -> String) <$> (x .: y))
+
 isValueSet :: Value -> Bool
 isValueSet val
     | Just v <- fromValue val :: Maybe String    = v /= []
@@ -341,7 +344,7 @@ data Reference =
 
 instance FromJSON Reference where
   parseJSON (Object v) = Reference <$>
-       v .: "id" <*>
+       v .#: "id" <*>
        v .:? "type" .!= NoType <*>
        v .:? "author" .!= [] <*>
        v .:? "editor" .!= [] <*>
