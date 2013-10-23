@@ -54,6 +54,10 @@ formatField = foldr f [] . g
 fromValue :: Data a => Value -> Maybe a
 fromValue (Value a) = cast a
 
+-- Parse as a string (even if the value is a number).
+(.#?) :: Object -> Text -> Parser (Maybe String)
+x .#? y = (x .: y) <|> (fmap (show :: Int -> String) <$> (x .:? y))
+
 isValueSet :: Value -> Bool
 isValueSet val
     | Just v <- fromValue val :: Maybe String    = v /= []
@@ -137,12 +141,12 @@ instance FromJSON RefDate where
           Error e         -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
   parseJSON (Object v) = RefDate <$>
-              v .:? "year" .!= "" <*>
-              v .:? "month" .!= "" <*>
-              v .:? "season" .!= "" <*>
-              v .:? "day" .!= "" <*>
-              v .:? "other" .!= "" <*>
-              v .:? "circa" .!= ""
+              v .#? "year" .!= "" <*>
+              v .#? "month" .!= "" <*>
+              v .#? "season" .!= "" <*>
+              v .#? "day" .!= "" <*>
+              v .#? "other" .!= "" <*>
+              v .#? "circa" .!= ""
   parseJSON _ = fail "Could not parse RefDate"
 
 instance ToJSON RefDate where
@@ -372,14 +376,14 @@ instance FromJSON Reference where
        v .:? "archive-location" .!= "" <*>
        v .:? "event" .!= "" <*>
        v .:? "event-place" .!= "" <*>
-       v .:? "page" .!= "" <*>
-       v .:? "page-first" .!= "" <*>
-       v .:? "number-of-pages" .!= "" <*>
-       v .:? "version" .!= "" <*>
-       v .:? "volume" .!= "" <*>
-       v .:? "number-of-volumes" .!= "" <*>
-       v .:? "issue" .!= "" <*>
-       v .:? "chapter-number" .!= "" <*>
+       v .#? "page" .!= "" <*>
+       v .#? "page-first" .!= "" <*>
+       v .#? "number-of-pages" .!= "" <*>
+       v .#? "version" .!= "" <*>
+       v .#? "volume" .!= "" <*>
+       v .#? "number-of-volumes" .!= "" <*>
+       v .#? "issue" .!= "" <*>
+       v .#? "chapter-number" .!= "" <*>
        v .:? "medium" .!= "" <*>
        v .:? "status" .!= "" <*>
        v .:? "edition" .!= "" <*>
@@ -390,7 +394,7 @@ instance FromJSON Reference where
        v .:? "annote" .!= "" <*>
        v .:? "abstract" .!= "" <*>
        v .:? "keyword" .!= "" <*>
-       v .:? "number" .!= "" <*>
+       v .#? "number" .!= "" <*>
        v .:? "references" .!= "" <*>
        v .:? "url" .!= "" <*>
        v .:? "doi" .!= "" <*>
@@ -398,7 +402,7 @@ instance FromJSON Reference where
        v .:? "issn" .!= "" <*>
        v .:? "pmcid" .!= "" <*>
        v .:? "pmid" .!= "" <*>
-       v .:? "call-number" .!= "" <*>
+       v .#? "call-number" .!= "" <*>
        v .:? "dimensions" .!= "" <*>
        v .:? "scale" .!= "" <*>
        v .:? "categories" .!= [] <*>
