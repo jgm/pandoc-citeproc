@@ -51,30 +51,6 @@ instance FromJSON Mode where
   parseJSON (String "bibliography-nosort") = return BibliographyNoSortMode
   parseJSON _                       = fail "Unknown mode"
 
-newtype FieldVal = FieldVal{
-                      unFieldVal :: (String, String)
-                    } deriving Show
-
-instance FromJSON FieldVal where
-  parseJSON (Object v) = do
-    x <- v .: "field"
-    y <- v .: "value"
-    return $ FieldVal (x,y)
-  parseJSON _ = fail "Could not parse FieldVal"
-
-instance FromJSON BibOpts where
-  parseJSON (Object v) = do
-    quash <- v .:? "quash".!= []
-    let quash' = map unFieldVal quash
-    (v .: "select" >>= \x -> return $ Select (map unFieldVal x) quash')
-     <|>
-     (v .: "include" >>= \x -> return $ Include (map unFieldVal x) quash')
-     <|>
-     (v .: "exclude" >>= \x -> return $ Exclude (map unFieldVal x) quash')
-     <|>
-     return (Select [] quash')
-  parseJSON _ = return $ Select [] []
-
 instance FromJSON TestCase where
   parseJSON (Object v) = TestCase <$>
               v .:  "mode" <*>

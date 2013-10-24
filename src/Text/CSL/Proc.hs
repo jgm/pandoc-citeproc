@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards, DeriveDataTypeable #-}
+{-# LANGUAGE PatternGuards, DeriveDataTypeable, OverloadedStrings #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Proc
@@ -28,6 +28,8 @@ import Text.CSL.Proc.Collapse
 import Text.CSL.Proc.Disamb
 import Text.CSL.Reference
 import Text.CSL.Style
+import Data.Aeson
+import Control.Applicative ((<|>))
 
 data ProcOpts
     = ProcOpts
@@ -40,6 +42,30 @@ data BibOpts
     | Include [(String, String)] [(String, String)]
     | Exclude [(String, String)] [(String, String)]
     deriving ( Show, Read, Eq )
+
+newtype FieldVal = FieldVal{
+                      unFieldVal :: (String, String)
+                    } deriving Show
+
+instance FromJSON FieldVal where
+  parseJSON (Object v) = do
+    x <- v .: "field"
+    y <- v .: "value"
+    return $ FieldVal (x,y)
+  parseJSON _ = fail "Could not parse FieldVal"
+
+instance FromJSON BibOpts where
+  parseJSON (Object v) = do
+    quash <- v .:? "quash".!= []
+    let quash' = map unFieldVal quash
+    (v .: "select" >>= \x -> return $ Select (map unFieldVal x) quash')
+     <|>
+     (v .: "include" >>= \x -> return $ Include (map unFieldVal x) quash')
+     <|>
+     (v .: "exclude" >>= \x -> return $ Exclude (map unFieldVal x) quash')
+     <|>
+     return (Select [] quash')
+  parseJSON _ = return $ Select [] []
 
 procOpts :: ProcOpts
 procOpts = ProcOpts (Select [] [])
