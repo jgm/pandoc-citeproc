@@ -171,6 +171,11 @@ runTest path = do
                     else cites
   let expected = trimEnd $ testResult testCase
   let mode     = testMode testCase
+  let assemble BibliographyMode xs =
+         "<div class=\"csl-bib-body\">\n" ++
+         unlines (map (\x -> "  <div class=\"csl-entry\">" ++ x ++
+                               "</div>") xs) ++ "</div>\n"
+      assemble _ xs = unlines xs
   case mode of
        BibliographyHeaderMode  -> do
          -- putStrLn $ "SKIPPING " ++ path ++ " (mode = bibliography-header)"
@@ -179,7 +184,7 @@ runTest path = do
          -- putStrLn $ "SKIPPING " ++ path ++ " (mode = bibliography-nosort)"
          return Skipped
        _ -> do
-         let result   = trimEnd $ intercalate "\n"
+         let result   = assemble mode
               $ mapMaybe (inlinesToString . bottomUp (concatMap removeNocaseSpans) . renderPandoc style) $
                 (case mode of {CitationMode -> citations; _ -> bibliography})
                 $ citeproc procOpts style refs cites'
