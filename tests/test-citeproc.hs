@@ -155,7 +155,7 @@ data TestResult =
   deriving (Show, Eq)
 
 testDir :: FilePath
-testDir = "." </> "citeproc-test" </> "processor-tests" </> "machines"
+testDir = "citeproc-test" </> "processor-tests" </> "machines"
 
 runTest :: FilePath -> IO TestResult
 runTest path = do

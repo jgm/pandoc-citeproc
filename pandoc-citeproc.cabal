@@ -145,6 +145,10 @@ flag unicode_collation
   description: Use Haskell bindings to the International Components for Unicode (ICU) libraries
   default:     False
 
+flag test_citeproc
+  description: Build the test-citeproc program
+  default:     False
+
 library
     hs-source-dirs:   src
     exposed-modules:  Text.CSL.Pandoc
@@ -231,6 +235,20 @@ executable biblio2yaml
     build-depends:    base >= 4, pandoc-citeproc, yaml, bytestring,
                       attoparsec, text, filepath
     default-language: Haskell98
+
+executable test-citeproc
+  Main-Is:        test-citeproc.hs
+  if flag(test_citeproc)
+    Buildable:    True
+  else
+    Buildable:    False
+  Hs-Source-Dirs: tests
+  build-depends:  base >= 4, aeson-pretty, aeson, directory, text,
+                  pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
+                  bytestring, pandoc-citeproc, process, temporary >= 1.1,
+                  yaml >= 0.8, containers >= 0.5 && < 0.6,
+                  vector >= 0.10 && < 0.11
+  default-language: Haskell98
 
 test-suite test-pandoc-citeproc
   Type:           exitcode-stdio-1.0
