@@ -350,7 +350,7 @@ data Reference =
 
 instance FromJSON Reference where
   parseJSON (Object v) = Reference <$>
-       v .#: "id" <*>
+       v .#? "id" .!= "" <*>
        v .:? "type" .!= NoType <*>
        v .:? "author" .!= [] <*>
        v .:? "editor" .!= [] <*>
