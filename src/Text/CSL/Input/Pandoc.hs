@@ -16,7 +16,7 @@ blocksToString = fmap (intercalate "\n\n") . mapM go
 
 inlinesToString :: (Functor m, Monad m) => [Inline] -> m String
 inlinesToString = fmap mconcat . mapM go
-  where go (Str xs)         = return xs
+  where go (Str xs)         = return $ escapeAts xs
         go Space            = return " "
         go (Emph xs)        = inTag "i" [] <$> inlinesToString xs
         go (Strong xs)      = inTag "b" [] <$> inlinesToString xs
@@ -46,6 +46,11 @@ inlinesToString = fmap mconcat . mapM go
         go (Quoted SingleQuote xs) = surround '‘' '’' <$> inlinesToString xs
         go (Quoted DoubleQuote xs) = surround '“' '”' <$> inlinesToString xs
         go _                = return ""
+
+-- escape @ at beginning of string, so '@foo' doesn't get treated as citation.
+escapeAts :: String -> String
+escapeAts ('@':xs) = '\\':'@':xs
+escapeAts xs       = xs
 
 parseRawLaTeX :: String -> [Inline]
 parseRawLaTeX ('\\':xs) =
