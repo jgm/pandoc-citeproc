@@ -16,12 +16,13 @@
 module Text.CSL.Style where
 
 import Control.Arrow
+import Control.Applicative
+import Data.Aeson
 import Data.List ( nubBy, isPrefixOf, isInfixOf )
 import Data.Generics ( Typeable, Data, everywhere
                      , everywhere', everything, mkT, mkQ )
 import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
-import Text.JSON
 import Text.Pandoc.Definition ( Inline, Target )
 import Data.Char (isPunctuation)
 
@@ -40,7 +41,7 @@ data Style
       , styleInfo          ::  Maybe CSInfo
       , styleDefaultLocale ::  String
       , styleLocale        :: [Locale]
-      , styleAbbrevs       :: [Abbrev]
+      , styleAbbrevs       :: Abbreviations
       , csOptions          :: [Option]
       , csMacros           :: [MacroMap]
       , citation           ::  Citation
@@ -116,8 +117,14 @@ rmOrdinals = proc' doRemove
           , "ordinal" `isInfixOf` t =   doRemove os
           | otherwise               = o:doRemove os
 
-type Abbrev
-    = (String, [(String, M.Map String String)])
+newtype Abbreviations = Abbreviations {
+           unAbbreviations :: M.Map String (M.Map String (M.Map String String))
+           } deriving ( Show, Read, Typeable, Data )
+
+instance FromJSON Abbreviations where
+  parseJSON (Object v)   = Abbreviations <$> parseJSON (Object v)
+  parseJSON (Bool False) = return $ Abbreviations M.empty
+  parseJSON _            = fail "Could not read Abbreviations"
 
 type MacroMap
     = (String,[Element])
@@ -420,15 +427,6 @@ data Affix
     = PlainText String
     | PandocText [Inline]
       deriving ( Show, Read, Eq, Ord, Typeable, Data )
-
--- | Needed for the test-suite.
-instance JSON Affix where
-    showJSON (PlainText  s) = JSString . toJSString $ s
-    showJSON (PandocText i) = JSString . toJSString $ show i
-    readJSON jv
-        | JSString js <- jv
-        , [(x,"")] <- reads (fromJSString js) = Ok x
-        | otherwise                           = Ok $ PlainText []
 
 type Citations = [[Cite]]
 data Cite

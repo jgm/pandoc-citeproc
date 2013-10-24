@@ -41,7 +41,7 @@ import Text.CSL.Style
 -- 'Locale', the 'MacroMap', the position of the cite and the
 -- 'Reference'.
 evalLayout :: Layout   -> EvalMode -> Bool -> [Locale] -> [MacroMap]
-           -> [Option] -> [Abbrev] -> Reference -> [Output]
+           -> [Option] -> Abbreviations -> Reference -> [Output]
 evalLayout (Layout _ _ es) em b l m o a r
     = cleanOutput evalOut
     where
@@ -68,7 +68,7 @@ evalLayout (Layout _ _ es) em b l m o a r
                  _          -> proc' rmTitleCase
 
 evalSorting :: EvalMode -> [Locale] -> [MacroMap] -> [Option] ->
-               [Sort] -> [Abbrev] -> Reference -> [Sorting]
+               [Sort] -> Abbreviations -> Reference -> [Sorting]
 evalSorting m l ms opts ss as r
     = map (format . sorting) ss
     where
@@ -217,7 +217,7 @@ evalIfThen i ei e
                                           b == "ibid-with-locator-c" then True  else False
           | otherwise                = isIbid b
 
-getFormattedValue :: [Option] -> [Abbrev] -> Form -> Formatting -> String -> Value -> [Output]
+getFormattedValue :: [Option] -> Abbreviations -> Form -> Formatting -> String -> Value -> [Output]
 getFormattedValue o as f fm s val
     | Just v <- fromValue val :: Maybe String    = rtfParser fm . getAbbr $ value v
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)

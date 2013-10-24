@@ -50,6 +50,7 @@ module Text.CSL
     , Bibliography (..)
     , Cite (..)
     , Affix (..)
+    , Abbreviations (..)
     , emptyCite
 
     -- ** High Level Processing

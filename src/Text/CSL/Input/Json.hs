@@ -20,7 +20,6 @@ import Control.Monad.State
 import Data.Generics
 import Data.Char (toLower, toUpper)
 import Data.List
-import qualified Data.Map as M
 import Data.Ratio
 
 import Text.JSON.Generic
@@ -51,14 +50,15 @@ readJsonString =
   let rmCom = unlines . filter (\x -> not (" *" `isPrefixOf` x || "/*" `isPrefixOf` x)) . lines
   in  either error id . runGetJSON readJSTopType . rmCom
 
-readJsonAbbrevFile :: FilePath -> IO [Abbrev]
+readJsonAbbrevFile :: FilePath -> IO Abbreviations
 readJsonAbbrevFile f = readJsonAbbrev `fmap` readJsonFile f
 
-readJsonAbbrev :: JSValue -> [Abbrev]
-readJsonAbbrev
-    = mapSndObj (mapSndObj (M.fromList . mapSndObj fromJString))
+readJsonAbbrev :: JSValue -> Abbreviations
+readJsonAbbrev = undefined {-
+    = map Abbrev . mapSndObj (mapSndObj (M.fromList . mapSndObj fromJString))
     where
       mapSndObj f = map (second f) . fromObj
+-}
 
 readJsonCitations :: JSValue -> [Cite]
 readJsonCitations jv
@@ -179,18 +179,18 @@ isRefDate :: String -> Bool
 isRefDate = flip elem [ "issued", "event-date", "accessed", "container", "original-date"]
 
 readJSData :: (Data a) => JSValue -> Result a
-readJSData j = readType j
-             `ext1R` jList
-             `extR` (value :: Result String)
-             `extR` (value :: Result Affix )
-  where
-    value :: (JSON a) => Result a
-    value = readJSON j
-
-    jList :: (Data e) => Result [e]
-    jList = case j of
-              JSArray j' -> mapM readJSData j'
-              _          -> Error $ "fromJSON: Prelude.[] bad data: " ++ show j
+readJSData j = undefined -- readType j
+--              `ext1R` jList
+--              `extR` (value :: Result String)
+--              `extR` (value :: Result Affix )
+--   where
+--     value :: (JSON a) => Result a
+--     value = readJSON j
+-- 
+--     jList :: (Data e) => Result [e]
+--     jList = case j of
+--               JSArray j' -> mapM readJSData j'
+--               _          -> Error $ "fromJSON: Prelude.[] bad data: " ++ show j
 
 -- | Build a datatype from a JSON object. Uses selectFields which
 -- allows to provied default values for fields not present in the JSON

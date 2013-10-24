@@ -24,6 +24,7 @@ import Data.Char        ( isUpper, toUpper, toLower )
 import Data.Maybe       ( catMaybes                 )
 import qualified Data.ByteString.Lazy as L
 import Data.ByteString.Lazy.UTF8 ( fromString )
+import qualified Data.Map as M
 #ifdef USE_NETWORK
 import Network.HTTP ( getResponseBody, mkRequest, RequestMethod(..) )
 import Network.Browser ( browse, setAllowRedirects, setUserAgent, request )
@@ -227,7 +228,7 @@ instance XmlPickler CSCategory where
 
 xpStyle :: PU Style
 xpStyle
-    = xpWrap ( \ ((v,sc,si,sl,l),(o,m,c,b))   -> Style v sc si sl l [] o m c b
+    = xpWrap ( \ ((v,sc,si,sl,l),(o,m,c,b))   -> Style v sc si sl l (Abbreviations M.empty) o m c b
              , \ (Style v sc si sl l _ o m c b) -> ((v,sc,si,sl,l),(o,m,c,b))) $
       xpIElem "style" $
       xpPair (xp5Tuple (xpAttrText "version")

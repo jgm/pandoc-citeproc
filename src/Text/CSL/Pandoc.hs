@@ -69,10 +69,11 @@ processCites' (Pandoc meta blocks) = do
   csl <- maybe (getDefaultCSL >>= parseCSL')
           (\f -> findFile [".", csldir] f >>= L.readFile >>= parseCSL') cslfile
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
-  let isSpaceOrTab s = s == ' ' || s == '\t'
-  abbrevs <- maybe (return [])
+  let skipLeadingSpace = L.dropWhile (\s -> s == 32 || (s >= 9 && s <= 13))
+  abbrevs <- maybe (return (Abbreviations M.empty))
              (\f -> findFile [".", csldir] f >>=
-               readJsonAbbrevFile . dropWhile isSpaceOrTab)
+               L.readFile >>=
+               either error return . eitherDecode . skipLeadingSpace)
              cslAbbrevFile
   let csl' = csl{ styleAbbrevs = abbrevs }
   return $ processCites csl' refs $ Pandoc meta blocks

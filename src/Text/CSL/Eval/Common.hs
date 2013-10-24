@@ -50,7 +50,7 @@ data Environment
       , dates   :: [Element]
       , options :: [Option]
       , names   :: [Element]
-      , abbrevs :: [Abbrev]
+      , abbrevs :: Abbreviations
       } deriving ( Show )
 
 data EvalMode
@@ -64,11 +64,11 @@ isSorting m = case m of EvalSorting _ -> True; _ -> False
 
 -- | With the variable name and the variable value search for an
 -- abbreviation or return an empty string.
-getAbbreviation :: [Abbrev] -> String -> String -> String
-getAbbreviation as s v
-    = case lookup "default" as of
+getAbbreviation :: Abbreviations -> String -> String -> String
+getAbbreviation (Abbreviations as) s v
+    = case M.lookup "default" as of
         Nothing -> []
-        Just x  -> case lookup (if s `elem` numericVars then "number" else s) x of
+        Just x  -> case M.lookup (if s `elem` numericVars then "number" else s) x of
                      Nothing -> []
                      Just x' -> case M.lookup v x' of
                                   Nothing  -> []

@@ -33,7 +33,7 @@ data TestCase = TestCase{
   , testCitations     :: [CiteObject] -- citations
   , testCitationItems :: Citations   -- citation-items
   , testCsl           :: Style       -- csl
-  , testAbbreviations :: [Abbrev]    -- abbreviations
+  , testAbbreviations :: Abbreviations -- abbreviations
   , testReferences    :: [Reference] -- input
   , testResult        :: String      -- result
   } deriving (Show)
@@ -58,18 +58,10 @@ instance FromJSON TestCase where
               v .:? "citations" .!= [] <*>
               v .:? "citation_items" .!= [] <*>
               v .:  "csl" <*>
-              v .:? "abbreviations" .!= [] <*>
+              v .:? "abbreviations" .!= (Abbreviations M.empty) <*>
               v .:  "input" <*>
               v .:  "result"
   parseJSON _ = fail "Could not parse test case"
-
-instance FromJSON [Abbrev] where
-  parseJSON x = case fromJSON x of
-                     Success (m :: M.Map String
-                                      (M.Map String
-                                         (M.Map String String))) ->
-                       return $ M.toList $ M.map M.toList m
-                     _ -> return []
 
 instance FromJSON Affix where
   parseJSON (String s) = pure $ PlainText (T.unpack s)
