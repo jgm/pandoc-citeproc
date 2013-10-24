@@ -205,13 +205,25 @@ showDiff expected' result' =
     let actualf   = fp </> "actual"
     writeFile expectedf expected'
     writeFile actualf result'
+    withDirectory fp $ void $ rawSystem "diff" ["-u","expected","actual"]
+
+withDirectory :: FilePath -> IO a -> IO a
+withDirectory fp action = do
     oldDir <- getCurrentDirectory
     setCurrentDirectory fp
-    rawSystem "diff" ["-u","expected","actual"]
+    result <- action
     setCurrentDirectory oldDir
+    return result
 
 main :: IO ()
 main = do
+  exists <- doesDirectoryExist testDir
+  unless exists $ do
+    putStrLn "Downloading test suite"
+    rawSystem "hg" ["clone", "https://bitbucket.org/bdarcus/citeproc-test"]
+    withDirectory "citeproc-test" $
+      void $ rawSystem "python" ["processor.py", "--grind"]
+
   testFiles <- (map (testDir </>) . sort .
                 filter (\f -> takeExtension f == ".json"))
               <$> getDirectoryContents testDir
