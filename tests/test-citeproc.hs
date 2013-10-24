@@ -178,18 +178,20 @@ runTest path = do
       assemble _ xs = unlines xs
   case mode of
        BibliographyHeaderMode  -> do
-         -- putStrLn $ "SKIPPING " ++ path ++ " (mode = bibliography-header)"
-         return Skipped
+          putStrLn $ "[SKIPPED] " ++ path ++ "\n"
+          return Skipped
        BibliographyNoSortMode  -> do
-         -- putStrLn $ "SKIPPING " ++ path ++ " (mode = bibliography-nosort)"
-         return Skipped
+          putStrLn $ "[SKIPPED] " ++ path ++ "\n"
+          return Skipped
        _ -> do
          let result   = assemble mode
               $ mapMaybe (inlinesToString . bottomUp (concatMap removeNocaseSpans) . renderPandoc style) $
                 (case mode of {CitationMode -> citations; _ -> bibliography})
                 $ citeproc procOpts style refs cites'
          if result == expected
-            then return Passed
+            then do
+              putStrLn $ "[PASSED] " ++ path ++ "\n"
+              return Passed
             else do
               putStrLn $ "[FAILED] " ++ path
               showDiff expected result
