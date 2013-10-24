@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
     ScopedTypeVariables #-}
 import System.Exit
+import Data.Char (isSpace)
+import System.Process
+import System.IO.Temp (withSystemTempDirectory)
 import Text.Pandoc.Definition (Inline(Span))
 import Text.Pandoc.Generic
 import Data.Maybe (mapMaybe)
@@ -148,8 +151,7 @@ instance FromJSON Style where
 data TestResult =
     Passed
   | Skipped
-  | Failed{ expectedValue :: String
-          , actualValue   :: String }
+  | Failed
   deriving (Show, Eq)
 
 testDir :: FilePath
@@ -157,7 +159,6 @@ testDir = "." </> "citeproc-test" </> "processor-tests" </> "machines"
 
 runTest :: FilePath -> IO TestResult
 runTest path = do
-  putStrLn path
   raw <- BL.readFile path
   let testCase = either error id $ eitherDecode raw
   let procOpts = ProcOpts (testBibopts testCase)
@@ -168,32 +169,46 @@ runTest path = do
   let cites'   = if null cites
                     then map (\ref -> [emptyCite{ citeId = refId ref}]) refs
                     else cites
-  let expected = testResult testCase
+  let expected = trimEnd $ testResult testCase
   let mode     = testMode testCase
   case mode of
        BibliographyHeaderMode  -> do
-         putStrLn $ "SKIPPING mode = bibliography-header"
+         -- putStrLn $ "SKIPPING " ++ path ++ " (mode = bibliography-header)"
          return Skipped
        BibliographyNoSortMode  -> do
-         putStrLn $ "SKIPPING mode = bibliography-nosort"
+         -- putStrLn $ "SKIPPING " ++ path ++ " (mode = bibliography-nosort)"
          return Skipped
        _ -> do
-         let result   = intercalate "\n"
+         let result   = trimEnd $ intercalate "\n"
               $ mapMaybe (inlinesToString . bottomUp (concatMap removeNocaseSpans) . renderPandoc style) $
                 (case mode of {CitationMode -> citations; _ -> bibliography})
                 $ citeproc procOpts style refs cites'
          if result == expected
             then return Passed
             else do
-              putStrLn $ "FAILED! EXPECTED:"
-              putStrLn expected
-              putStrLn "GOT:"
-              putStrLn result
-              return $ Failed expected result
+              putStrLn $ "[FAILED] " ++ path
+              showDiff expected result
+              putStrLn ""
+              return Failed
+
+trimEnd :: String -> String
+trimEnd = reverse . ('\n':) . dropWhile isSpace . reverse
 
 removeNocaseSpans :: Inline -> [Inline]
 removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs
 removeNocaseSpans x = [x]
+
+showDiff :: String -> String -> IO ()
+showDiff expected' result' =
+  withSystemTempDirectory "test-pandoc-citeproc-XXX" $ \fp -> do
+    let expectedf = fp </> "expected"
+    let actualf   = fp </> "actual"
+    writeFile expectedf expected'
+    writeFile actualf result'
+    oldDir <- getCurrentDirectory
+    setCurrentDirectory fp
+    rawSystem "diff" ["-u","expected","actual"]
+    setCurrentDirectory oldDir
 
 main :: IO ()
 main = do
@@ -203,7 +218,7 @@ main = do
   results <- mapM runTest testFiles
   let numpasses  = length $ filter (== Passed) results
   let numskipped = length $ filter (== Skipped) results
-  let numfailures = length $ filter (\r -> r /= Passed && r /= Skipped) results
+  let numfailures = length $ filter (== Failed) results
   putStrLn $ show numpasses ++ " passed; " ++ show numfailures ++
               " failed; " ++ show numskipped ++ " skipped."
   exitWith $ if numfailures == 0
