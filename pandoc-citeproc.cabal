@@ -168,7 +168,6 @@ library
                       Text.CSL.Input.MODS
                       Text.CSL.Input.Bibutils
                       Text.CSL.Input.Bibtex
-                      Text.CSL.Input.Json
                       Text.CSL.Input.Pandoc
                       Text.CSL.Output.Pandoc
                       Text.CSL.Output.Plain
@@ -176,7 +175,7 @@ library
     other-modules:    Paths_pandoc_citeproc
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
     ghc-prof-options: -prof -auto-all
-    build-depends:    containers, directory, mtl, json, utf8-string,
+    build-depends:    containers, directory, mtl, utf8-string,
                       bytestring, filepath, pandoc-types >= 1.12.3, tagsoup,
                       aeson, text, vector, texmath >= 0.6.4, split,
                       yaml >= 0.8, pandoc >= 1.12.1

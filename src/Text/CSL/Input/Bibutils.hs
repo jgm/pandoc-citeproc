@@ -22,10 +22,11 @@ import Data.Char
 import System.FilePath ( takeExtension )
 import Text.CSL.Pickle
 import Text.CSL.Reference
-import Text.CSL.Input.Json
 import Text.CSL.Input.MODS
 import Text.CSL.Input.Bibtex
-import Text.JSON.Generic
+import qualified Data.ByteString.Lazy as BL
+import Data.Aeson
+import Control.Applicative ( (<$>) )
 
 #ifdef USE_BIBUTILS
 import qualified Control.Exception as E
@@ -43,33 +44,28 @@ import Text.Bibutils
 -- Supported formats are: @json@, @mods@, @bibtex@, @biblatex@, @ris@,
 -- @endnote@, @endnotexml@, @isi@, @medline@, and @copac@.
 readBiblioFile :: FilePath -> IO [Reference]
-#ifdef USE_BIBUTILS
 readBiblioFile f
     = case getExt f of
-        ".mods"     -> readBiblioFile' f mods_in
+        ".json"     -> (either error return . eitherDecode)
+                          <$> BL.readFile f
+        ".native"   -> (either error return . eitherDecode)
+                          <$> BL.readFile f
         ".bib"      -> readBibtexInput False f
         ".bibtex"   -> readBibtexInput True f
         ".biblatex" -> readBibtexInput False f
+#ifdef USE_BIBUTILS
+        ".mods"     -> readBiblioFile' f mods_in
         ".ris"      -> readBiblioFile' f ris_in
         ".enl"      -> readBiblioFile' f endnote_in
         ".xml"      -> readBiblioFile' f endnotexml_in
         ".wos"      -> readBiblioFile' f isi_in
         ".medline"  -> readBiblioFile' f medline_in
         ".copac"    -> readBiblioFile' f copac_in
-        ".json"     -> readJsonInput f
-        ".native"   -> readFile f >>= return . decodeJSON
         _           -> error $ "citeproc: the format of the bibliographic database could not be recognized\n" ++
                               "using the file extension."
-
 #else
-readBiblioFile f
-    | ".mods"   <- getExt f = readModsCollectionFile f
-    | ".json"   <- getExt f = readJsonInput f
-    | ".native" <- getExt f = readFile f >>= return . decodeJSON
-    | ".bib"    <- getExt f = readBibtexInput False f
-    | ".bibtex" <- getExt  =  readBibtexInput True f
-    | otherwise             = error $ "citeproc: Bibliography format not supported.\n" ++
-                                      "citeproc-hs was not compiled with bibutils support."
+        ".mods"     -> readModsCollectionFile f
+        _           -> error $ "citeproc: Bibliography format not supported.\n" ++
 #endif
 
 data BibFormat
@@ -90,8 +86,8 @@ data BibFormat
 readBiblioString :: BibFormat -> String -> IO [Reference]
 readBiblioString b s
     | Mods      <- b = return $ readXmlString xpModsCollection (fromString s)
-    | Json      <- b = return $ readJsonInputString s
-    | Native    <- b = return $ decodeJSON s
+    | Json      <- b = either error return $ eitherDecode $ fromString s
+    | Native    <- b = either error return $ eitherDecode $ fromString s
     | Bibtex    <- b = readBibtexInputString True s
     | BibLatex  <- b = readBibtexInputString False s
 #ifdef USE_BIBUTILS
