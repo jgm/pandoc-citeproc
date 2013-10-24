@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
     ScopedTypeVariables #-}
 import System.Exit
+import Data.Maybe (mapMaybe)
 import Data.Aeson
 import Data.Aeson.Types (Parser)
 import System.FilePath
@@ -14,6 +15,7 @@ import Text.CSL.Style hiding (Number)
 import Text.CSL.Reference
 import Text.CSL.Parser (parseCSL')
 import Text.CSL
+import Text.CSL.Input.Pandoc (inlinesToString)
 import Control.Monad
 import Control.Applicative
 import qualified Data.ByteString.Lazy as BL
@@ -30,12 +32,17 @@ data TestCase = TestCase{
   , testResult        :: String      -- result
   } deriving (Show)
 
-data Mode = CitationMode | BibliographyMode | BibliographyHeaderMode deriving Show
+data Mode = CitationMode
+          | BibliographyMode
+          | BibliographyHeaderMode
+          | BibliographyNoSortMode
+          deriving Show
 
 instance FromJSON Mode where
   parseJSON (String "citation")     = return CitationMode
   parseJSON (String "bibliography") = return BibliographyMode
   parseJSON (String "bibliography-header") = return BibliographyHeaderMode
+  parseJSON (String "bibliography-nosort") = return BibliographyNoSortMode
   parseJSON _                       = fail "Unknown mode"
 
 newtype FieldVal = FieldVal{
@@ -141,7 +148,7 @@ data TestResult =
   | Skipped
   | Failed{ expectedValue :: String
           , actualValue   :: String }
-  deriving (Show)
+  deriving (Show, Eq)
 
 testDir :: FilePath
 testDir = "." </> "citeproc-test" </> "processor-tests" </> "machines"
@@ -165,8 +172,11 @@ runTest path = do
        BibliographyHeaderMode  -> do
          putStrLn $ "SKIPPING mode = bibliography-header"
          return Skipped
+       BibliographyNoSortMode  -> do
+         putStrLn $ "SKIPPING mode = bibliography-nosort"
+         return Skipped
        _ -> do
-         let result   = intercalate "\n" $ map (renderPlain) $
+         let result   = intercalate "\n" $ mapMaybe (inlinesToString . renderPandoc style) $
                         (case mode of {CitationMode -> citations; _ -> bibliography})
                         $ citeproc procOpts style refs cites'
          if result == expected
@@ -184,10 +194,11 @@ main = do
                 filter (\f -> takeExtension f == ".json"))
               <$> getDirectoryContents testDir
   results <- mapM runTest testFiles
-  let isPass Passed = True
-      isPass _      = False
-  let numpasses = length $ filter isPass results
-  let numfailures = length $ filter (not . isPass) results
+  let numskipped  = length $ filter (== Passed) results
+  let numpasses   = length $ filter (== Skipped) results
+  let numfailures = length $ filter (\r -> r /= Passed && r /= Skipped) results
+  putStrLn $ show numpasses ++ " passed; " ++ show numfailures ++
+              " failed; " ++ show numskipped ++ " skipped."
   exitWith $ if numfailures == 0
                 then ExitSuccess
                 else ExitFailure numfailures
