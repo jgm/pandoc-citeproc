@@ -28,8 +28,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import Data.Char (toUpper, isSpace, toLower, isUpper, isLower, isDigit)
-
-import Text.CSL.Style
+import Text.CSL.Style hiding (Number)
 import Text.CSL.Output.Plain ((<+>))
 
 -- | An existential type to wrap the different types a 'Reference' is
@@ -57,10 +56,10 @@ fromValue (Value a) = cast a
 
 -- Parse as a string (even if the value is a number).
 (.#?) :: Object -> Text -> Parser (Maybe String)
-x .#? y = (x .: y) <|> (fmap (show :: Int -> String) <$> (x .:? y))
+x .#? y = fmap unDString <$> (x .:? y)
 
 (.#:) :: Object -> Text -> Parser String
-x .#: y = (x .: y) <|> ((show :: Int -> String) <$> (x .: y))
+x .#: y = unDString <$> (x .: y)
 
 isValueSet :: Value -> Bool
 isValueSet val
@@ -139,15 +138,10 @@ data RefDate =
 instance FromJSON RefDate where
   parseJSON (Array v) =
      case fromJSON (Array v) of
-          Success [y]     -> return $ RefDate y "" "" "" "" ""
-          Success [y,m]   -> return $ RefDate y m "" "" "" ""
-          Success [y,m,d] -> return $ RefDate y m "" d "" ""
-          Error e         ->
-             case fromJSON (Array v) of  -- try parsing as numbers
-                  Success [y' :: Int]-> return $ RefDate (show y') "" "" "" "" ""
-                  Success [y',m']    -> return $ RefDate (show y') (show m') "" "" "" ""
-                  Success [y',m',d'] -> return $ RefDate (show y') (show m') "" (show d') "" ""
-                  _                  -> fail $ "Could not parse RefDate: " ++ e
+          Success [y]     -> return $ RefDate (unDString y) "" "" "" "" ""
+          Success [y,m]   -> return $ RefDate (unDString y) (unDString m) "" "" "" ""
+          Success [y,m,d] -> return $ RefDate (unDString y) (unDString m) "" (unDString d) "" ""
+          Error e         -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
   parseJSON (Object v) = RefDate <$>
               v .#? "year" .!= "" <*>
@@ -167,6 +161,18 @@ instance ToJSON RefDate where
     , "other" .= other refdate
     , "circa" .= circa refdate
     ]
+
+newtype DString = DString { unDString :: String } deriving Show
+
+instance FromJSON DString where
+  parseJSON (String s)     = return $ DString $ T.unpack s
+  parseJSON (Number n)     = case fromJSON (Number n) of
+                                  Success (x :: Int) -> return $ DString $ show x
+                                  Error _ -> case fromJSON (Number n) of
+                                                  Success (x :: Double) -> return $ DString $ show x
+                                                  Error e -> fail $ "Could not parse DString: " ++ e
+  parseJSON (Bool b)       = return $ DString $ map toLower $ show b
+  parseJSON _              = fail "Could not parse DString"
 
 instance FromJSON [RefDate] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
@@ -393,10 +399,10 @@ instance FromJSON Reference where
        v .#? "number-of-volumes" .!= "" <*>
        v .#? "issue" .!= "" <*>
        v .#? "chapter-number" .!= "" <*>
-       v .:? "medium" .!= "" <*>
-       v .:? "status" .!= "" <*>
-       v .:? "edition" .!= "" <*>
-       v .:? "section" .!= "" <*>
+       v .#? "medium" .!= "" <*>
+       v .#? "status" .!= "" <*>
+       v .#? "edition" .!= "" <*>
+       v .#? "section" .!= "" <*>
        v .:? "source" .!= "" <*>
        v .:? "genre" .!= "" <*>
        v .:? "note" .!= "" <*>
