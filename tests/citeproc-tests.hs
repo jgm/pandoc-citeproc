@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
     ScopedTypeVariables #-}
 import System.Exit
+import Text.Pandoc.Definition (Inline(Span))
+import Text.Pandoc.Generic
 import Data.Maybe (mapMaybe)
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -176,9 +178,10 @@ runTest path = do
          putStrLn $ "SKIPPING mode = bibliography-nosort"
          return Skipped
        _ -> do
-         let result   = intercalate "\n" $ mapMaybe (inlinesToString . renderPandoc style) $
-                        (case mode of {CitationMode -> citations; _ -> bibliography})
-                        $ citeproc procOpts style refs cites'
+         let result   = intercalate "\n"
+              $ mapMaybe (inlinesToString . bottomUp (concatMap removeNocaseSpans) . renderPandoc style) $
+                (case mode of {CitationMode -> citations; _ -> bibliography})
+                $ citeproc procOpts style refs cites'
          if result == expected
             then return Passed
             else do
@@ -188,14 +191,18 @@ runTest path = do
               putStrLn result
               return $ Failed expected result
 
+removeNocaseSpans :: Inline -> [Inline]
+removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs
+removeNocaseSpans x = [x]
+
 main :: IO ()
 main = do
   testFiles <- (map (testDir </>) . sort .
                 filter (\f -> takeExtension f == ".json"))
               <$> getDirectoryContents testDir
   results <- mapM runTest testFiles
-  let numskipped  = length $ filter (== Passed) results
-  let numpasses   = length $ filter (== Skipped) results
+  let numpasses  = length $ filter (== Passed) results
+  let numskipped = length $ filter (== Skipped) results
   let numfailures = length $ filter (\r -> r /= Passed && r /= Skipped) results
   putStrLn $ show numpasses ++ " passed; " ++ show numfailures ++
               " failed; " ++ show numskipped ++ " skipped."
