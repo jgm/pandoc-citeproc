@@ -4,8 +4,9 @@ import System.Exit
 import Data.Char (isSpace)
 import System.Process
 import System.IO.Temp (withSystemTempDirectory)
-import Text.Pandoc.Definition (Inline(Span))
+import Text.Pandoc.Definition (Inline(Span, Str))
 import Text.Pandoc.Generic
+import Text.Pandoc.Walk
 import Data.Maybe (mapMaybe)
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -157,6 +158,12 @@ data TestResult =
 testDir :: FilePath
 testDir = "citeproc-test" </> "processor-tests" </> "machines"
 
+escapeHtml :: String -> String
+escapeHtml [] = []
+escapeHtml ('&':xs) = "&#38;" ++ escapeHtml xs
+escapeHtml ('<':xs) = "&#60;" ++ escapeHtml xs
+escapeHtml (x:xs)   = x : escapeHtml xs
+
 runTest :: FilePath -> IO TestResult
 runTest path = do
   raw <- BL.readFile path
@@ -185,7 +192,10 @@ runTest path = do
           return Skipped
        _ -> do
          let result   = assemble mode
-              $ mapMaybe (inlinesToString . bottomUp (concatMap removeNocaseSpans) . renderPandoc style) $
+              $ mapMaybe (inlinesToString .
+                          walk escapeStr .
+                          bottomUp (concatMap removeNocaseSpans) .
+                          renderPandoc style) $
                 (case mode of {CitationMode -> citations; _ -> bibliography})
                 $ citeproc procOpts style refs cites'
          if result == expected
@@ -204,6 +214,10 @@ trimEnd = reverse . ('\n':) . dropWhile isSpace . reverse
 removeNocaseSpans :: Inline -> [Inline]
 removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs
 removeNocaseSpans x = [x]
+
+escapeStr :: Inline -> Inline
+escapeStr (Str xs) = Str $ escapeHtml xs
+escapeStr x = x
 
 showDiff :: String -> String -> IO ()
 showDiff expected' result' =
