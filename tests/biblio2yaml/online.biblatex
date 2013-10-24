@@ -46,7 +46,7 @@ references:
   url: http://tug.ctan.org/tex-archive/info/bibtex/tamethebeast/ttb_en.pdf
   type: webpage
   language: en-US
-- annote: This is an online entry. The <sc>url</sc>, which is given in the url field,
+- annote: This is an online entry. The <span style="font-variant:small-caps;">url</span>, which is given in the url field,
     is transformed into a clickable link if hyperref support has been enabled. Note
     the format of the urldate field (yyyy-mm-dd) in the database file. Also note the
     label field which may be used as a fallback by citation styles which need an author
