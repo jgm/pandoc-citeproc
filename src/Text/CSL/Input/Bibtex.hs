@@ -124,7 +124,7 @@ bibItem = do
   spaces
   char '{'
   spaces
-  entid <- many1 (satisfy isBibtexKeyChar)
+  entid <- many (satisfy isBibtexKeyChar)
   spaces
   char ','
   spaces
