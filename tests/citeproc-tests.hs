@@ -10,7 +10,7 @@ import qualified Data.Vector as V
 import qualified Data.Map as M
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
-import Text.CSL.Style
+import Text.CSL.Style hiding (Number)
 import Text.CSL.Reference
 import Text.CSL.Parser (parseCSL')
 import Text.CSL
@@ -86,6 +86,16 @@ instance FromJSON Affix where
   parseJSON (String s) = pure $ PlainText (T.unpack s)
   parseJSON _          = fail "Could not parse affix"
 
+newtype DBool = DBool { unDBool :: Bool } deriving Show
+
+instance FromJSON DBool where
+  parseJSON (Bool b  ) = return $ DBool b
+  parseJSON (Number n) = case fromJSON (Number n) of
+                              Success (0 :: Int) -> return $ DBool False
+                              Success _          -> return $ DBool True
+                              Error e            -> fail $ "Could not parse DBool: " ++ e
+  parseJSON _ = fail "Could not parse DBool"
+
 instance FromJSON Cite where
   parseJSON (Object v) = Cite <$>
               v .#: "id" <*>
@@ -95,9 +105,9 @@ instance FromJSON Cite where
               v .#? "locator"  .!= "" <*>
               v .#? "note-number" .!= "" <*>
               v .#? "position" .!= "" <*>
-              v .:? "near-note" .!= False <*>
-              v .:? "author-in-text" .!= False <*>
-              v .:? "suppress-author" .!= False <*>
+              (fmap unDBool <$> (v .:? "near-note")) .!= False <*>
+              (fmap unDBool <$> (v .:? "author-in-text")) .!= False <*>
+              (fmap unDBool <$> (v .:? "suppress-author")) .!= False <*>
               v .:? "cite-hash" .!= 0
   parseJSON _ = fail "Could not parse Cite"
 
