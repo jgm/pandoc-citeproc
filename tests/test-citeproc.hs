@@ -167,7 +167,7 @@ runTest path = do
   let refs     = testReferences testCase
   let cites    = map unCiteObject (testCitations testCase) ++ testCitationItems testCase
   let cites'   = if null cites
-                    then map (\ref -> [emptyCite{ citeId = refId ref}]) refs
+                    then [map (\ref -> emptyCite{ citeId = refId ref}) refs]
                     else cites
   let expected = trimEnd $ testResult testCase
   let mode     = testMode testCase
