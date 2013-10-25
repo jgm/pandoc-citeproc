@@ -172,7 +172,8 @@ library
                       Text.CSL.Output.Pandoc
                       Text.CSL.Output.Plain
                       Text.CSL.Data
-    other-modules:    Paths_pandoc_citeproc
+    other-modules:    Text.CSL.Util
+                      Paths_pandoc_citeproc
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
     ghc-prof-options: -prof -auto-all
     build-depends:    containers, directory, mtl,

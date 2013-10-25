@@ -1,4 +1,5 @@
-{-# LANGUAGE PatternGuards, DeriveDataTypeable #-}
+{-# LANGUAGE OverloadedStrings, PatternGuards, DeriveDataTypeable,
+    ScopedTypeVariables #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Style
@@ -15,9 +16,9 @@
 
 module Text.CSL.Style where
 
+import Data.Aeson
 import Control.Arrow
 import Control.Applicative
-import Data.Aeson
 import Data.List ( nubBy, isPrefixOf, isInfixOf )
 import Data.Generics ( Typeable, Data, everywhere
                      , everywhere', everything, mkT, mkQ )
@@ -25,6 +26,8 @@ import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
 import Text.Pandoc.Definition ( Inline, Target )
 import Data.Char (isPunctuation)
+import Text.CSL.Util (mb, parseBool, (.#?), (.#:))
+import qualified Data.Text as T
 
 #ifdef UNICODE_COLLATION
 import qualified Data.Text     as T
@@ -428,6 +431,10 @@ data Affix
     | PandocText [Inline]
       deriving ( Show, Read, Eq, Ord, Typeable, Data )
 
+instance FromJSON Affix where
+  parseJSON (String s) = pure $ PlainText (T.unpack s)
+  parseJSON _          = fail "Could not parse affix"
+
 type Citations = [[Cite]]
 data Cite
     = Cite
@@ -443,6 +450,21 @@ data Cite
       , suppressAuthor :: Bool
       , citeHash       :: Int
       } deriving ( Show, Eq, Typeable, Data )
+
+instance FromJSON Cite where
+  parseJSON (Object v) = Cite <$>
+              v .#: "id" <*>
+              v .:? "prefix" .!= PlainText "" <*>
+              v .:? "suffix" .!= PlainText "" <*>
+              v .#? "label" .!= "" <*>
+              v .#? "locator"  .!= "" <*>
+              v .#? "note-number" .!= "" <*>
+              v .#? "position" .!= "" <*>
+              (v .:? "near-note" >>= mb parseBool) .!= False <*>
+              (v .:? "author-in-text" >>= mb parseBool) .!= False <*>
+              (v .:? "suppress-author" >>= mb parseBool) .!= False <*>
+              v .:? "cite-hash" .!= 0
+  parseJSON _ = fail "Could not parse Cite"
 
 emptyAffix :: Affix
 emptyAffix = PlainText []
@@ -603,7 +625,8 @@ hasYear = not . null . query getYear
 
 hasYearSuf :: Output -> Bool
 hasYearSuf = not . null . query getYearSuf
-    where getYearSuf o
+    where getYearSuf :: Output -> [String]
+          getYearSuf o
               | OYearSuf _ _ _ _ <- o = ["a"]
               | otherwise             = []
 

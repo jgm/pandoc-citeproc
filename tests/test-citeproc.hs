@@ -63,35 +63,6 @@ instance FromJSON TestCase where
               v .:  "result"
   parseJSON _ = fail "Could not parse test case"
 
-instance FromJSON Affix where
-  parseJSON (String s) = pure $ PlainText (T.unpack s)
-  parseJSON _          = fail "Could not parse affix"
-
-newtype DBool = DBool { unDBool :: Bool } deriving Show
-
-instance FromJSON DBool where
-  parseJSON (Bool b  ) = return $ DBool b
-  parseJSON (Number n) = case fromJSON (Number n) of
-                              Success (0 :: Int) -> return $ DBool False
-                              Success _          -> return $ DBool True
-                              Error e            -> fail $ "Could not parse DBool: " ++ e
-  parseJSON _ = fail "Could not parse DBool"
-
-instance FromJSON Cite where
-  parseJSON (Object v) = Cite <$>
-              v .#: "id" <*>
-              v .:? "prefix" .!= PlainText "" <*>
-              v .:? "suffix" .!= PlainText "" <*>
-              v .#? "label" .!= "" <*>
-              v .#? "locator"  .!= "" <*>
-              v .#? "note-number" .!= "" <*>
-              v .#? "position" .!= "" <*>
-              (fmap unDBool <$> (v .:? "near-note")) .!= False <*>
-              (fmap unDBool <$> (v .:? "author-in-text")) .!= False <*>
-              (fmap unDBool <$> (v .:? "suppress-author")) .!= False <*>
-              v .:? "cite-hash" .!= 0
-  parseJSON _ = fail "Could not parse Cite"
-
 newtype CiteObject =
         CiteObject { unCiteObject :: [Cite] } deriving Show
 
