@@ -385,20 +385,24 @@ getOldDates prefix = do
   endyear' <- getField (prefix ++ "endyear") <|> return ""
   endmonth' <- getField (prefix ++ "endmonth") <|> return ""
   endday' <- getField (prefix ++ "endday") <|> return ""
-  let start' = RefDate { year   = year'
+  let start' = RefDate { year   = if all isDigit year' then year' else ""
                        , month  = month'
                        , season = ""
                        , day    = day'
-                       , other  = ""
+                       , other  = if all isDigit year' then "" else year'
                        , circa  = ""
                        }
   let end' = if null endyear'
                 then []
-                else [RefDate { year   = endyear'
+                else [RefDate { year   = if all isDigit endyear'
+                                            then endyear'
+                                            else ""
                               , month  = endmonth'
                               , day    = endday'
                               , season = ""
-                              , other  = ""
+                              , other  = if all isDigit endyear'
+                                            then ""
+                                            else endyear'
                               , circa  = ""
                               }]
   return (start':end')
@@ -870,7 +874,11 @@ itemToReference lang bibtex = bib $ do
                else getField "addendum"
                  <|> return ""
   pubstate' <- resolveKey lang `fmap`
-                   getRawField "pubstate" <|> return ""
+                 (  getRawField "pubstate"
+                <|> case issued' of
+                         (x:_) | other x == "forthcoming" -> return "forthcoming"
+                         _ -> return ""
+                 )
 
   let convertEnDash = map (\c -> if c == '–' then '-' else c)
 
