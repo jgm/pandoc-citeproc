@@ -526,8 +526,8 @@ latexTitle :: (MonadPlus m, Functor m) => Lang -> String -> m String
 latexTitle (Lang l _) s =
   trim `fmap` (latex' s >>= blocksToString . processTitle)
   where processTitle = case l of
-                          'e':'n':_ -> unTitlecase
-                          _         -> id
+                          "en" -> unTitlecase
+                          _    -> id
 
 latexAuthors :: (MonadPlus m, Functor m) => Options -> String -> m [Agent]
 latexAuthors opts s = latex' s >>= toAuthorList opts
@@ -556,10 +556,10 @@ untc (x:xs) = x : map go xs
 
 toLocale :: String -> String
 toLocale "english"    = "en-US" -- "en-EN" unavailable in CSL
-toLocale "USenglish"  = "en-US"
+toLocale "usenglish"  = "en-US"
 toLocale "american"   = "en-US"
 toLocale "british"    = "en-GB"
-toLocale "UKenglish"  = "en-GB"
+toLocale "ukenglish"  = "en-GB"
 toLocale "canadian"   = "en-US" -- "en-CA" unavailable in CSL
 toLocale "australian" = "en-GB" -- "en-AU" unavailable in CSL
 toLocale "newzealand" = "en-GB" -- "en-NZ" unavailable in CSL
@@ -614,7 +614,8 @@ toLocale "thai"       = "th-TH"
 toLocale "turkish"    = "tr-TR"
 toLocale "ukrainian"  = "uk-UA"
 toLocale "vietnamese" = "vi-VN"
-toLocale _            = ""
+toLocale "latin"      = "la"
+toLocale x            = x
 
 concatWith :: Char -> [String] -> String
 concatWith sep xs = foldl go "" xs
@@ -712,7 +713,7 @@ itemToReference lang bibtex = bib $ do
   -- hyphenation:
   let defaultHyphenation = case lang of
                                 Lang x y -> x ++ "-" ++ y
-  hyphenation <- (toLocale <$> getRawField "hyphenation")
+  hyphenation <- ((toLocale . map toLower) <$> getRawField "hyphenation")
                 <|> return ""
 
   -- authors:
