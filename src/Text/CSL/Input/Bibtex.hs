@@ -477,8 +477,9 @@ toAuthor opts ils =
   where useprefix = maybe False (== "true") $ lookup "useprefix" opts
         usecomma = maybe False (== "true") $ lookup "juniorcomma" opts
         commaParts = map words' $ splitWhen (== Str ",")
-                                $ splitStrWhen (== ',') ils
-        words' = wordsBy (== Space)
+                                $ splitStrWhen
+                                  (\c -> c == ',' || c == '\160') ils
+        words' = wordsBy (\x -> x == Space || x == Str "\160")
         isCapitalized (Str (c:cs) : rest)
           | isUpper c = True
           | isDigit c = isCapitalized (Str cs : rest)
