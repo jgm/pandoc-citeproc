@@ -62,6 +62,7 @@ parseRawLaTeX ('\\':xs) =
          command  = trim command'
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
          f "mkbibquote" ils = [Quoted DoubleQuote ils]
+         f "bibstring" [Str s] = [Code ("",["bibstring"],[]) s]
          f _            ils = [Span nullAttr ils]
 parseRawLaTeX _ = []
 

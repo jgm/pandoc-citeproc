@@ -19,6 +19,7 @@ module Text.CSL.Input.Bibtex
 import Text.Parsec hiding (optional, (<|>), many)
 import Control.Applicative
 import Text.Pandoc
+import Text.Pandoc.Walk (walk)
 import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
                            dropBlanks, split)
 import Data.List (intercalate)
@@ -26,10 +27,12 @@ import Data.Maybe
 import Data.Char (toLower, isUpper, toUpper, isDigit, isLower, isAlphaNum,
                   isPunctuation)
 import Control.Monad
-import Control.Monad.Reader
+import Control.Monad.RWS
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
 import Text.CSL.Input.Pandoc (blocksToString, inlinesToString)
+
+import Debug.Trace
 
 data Item = Item{ identifier :: String
                 , entryType  :: String
@@ -332,7 +335,12 @@ parseMonth "nov" = "11"
 parseMonth "dec" = "12"
 parseMonth x     = x
 
-type Bib = ReaderT Item Maybe
+data BibState = BibState{
+           untitlecase  :: Bool
+         , localeLang   :: Lang
+         }
+
+type Bib = RWST Item () BibState Maybe
 
 notFound :: String -> Bib a
 notFound f = fail $ f ++ " not found"
@@ -340,28 +348,33 @@ notFound f = fail $ f ++ " not found"
 getField :: String -> Bib String
 getField f = do
   fs <- asks fields
-  case lookup f fs >>= latex of
-       Just x  -> return x
+  case lookup f fs of
+       Just x  -> latex x
        Nothing -> notFound f
 
-getTitle :: Lang -> String -> Bib String
-getTitle lang f = do
+getTitle :: String -> Bib String
+getTitle f = do
   fs <- asks fields
-  case lookup f fs >>= latexTitle lang of
-       Just x  -> return x
+  case lookup f fs of
+       Just x  -> latexTitle x
        Nothing -> notFound f
+
+resolveBibStrings :: [Block] -> Bib [Block]
+resolveBibStrings bs = do
+  lang <- gets localeLang
+  return $ walk (convBibString lang) bs
+
+convBibString :: Lang -> Inline -> Inline
+convBibString lang (Code ("",["bibstring"],[]) s) = Str (resolveKey lang s)
+convBibString _ x = x
 
 getDates :: String -> Bib [RefDate]
-getDates f = do
-  fs <- asks fields
-  case lookup f fs >>= parseDates of
-       Just x  -> return x
-       Nothing -> notFound f
+getDates f = getField f >>= parseDates
 
-parseDates :: String -> Maybe [RefDate]
+parseDates :: Monad m => String -> m [RefDate]
 parseDates s = mapM parseDate $ splitWhen (=='/') s
 
-parseDate :: String -> Maybe RefDate
+parseDate :: Monad m => String -> m RefDate
 parseDate s = do
   let (year', month', day') =
         case splitWhen (== '-') s of
@@ -417,8 +430,8 @@ getRawField f = do
 getAuthorList :: Options -> String -> Bib [Agent]
 getAuthorList opts  f = do
   fs <- asks fields
-  case lookup f fs >>= latexAuthors opts of
-       Just xs -> return xs
+  case lookup f fs of
+       Just x  -> latexAuthors opts x
        Nothing -> notFound f
 
 getLiteralList :: String -> Bib [String]
@@ -520,25 +533,24 @@ splitStrWhen p (Str xs : ys)
   | any p xs = map Str ((split . dropBlanks) (whenElt p) xs) ++ splitStrWhen p ys
 splitStrWhen p (x : ys) = x : splitStrWhen p ys
 
-latex' :: (MonadPlus m, Functor m) => String -> m [Block]
-latex' s = return bs
+latex' :: String -> Bib [Block]
+latex' s = resolveBibStrings bs
   where Pandoc _ bs = readLaTeX def{readerParseRaw = True} s
 
-latex :: (MonadPlus m, Functor m) => String -> m String
+latex :: String -> Bib String
 latex s = latex' (trim s) >>= blocksToString
 
-latexTitle :: (MonadPlus m, Functor m) => Lang -> String -> m String
-latexTitle (Lang l _) s =
+latexTitle :: String -> Bib String
+latexTitle s = do
+  utc <- gets untitlecase
+  let processTitle = if utc then unTitlecase else id
   trim `fmap` (latex' s >>= blocksToString . processTitle)
-  where processTitle = case l of
-                          "en" -> unTitlecase
-                          _    -> id
 
-latexAuthors :: (MonadPlus m, Functor m) => Options -> String -> m [Agent]
-latexAuthors opts s = latex' s >>= toAuthorList opts
+latexAuthors :: Options -> String -> Bib [Agent]
+latexAuthors opts s = latex' (trim s) >>= toAuthorList opts
 
 bib :: Bib Reference -> Item -> Maybe Reference
-bib m entry = runReaderT m entry
+bib m entry = fmap fst $ evalRWST m entry (BibState True (Lang "en" "US"))
 
 unTitlecase :: [Block] -> [Block]
 unTitlecase [Para ils]  = [Para $ untc $ splitStrWhen isPunctuation ils]
@@ -641,6 +653,10 @@ parseOptions = map breakOpt . splitWhen (==',')
 
 itemToReference :: Lang -> Bool -> Item -> Maybe Reference
 itemToReference lang bibtex = bib $ do
+  modify $ \st -> st{ localeLang = lang,
+                      untitlecase = case lang of
+                                         Lang "en" _ -> True
+                                         _           -> False }
   id' <- asks identifier
   et <- asks entryType
   guard $ et /= "xdata"
@@ -741,60 +757,59 @@ itemToReference lang bibtex = bib $ do
   let hyphenation' = if null hyphenation
                      then defaultHyphenation
                      else hyphenation
-  let (la, co) = case splitWhen (== '-') hyphenation' of
-                      [x]     -> (x, "")
-                      (x:y:_) -> (x, y)
-                      []      -> ("", "")
-  let getTitle' = getTitle (Lang la co)
-  title' <- getTitle' (if isPeriodical then "issuetitle" else "title")
+  let la = case splitWhen (== '-') hyphenation' of
+                      (x:_) -> x
+                      []    -> ""
+  modify $ \s -> s{ untitlecase = la == "en" }
+  title' <- getTitle (if isPeriodical then "issuetitle" else "title")
            <|> return ""
-  subtitle' <- getTitle' (if isPeriodical then "issuesubtitle" else "subtitle")
+  subtitle' <- getTitle (if isPeriodical then "issuesubtitle" else "subtitle")
               <|> return ""
-  titleaddon' <- getTitle' "titleaddon"
+  titleaddon' <- getTitle "titleaddon"
                <|> return ""
-  volumeTitle' <- (getTitle' "maintitle" >> guard hasVolumes
-                    >> getTitle' "booktitle")
+  volumeTitle' <- (getTitle "maintitle" >> guard hasVolumes
+                    >> getTitle "booktitle")
                   <|> return ""
-  volumeSubtitle' <- (getTitle' "maintitle" >> guard hasVolumes
-                      >> getTitle' "booksubtitle")
+  volumeSubtitle' <- (getTitle "maintitle" >> guard hasVolumes
+                      >> getTitle "booksubtitle")
                      <|> return ""
-  volumeTitleAddon' <- (getTitle' "maintitle" >> guard hasVolumes
-                                   >> getTitle' "booktitleaddon")
+  volumeTitleAddon' <- (getTitle "maintitle" >> guard hasVolumes
+                                   >> getTitle "booktitleaddon")
                        <|> return ""
   containerTitle' <- (guard isPeriodical >> getField "title")
-                  <|> getTitle' "maintitle"
+                  <|> getTitle "maintitle"
                   <|> (guard (not isContainer) >>
-                       guard (null volumeTitle') >> getTitle' "booktitle")
+                       guard (null volumeTitle') >> getTitle "booktitle")
                   <|> getField "journaltitle"
                   <|> getField "journal"
                   <|> return ""
   containerSubtitle' <- (guard isPeriodical >> getField "subtitle")
-                       <|> getTitle' "mainsubtitle"
+                       <|> getTitle "mainsubtitle"
                        <|> (guard (not isContainer) >>
                             guard (null volumeSubtitle') >>
-                             getTitle' "booksubtitle")
+                             getTitle "booksubtitle")
                        <|> getField "journalsubtitle"
                        <|> return ""
   containerTitleAddon' <- (guard isPeriodical >> getField "titleaddon")
-                       <|> getTitle' "maintitleaddon"
+                       <|> getTitle "maintitleaddon"
                        <|> (guard (not isContainer) >>
                             guard (null volumeTitleAddon') >>
-                             getTitle' "booktitleaddon")
+                             getTitle "booktitleaddon")
                        <|> return ""
   containerTitleShort' <- (guard isPeriodical >> getField "shorttitle")
                         <|> (guard (not isContainer) >>
-                             getTitle' "booktitleshort")
+                             getTitle "booktitleshort")
                         <|> getField "journaltitleshort"
                         <|> getField "shortjournal"
                         <|> return ""
-  seriesTitle' <- resolveKey lang <$> getTitle' "series" <|> return ""
-  shortTitle' <- getTitle' "shorttitle"
+  seriesTitle' <- resolveKey lang <$> getTitle "series" <|> return ""
+  shortTitle' <- getTitle "shorttitle"
                <|> if ':' `elem` title'
                    then return (takeWhile (/=':') title')
                    else return ""
 
-  eventTitle' <- getTitle' "eventtitle" <|> return ""
-  origTitle' <- getTitle' "origtitle" <|> return ""
+  eventTitle' <- getTitle "eventtitle" <|> return ""
+  origTitle' <- getTitle "origtitle" <|> return ""
 
   -- publisher
   pubfields <- mapM (\f -> Just `fmap`
