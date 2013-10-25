@@ -23,7 +23,7 @@ import Data.Maybe ( isJust )
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
-import Text.CSL.Util ( readNum, (<^>) )
+import Text.CSL.Util ( readNum, (<^>), (<+>) )
 import Text.CSL.Reference
 import Text.CSL.Style
 import Text.Pandoc.Definition
@@ -347,9 +347,3 @@ formatLabel f fm p s
       period      = if stripPeriods fm then filter (/= '.') else id
       capital   x = toUpper (head x) : (tail x)
 
-(<+>) :: String -> String -> String
-[] <+> ss = ss
-s  <+> [] = s
-s  <+> ss = if last s == '\''
-            then init s ++ "’" ++ ss
-            else      s ++ " " ++ ss

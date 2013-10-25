@@ -29,7 +29,10 @@ readNum s = case reads s of
 (<+>) :: String -> String -> String
 [] <+> ss = ss
 s  <+> [] = s
-s  <+> ss = s ++ " " ++ ss
+s  <+> ss =
+  case reverse s of
+       ('\'':rs) -> reverse rs ++ ('’':ss)
+       _         -> s ++ (' ':ss)
 
 -- | Conjoin strings, avoiding repeated punctuation.
 (<^>) :: String -> String -> String
