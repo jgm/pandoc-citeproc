@@ -13,7 +13,7 @@
 
 module Text.CSL.Pickle.Xml where
 
-import Data.ByteString.Lazy.UTF8 ( toString )
+import Text.Pandoc.UTF8 ( toStringLazy )
 import qualified Data.ByteString.Lazy as L
 import Data.Maybe
 import Text.XML.Light
@@ -85,6 +85,6 @@ onlyElems' = map Elem . onlyElems
 
 parseXML' :: L.ByteString -> [Content]
 parseXML' s
-    = case parseXML (toString s) of
+    = case parseXML (toStringLazy s) of
         [] -> error $ "error while reading the XML string"
         x  -> x

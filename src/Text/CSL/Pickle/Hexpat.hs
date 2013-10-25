@@ -14,7 +14,7 @@
 module Text.CSL.Pickle.Hexpat where
 
 import qualified Data.ByteString.Lazy as L
-import Data.ByteString.Lazy.UTF8 ( toString )
+import Text.Pandoc.UTF8 ( toStringLazy )
 import Text.XML.Expat.Tree hiding ( mkText, getText, getChildren )
 import Text.XML.Expat.Format
 import Text.XML.Expat.Proc
@@ -23,7 +23,7 @@ type Content = UNode String
 type Attr    = (String, String)
 
 showXML :: Content -> String
-showXML = toString . format
+showXML = toStringLazy . format
 
 getText :: [Content] -> Maybe String
 getText [] = Nothing

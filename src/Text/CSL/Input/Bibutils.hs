@@ -17,7 +17,7 @@ module Text.CSL.Input.Bibutils
     , BibFormat (..)
     ) where
 
-import Data.ByteString.Lazy.UTF8 ( fromString )
+import Text.Pandoc.UTF8 ( fromStringLazy )
 import Data.Char
 import System.FilePath ( takeExtension )
 import Text.CSL.Pickle
@@ -85,9 +85,9 @@ data BibFormat
 
 readBiblioString :: BibFormat -> String -> IO [Reference]
 readBiblioString b s
-    | Mods      <- b = return $ readXmlString xpModsCollection (fromString s)
-    | Json      <- b = either error return $ eitherDecode $ fromString s
-    | Native    <- b = either error return $ eitherDecode $ fromString s
+    | Mods      <- b = return $ readXmlString xpModsCollection (fromStringLazy s)
+    | Json      <- b = either error return $ eitherDecode $ fromStringLazy s
+    | Native    <- b = either error return $ eitherDecode $ fromStringLazy s
     | Bibtex    <- b = readBibtexInputString True s
     | BibLatex  <- b = readBibtexInputString False s
 #ifdef USE_BIBUTILS

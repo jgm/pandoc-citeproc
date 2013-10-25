@@ -23,7 +23,7 @@ import Text.CSL.Data    ( getLocale )
 import Data.Char        ( isUpper, toUpper, toLower )
 import Data.Maybe       ( catMaybes                 )
 import qualified Data.ByteString.Lazy as L
-import Data.ByteString.Lazy.UTF8 ( fromString )
+import Text.Pandoc.UTF8 ( fromStringLazy )
 import qualified Data.Map as M
 #ifdef USE_NETWORK
 import Network.HTTP ( getResponseBody, mkRequest, RequestMethod(..) )
@@ -51,7 +51,7 @@ readCSLFile src = do
 
 -- | Parse a 'String' into a fully localized 'Style'
 parseCSL :: String -> IO Style
-parseCSL = parseCSL' . fromString
+parseCSL = parseCSL' . fromStringLazy
 
 parseCSL' :: L.ByteString -> IO Style
 parseCSL' f = do
