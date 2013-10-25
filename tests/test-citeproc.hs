@@ -77,10 +77,6 @@ instance FromJSON [CiteObject] where
   parseJSON (Array v) = mapM parseJSON $ V.toList v
   parseJSON _ = return []
 
-instance FromJSON [[Cite]] where
-  parseJSON (Array v) = mapM parseJSON $ V.toList v
-  parseJSON _ = return []
-
 data TestResult =
     Passed
   | Skipped

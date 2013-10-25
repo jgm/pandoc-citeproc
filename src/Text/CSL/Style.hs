@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings, PatternGuards, DeriveDataTypeable,
-    ScopedTypeVariables #-}
+    ScopedTypeVariables, FlexibleInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Style
@@ -40,6 +40,7 @@ import Data.RFC5051 (compareUnicode)
 import Text.CSL.Pickle
 import Text.CSL.Data    ( getLocale )
 import Data.Char        ( isUpper, toUpper, toLower )
+import qualified Data.Vector as V
 import Data.Maybe       ( catMaybes                 )
 import qualified Data.ByteString.Lazy as L
 #ifdef USE_NETWORK
@@ -485,6 +486,10 @@ instance FromJSON Cite where
               (v .:? "suppress-author" >>= mb parseBool) .!= False <*>
               v .:? "cite-hash" .!= 0
   parseJSON _ = fail "Could not parse Cite"
+
+instance FromJSON [[Cite]] where
+  parseJSON (Array v) = mapM parseJSON $ V.toList v
+  parseJSON _ = return []
 
 emptyAffix :: Affix
 emptyAffix = PlainText []
