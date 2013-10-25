@@ -39,7 +39,8 @@ s  <+> ss =
 [] <^> sb         = sb
 sa <^> []         = sa
 sa <^> (s:xs)
-  | s `elem` ";:,. " && last sa == s = sa ++ xs
+  | s `elem` puncts && last sa `elem` puncts = sa ++ xs
+  where puncts = ";:,. "
 sa <^> sb         = sa ++ sb
 
 capitalize :: String -> String
