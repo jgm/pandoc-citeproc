@@ -24,7 +24,6 @@ import Data.Maybe ( isJust )
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
 import Text.CSL.Util ( readNum, (<^>) )
-import Text.CSL.Style ( toRead )
 import Text.CSL.Reference
 import Text.CSL.Style
 import Text.Pandoc.Definition
