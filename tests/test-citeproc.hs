@@ -1,7 +1,8 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
     ScopedTypeVariables #-}
 import System.Exit
-import Data.Char (isSpace)
+import Data.Char (isSpace, toLower)
+import System.Environment (getArgs)
 import System.Process
 import System.IO.Temp (withSystemTempDirectory)
 import Text.Pandoc.Definition (Inline(Span, Str))
@@ -12,7 +13,7 @@ import Data.Aeson
 import Data.Aeson.Types (Parser)
 import System.FilePath
 import System.Directory
-import Data.List (intercalate, sort)
+import Data.List (intercalate, sort, isInfixOf)
 import qualified Data.Vector as V
 import qualified Data.Map as M
 import qualified Data.Text as T
@@ -104,7 +105,7 @@ runTest path = do
   let cites'   = if null cites
                     then [map (\ref -> emptyCite{ citeId = refId ref}) refs]
                     else cites
-  let expected = trimEnd $ testResult testCase
+  let expected = fixBegins $ trimEnd $ testResult testCase
   let mode     = testMode testCase
   let assemble BibliographyMode xs =
          "<div class=\"csl-bib-body\">\n" ++
@@ -139,6 +140,16 @@ runTest path = do
 trimEnd :: String -> String
 trimEnd = reverse . ('\n':) . dropWhile isSpace . reverse
 
+-- citeproc-js test suite expects "citations" to be formatted like
+-- .. [0] Smith (2007)
+-- >> [1] Jones (2008)
+-- To get a meaningful comparison, we remove this.
+fixBegins :: String -> String
+fixBegins = unlines . map fixLine . lines
+  where fixLine ('.':'.':'[':xs) = dropWhile isSpace $ dropWhile (not . isSpace) xs
+        fixLine ('>':'>':'[':xs) = dropWhile isSpace $ dropWhile (not . isSpace) xs
+        fixLine xs = xs
+
 removeNocaseSpans :: Inline -> [Inline]
 removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs
 removeNocaseSpans x = [x]
@@ -166,6 +177,11 @@ withDirectory fp action = do
 
 main :: IO ()
 main = do
+  args <- getArgs
+  let matchesPattern x = if null args
+                            then True
+                            else let x' = map toLower x
+                                 in  any (`isInfixOf` x') args
   exists <- doesDirectoryExist testDir
   unless exists $ do
     putStrLn "Downloading test suite"
@@ -174,6 +190,7 @@ main = do
       void $ rawSystem "python" ["processor.py", "--grind"]
 
   testFiles <- (map (testDir </>) . sort .
+                filter matchesPattern .
                 filter (\f -> takeExtension f == ".json"))
               <$> getDirectoryContents testDir
   results <- mapM runTest testFiles
