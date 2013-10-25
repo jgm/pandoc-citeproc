@@ -73,7 +73,6 @@ module Text.CSL
     , endWithPunct
     ) where
 
-import Text.CSL.Parser
 import Text.CSL.Proc
 import Text.CSL.Reference
 import Text.CSL.Style

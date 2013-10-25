@@ -16,15 +16,11 @@
 module Text.CSL.Output.Plain
     ( renderPlain
     , renderPlainStrict
-    , (<+>)
-    , (<^>)
-    , capitalize
-    , head'
-    , tail'
     ) where
 
 import Data.Char
 import Text.CSL.Style
+import Text.CSL.Util (capitalize, (<^>))
 
 -- | Render the 'FormattedOutput' into a plain text string.
 renderPlain :: [FormattedOutput] -> String
@@ -65,26 +61,4 @@ render noClean fo =
             "uppercase"        -> map toUpper s
             _                  -> s
 
-(<+>) :: String -> String -> String
-[] <+> ss = ss
-s  <+> [] = s
-s  <+> ss = s ++ " " ++ ss
 
--- | Conjoin strings, avoiding repeated punctuation.
-(<^>) :: String -> String -> String
-[] <^> sb         = sb
-sa <^> []         = sa
-sa <^> (s:xs)
-  | s `elem` ";:,. "
-  , last sa == s = sa ++ xs
-sa <^> sb         = sa ++ sb
-
-capitalize :: String -> String
-capitalize [] = []
-capitalize (c:cs) = toUpper c : cs
-
-head' :: [a] -> [a]
-head' = take 1
-
-tail' :: Eq a => [a] -> [a]
-tail' = drop 1

@@ -19,13 +19,11 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Reference
-import Text.CSL.Parser (parseCSL')
 import Text.CSL
 import Text.CSL.Input.Pandoc (inlinesToString)
 import Control.Monad
 import Control.Applicative
 import qualified Data.ByteString.Lazy as BL
-import System.IO.Unsafe
 
 data TestCase = TestCase{
     testMode          :: Mode        -- mode
@@ -82,11 +80,6 @@ instance FromJSON [CiteObject] where
 instance FromJSON [[Cite]] where
   parseJSON (Array v) = mapM parseJSON $ V.toList v
   parseJSON _ = return []
-
-instance FromJSON Style where
-  parseJSON (String s) = return $ unsafePerformIO $ parseCSL'
-                         $ BL.fromChunks [T.encodeUtf8 s]
-  parseJSON _ = fail "Could not parse Style"
 
 data TestResult =
     Passed

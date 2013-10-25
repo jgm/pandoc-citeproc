@@ -24,9 +24,9 @@ import Data.Maybe
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
-import Text.CSL.Parser ( toRead )
-import Text.CSL.Reference
 import Text.CSL.Style
+import Text.CSL.Reference
+import Text.CSL.Util ( readNum )
 import Text.Pandoc.Definition ( Inline (Str) )
 
 evalDate :: Element -> State EvalState [Output]

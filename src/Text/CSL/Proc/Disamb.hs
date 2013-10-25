@@ -26,9 +26,9 @@ import Data.Maybe
 import Data.Ord ( comparing )
 
 import Text.CSL.Eval
-import Text.CSL.Output.Plain
 import Text.CSL.Reference
 import Text.CSL.Style
+import Text.CSL.Util (head')
 
 -- | Given the 'Style', the list of references and the citation
 -- groups, disambiguate citations according to the style options.

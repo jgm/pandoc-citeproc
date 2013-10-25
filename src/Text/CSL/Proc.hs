@@ -22,8 +22,8 @@ import Data.List
 import Data.Ord  ( comparing )
 import Data.Maybe ( mapMaybe )
 import Text.CSL.Eval hiding ( trim )
+import Text.CSL.Util ( head', tail', capitalize )
 import Text.CSL.Output.Plain
-import Text.CSL.Parser
 import Text.CSL.Proc.Collapse
 import Text.CSL.Proc.Disamb
 import Text.CSL.Reference

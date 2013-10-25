@@ -159,7 +159,6 @@ library
                       Text.CSL.Eval.Names
                       Text.CSL.Eval.Output
                       Text.CSL.Pickle
-                      Text.CSL.Parser
                       Text.CSL.Proc
                       Text.CSL.Proc.Collapse
                       Text.CSL.Proc.Disamb

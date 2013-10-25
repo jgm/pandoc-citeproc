@@ -4,7 +4,7 @@ module Text.CSL.Pandoc (processCites, processCites',
                         blocksToString, inlinesToString)
                         where
 
-import Text.CSL.Parser (parseCSL')
+import Text.CSL.Style (parseCSL')
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk
 import Text.Pandoc.Shared (stringify)

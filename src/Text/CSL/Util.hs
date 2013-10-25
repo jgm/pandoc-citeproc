@@ -1,6 +1,13 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module Text.CSL.Util
-  ( parseBool
+  ( safeRead
+  , readNum
+  , (<+>)
+  , (<^>)
+  , capitalize
+  , head'
+  , tail'
+  , parseBool
   , parseString
   , mb
   , (.#?)
@@ -10,8 +17,37 @@ import Data.Aeson
 import Data.Aeson.Types (Parser)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Data.Char (toLower)
+import Data.Char (toLower, toUpper)
 import Data.Traversable (mapM)
+import Text.Pandoc.Shared (safeRead)
+
+readNum :: String -> Int
+readNum s = case reads s of
+              [(x,"")] -> x
+              _        -> 0
+
+(<+>) :: String -> String -> String
+[] <+> ss = ss
+s  <+> [] = s
+s  <+> ss = s ++ " " ++ ss
+
+-- | Conjoin strings, avoiding repeated punctuation.
+(<^>) :: String -> String -> String
+[] <^> sb         = sb
+sa <^> []         = sa
+sa <^> (s:xs)
+  | s `elem` ";:,. " && last sa == s = sa ++ xs
+sa <^> sb         = sa ++ sb
+
+capitalize :: String -> String
+capitalize [] = []
+capitalize (c:cs) = toUpper c : cs
+
+head' :: [a] -> [a]
+head' = take 1
+
+tail' :: Eq a => [a] -> [a]
+tail' = drop 1
 
 -- | Parse JSON Boolean or Number as Bool.
 parseBool :: Value -> Parser Bool

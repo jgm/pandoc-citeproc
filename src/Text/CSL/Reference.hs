@@ -27,10 +27,10 @@ import Control.Applicative ((<$>), (<*>), (<|>), pure)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Vector as V
-import Data.Char (toUpper, isSpace, toLower, isUpper, isLower, isDigit)
+import Data.Char (toUpper, toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
-import Text.CSL.Output.Plain ((<+>))
-import Text.CSL.Util ((.#?), parseString)
+import Text.CSL.Util ((<+>))
+import Text.CSL.Util ((.#?), parseString, safeRead, readNum)
 
 -- | An existential type to wrap the different types a 'Reference' is
 -- made of. This way we can create a map to make queries easier.
@@ -675,14 +675,3 @@ object' = object . filter (not . isempty)
         isempty ("citation-number", Aeson.Number n) = n == 0
         isempty (_, _)        = False
 
-safeRead :: (Monad m, Read a) => String -> m a
-safeRead s = case reads s of
-                  (d,x):_
-                    | all isSpace x -> return d
-                  _                 -> fail $ "Could not read `" ++ s ++ "'"
-
-
-readNum :: String -> Int
-readNum s = case reads s of
-              [(x,"")] -> x
-              _        -> 0
