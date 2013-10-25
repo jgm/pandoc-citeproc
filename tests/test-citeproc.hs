@@ -123,7 +123,7 @@ runTest path = do
          let result   = assemble mode
               $ mapMaybe (inlinesToString .
                           walk escapeStr .
-                          bottomUp (concatMap removeNocaseSpans) .
+                          bottomUp (concatMap adjustSpans) .
                           renderPandoc style) $
                 (case mode of {CitationMode -> citations; _ -> bibliography})
                 $ citeproc procOpts style refs cites'
@@ -150,9 +150,12 @@ fixBegins = unlines . map fixLine . lines
         fixLine ('>':'>':'[':xs) = dropWhile isSpace $ dropWhile (not . isSpace) xs
         fixLine xs = xs
 
-removeNocaseSpans :: Inline -> [Inline]
-removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs
-removeNocaseSpans x = [x]
+-- adjust the spans so we fit what the test suite expects.
+adjustSpans :: Inline -> [Inline]
+adjustSpans (Span ("",["nocase"],[]) xs) = xs
+adjustSpans (Span ("",["citeproc-no-output"],[]) _) =
+  [Str "[CSL STYLE ERROR: reference with no printed form.]"]
+adjustSpans x = [x]
 
 escapeStr :: Inline -> Inline
 escapeStr (Str xs) = Str $ escapeHtml xs
