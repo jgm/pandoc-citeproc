@@ -1,8 +1,6 @@
 {-# LANGUAGE PatternGuards, OverloadedStrings, FlexibleInstances,
     ScopedTypeVariables, CPP #-}
-module Text.CSL.Pandoc (processCites, processCites',
-                        blocksToString, inlinesToString)
-                        where
+module Text.CSL.Pandoc (processCites, processCites') where
 
 import Text.CSL.Style (parseCSL')
 import Text.Pandoc.Definition
