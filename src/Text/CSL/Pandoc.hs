@@ -3,7 +3,7 @@
 module Text.CSL.Pandoc (processCites, processCites') where
 
 import Text.CSL.Style (parseCSL')
-import Text.Pandoc.Definition
+import Text.Pandoc
 import Text.Pandoc.Walk
 import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
@@ -15,10 +15,8 @@ import Data.List
 import Data.Char ( isDigit, isPunctuation )
 import qualified Data.Map as M
 import Text.CSL hiding ( Cite(..), Citation(..), endWithPunct )
-import Text.CSL.Input.Pandoc (blocksToString, inlinesToString)
 import Text.CSL.Data (getDefaultCSL)
 import qualified Text.CSL as CSL ( Cite(..) )
-import Text.Pandoc.Generic
 import Text.Parsec hiding (State, (<|>))
 import Control.Monad
 import Control.Monad.State
@@ -112,9 +110,15 @@ decodeEntities (x:xs) = x : decodeEntities xs
 convertRefs :: Maybe MetaValue -> Either String [Reference]
 convertRefs Nothing = Right []
 convertRefs (Just v) =
-  case metaValueToJSON blocksToString inlinesToString v >>= fromJSON of
+  case metaValueToJSON blocksToMarkdown inlinesToMarkdown v >>= fromJSON of
        Data.Aeson.Error s   -> Left s
        Success x            -> Right x
+
+blocksToMarkdown :: (Functor m, Monad m) => [Block] -> m String
+blocksToMarkdown bs = return $ writeMarkdown def $ Pandoc nullMeta bs
+
+inlinesToMarkdown :: (Functor m, Monad m) => [Inline] -> m String
+inlinesToMarkdown ils = blocksToMarkdown [Plain ils]
 
 metaValueToJSON :: Monad m
                 => ([Block] -> m String)

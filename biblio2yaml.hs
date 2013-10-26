@@ -108,7 +108,8 @@ tag = do
   return $ B8.pack ": \"" <> B.concat cs <> B8.pack "\""
 
 other :: Attoparsec.Parser B.ByteString
-other = Attoparsec.takeWhile1 (/=':') <|> Attoparsec.take 1
+other = uchar <|> Attoparsec.takeWhile1 notspecial <|> Attoparsec.take 1
+  where notspecial = not . inClass ":!\\"
 
 uchar :: Attoparsec.Parser B.ByteString
 uchar = do
