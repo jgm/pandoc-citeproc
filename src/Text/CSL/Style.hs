@@ -29,7 +29,6 @@ import Text.Pandoc.Definition ( Inline, Target )
 import Data.Char (isPunctuation)
 import Text.CSL.Util (mb, parseBool, (.#?), (.#:), readNum)
 import qualified Data.Text as T
-import System.IO.Unsafe
 
 #ifdef UNICODE_COLLATION
 import qualified Data.Text     as T
@@ -65,11 +64,8 @@ data Style
       , biblio             ::  Maybe Bibliography
       } deriving ( Show, Read, Typeable, Data )
 
--- TODO factor out pure part of parseCSL' so we don't have to
--- do unsafePerformIO
 instance FromJSON Style where
-  parseJSON (String s) = return $ unsafePerformIO $ parseCSL'
-                         $ L.fromChunks [T.encodeUtf8 s]
+  parseJSON (String s) = return $ parseCSL' $ L.fromChunks [T.encodeUtf8 s]
   parseJSON _ = fail "Could not parse Style"
 
 data Locale
@@ -661,8 +657,7 @@ betterThan a  _ = a
 
 -- following was Text.CSL.Parser:
 
--- | Read and parse a CSL style file into the internal style
--- representation, the 'Style'.
+-- | Read and parse a CSL style file into a localized sytle.
 readCSLFile :: FilePath -> IO Style
 readCSLFile src = do
 #ifdef USE_NETWORK
@@ -677,15 +672,18 @@ readCSLFile src = do
 #else
   f <- readFile' src
 #endif
-  parseCSL' f
+  localizeCSL $ parseCSL' f
 
--- | Parse a 'String' into a fully localized 'Style'
-parseCSL :: String -> IO Style
+-- | Parse a 'String' into a 'Style' (with default locale).
+parseCSL :: String -> Style
 parseCSL = parseCSL' . fromStringLazy
 
-parseCSL' :: L.ByteString -> IO Style
-parseCSL' f = do
-  let s = readXmlString xpStyle f
+parseCSL' :: L.ByteString -> Style
+parseCSL' f = readXmlString xpStyle f
+
+-- | Merge locale into a CSL style.
+localizeCSL :: Style -> IO Style
+localizeCSL s = do
   l <- readXmlString xpLocale `fmap` getLocale (styleDefaultLocale s)
   return s { styleLocale = mergeLocales (styleDefaultLocale s) l (styleLocale s)}
 

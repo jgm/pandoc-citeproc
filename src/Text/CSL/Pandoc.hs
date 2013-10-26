@@ -2,7 +2,6 @@
     ScopedTypeVariables, CPP #-}
 module Text.CSL.Pandoc (processCites, processCites') where
 
-import Text.CSL.Style (parseCSL')
 import Text.Pandoc
 import Text.Pandoc.Walk
 import Text.Pandoc.Shared (stringify)
@@ -62,8 +61,9 @@ processCites' (Pandoc meta blocks) = do
   let refs = inlineRefs ++ bibRefs
   let cslfile = (lookupMeta "csl" meta <|> lookupMeta "citation-style" meta)
                 >>= toPath
-  csl <- maybe (getDefaultCSL >>= parseCSL')
-          (\f -> findFile [".", csldir] f >>= L.readFile >>= parseCSL') cslfile
+  rawCSL <- maybe getDefaultCSL (\f -> findFile [".", csldir] f >>= L.readFile)
+               cslfile
+  csl <- localizeCSL $ parseCSL' rawCSL
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
   let skipLeadingSpace = L.dropWhile (\s -> s == 32 || (s >= 9 && s <= 13))
   abbrevs <- maybe (return (Abbreviations M.empty))

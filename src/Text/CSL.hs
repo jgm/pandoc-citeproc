@@ -40,6 +40,8 @@ module Text.CSL
     -- * CSL Parser, Representation, and Processing
     , readCSLFile
     , parseCSL
+    , parseCSL'
+    , localizeCSL
 
     -- ** The Style Types
     , Style (..)
