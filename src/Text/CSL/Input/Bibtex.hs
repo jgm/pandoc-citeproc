@@ -32,8 +32,6 @@ import System.Environment (getEnvironment)
 import Text.CSL.Reference
 import Text.CSL.Input.Pandoc (blocksToString, inlinesToString)
 
-import Debug.Trace
-
 data Item = Item{ identifier :: String
                 , entryType  :: String
                 , fields     :: [(String, String)]
@@ -390,30 +388,41 @@ parseDate s = do
                  , circa  = ""
                  }
 
+isNumber :: String -> Bool
+isNumber ('-':d:ds) = all isDigit (d:ds)
+isNumber (d:ds)     = all isDigit (d:ds)
+isNumber _          = False
+
+-- A negative (BC) year might be written with -- or --- in bibtex:
+fixLeadingDash :: String -> String
+fixLeadingDash (c:d:ds)
+  | (c == '–' || c == '—') && isDigit d = '-':d:ds
+fixLeadingDash xs = xs
+
 getOldDates :: String -> Bib [RefDate]
 getOldDates prefix = do
-  year' <- getField (prefix ++ "year")
+  year' <- fixLeadingDash <$> getField (prefix ++ "year")
   month' <- (parseMonth <$> getField (prefix ++ "month")) <|> return ""
   day' <- getField (prefix ++ "day") <|> return ""
-  endyear' <- getField (prefix ++ "endyear") <|> return ""
+  endyear' <- fixLeadingDash <$> getField (prefix ++ "endyear") <|> return ""
   endmonth' <- getField (prefix ++ "endmonth") <|> return ""
   endday' <- getField (prefix ++ "endday") <|> return ""
-  let start' = RefDate { year   = if all isDigit year' then year' else ""
+  let start' = RefDate { year   = if isNumber year' then year' else ""
                        , month  = month'
                        , season = ""
                        , day    = day'
-                       , other  = if all isDigit year' then "" else year'
+                       , other  = if isNumber year' then "" else year'
                        , circa  = ""
                        }
   let end' = if null endyear'
                 then []
-                else [RefDate { year   = if all isDigit endyear'
+                else [RefDate { year   = if isNumber endyear'
                                             then endyear'
                                             else ""
                               , month  = endmonth'
                               , day    = endday'
                               , season = ""
-                              , other  = if all isDigit endyear'
+                              , other  = if isNumber endyear'
                                             then ""
                                             else endyear'
                               , circa  = ""
