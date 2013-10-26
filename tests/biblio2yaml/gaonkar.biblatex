@@ -1,0 +1,55 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Gaonkar 2001)
+
+Gaonkar, Dilip Parameshwar, ed. 2001. *Alternative Modernities*. Durham;
+London: Duke University Press.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Gaonkar, 2001)
+
+Gaonkar, D. P. (Ed.). (2001). *Alternative modernities*. Durham; London:
+Duke University Press.
+
+
+}
+
+@Collection{gaonkar,
+  editor       = {Gaonkar, Dilip Parameshwar},
+  title        = {Alternative Modernities},
+  date         = 2001,
+  publisher    = {Duke University Press},
+  location     = {Durham and London},
+  isbn         = {0-822-32714-7},
+  hyphenation  = {american},
+  annotation   = {This is a \texttt{collection} entry. Note the format of the
+                  \texttt{location} field in the database file as well as the
+                  \texttt{isbn} field},
+}
+
+---
+references:
+- annote: This is a collection entry. Note the format of the location field in the
+    database file as well as the isbn field
+  title: Alternative modernities
+  id: gaonkar
+  issued:
+    year: 2001
+  editor:
+    given:
+    - Dilip
+    - Parameshwar
+    family: Gaonkar
+  publisher: Duke University Press
+  isbn: 0-822-32714-7
+  type: book
+  publisher-place: Durham; London
+  language: en-US
+...

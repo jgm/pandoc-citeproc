@@ -1,0 +1,65 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Knuth 1986)
+
+Knuth, Donald E. 1986. *METAFONT: The Program*. *Computers &
+Typesetting*. Vol. D. Reading, Mass.: Addison-Wesley.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Knuth, 1986)
+
+Knuth, D. E. (1986). *METAFONT: The program*. *Computers & typesetting*
+(Vol. D). Reading, Mass.: Addison-Wesley.
+
+
+NOTES:
+
+- biblio2yaml
+	- Should letters following a colon, such as the "T" in "{{METAFONT}: {T}he Program}" be protected by default? -- I'm not sure ...
+
+}
+
+@Book{knuth:ct:d,
+  author       = {Knuth, Donald E.},
+  title        = {{METAFONT}: {T}he Program},
+  date         = 1986,
+  maintitle    = {Computers \& Typesetting},
+  volume       = {D},
+  publisher    = {Addison-Wesley},
+  location     = {Reading, Mass.},
+  hyphenation  = {american},
+  sortyear     = {1986-3},
+  sorttitle    = {Computers & Typesetting D},
+  shorttitle   = {{METAFONT}},
+  annotation   = {The fourth volume of a five-volume book. Note the
+                  \texttt{sorttitle} and \texttt{sortyear} fields},
+}
+
+---
+references:
+- title-short: METAFONT
+  annote: The fourth volume of a five-volume book. Note the sorttitle and sortyear
+    fields
+  title: ! 'METAFONT: The program'
+  volume: D
+  id: knuth:ct:d
+  issued:
+    year: 1986
+  author:
+    given:
+    - Donald
+    - E.
+    family: Knuth
+  container-title: Computers & typesetting
+  publisher: Addison-Wesley
+  type: book
+  publisher-place: Reading, Mass.
+  language: en-US
+...

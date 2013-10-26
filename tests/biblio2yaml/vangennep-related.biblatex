@@ -1,0 +1,64 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(van Gennep 1909)
+
+van Gennep, Arnold. 1909. *Les rites de passage*. Paris: Nourry.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(van Gennep, 1909)
+
+van Gennep, A. (1909). *Les rites de passage*. Paris: Nourry.
+
+NOTES:
+
+- biblio2yaml
+	- "related = {vizedom:related}, relatedtype = {bytranslator}": no equivalent implemented in CSL
+	- "options = {useprefix}," is shorthand for "options = {useprefix=true},"
+
+
+}
+
+@Book{vangennep:related,
+  author       = {van Gennep, Arnold},
+  title        = {Les rites de passage},
+  date         = 1909,
+  publisher    = {Nourry},
+  location     = {Paris},
+  options      = {useprefix},
+  hyphenation  = {french},
+  related      = {vizedom:related},
+  relatedtype  = {bytranslator},
+  sorttitle    = {Rites de passage},
+  indextitle   = {Rites de passage, Les},
+  shorttitle   = {Rites de passage},
+  annotation   = {A variant of the \texttt{vangennep} entry related to its
+                  translation. Note the format of the \texttt{related} and
+                  \texttt{relatedtype} fields},
+}
+
+---
+references:
+- title-short: Rites de passage
+  annote: A variant of the vangennep entry related to its translation. Note the format
+    of the related and relatedtype fields
+  title: Les rites de passage
+  id: vangennep:related
+  issued:
+    year: 1909
+  author:
+    given:
+    - Arnold
+    family: Gennep
+    non-dropping-particle: van
+  publisher: Nourry
+  type: book
+  publisher-place: Paris
+  language: fr-FR
+...

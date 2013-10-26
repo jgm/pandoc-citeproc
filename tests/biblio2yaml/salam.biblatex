@@ -1,0 +1,71 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Salam 1968)
+
+Salam, Abdus. 1968. “Weak and Electromagnetic Interactions.” In
+*Elementary Particle Theory: Relativistic Groups and Analyticity.
+Proceedings of the Eighth Nobel Symposium*, edited by Nils Svartholm,
+367–377. Stockholm: Almquist & Wiksell.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Salam, 1968)
+
+Salam, A. (1968). Weak and electromagnetic interactions. In N. Svartholm
+(Ed.), *Elementary particle theory: Relativistic groups and analyticity.
+Proceedings of the eighth Nobel symposium* (pp. 367–377). Stockholm:
+Almquist & Wiksell.
+
+
+}
+
+@InProceedings{salam,
+  author       = {Salam, Abdus},
+  editor       = {Svartholm, Nils},
+  title        = {Weak and Electromagnetic Interactions},
+  date         = 1968,
+  booktitle    = {Elementary particle theory},
+  booksubtitle = {Relativistic groups and analyticity},
+  booktitleaddon= {Proceedings of the Eighth {Nobel} Symposium},
+  eventdate    = {1968-05-19/1968-05-25},
+  venue        = {Aspen{\"a}sgarden, Lerum},
+  publisher    = {Almquist \& Wiksell},
+  location     = {Stockholm},
+  pages        = {367-377},
+}
+
+---
+references:
+- page: 367-377
+  title: Weak and electromagnetic interactions
+  event-date:
+  - day: 19
+    month: 05
+    year: 1968
+  - day: 25
+    month: 05
+    year: 1968
+  id: salam
+  issued:
+    year: 1968
+  author:
+    given:
+    - Abdus
+    family: Salam
+  container-title: ! 'Elementary particle theory: Relativistic groups and analyticity.
+    Proceedings of the eighth Nobel symposium'
+  editor:
+    given:
+    - Nils
+    family: Svartholm
+  publisher: Almquist & Wiksell
+  type: paper-conference
+  publisher-place: Stockholm
+  event-place: Aspenäsgarden, Lerum
+...

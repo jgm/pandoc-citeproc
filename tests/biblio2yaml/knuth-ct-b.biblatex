@@ -1,0 +1,62 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Knuth 1986)
+
+Knuth, Donald E. 1986. *TeX: The Program*. *Computers & Typesetting*.
+Vol. B. Reading, Mass.: Addison-Wesley.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Knuth, 1986)
+
+Knuth, D. E. (1986). *TeX: The program*. *Computers & typesetting* (Vol.
+B). Reading, Mass.: Addison-Wesley.
+
+
+}
+
+@Book{knuth:ct:b,
+  author       = {Knuth, Donald E.},
+  title        = {\TeX: {T}he Program},
+  date         = 1986,
+  maintitle    = {Computers \& Typesetting},
+  volume       = {B},
+  publisher    = {Addison-Wesley},
+  location     = {Reading, Mass.},
+  hyphenation  = {american},
+  sortyear     = {1986-1},
+  sorttitle    = {Computers & Typesetting B},
+  indexsorttitle= {TeX: The Program},
+  shorttitle   = {\TeX},
+  annotation   = {The second volume of a five-volume book. Note the
+                  \texttt{sorttitle} and \texttt{sortyear} fields. Also note the
+                  \texttt{indexsorttitle} field},
+}
+
+---
+references:
+- title-short: TeX
+  annote: The second volume of a five-volume book. Note the sorttitle and sortyear
+    fields. Also note the indexsorttitle field
+  title: ! 'TeX: The program'
+  volume: B
+  id: knuth:ct:b
+  issued:
+    year: 1986
+  author:
+    given:
+    - Donald
+    - E.
+    family: Knuth
+  container-title: Computers & typesetting
+  publisher: Addison-Wesley
+  type: book
+  publisher-place: Reading, Mass.
+  language: en-US
+...

@@ -1,0 +1,56 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(van Gennep 1909)
+
+van Gennep, Arnold. 1909. *Les rites de passage*. Paris: Nourry.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(van Gennep, 1909)
+
+van Gennep, A. (1909). *Les rites de passage*. Paris: Nourry.
+
+
+}
+
+@Book{vangennep,
+  author       = {van Gennep, Arnold},
+  title        = {Les rites de passage},
+  date         = 1909,
+  publisher    = {Nourry},
+  location     = {Paris},
+  options      = {useprefix},
+  hyphenation  = {french},
+  sorttitle    = {Rites de passage},
+  indextitle   = {Rites de passage, Les},
+  shorttitle   = {Rites de passage},
+  annotation   = {A \texttt{book} entry. Note the format of the printed name and
+                  compare the \texttt{useprefix} option in the \texttt{options}
+                  field as well as \texttt{brandt} and \texttt{geer}},
+}
+
+---
+references:
+- title-short: Rites de passage
+  annote: A book entry. Note the format of the printed name and compare the useprefix
+    option in the options field as well as brandt and geer
+  title: Les rites de passage
+  id: vangennep
+  issued:
+    year: 1909
+  author:
+    given:
+    - Arnold
+    family: Gennep
+    non-dropping-particle: van
+  publisher: Nourry
+  type: book
+  publisher-place: Paris
+  language: fr-FR
+...

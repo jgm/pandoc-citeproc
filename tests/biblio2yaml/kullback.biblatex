@@ -1,0 +1,47 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Kullback 1959)
+
+Kullback, Solomon. 1959. *Information Theory and Statistics*. New York:
+John Wiley & Sons.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Kullback, 1959)
+
+Kullback, S. (1959). *Information theory and statistics*. New York: John
+Wiley & Sons.
+
+
+}
+
+@Book{kullback,
+  author       = {Kullback, Solomon},
+  title        = {Information Theory and Statistics},
+  year         = 1959,
+  publisher    = {John Wiley \& Sons},
+  location     = {New York},
+  hyphenation  = {american},
+}
+
+---
+references:
+- title: Information theory and statistics
+  id: kullback
+  issued:
+    year: 1959
+  author:
+    given:
+    - Solomon
+    family: Kullback
+  publisher: John Wiley & Sons
+  type: book
+  publisher-place: New York
+  language: en-US
+...

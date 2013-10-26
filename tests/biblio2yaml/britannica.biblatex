@@ -1,0 +1,80 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Preece 2003)
+
+Preece, Warren E., ed. 2003. *The New EncyclopæDia Britannica*. 15th ed.
+32. Chicago, Ill.: Encyclopædia Britannica.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Preece, 2003)
+
+Preece, W. E. (Ed.). (2003). *The new encyclopædia Britannica* (15th
+ed., 1-32). Chicago, Ill.: Encyclopædia Britannica.
+
+
+NOTES:
+
+- biblio2yaml
+	- spurious <span> in Encyclopædia
+	- options = {useeditor=false} has no equivalent in CSL, so citing and alphabetizing by title even though there is an editor does not seem to be possible
+
+- citeproc
+	- incorrect camel case: "EncyclopæDia"
+	- term "vols." missing
+
+}
+
+@Collection{britannica,
+  editor       = {Preece, Warren E.},
+  title        = {The New Encyclop{\ae}dia {Britannica}},
+  date         = 2003,
+  edition      = 15,
+  volumes      = 32,
+  publisher    = {Encyclop{\ae}dia Britannica},
+  location     = {Chicago, Ill.},
+  options      = {useeditor=false},
+  label        = {EB},
+  hyphenation  = {british},
+  sorttitle    = {Encyclop{\ae}dia Britannica},
+  indextitle   = {Encyclop{\ae}dia Britannica, The New},
+  shorttitle   = {Encyclop{\ae}dia {Britannica}},
+  annotation   = {This is a \texttt{collection} entry for an encyclopedia. Note
+                  the \texttt{useeditor} option in the \texttt{options} field as
+                  well as the \texttt{sorttitle} field. We want this entry to be
+                  cited and alphabetized by title even though there is an
+                  editor. In addition to that, we want the title to be
+                  alphabetized under \enquote*{E} rather than \enquote*{T}. Also
+                  note the \texttt{label} field which is provided for
+                  author-year citation styles},
+}
+
+---
+references:
+- title-short: "Encyclopædia Britannica"
+  annote: "This is a collection entry for an encyclopedia. Note the useeditor option
+    in the options field as well as the sorttitle field. We want this entry to be
+    cited and alphabetized by title even though there is an editor. In addition to
+    that, we want the title to be alphabetized under “E” rather than “T”.
+    Also note the label field which is provided for author-year citation styles"
+  title: "The new encyclopædia Britannica"
+  id: britannica
+  issued:
+    year: 2003
+  edition: 15
+  number-of-volumes: 32
+  editor:
+    given:
+    - Warren
+    - E.
+    family: Preece
+  publisher: "Encyclopædia Britannica"
+  type: book
+  publisher-place: Chicago, Ill.
+  language: en-GB
+...

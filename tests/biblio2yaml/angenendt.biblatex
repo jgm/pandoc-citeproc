@@ -1,0 +1,60 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Angenendt 2002)
+
+Angenendt, Arnold. 2002. “In Honore Salvatoris – Vom Sinn und Unsinn der
+Patrozinienkunde.” *Revue d’Histoire Ecclésiastique* 97: 431–456,
+791–823.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Angenendt, 2002)
+
+Angenendt, A. (2002). In Honore Salvatoris – Vom Sinn und Unsinn der
+Patrozinienkunde. *Revue d’Histoire Ecclésiastique*, *97*, 431–456,
+791–823.
+
+
+}
+
+@Article{angenendt,
+  author       = {Angenendt, Arnold},
+  title        = {In Honore Salvatoris~-- Vom Sinn und Unsinn der
+                  Patrozinienkunde},
+  journaltitle = {Revue d'Histoire Eccl{\'e}siastique},
+  date         = 2002,
+  volume       = 97,
+  pages        = {431--456, 791--823},
+  hyphenation  = {german},
+  indextitle   = {In Honore Salvatoris},
+  shorttitle   = {In Honore Salvatoris},
+  annotation   = {A German article in a French journal. Apart from that, a
+                  typical \texttt{article} entry. Note the \texttt{indextitle}
+                  field},
+}
+
+---
+references:
+- title-short: In Honore Salvatoris
+  annote: A German article in a French journal. Apart from that, a typical article
+    entry. Note the indextitle field
+  page: 431-456, 791-823
+  title: "In Honore Salvatoris – Vom Sinn und Unsinn der Patrozinienkunde"
+  volume: 97
+  id: angenendt
+  issued:
+    year: 2002
+  author:
+    given:
+    - Arnold
+    family: Angenendt
+  container-title: "Revue d’Histoire Ecclésiastique"
+  type: article-journal
+  language: de-DE
+...

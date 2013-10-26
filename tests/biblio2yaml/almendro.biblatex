@@ -1,0 +1,70 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Almendro et al. 1998)
+
+Almendro, José L., Jacinto Martín, Alberto Sánchez, and Fernando Nozal.
+1998. “Elektromagnetisches Signalhorn.”
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Almendro, Martín, Sánchez, & Nozal, 1998)
+
+Almendro, J. L., Martín, J., Sánchez, A., & Nozal, F. (1998).
+Elektromagnetisches Signalhorn.
+
+
+NOTES:
+
+- CSL styles’ handling of patent items needs to be improved
+
+}
+
+@Patent{almendro,
+  author       = {Almendro, Jos{\'e} L. and Mart{\'i}n, Jacinto and S{\'a}nchez,
+                  Alberto and Nozal, Fernando},
+  title        = {Elektromagnetisches Signalhorn},
+  number       = {EU-29702195U},
+  date         = 1998,
+  location     = {countryfr and countryuk and countryde},
+  hyphenation  = {german},
+  annotation   = {This is a \texttt{patent} entry with a \texttt{location}
+                  field. The number is given in the \texttt{number} field. Note
+                  the format of the \texttt{location} field in the database
+                  file. Compare \texttt{laufenberg}, \texttt{sorace}, and
+                  \texttt{kowalik}},
+}
+
+---
+references:
+- annote: This is a patent entry with a location field. The number is given in the
+    number field. Note the format of the location field in the database file. Compare
+    laufenberg, sorace, and kowalik
+  title: Elektromagnetisches Signalhorn
+  id: almendro
+  issued:
+    year: 1998
+  author:
+  - given:
+    - ! "José"
+    - L.
+    family: Almendro
+  - given:
+    - Jacinto
+    family: "Martín"
+  - given:
+    - Alberto
+    family: "Sánchez"
+  - given:
+    - Fernando
+    family: Nozal
+  number: EU-29702195U
+  type: patent
+  jurisdiction: France; United Kingdom; Germany
+  language: de-DE
+...

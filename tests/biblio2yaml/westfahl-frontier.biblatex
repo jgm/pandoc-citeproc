@@ -1,0 +1,54 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Westfahl 2000)
+
+Westfahl, Gary, ed. 2000. *Space and Beyond: The Frontier Theme in
+Science Fiction*. Westport, Conn.; London: Greenwood.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Westfahl, 2000)
+
+Westfahl, G. (Ed.). (2000). *Space and beyond: The frontier theme in
+science fiction*. Westport, Conn.; London: Greenwood.
+
+
+}
+
+@Collection{westfahl:frontier,
+  editor       = {Westfahl, Gary},
+  title        = {Space and Beyond},
+  date         = 2000,
+  subtitle     = {The Frontier Theme in Science Fiction},
+  publisher    = {Greenwood},
+  location     = {Westport, Conn. and London},
+  hyphenation  = {american},
+  booktitle    = {Space and Beyond},
+  booksubtitle = {The Frontier Theme in Science Fiction},
+  annotation   = {This is a \texttt{collection} entry. Note the format of the
+                  \texttt{location} field as well as the \texttt{subtitle} and
+                  \texttt{booksubtitle} fields},
+}
+
+---
+references:
+- annote: This is a collection entry. Note the format of the location field as well
+    as the subtitle and booksubtitle fields
+  title: ! 'Space and beyond: The frontier theme in science fiction'
+  id: westfahl:frontier
+  issued:
+    year: 2000
+  editor:
+    given:
+    - Gary
+    family: Westfahl
+  publisher: Greenwood
+  type: book
+  publisher-place: Westport, Conn.; London
+  language: en-US
+...

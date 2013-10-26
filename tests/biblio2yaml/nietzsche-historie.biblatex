@@ -1,0 +1,98 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Nietzsche 1988)
+
+Nietzsche, Friedrich. 1988. “Unzeitgemässe Betrachtungen. Zweites Stück:
+Vom Nutzen und Nachtheil der Historie für das Leben.” In *Sämtliche
+Werke: Kritische Studienausgabe*, by Friedrich Nietzsche, edited by
+Giorgio Colli and Mazzino Montinari, 1:243–334. München; Berlin; New
+York: Deutscher Taschenbuch-Verlag; Walter de Gruyter.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Nietzsche, 1988)
+
+Nietzsche, F. (1988). Unzeitgemässe Betrachtungen. Zweites Stück: Vom
+Nutzen und Nachtheil der Historie für das Leben. In G. Colli & M.
+Montinari (eds.), *Sämtliche Werke: Kritische Studienausgabe* (Vol. 1,
+pp. 243–334). München; Berlin; New York: Deutscher Taschenbuch-Verlag;
+Walter de Gruyter.
+
+
+}
+
+@string{ dtv     = {Deutscher Taschenbuch-Verlag} }
+
+@InBook{nietzsche:historie,
+  title        = {Unzeitgem{\"a}sse Betrachtungen. Zweites St{\"u}ck},
+  date         = 1988,
+  author       = {Nietzsche, Friedrich},
+  booktitle    = {Die Geburt der Trag{\"o}die. Unzeitgem{\"a}{\ss}e
+                  Betrachtungen I--IV. Nachgelassene Schriften 1870--1973},
+  bookauthor   = {Nietzsche, Friedrich},
+  editor       = {Colli, Giorgio and Montinari, Mazzino},
+  subtitle     = {Vom Nutzen und Nachtheil der Historie f{\"u}r das Leben},
+  maintitle    = {S{\"a}mtliche Werke},
+  mainsubtitle = {Kritische Studienausgabe},
+  volume       = 1,
+  publisher    = dtv # { and Walter de Gruyter},
+  location     = {M{\"u}nchen and Berlin and New York},
+  pages        = {243-334},
+  hyphenation  = {german},
+  sortyear     = {1988-2},
+  sorttitle    = {Werke-01-243},
+  indexsorttitle= {Vom Nutzen und Nachtheil der Historie fur das Leben},
+  indextitle   = {Vom Nutzen und Nachtheil der Historie f{\"u}r das Leben},
+  shorttitle   = {Vom Nutzen und Nachtheil der Historie},
+  annotation   = {A single essay from the critical edition of Nietzsche's works.
+                  This \texttt{inbook} entry explicitly refers to an essay found
+                  in the first volume. Note the \texttt{title},
+                  \texttt{booktitle}, and \texttt{maintitle} fields. Also note
+                  the \texttt{sorttitle} and \texttt{sortyear} fields. We want
+                  this entry to be listed after the entry referring to the
+                  entire first volume},
+}
+
+---
+references:
+- title-short: Vom Nutzen und Nachtheil der Historie
+  annote: "A single essay from the critical edition of Nietzsche’s works. This
+    inbook entry explicitly refers to an essay found in the first volume. Note the
+    title, booktitle, and maintitle fields. Also note the sorttitle and sortyear fields.
+    We want this entry to be listed after the entry referring to the entire first
+    volume"
+  page: 243-334
+  title: "Unzeitgemässe Betrachtungen. Zweites Stück: Vom Nutzen und Nachtheil
+    der Historie für das Leben"
+  volume: 1
+  id: nietzsche:historie
+  issued:
+    year: 1988
+  author:
+    given:
+    - Friedrich
+    family: Nietzsche
+  container-title: "Sämtliche Werke: Kritische Studienausgabe"
+  container-author:
+    given:
+    - Friedrich
+    family: Nietzsche
+  editor:
+  - given:
+    - Giorgio
+    family: Colli
+  - given:
+    - Mazzino
+    family: Montinari
+  publisher: Deutscher Taschenbuch-Verlag; Walter de Gruyter
+  type: chapter
+  publisher-place: "München; Berlin; New York"
+  volume-title: "Die Geburt der Tragödie. Unzeitgemäße Betrachtungen I–IV.
+    Nachgelassene Schriften 1870–1973"
+  language: de-DE
+...

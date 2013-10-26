@@ -1,0 +1,51 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Massa 2004)
+
+Massa, Werner. 2004. *Crystal Structure Determination*. 2nd ed. Berlin:
+Spinger.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Massa, 2004)
+
+Massa, W. (2004). *Crystal structure determination* (2nd ed.). Berlin:
+Spinger.
+
+
+}
+
+@Book{massa,
+  author       = {Werner Massa},
+  title        = {Crystal structure determination},
+  date         = 2004,
+  edition      = 2,
+  publisher    = {Spinger},
+  location     = {Berlin},
+  hyphenation  = {british},
+  annotation   = {A \texttt{book} entry with an \texttt{edition} field},
+}
+
+---
+references:
+- annote: A book entry with an edition field
+  title: Crystal structure determination
+  id: massa
+  issued:
+    year: 2004
+  author:
+    given:
+    - Werner
+    family: Massa
+  edition: 2
+  publisher: Spinger
+  type: book
+  publisher-place: Berlin
+  language: en-GB
+...

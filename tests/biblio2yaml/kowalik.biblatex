@@ -1,0 +1,65 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Kowalik and Isard 1995)
+
+Kowalik, F., and M. Isard. 1995. “Estimateur d’un défaut de
+fonctionnement d’un modulateur en quadrature et étage de modulation
+l’utilisant.” French patent request.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Kowalik & Isard, 1995)
+
+Kowalik, F., & Isard, M. (1995, January 11). Estimateur d’un défaut de
+fonctionnement d’un modulateur en quadrature et étage de modulation
+l’utilisant. French patent request.
+
+
+}
+
+@Patent{kowalik,
+  author       = {Kowalik, F. and Isard, M.},
+  title        = {Estimateur d'un d{\'e}faut de fonctionnement d'un modulateur
+                  en quadrature et {\'e}tage de modulation l'utilisant},
+  number       = 9500261,
+  date         = {1995-01-11},
+  type         = {patreqfr},
+  hyphenation  = {french},
+  indextitle   = {Estimateur d'un d{\'e}faut de fonctionnement},
+  annotation   = {This is a \texttt{patent} entry for a French patent request
+                  with a full date. The number is given in the \texttt{number}
+                  field. Note the format of the \texttt{type} and \texttt{date}
+                  fields in the database file. Compare \texttt{almendro},
+                  \texttt{laufenberg}, and \texttt{sorace}},
+}
+
+---
+references:
+- annote: This is a patent entry for a French patent request with a full date. The
+    number is given in the number field. Note the format of the type and date fields
+    in the database file. Compare almendro, laufenberg, and sorace
+  genre: French patent request
+  title: "Estimateur d’un défaut de fonctionnement d’un modulateur
+    en quadrature et étage de modulation l’utilisant"
+  id: kowalik
+  issued:
+    day: 11
+    month: 01
+    year: 1995
+  author:
+  - given:
+    - F.
+    family: Kowalik
+  - given:
+    - M.
+    family: Isard
+  number: 9500261
+  type: patent
+  language: fr-FR
+...

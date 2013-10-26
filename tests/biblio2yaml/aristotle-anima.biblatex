@@ -1,0 +1,58 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Aristotle 1907)
+
+Aristotle. 1907. *De Anima*. Edited by Robert Drew Hicks. Cambridge:
+Cambridge University Press.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Aristotle, 1907)
+
+Aristotle. (1907). *De anima*. (R. D. Hicks, Ed.). Cambridge: Cambridge
+University Press.
+
+
+}
+
+@string{ cup     = {Cambridge University Press} }
+
+@Book{aristotle:anima,
+  author       = {Aristotle},
+  title        = {De Anima},
+  date         = 1907,
+  editor       = {Hicks, Robert Drew},
+  publisher    = cup,
+  location     = {Cambridge},
+  keywords     = {primary},
+  hyphenation  = {british},
+  annotation   = {A \texttt{book} entry with an \texttt{author} and an
+                  \texttt{editor}},
+}
+
+---
+references:
+- annote: A book entry with an author and an editor
+  keyword: primary
+  title: De anima
+  id: aristotle:anima
+  issued:
+    year: 1907
+  author:
+    family: Aristotle
+  editor:
+    given:
+    - Robert
+    - Drew
+    family: Hicks
+  publisher: Cambridge University Press
+  type: book
+  publisher-place: Cambridge
+  language: en-GB
+...

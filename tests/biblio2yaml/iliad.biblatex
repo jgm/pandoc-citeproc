@@ -1,0 +1,63 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Homer 2004)
+
+Homer. 2004. *Die Ilias*. Translated by Wolfgang Schadewaldt. 3rd ed.
+Düsseldorf; Zürich: Artemis & Winkler.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Homer, 2004)
+
+Homer. (2004). *Die Ilias*. (W. Schadewaldt, trans.) (3rd ed.).
+Düsseldorf; Zürich: Artemis & Winkler.
+
+}
+
+@Book{iliad,
+  author       = {Homer},
+  title        = {Die Ilias},
+  date         = 2004,
+  translator   = {Schadewaldt, Wolfgang},
+  introduction = {Latacz, Joachim},
+  edition      = 3,
+  publisher    = {Artemis \& Winkler},
+  location     = {D{\"u}sseldorf and Z{\"u}rich},
+  hyphenation  = {german},
+  sorttitle    = {Ilias},
+  indextitle   = {Ilias, Die},
+  shorttitle   = {Ilias},
+  annotation   = {A German translation of the \emph{Iliad}. Note the
+                  \texttt{translator} and \texttt{introduction} fields and the
+                  format of the \texttt{location} field in the database
+                  file. Also note the \texttt{sorttitle} and \texttt{indextitle}
+                  fields},
+}
+
+---
+references:
+- title-short: Ilias
+  annote: A German translation of the <i>Iliad</i>. Note the translator and introduction
+    fields and the format of the location field in the database file. Also note the
+    sorttitle and indextitle fields
+  title: Die Ilias
+  id: iliad
+  issued:
+    year: 2004
+  author:
+    family: Homer
+  edition: 3
+  translator:
+    given:
+    - Wolfgang
+    family: Schadewaldt
+  publisher: Artemis & Winkler
+  type: book
+  publisher-place: Düsseldorf; Zürich
+  language: de-DE
+...

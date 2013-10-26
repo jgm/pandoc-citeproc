@@ -1,0 +1,66 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Vizedom and Caffee 1960)
+
+Vizedom, Monika B., and Gabrielle L. Caffee, trans. 1960. *The Rites of
+Passage*. University of Chicago Press.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Vizedom & Caffee, 1960)
+
+Vizedom, M. B., & Caffee, G. L. (Trans.). (1960). *The rites of
+passage*. University of Chicago Press.
+
+
+NOTES:
+
+- biblio2yaml
+	- "related = {vangennep}, relatedtype = {translationof}": no equivalent implemented in CSL
+
+}
+
+@Book{vizedom:related,
+  title        = {The Rites of Passage},
+  year         = 1960,
+  translator   = {Vizedom, Monika B. and Caffee, Gabrielle L.},
+  language     = {english},
+  publisher    = {University of Chicago Press},
+  hyphenation  = {american},
+  options      = {usetranslator},
+  related      = {vangennep},
+  relatedtype  = {translationof},
+  indextitle   = {Rites of Passage, The},
+  sorttitle    = {Rites of Passage},
+  shorttitle   = {Rites of Passage},
+  annotation   = {A translated work from \texttt{vangennep}. Note the format of
+                  the \texttt{related} and \texttt{relatedtype} fields},
+}
+
+---
+references:
+- title-short: Rites of passage
+  annote: A translated work from vangennep. Note the format of the related and relatedtype
+    fields
+  title: The rites of passage
+  id: vizedom:related
+  issued:
+    year: 1960
+  translator:
+  - given:
+    - Monika
+    - B.
+    family: Vizedom
+  - given:
+    - Gabrielle
+    - L.
+    family: Caffee
+  publisher: University of Chicago Press
+  type: book
+  language: en-US
+...

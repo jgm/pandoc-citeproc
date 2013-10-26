@@ -1,0 +1,54 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Piccato 2001)
+
+Piccato, Pablo. 2001. *City of Suspects: Crime in Mexico City,
+1900–1931*. Durham; London: Duke University Press.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Piccato, 2001)
+
+Piccato, P. (2001). *City of suspects: Crime in Mexico City, 1900–1931*.
+Durham; London: Duke University Press.
+
+
+}
+
+@Book{piccato,
+  author       = {Piccato, Pablo},
+  title        = {City of Suspects},
+  date         = 2001,
+  publisher    = {Duke University Press},
+  location     = {Durham and London},
+  hyphenation  = {american},
+  subtitle     = {Crime in {Mexico City}, 1900--1931},
+  shorttitle   = {City of Suspects},
+  annotation   = {This is a \texttt{book} entry. Note the format of the
+                  \texttt{location} field in the database file},
+}
+
+---
+references:
+- title-short: City of suspects
+  annote: This is a book entry. Note the format of the location field in the database
+    file
+  title: "City of suspects: Crime in Mexico City, 1900–1931"
+  id: piccato
+  issued:
+    year: 2001
+  author:
+    given:
+    - Pablo
+    family: Piccato
+  publisher: Duke University Press
+  type: book
+  publisher-place: Durham; London
+  language: en-US
+...

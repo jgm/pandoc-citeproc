@@ -1,0 +1,68 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Baez and Lauda 2004)
+
+Baez, John C., and Aaron D. Lauda. 2004. “Higher-dimensional Algebra V:
+2-groups” (version 3). October 27.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Baez & Lauda, 2004)
+
+Baez, J. C., & Lauda, A. D. (2004, October 27). Higher-dimensional
+algebra V: 2-groups.
+
+
+NOTES:
+
+- biblio2yaml:
+	- eprinttype = {arxiv}, eprint = {math/0307200v3}, 
+	  should be converted to a url: http://arxiv.org/abs/math/0307200v3
+	  (prefix http://arxiv.org/abs/ seems to work for all arxiv material)
+
+}
+
+@Online{baez-online,
+  author       = {Baez, John C. and Lauda, Aaron D.},
+  title        = {Higher-Dimensional Algebra {V}: 2-Groups},
+  date         = {2004-10-27},
+  version      = 3,
+  hyphenation  = {american},
+  eprinttype   = {arxiv},
+  eprint       = {math/0307200v3},
+  annotation   = {An \texttt{online} reference from arXiv. Note the
+                  \texttt{eprint} and \texttt{eprinttype} fields. Compare
+                  \texttt{baez\slash article} which is the same item given as an
+                  \texttt{article} entry with eprint information},
+}
+
+---
+references:
+- title-short: Higher-dimensional algebra V
+  annote: An online reference from arXiv. Note the eprint and eprinttype fields. Compare
+    baez/article which is the same item given as an article entry with eprint information
+  title: ! 'Higher-dimensional algebra V: 2-groups'
+  id: baez-online
+  issued:
+    day: 27
+    month: 10
+    year: 2004
+  author:
+  - given:
+    - John
+    - C.
+    family: Baez
+  - given:
+    - Aaron
+    - D.
+    family: Lauda
+  version: 3
+  type: webpage
+  language: en-US
+  url: http://arxiv.org/abs/math/0307200v3
+...

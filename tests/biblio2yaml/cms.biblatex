@@ -1,0 +1,74 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(*The Chicago Manual of Style: The Essential Guide for Writers, Editors,
+and Publishers* 2003)
+
+*The Chicago Manual of Style: The Essential Guide for Writers, Editors,
+and Publishers*. 2003. 15th ed. Chicago, Ill.: University of Chicago
+Press.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(*Chicago manual of style*, 2003)
+
+*The Chicago manual of style: The essential guide for writers, editors,
+and publishers*. (2003) (15th ed.). Chicago, Ill.: University of Chicago
+Press.
+
+
+NOTES:
+
+- chicago-author-date.csl should have as in-text citation: 
+  (*Chicago Manual of Style* 2003)
+  Same behaviour in Zotero; most probably a style file issue.
+
+}
+
+@Manual{cms,
+  title        = {The {Chicago} Manual of Style},
+  date         = 2003,
+  subtitle     = {The Essential Guide for Writers, Editors, and Publishers},
+  edition      = 15,
+  publisher    = {University of Chicago Press},
+  location     = {Chicago, Ill.},
+  isbn         = {0-226-10403-6},
+  label        = {CMS},
+  hyphenation  = {american},
+  sorttitle    = {Chicago Manual of Style},
+  indextitle   = {Chicago Manual of Style, The},
+  shorttitle   = {Chicago Manual of Style},
+  annotation   = {This is a \texttt{manual} entry without an \texttt{author} or
+                  \texttt{editor}. Note the \texttt{label} field in the database
+                  file which is provided for author-year citation styles. Also
+                  note the \texttt{sorttitle} and \texttt{indextitle} fields. By
+                  default, all entries without an \texttt{author} or
+                  \texttt{editor} are alphabetized by \texttt{title} but we want
+                  this entry to be alphabetized under \enquote*{C} rather than
+                  \enquote*{T}. There's also an \texttt{isbn} field},
+}
+
+---
+references:
+- title-short: Chicago manual of style
+  annote: "This is a manual entry without an author or editor. Note the label field
+    in the database file which is provided for author-year citation styles. Also note
+    the sorttitle and indextitle fields. By default, all entries without an author
+    or editor are alphabetized by title but we want this entry to be alphabetized
+    under “C” rather than “T”. There’s also an isbn field"
+  title: ! 'The Chicago manual of style: The essential guide for writers, editors,
+    and publishers'
+  id: cms
+  issued:
+    year: 2003
+  edition: 15
+  publisher: University of Chicago Press
+  isbn: 0-226-10403-6
+  type: book
+  publisher-place: Chicago, Ill.
+  language: en-US
+...

@@ -1,0 +1,90 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Coleridge 1983)
+
+Coleridge, Samuel Taylor. 1983. *Biographia Literaria, or Biographical
+Sketches of My Literary Life and Opinions*. Edited by Kathleen Coburn,
+James Engell, and W. Jackson Bate. *The Collected Works of Samuel Taylor
+Coleridge*. Vol. 7.2. Bollingen Series 75. London: Routledge; Kegan
+Paul.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Coleridge, 1983)
+
+Coleridge, S. T. (1983). *Biographia literaria, or Biographical sketches
+of my literary life and opinions*. (K. Coburn, J. Engell, & W. J. Bate,
+Eds.)*The collected works of Samuel Taylor Coleridge* (Vol. 7.2).
+London: Routledge; Kegan Paul.
+
+
+NOTES:
+
+- Output from book entries with title and maintitle is not entirely correct, but that’s most likely an issue with the style files.
+
+}
+
+@Book{coleridge,
+  author       = {Coleridge, Samuel Taylor},
+  title        = {Biographia literaria, or {Biographical} sketches of my literary
+                  life and opinions},
+  date         = 1983,
+  editor       = {Coburn, Kathleen and Engell, James and Bate, W. Jackson},
+  maintitle    = {The collected works of {Samuel Taylor Coleridge}},
+  volume       = 7,
+  part         = 2,
+  series       = {Bollingen Series},
+  number       = 75,
+  publisher    = {Routledge and Kegan Paul},
+  location     = {London},
+  hyphenation  = {british},
+  indextitle   = {Biographia literaria},
+  shorttitle   = {Biographia literaria},
+  annotation   = {One (partial) volume of a multivolume book. This is a
+                  \texttt{book} entry with a \texttt{volume} and a \texttt{part}
+                  field which explicitly refers to the second (physical) part of
+                  the seventh (logical) volume. Also note the \texttt{series}
+                  and \texttt{number} fields},
+}
+
+---
+references:
+- title-short: Biographia literaria
+  annote: One (partial) volume of a multivolume book. This is a book entry with a
+    volume and a part field which explicitly refers to the second (physical) part
+    of the seventh (logical) volume. Also note the series and number fields
+  title: Biographia literaria, or Biographical sketches of my literary life and opinions
+  volume: 7.2
+  id: coleridge
+  issued:
+    year: 1983
+  author:
+    given:
+    - Samuel
+    - Taylor
+    family: Coleridge
+  container-title: The collected works of Samuel Taylor Coleridge
+  editor:
+  - given:
+    - Kathleen
+    family: Coburn
+  - given:
+    - James
+    family: Engell
+  - given:
+    - W.
+    - Jackson
+    family: Bate
+  publisher: Routledge; Kegan Paul
+  collection-title: Bollingen series
+  type: book
+  publisher-place: London
+  collection-number: 75
+  language: en-GB
+...

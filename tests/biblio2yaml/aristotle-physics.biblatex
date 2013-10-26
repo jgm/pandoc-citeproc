@@ -1,0 +1,61 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Aristotle 1929)
+
+Aristotle. 1929. *Physics*. Translated by P. H. Wicksteed and F. M.
+Cornford. New York: G. P. Putnam.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Aristotle, 1929)
+
+Aristotle. (1929). *Physics*. (P. H. Wicksteed & F. M. Cornford,
+Trans.). New York: G. P. Putnam.
+
+
+}
+
+@Book{aristotle:physics,
+  author       = {Aristotle},
+  title        = {Physics},
+  date         = 1929,
+  translator   = {Wicksteed, P. H. and Cornford, F. M.},
+  publisher    = {G. P. Putnam},
+  location     = {New York},
+  keywords     = {primary},
+  hyphenation  = {american},
+  shorttitle   = {Physics},
+  annotation   = {A \texttt{book} entry with a \texttt{translator} field},
+}
+
+---
+references:
+- title-short: Physics
+  annote: A book entry with a translator field
+  keyword: primary
+  title: Physics
+  id: aristotle:physics
+  issued:
+    year: 1929
+  author:
+    family: Aristotle
+  translator:
+  - given:
+    - P.
+    - H.
+    family: Wicksteed
+  - given:
+    - F.
+    - M.
+    family: Cornford
+  publisher: G. P. Putnam
+  type: book
+  publisher-place: New York
+  language: en-US
+...

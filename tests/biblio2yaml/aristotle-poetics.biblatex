@@ -1,0 +1,60 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Aristotle 1968)
+
+Aristotle. 1968. *Poetics*. Edited by D. W. Lucas. Clarendon Aristotle.
+Oxford: Clarendon Press.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Aristotle, 1968)
+
+Aristotle. (1968). *Poetics*. (D. W. Lucas, Ed.). Oxford: Clarendon
+Press.
+
+
+}
+
+@Book{aristotle:poetics,
+  author       = {Aristotle},
+  title        = {Poetics},
+  date         = 1968,
+  editor       = {Lucas, D. W.},
+  series       = {Clarendon {Aristotle}},
+  publisher    = {Clarendon Press},
+  location     = {Oxford},
+  keywords     = {primary},
+  hyphenation  = {british},
+  shorttitle   = {Poetics},
+  annotation   = {A \texttt{book} entry with an \texttt{author} and an
+                  \texttt{editor} as well as a \texttt{series} field},
+}
+
+---
+references:
+- title-short: Poetics
+  annote: A book entry with an author and an editor as well as a series field
+  keyword: primary
+  title: Poetics
+  id: aristotle:poetics
+  issued:
+    year: 1968
+  author:
+    family: Aristotle
+  editor:
+    given:
+    - D.
+    - W.
+    family: Lucas
+  publisher: Clarendon Press
+  collection-title: Clarendon Aristotle
+  type: book
+  publisher-place: Oxford
+  language: en-GB
+...

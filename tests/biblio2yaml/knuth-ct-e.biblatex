@@ -1,0 +1,58 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Knuth 1986)
+
+Knuth, Donald E. 1986. *Computer Modern Typefaces*. *Computers &
+Typesetting*. Vol. E. Reading, Mass.: Addison-Wesley.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Knuth, 1986)
+
+Knuth, D. E. (1986). *Computer modern typefaces*. *Computers &
+typesetting* (Vol. E). Reading, Mass.: Addison-Wesley.
+
+
+}
+
+@Book{knuth:ct:e,
+  author       = {Knuth, Donald E.},
+  title        = {Computer Modern Typefaces},
+  date         = 1986,
+  maintitle    = {Computers \& Typesetting},
+  volume       = {E},
+  publisher    = {Addison-Wesley},
+  location     = {Reading, Mass.},
+  hyphenation  = {american},
+  sortyear     = {1986-4},
+  sorttitle    = {Computers & Typesetting E},
+  annotation   = {The fifth volume of a five-volume book. Note the
+                  \texttt{sorttitle} and \texttt{sortyear} fields},
+}
+
+---
+references:
+- annote: The fifth volume of a five-volume book. Note the sorttitle and sortyear
+    fields
+  title: Computer modern typefaces
+  volume: E
+  id: knuth:ct:e
+  issued:
+    year: 1986
+  author:
+    given:
+    - Donald
+    - E.
+    family: Knuth
+  container-title: Computers & typesetting
+  publisher: Addison-Wesley
+  type: book
+  publisher-place: Reading, Mass.
+  language: en-US
+...

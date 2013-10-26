@@ -1,0 +1,57 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Hammond 1997)
+
+Hammond, Christopher. 1997. *The Basics of Crystallography and
+Diffraction*. Oxford: International Union of Crystallography; Oxford
+University Press.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Hammond, 1997)
+
+Hammond, C. (1997). *The basics of crystallography and diffraction*.
+Oxford: International Union of Crystallography; Oxford University Press.
+
+
+}
+
+@Book{hammond,
+  author       = {Hammond, Christopher},
+  title        = {The basics of crystallography and diffraction},
+  date         = 1997,
+  publisher    = {International Union of Crystallography and Oxford University
+                  Press},
+  location     = {Oxford},
+  hyphenation  = {british},
+  sorttitle    = {Basics of crystallography and diffraction},
+  indextitle   = {Basics of crystallography and diffraction, The},
+  shorttitle   = {Crystallography and diffraction},
+  annotation   = {A \texttt{book} entry. Note the \texttt{sorttitle} and
+                  \texttt{indextitle} fields as well as the format of the
+                  \texttt{publisher} field},
+}
+
+---
+references:
+- title-short: Crystallography and diffraction
+  annote: A book entry. Note the sorttitle and indextitle fields as well as the format
+    of the publisher field
+  title: The basics of crystallography and diffraction
+  id: hammond
+  issued:
+    year: 1997
+  author:
+    given:
+    - Christopher
+    family: Hammond
+  publisher: International Union of Crystallography; Oxford University Press
+  type: book
+  publisher-place: Oxford
+  language: en-GB
+...

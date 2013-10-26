@@ -1,0 +1,61 @@
+@comment{
+
+Adapted from biblatex-example.bib
+
+
+Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+
+(Malinowski 1972)
+
+Malinowski, Bronisław. 1972. *Argonauts of the Western Pacific: An
+Account of Native Enterprise and Adventure in the Archipelagoes of
+Melanesian New Guinea*. 8th ed. London: Routledge and Kegan Paul.
+
+
+Formatted with pandoc and apa.csl, 2013-10-23:
+
+(Malinowski, 1972)
+
+Malinowski, B. (1972). *Argonauts of the Western Pacific: An account of
+native enterprise and adventure in the Archipelagoes of Melanesian New
+Guinea* (8th ed.). London: Routledge and Kegan Paul.
+
+
+}
+
+@Book{malinowski,
+  author       = {Malinowski, Bronis{\l}aw},
+  title        = {Argonauts of the {Western Pacific}},
+  date         = 1972,
+  edition      = 8,
+  publisher    = {Routledge {and} Kegan Paul},
+  location     = {London},
+  hyphenation  = {british},
+  subtitle     = {An account of native enterprise and adventure in the
+                  {Archipelagoes of Melanesian New Guinea}},
+  shorttitle   = {Argonauts},
+  annotation   = {This is a \texttt{book} entry. Note the format of the
+                  \texttt{publisher} and \texttt{edition} fields as well as the
+                  \texttt{subtitle} field},
+}
+
+---
+references:
+- title-short: Argonauts
+  annote: This is a book entry. Note the format of the publisher and edition fields
+    as well as the subtitle field
+  title: ! 'Argonauts of the Western Pacific: An account of native enterprise and
+    adventure in the Archipelagoes of Melanesian New Guinea'
+  id: malinowski
+  issued:
+    year: 1972
+  author:
+    given:
+    - Bronisław
+    family: Malinowski
+  edition: 8
+  publisher: Routledge and Kegan Paul
+  type: book
+  publisher-place: London
+  language: en-GB
+...
