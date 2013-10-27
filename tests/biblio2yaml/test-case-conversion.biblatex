@@ -52,7 +52,7 @@ and a {camelCase} Word and Some Units, 400~{nm}, 3~{cm}, and a Quote,
 
 ---
 references:
-- title: A title, in English, with a Proper Name and an ACRONYM and a <span class="nocase">camelCase</span> word and some units, 400 <span class="nocase">nm</span>, 3 <span class="nocase">cm</span>, and a quote, <i>Alea <span class="nocase">iacta est</span></i>
+- title: A title, in English, with a Proper Name and an ACRONYM and a <span class="nocase">camelCase</span> word and some units, 400 <span class="nocase">nm</span>, 3 <span class="nocase">cm</span>, and a quote, *Alea <span class="nocase">iacta est</span>*
   id: item1
   issued:
     year: 2013
