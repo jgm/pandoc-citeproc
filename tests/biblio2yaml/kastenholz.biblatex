@@ -95,7 +95,7 @@ references:
     - Philippe
     - H.
     family: Hünenberger
-  container-title: "J. Chem. Phys."
+  container-title: "J. Chem. Phys."
   type: article-journal
   abstract: The computation of ionic solvation free energies from atomistic simulations
     is a surprisingly difficult problem that has found no satisfactory solution for

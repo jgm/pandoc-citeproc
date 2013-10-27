@@ -55,6 +55,7 @@ references:
     the database file. Also note the label field which may be used as a fallback by
     citation styles which need an author and/or a year
   title: ! 'CTAN: The Comprehensive TeX Archive Network'
+  title-short: CTAN
   id: ctan
   issued:
     year: 2006
