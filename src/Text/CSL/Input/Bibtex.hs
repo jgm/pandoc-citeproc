@@ -30,7 +30,18 @@ import Control.Monad
 import Control.Monad.RWS
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
-import Text.CSL.Input.Pandoc (blocksToString, inlinesToString)
+
+blocksToString  :: [Block]  -> String
+blocksToString =
+  writeMarkdown def{ writerWrapText = False } . Pandoc nullMeta .
+    bottomUp (concatMap adjustSpans)
+
+adjustSpans :: Inline -> [Inline]
+adjustSpans (Span ("",[],[]) xs) = xs
+adjustSpans x = [x]
+
+inlinesToString :: [Inline] -> String
+inlinesToString = trim . blocksToString . (:[]) . Plain
 
 data Item = Item{ identifier :: String
                 , entryType  :: String
@@ -457,13 +468,13 @@ getLiteralList' f = intercalate "; " <$> getLiteralList f
 splitByAnd :: [Inline] -> [[Inline]]
 splitByAnd = splitOn [Space, Str "and", Space]
 
-toLiteralList :: (Functor m, MonadPlus m) => [Block] -> m [String]
+toLiteralList :: [Block] -> Bib [String]
 toLiteralList [Para xs] =
-  mapM inlinesToString $ splitByAnd xs
+  return $ map inlinesToString $ splitByAnd xs
 toLiteralList [Plain xs] = toLiteralList [Para xs]
 toLiteralList _ = mzero
 
-toAuthorList :: MonadPlus m => Options -> [Block] -> m [Agent]
+toAuthorList :: Options -> [Block] -> Bib [Agent]
 toAuthorList opts [Para xs] =
   return $ map (toAuthor opts) $ splitByAnd xs
 toAuthorList opts [Plain xs] = toAuthorList opts [Para xs]
@@ -485,7 +496,7 @@ toAuthor _ [Span ("",[],[]) ils] = -- corporate author
           , nonDroppingPart = ""
           , familyName      = ""
           , nameSuffix      = ""
-          , literal         = maybe "" id $ inlinesToString ils
+          , literal         = inlinesToString ils
           , commaSuffix     = False
           }
 -- First von Last
@@ -512,11 +523,10 @@ toAuthor opts ils =
           | otherwise = False
         isCapitalized (_:rest) = isCapitalized rest
         isCapitalized [] = True
-        inlinesToString' = maybe "" id . inlinesToString
-        prefix = inlinesToString' $ intercalate [Space] von
-        family = inlinesToString' $ intercalate [Space] lastname
-        suffix = inlinesToString' $ intercalate [Space] jr
-        givens = map inlinesToString' first
+        prefix = inlinesToString $ intercalate [Space] von
+        family = inlinesToString $ intercalate [Space] lastname
+        suffix = inlinesToString $ intercalate [Space] jr
+        givens = map inlinesToString first
         (first, vonlast, jr) =
             case commaParts of
                  --- First is the longest sequence of white-space separated
@@ -547,13 +557,13 @@ latex' s = resolveBibStrings bs
   where Pandoc _ bs = readLaTeX def{readerParseRaw = True} s
 
 latex :: String -> Bib String
-latex s = latex' (trim s) >>= blocksToString
+latex s = blocksToString <$> latex' (trim s)
 
 latexTitle :: String -> Bib String
 latexTitle s = do
   utc <- gets untitlecase
   let processTitle = if utc then unTitlecase else id
-  trim `fmap` (latex' s >>= blocksToString . processTitle)
+  (trim . blocksToString . processTitle) `fmap` latex' s
 
 latexAuthors :: Options -> String -> Bib [Agent]
 latexAuthors opts s = latex' (trim s) >>= toAuthorList opts

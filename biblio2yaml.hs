@@ -103,20 +103,25 @@ unescapeTags bs = case parseOnly (many $ tag <|> other) bs of
 
 tag :: Attoparsec.Parser B.ByteString
 tag = do
-  _ <- string $ B8.pack ": ! \""
-  cs <- manyTill (uchar <|> regchar) (char '"')
-  return $ B8.pack ": \"" <> B.concat cs <> B8.pack "\""
+  _ <- string $ B8.pack ": ! "
+  c <- char '\'' <|> char '"'
+  cs <- manyTill (escaped c <|> other) (char c)
+  return $ B8.pack ": " <> B8.singleton c <> B.concat cs <> B8.singleton c
+
+escaped :: Char -> Attoparsec.Parser B.ByteString
+escaped c = string $ B8.pack ['\\',c]
 
 other :: Attoparsec.Parser B.ByteString
-other = uchar <|> Attoparsec.takeWhile1 notspecial <|> Attoparsec.take 1
-  where notspecial = not . inClass ":!\\"
+other = uchar <|> Attoparsec.takeWhile1 notspecial <|> regchar
+  where notspecial = not . inClass ":!\\\"'"
 
 uchar :: Attoparsec.Parser B.ByteString
 uchar = do
-  _ <- string $ B8.pack "\\u"
-  cs <- count 4 $ satisfy $ inClass "0-9a-fA-F"
+  _ <- char '\\'
+  num <- (2 <$ char 'x') <|> (4 <$ char 'u') <|> (8 <$ char 'U')
+  cs <- count num $ satisfy $ inClass "0-9a-fA-F"
   let n = read ('0':'x':cs)
   return $ encodeUtf8 $ T.pack [chr n]
 
 regchar :: Attoparsec.Parser B.ByteString
-regchar = (B8.pack . (:[])) <$> anyChar
+regchar = B8.singleton <$> anyChar
