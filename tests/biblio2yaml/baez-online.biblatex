@@ -37,7 +37,7 @@ NOTES:
   eprint       = {math/0307200v3},
   annotation   = {An online reference from arXiv. Note the
                   eprint and eprinttype fields. Compare
-                  \texttt{baez\slash article} which is the same item given as an
+                  baez\slash article which is the same item given as an
                   article entry with eprint information},
 }
 
