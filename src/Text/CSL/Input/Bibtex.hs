@@ -22,7 +22,7 @@ import Text.Pandoc
 import Text.Pandoc.Walk (walk)
 import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
                            dropBlanks, split)
-import Data.List (intercalate)
+import Data.List (intercalate, intersperse)
 import Data.Maybe
 import Data.Char (toLower, isUpper, toUpper, isDigit, isLower, isAlphaNum,
                   isPunctuation)
@@ -41,6 +41,8 @@ adjustSpans (Span ("",[],[]) xs) = xs
 adjustSpans (RawInline (Format "latex") s) = parseRawLaTeX s
 adjustSpans (SmallCaps xs) =
   [Span ("",[],[("style","font-variant:small-caps;")]) xs]
+adjustSpans (Str xs) =
+  intersperse Space $ map Str $ splitWhen (=='\160') xs
 adjustSpans x = [x]
 
 parseRawLaTeX :: String -> [Inline]
