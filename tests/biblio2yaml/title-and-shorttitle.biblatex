@@ -49,6 +49,7 @@ references:
   id: item3
   type: book
 - title: ! 'The title: The subtitle, in two separate fields'
+  title-short: The title
   id: item2
   type: book
 - title-short: The title

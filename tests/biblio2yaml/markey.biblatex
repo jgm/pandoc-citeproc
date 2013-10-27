@@ -44,6 +44,7 @@ references:
 - annote: An online entry for a tutorial. Note the format of the date field (yyyy-mm-dd)
     in the database file.
   title: ! 'Tame the BeaST: The B to X of BibTeX'
+  title-short: Tame the BeaST
   id: markey
   issued:
     day: 16

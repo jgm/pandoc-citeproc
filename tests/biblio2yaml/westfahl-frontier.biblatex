@@ -40,6 +40,7 @@ references:
 - annote: This is a collection entry. Note the format of the location field as well
     as the subtitle and booksubtitle fields
   title: ! 'Space and beyond: The frontier theme in science fiction'
+  title-short: Space and beyond
   id: westfahl:frontier
   issued:
     year: 2000

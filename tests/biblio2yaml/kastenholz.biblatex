@@ -81,6 +81,7 @@ references:
     is transformed into a clickable link if hyperref support has been enabled
   title: ! 'Computation of methodology-independent ionic solvation free energies from
     molecular simulations: I. The electrostatic potential in molecular liquids'
+  title-short: Computation of methodology-independent ionic solvation free energies from molecular simulations
   volume: 124
   id: kastenholz
   issued:

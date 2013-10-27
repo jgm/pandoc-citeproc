@@ -61,6 +61,7 @@ references:
     and sortyear fields which are used to fine-tune the sorting order of the bibliography.
     We want this item listed first in the bibliography"
   title: "Sämtliche Werke: Kritische Studienausgabe"
+  title-short: Sämtliche Werke
   id: nietzsche:ksa
   issued:
     year: 1988

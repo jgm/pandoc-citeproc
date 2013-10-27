@@ -99,6 +99,7 @@ references:
   note: The Note. The Addendum
   title: ! 'An article entry with the required and all optional fields: The subtitle.
     The titleaddon'
+  title-short: An article entry with the required and all optional fields
   volume: volume
   id: article-opt
   issued:

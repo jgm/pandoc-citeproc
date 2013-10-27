@@ -17,6 +17,7 @@
 ---
 references:
 - title: ! 'Title of the Book: Subtitle. Titleaddon'
+  title-short: Title of the book
   id: item1
   issued:
     year: 2013
