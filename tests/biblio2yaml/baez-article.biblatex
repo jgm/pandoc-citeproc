@@ -40,7 +40,7 @@ NOTES:
   annotation   = {An article with eprint and
                   eprinttype fields. Note that the arXiv reference is
                   transformed into a clickable link if hyperref support
-                  has been enabled.  Compare \texttt{baez\slash online}, which
+                  has been enabled.  Compare baez\slash online, which
                   is the same item given as an online entry},
 }
 
@@ -68,5 +68,6 @@ references:
   version: 3
   container-title: Theory and Applications of Categories
   type: article-journal
+  url: http://arxiv.org/abs/math/0307200v3
   language: en-US
 ...

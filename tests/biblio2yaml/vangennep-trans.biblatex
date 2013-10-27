@@ -36,7 +36,7 @@ Caffee, Trans.). University of Chicago Press.
   hyphenation  = {american},
   annotation   = {A translation of the vangennep entry. Note the
                   translator and origlanguage fields. Compare
-                  with the \texttt{vangennep:related} entry.},
+                  with the vangennep:related entry.},
 }
 
 ---
