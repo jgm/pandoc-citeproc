@@ -857,9 +857,12 @@ itemToReference lang bibtex = bib $ do
                         <|> return ""
   seriesTitle' <- resolveKey lang <$> getTitle "series" <|> return ""
   shortTitle' <- getTitle "shorttitle"
-               <|> if ':' `elem` title'
-                   then return (takeWhile (/=':') title')
-                   else return ""
+               <|> return (takeWhile (/=':') $
+                           if not (null subtitle')
+                              then title'
+                              else if ':' `elem` title'
+                                   then title'
+                                   else "")
 
   eventTitle' <- getTitle "eventtitle" <|> return ""
   origTitle' <- getTitle "origtitle" <|> return ""
