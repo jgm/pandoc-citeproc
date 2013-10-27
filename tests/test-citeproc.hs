@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
     ScopedTypeVariables #-}
 import System.Exit
+import Text.Pandoc
 import Data.Char (isSpace, toLower)
 import System.Environment (getArgs)
 import System.Process
@@ -21,7 +22,6 @@ import qualified Data.Text.Encoding as T
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Reference
 import Text.CSL
-import Text.CSL.Input.Pandoc (inlinesToString)
 import Control.Monad
 import Control.Applicative
 import qualified Data.ByteString.Lazy as BL
@@ -121,10 +121,7 @@ runTest path = do
           return Skipped
        _ -> do
          let result   = assemble mode
-              $ mapMaybe (inlinesToString .
-                          walk escapeStr .
-                          bottomUp (concatMap adjustSpans) .
-                          renderPandoc style) $
+              $ map (inlinesToString . renderPandoc style) $
                 (case mode of {CitationMode -> citations; _ -> bibliography})
                 $ citeproc procOpts style refs cites'
          if result == expected
@@ -139,6 +136,13 @@ runTest path = do
 
 trimEnd :: String -> String
 trimEnd = reverse . ('\n':) . dropWhile isSpace . reverse
+
+-- this is designed to mimic the test suite's output:
+inlinesToString  :: [Inline]  -> String
+inlinesToString ils =
+  writeHtmlString def{ writerWrapText = False }
+    $ bottomUp (concatMap adjustSpans)
+    $ Pandoc nullMeta [Plain ils]
 
 -- citeproc-js test suite expects "citations" to be formatted like
 -- .. [0] Smith (2007)
@@ -156,10 +160,6 @@ adjustSpans (Span ("",["nocase"],[]) xs) = xs
 adjustSpans (Span ("",["citeproc-no-output"],[]) _) =
   [Str "[CSL STYLE ERROR: reference with no printed form.]"]
 adjustSpans x = [x]
-
-escapeStr :: Inline -> Inline
-escapeStr (Str xs) = Str $ escapeHtml xs
-escapeStr x = x
 
 showDiff :: String -> String -> IO ()
 showDiff expected' result' =
