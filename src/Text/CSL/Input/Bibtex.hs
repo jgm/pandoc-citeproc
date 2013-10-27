@@ -38,7 +38,8 @@ blocksToString =
 
 adjustSpans :: Inline -> [Inline]
 adjustSpans (Span ("",[],[]) xs) = xs
-adjustSpans (RawInline (Format "latex") s) = parseRawLaTeX s
+adjustSpans (RawInline (Format "latex") s) =
+  bottomUp (concatMap adjustSpans) $ parseRawLaTeX s
 adjustSpans (SmallCaps xs) =
   [Span ("",[],[("style","font-variant:small-caps;")]) xs]
 adjustSpans x = [x]
