@@ -75,5 +75,5 @@ references:
     a fast radix sorting algorithm that builds upon a microarchitecture-aware variant
     of counting sort
   language: en-US
-  url: http://arxiv.org/abs/1008.2849
+  url: http://arxiv.org/abs/1008.2849v1
 ...
