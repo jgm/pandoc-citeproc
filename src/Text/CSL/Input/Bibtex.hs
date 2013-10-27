@@ -41,8 +41,6 @@ adjustSpans (Span ("",[],[]) xs) = xs
 adjustSpans (RawInline (Format "latex") s) = parseRawLaTeX s
 adjustSpans (SmallCaps xs) =
   [Span ("",[],[("style","font-variant:small-caps;")]) xs]
-adjustSpans (Str xs) =
-  intersperse Space $ map Str $ splitWhen (=='\160') xs
 adjustSpans x = [x]
 
 parseRawLaTeX :: String -> [Inline]
