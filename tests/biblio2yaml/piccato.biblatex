@@ -30,8 +30,8 @@ Durham; London: Duke University Press.
   hyphenation  = {american},
   subtitle     = {Crime in {Mexico City}, 1900--1931},
   shorttitle   = {City of Suspects},
-  annotation   = {This is a \texttt{book} entry. Note the format of the
-                  \texttt{location} field in the database file},
+  annotation   = {This is a book entry. Note the format of the
+                  location field in the database file},
 }
 
 ---

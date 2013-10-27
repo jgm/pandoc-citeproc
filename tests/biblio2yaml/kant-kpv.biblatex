@@ -45,12 +45,12 @@ NOTES:
   hyphenation  = {german},
   shorttitle   = {Kritik der praktischen Vernunft},
   annotation   = {An edition of Kant's \emph{Collected Works}, volume five. This
-                  is an \texttt{inbook} entry which explicitly refers to the
+                  is an inbook entry which explicitly refers to the
                   \emph{Critique of Practical Reason} only, not to the entire
-                  fifth volume. Note the \texttt{author} and \texttt{bookauthor}
+                  fifth volume. Note the author and bookauthor
                   fields in the database file. By default, the
-                  \texttt{bookauthor} is omitted if the values of the
-                  \texttt{author} and \texttt{bookauthor} fields are identical},
+                  bookauthor is omitted if the values of the
+                  author and bookauthor fields are identical},
 }
 
 ---

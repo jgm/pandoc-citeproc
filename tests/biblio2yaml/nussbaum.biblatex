@@ -33,8 +33,8 @@ Princeton University Press.
   hyphenation  = {american},
   sorttitle    = {Aristotle's De Motu Animalium},
   indexsorttitle= {Aristotle's De Motu Animalium},
-  annotation   = {A \texttt{book} entry. Note the \texttt{sorttitle} and
-                  \texttt{indexsorttitle} fields and the markup of the quotes in
+  annotation   = {A book entry. Note the sorttitle and
+                  indexsorttitle fields and the markup of the quotes in
                   the database file},
 }
 

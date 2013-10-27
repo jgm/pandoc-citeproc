@@ -32,8 +32,8 @@ Austin: University of Texas Press.
   indextitle   = {Cast of Character, The},
   subtitle     = {Style in {Greek} Literature},
   shorttitle   = {Cast of Character},
-  annotation   = {A \texttt{book} entry. Note the \texttt{sorttitle} and
-                  \texttt{indextitle} fields},
+  annotation   = {A book entry. Note the sorttitle and
+                  indextitle fields},
 }
 
 ---

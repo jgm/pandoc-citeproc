@@ -37,8 +37,8 @@ NOTES:
   sortyear     = {1984-0},
   sorttitle    = {Computers & Typesetting},
   indexsorttitle= {Computers & Typesetting},
-  annotation   = {A five-volume book cited as a whole. This is a \texttt{book}
-                  entry, note the \texttt{volumes} field},
+  annotation   = {A five-volume book cited as a whole. This is a book
+                  entry, note the volumes field},
 }
 
 ---

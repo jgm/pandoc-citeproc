@@ -47,10 +47,10 @@ NOTES:
   indextitle   = {Biographia literaria},
   shorttitle   = {Biographia literaria},
   annotation   = {One (partial) volume of a multivolume book. This is a
-                  \texttt{book} entry with a \texttt{volume} and a \texttt{part}
+                  book entry with a volume and a part
                   field which explicitly refers to the second (physical) part of
-                  the seventh (logical) volume. Also note the \texttt{series}
-                  and \texttt{number} fields},
+                  the seventh (logical) volume. Also note the series
+                  and number fields},
 }
 
 ---

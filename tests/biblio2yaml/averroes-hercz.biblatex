@@ -46,9 +46,9 @@ NOTES:
   subtitle     = {Von Averroes (Vater und Sohn), aus dem Arabischen
                   {\"u}bersetzt von Samuel Ibn Tibbon},
   shorttitle   = {Drei Abhandlungen},
-  annotation   = {A \texttt{book} entry. Note the concatenation of the
-                  \texttt{editor} and \texttt{translator} fields as well as the
-                  \texttt{indextitle} and \texttt{indexsorttitle} fields},
+  annotation   = {A book entry. Note the concatenation of the
+                  editor and translator fields as well as the
+                  indextitle and indexsorttitle fields},
 }
 
 ---

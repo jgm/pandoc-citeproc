@@ -38,9 +38,9 @@ NOTES:
   sorttitle    = {Rites de passage},
   indextitle   = {Rites de passage, Les},
   shorttitle   = {Rites de passage},
-  annotation   = {A variant of the \texttt{vangennep} entry related to its
-                  translation. Note the format of the \texttt{related} and
-                  \texttt{relatedtype} fields},
+  annotation   = {A variant of the vangennep entry related to its
+                  translation. Note the format of the related and
+                  relatedtype fields},
 }
 
 ---

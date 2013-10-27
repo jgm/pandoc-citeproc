@@ -6,7 +6,7 @@
 
 
 @incollection{westfahl:space,
-	Annotation = {A cross-referenced article from a \texttt{collection}. This is an \texttt{incollection} entry with a \texttt{crossref} field. Note the \texttt{subtitle} and \texttt{indextitle} fields},
+	Annotation = {A cross-referenced article from a collection. This is an incollection entry with a crossref field. Note the subtitle and indextitle fields},
 	Author = {Westfahl, Gary},
 	Crossref = {westfahl:frontier},
 	Hyphenation = {american},
@@ -27,7 +27,7 @@
 	Title = {On Alternative Modernities}}
 
 @collection{westfahl:frontier,
-	Annotation = {This is a \texttt{collection} entry. Note the format of the \texttt{location} field as well as the \texttt{subtitle} and \texttt{booksubtitle} fields},
+	Annotation = {This is a collection entry. Note the format of the location field as well as the subtitle and booksubtitle fields},
 	Booksubtitle = {The Frontier Theme in Science Fiction},
 	Booktitle = {Space and Beyond},
 	Date = 2000,

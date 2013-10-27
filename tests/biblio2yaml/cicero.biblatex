@@ -43,10 +43,10 @@ NOTES:
   indextitle   = {De natura deorum},
   shorttitle   = {De natura deorum},
   annotation   = {A bilingual edition of Cicero's \emph{De natura deorum}, with
-                  a German translation. Note the format of the \texttt{language}
+                  a German translation. Note the format of the language
                   field in the database file, the concatenation of the
-                  \texttt{editor} and \texttt{translator} fields, and the
-                  \texttt{afterword} field},
+                  editor and translator fields, and the
+                  afterword field},
 }
 
 ---

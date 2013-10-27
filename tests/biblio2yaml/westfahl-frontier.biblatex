@@ -30,9 +30,9 @@ science fiction*. Westport, Conn.; London: Greenwood.
   hyphenation  = {american},
   booktitle    = {Space and Beyond},
   booksubtitle = {The Frontier Theme in Science Fiction},
-  annotation   = {This is a \texttt{collection} entry. Note the format of the
-                  \texttt{location} field as well as the \texttt{subtitle} and
-                  \texttt{booksubtitle} fields},
+  annotation   = {This is a collection entry. Note the format of the
+                  location field as well as the subtitle and
+                  booksubtitle fields},
 }
 
 ---

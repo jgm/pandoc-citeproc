@@ -33,9 +33,9 @@ Düsseldorf; Zürich: Artemis & Winkler.
   indextitle   = {Ilias, Die},
   shorttitle   = {Ilias},
   annotation   = {A German translation of the \emph{Iliad}. Note the
-                  \texttt{translator} and \texttt{introduction} fields and the
-                  format of the \texttt{location} field in the database
-                  file. Also note the \texttt{sorttitle} and \texttt{indextitle}
+                  translator and introduction fields and the
+                  format of the location field in the database
+                  file. Also note the sorttitle and indextitle
                   fields},
 }
 

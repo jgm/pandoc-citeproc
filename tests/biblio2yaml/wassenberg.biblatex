@@ -34,11 +34,11 @@ NOTES:
   eprinttype   = {arxiv},
   eprintclass  = {cs.DS},
   eprint       = {1008.2849v1},
-  annotation   = {A recent \texttt{online} reference from arXiv using the new
+  annotation   = {A recent online reference from arXiv using the new
                   (April 2007 onward) identifier format. Note the
-                  \texttt{eprint}, \texttt{eprinttype}, and \texttt{eprintclass}
+                  eprint, eprinttype, and eprintclass
                   fields. Also note that the arXiv reference is transformed into
-                  a clickable link if \texttt{hyperref} support has been
+                  a clickable link if hyperref support has been
                   enabled},
   abstract     = {Sorting algorithms are the deciding factor for the performance
                   of common operations such as removal of duplicates or database

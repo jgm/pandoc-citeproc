@@ -50,10 +50,10 @@ Walter de Gruyter.
   indextitle   = {Vom Nutzen und Nachtheil der Historie f{\"u}r das Leben},
   shorttitle   = {Vom Nutzen und Nachtheil der Historie},
   annotation   = {A single essay from the critical edition of Nietzsche's works.
-                  This \texttt{inbook} entry explicitly refers to an essay found
-                  in the first volume. Note the \texttt{title},
-                  \texttt{booktitle}, and \texttt{maintitle} fields. Also note
-                  the \texttt{sorttitle} and \texttt{sortyear} fields. We want
+                  This inbook entry explicitly refers to an essay found
+                  in the first volume. Note the title,
+                  booktitle, and maintitle fields. Also note
+                  the sorttitle and sortyear fields. We want
                   this entry to be listed after the entry referring to the
                   entire first volume},
 }

@@ -8,7 +8,7 @@
 @string{pup = {Princeton University Press}}
 
 @book{nussbaum,
-	Annotation = {A \texttt{book} entry. Note the \texttt{sorttitle} and \texttt{indexsorttitle} fields and the markup of the quotes in the database file},
+	Annotation = {A book entry. Note the sorttitle and indexsorttitle fields and the markup of the quotes in the database file},
 	Author = {Nussbaum, Martha},
 	Date = 1978,
 	Hyphenation = {american},

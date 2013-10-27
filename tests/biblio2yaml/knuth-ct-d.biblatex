@@ -39,7 +39,7 @@ NOTES:
   sorttitle    = {Computers & Typesetting D},
   shorttitle   = {{METAFONT}},
   annotation   = {The fourth volume of a five-volume book. Note the
-                  \texttt{sorttitle} and \texttt{sortyear} fields},
+                  sorttitle and sortyear fields},
 }
 
 ---

@@ -44,7 +44,7 @@ properties as a function of core size. *Langmuir*, *14*(1), 17–30.
   hyphenation  = {american},
   indextitle   = {Alkanethiolate gold cluster molecules},
   shorttitle   = {Alkanethiolate gold cluster molecules},
-  annotation   = {An \texttt{article} entry with \arabic{author} authors. By
+  annotation   = {An article entry with \arabic{author} authors. By
                   default, long author and editor lists are automatically
                   truncated. This is configurable},
 }

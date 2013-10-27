@@ -32,8 +32,8 @@ University Press.
   location     = {Cambridge},
   keywords     = {primary},
   hyphenation  = {british},
-  annotation   = {A \texttt{book} entry with an \texttt{author} and an
-                  \texttt{editor}},
+  annotation   = {A book entry with an author and an
+                  editor},
 }
 
 ---

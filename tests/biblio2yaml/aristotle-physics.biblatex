@@ -31,7 +31,7 @@ Trans.). New York: G. P. Putnam.
   keywords     = {primary},
   hyphenation  = {american},
   shorttitle   = {Physics},
-  annotation   = {A \texttt{book} entry with a \texttt{translator} field},
+  annotation   = {A book entry with a translator field},
 }
 
 ---

@@ -39,10 +39,10 @@ NOTES:
   hyphenation  = {american},
   eprinttype   = {arxiv},
   eprint       = {hep-th/9603067},
-  annotation   = {An \texttt{online} reference from arXiv. Note the
-                  \texttt{eprint} and \texttt{eprinttype} fields. Also note that
+  annotation   = {An online reference from arXiv. Note the
+                  eprint and eprinttype fields. Also note that
                   the arXiv reference is transformed into a clickable link if
-                  \texttt{hyperref} support has been enabled},
+                  hyperref support has been enabled},
   abstract     = {We discuss the limitations of 't Hooft's proposal for the
                   black hole S-matrix. We find that the validity of the S-matrix
                   implies violation of the semi-classical approximation at

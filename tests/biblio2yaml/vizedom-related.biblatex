@@ -38,8 +38,8 @@ NOTES:
   indextitle   = {Rites of Passage, The},
   sorttitle    = {Rites of Passage},
   shorttitle   = {Rites of Passage},
-  annotation   = {A translated work from \texttt{vangennep}. Note the format of
-                  the \texttt{related} and \texttt{relatedtype} fields},
+  annotation   = {A translated work from vangennep. Note the format of
+                  the related and relatedtype fields},
 }
 
 ---

@@ -42,8 +42,8 @@ America Press.
   hyphenation  = {american},
   indextitle   = {Aristotle's Theory of the Intellect},
   shorttitle   = {Aristotle's Theory of the Intellect},
-  annotation   = {An \texttt{incollection} entry with a \texttt{series} and
-                  \texttt{number} field},
+  annotation   = {An incollection entry with a series and
+                  number field},
 }
 
 ---

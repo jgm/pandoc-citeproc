@@ -29,7 +29,7 @@ NOTES:
   volume       = 35,
   number       = 4,
   issn         = {0097-8493},
-  annotation   = {This is a \texttt{periodical} entry with an \texttt{issn}
+  annotation   = {This is a periodical entry with an issn
                   field.},
 }
 

@@ -3,7 +3,7 @@
 @string{hup = {Harvard University Press}}
 
 @incollection{brandt,
-	Annotation = {An \texttt{incollection} entry with a \texttt{series} and a \texttt{number}. Note the format of the printed name and compare the \texttt{useprefix} option in the \texttt{options} field as well as \texttt{vangennep}. Also note the \texttt{indextitle, and \texttt{indexsorttitle} fields}},
+	Annotation = {An incollection entry with a series and a number. Note the format of the printed name and compare the useprefix option in the options field as well as vangennep. Also note the \texttt{indextitle, and indexsorttitle fields}},
 	Author = {von Brandt, Ahasver and Hoffmann, Erich},
 	Booktitle = {Europa im Hoch- und Spätmittelalter},
 	Date = 1987,
@@ -21,7 +21,7 @@
 	Title = {Die nordischen Länder von der Mitte des 11.~Jahrhunderts bis 1448}}
 
 @incollection{hyman,
-	Annotation = {An \texttt{incollection} entry with a \texttt{series} and \texttt{number} field},
+	Annotation = {An incollection entry with a series and number field},
 	Author = {Hyman, Arthur},
 	Booktitle = {Studies in {Aristotle}},
 	Date = 1981,
@@ -38,7 +38,7 @@
 	Title = {Aristotle's Theory of the Intellect and its Interpretation by {Averroes}}}
 
 @incollection{pines,
-	Annotation = {A typical \texttt{incollection} entry. Note the \texttt{indextitle} field},
+	Annotation = {A typical incollection entry. Note the indextitle field},
 	Author = {Pines, Shlomo},
 	Booktitle = {Studies in Medieval {Jewish} History and Literature},
 	Date = 1979,

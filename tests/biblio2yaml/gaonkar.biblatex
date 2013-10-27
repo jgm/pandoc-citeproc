@@ -29,9 +29,9 @@ Duke University Press.
   location     = {Durham and London},
   isbn         = {0-822-32714-7},
   hyphenation  = {american},
-  annotation   = {This is a \texttt{collection} entry. Note the format of the
-                  \texttt{location} field in the database file as well as the
-                  \texttt{isbn} field},
+  annotation   = {This is a collection entry. Note the format of the
+                  location field in the database file as well as the
+                  isbn field},
 }
 
 ---

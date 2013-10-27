@@ -34,8 +34,8 @@ NOTES:
   hyphenation  = {american},
   related      = {kullback},
   relatedtype  = {origpubin},
-  annotation   = {A reprint of the \texttt{kullback} entry. Note the format of
-                  the \texttt{related} and \texttt{relatedtype} fields},
+  annotation   = {A reprint of the kullback entry. Note the format of
+                  the related and relatedtype fields},
 }
 
 ---

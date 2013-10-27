@@ -13,14 +13,14 @@
   sorttitle    = {Chicago Manual of Style},
   indextitle   = {Chicago Manual of Style, The},
   shorttitle   = {Chicago Manual of Style},
-  annotation   = {This is a \texttt{manual} entry without an \texttt{author} or
-                  \texttt{editor}. Note the \texttt{label} field in the database
+  annotation   = {This is a manual entry without an author or
+                  editor. Note the label field in the database
                   file which is provided for author-year citation styles. Also
-                  note the \texttt{sorttitle} and \texttt{indextitle} fields. By
-                  default, all entries without an \texttt{author} or
-                  \texttt{editor} are alphabetized by \texttt{title} but we want
+                  note the sorttitle and indextitle fields. By
+                  default, all entries without an author or
+                  editor are alphabetized by title but we want
                   this entry to be alphabetized under \enquote*{C} rather than
-                  \enquote*{T}. There's also an \texttt{isbn} field},
+                  \enquote*{T}. There's also an isbn field},
 }
 ---
 references:

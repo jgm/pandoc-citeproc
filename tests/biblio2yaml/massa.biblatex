@@ -29,7 +29,7 @@ Spinger.
   publisher    = {Spinger},
   location     = {Berlin},
   hyphenation  = {british},
-  annotation   = {A \texttt{book} entry with an \texttt{edition} field},
+  annotation   = {A book entry with an edition field},
 }
 
 ---

@@ -37,14 +37,14 @@ NOTES:
   urldate      = {2006-10-01},
   label        = {CTAN},
   hyphenation  = {american},
-  annotation   = {This is an \texttt{online} entry. The \textsc{url}, which is
-                  given in the \texttt{url} field, is transformed into a
-                  clickable link if \texttt{hyperref} support has been
-                  enabled. Note the format of the \texttt{urldate} field
-                  (\texttt{yyyy-mm-dd}) in the database file. Also note the
-                  \texttt{label} field which may be used as a fallback by
-                  citation styles which need an \texttt{author} and\slash or a
-                  \texttt{year}},
+  annotation   = {This is an online entry. The \textsc{url}, which is
+                  given in the url field, is transformed into a
+                  clickable link if hyperref support has been
+                  enabled. Note the format of the urldate field
+                  (yyyy-mm-dd) in the database file. Also note the
+                  label field which may be used as a fallback by
+                  citation styles which need an author and\slash or a
+                  year},
 }
 
 ---

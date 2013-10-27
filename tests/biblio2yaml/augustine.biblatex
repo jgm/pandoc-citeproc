@@ -29,7 +29,7 @@ chemist*. New York: Marcel Dekker.
   location     = {New York},
   hyphenation  = {american},
   shorttitle   = {Heterogeneous catalysis},
-  annotation   = {A plain \texttt{book} entry},
+  annotation   = {A plain book entry},
 }
 
 ---

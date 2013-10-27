@@ -34,8 +34,8 @@ Caffee, Trans.). University of Chicago Press.
   sorttitle    = {Rites of Passage},
   shorttitle   = {Rites of Passage},
   hyphenation  = {american},
-  annotation   = {A translation of the \texttt{vangennep} entry. Note the
-                  \texttt{translator} and \texttt{origlanguage} fields. Compare
+  annotation   = {A translation of the vangennep entry. Note the
+                  translator and origlanguage fields. Compare
                   with the \texttt{vangennep:related} entry.},
 }
 

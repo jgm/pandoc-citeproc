@@ -40,11 +40,11 @@ NOTES:
   sorttitle    = {Hybrid Hierarchical Model of a Multiple Virtual Storage (MVS)
                   Operating System},
   indextitle   = {Hybrid Hierarchical Model, A},
-  annotation   = {This is a \texttt{report} entry for a research report. Note
-                  the format of the \texttt{type} field in the database file
+  annotation   = {This is a report entry for a research report. Note
+                  the format of the type field in the database file
                   which uses a localization key. The number of the report is
-                  given in the \texttt{number} field. Also note the
-                  \texttt{sorttitle} and \texttt{indextitle} fields},
+                  given in the number field. Also note the
+                  sorttitle and indextitle fields},
 }
 
 ---

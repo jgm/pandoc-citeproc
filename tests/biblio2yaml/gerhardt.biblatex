@@ -33,9 +33,9 @@ Press.
   indextitle   = {Federal Appointments Process, The},
   subtitle     = {A Constitutional and Historical Analysis},
   shorttitle   = {Federal Appointments Process},
-  annotation   = {This is a \texttt{book} entry. Note the format of the
-                  \texttt{location} field as well as the \texttt{sorttitle} and
-                  \texttt{indextitle} fields},
+  annotation   = {This is a book entry. Note the format of the
+                  location field as well as the sorttitle and
+                  indextitle fields},
 }
 
 ---

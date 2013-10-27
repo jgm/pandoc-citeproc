@@ -36,9 +36,9 @@ NOTES:
   hyphenation  = {american},
   shorttitle   = {Animal Triste},
   annotation   = {An English translation of a German novel with a French title.
-                  In other words: a \texttt{book} entry with a
-                  \texttt{translator} field.  Note the \texttt{origlanguage}
-                  field which is concatenated with the \texttt{translator}},
+                  In other words: a book entry with a
+                  translator field.  Note the origlanguage
+                  field which is concatenated with the translator},
 }
 
 ---

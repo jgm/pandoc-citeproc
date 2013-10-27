@@ -35,10 +35,10 @@ NOTES:
   hyphenation  = {american},
   eprinttype   = {arxiv},
   eprint       = {math/0307200v3},
-  annotation   = {An \texttt{online} reference from arXiv. Note the
-                  \texttt{eprint} and \texttt{eprinttype} fields. Compare
+  annotation   = {An online reference from arXiv. Note the
+                  eprint and eprinttype fields. Compare
                   \texttt{baez\slash article} which is the same item given as an
-                  \texttt{article} entry with eprint information},
+                  article entry with eprint information},
 }
 
 ---

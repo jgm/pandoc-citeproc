@@ -42,9 +42,9 @@ NOTES
   related      = {matuz:doody},
   relatedstring= {\autocap{e}xcerpt in},
   journal      = {The Journal of Narrative Technique},
-  annotation   = {An \texttt{article} entry cited as an excerpt from a
-                  \texttt{collection} entry. Note the format of the
-                  \texttt{related} and \texttt{relatedstring} fields},
+  annotation   = {An article entry cited as an excerpt from a
+                  collection entry. Note the format of the
+                  related and relatedstring fields},
 }
 
 @Collection{matuz:doody,
@@ -56,9 +56,9 @@ NOTES
   location     = {Detroit},
   pages        = {204-208},
   hyphenation  = {american},
-  annotation   = {A \texttt{collection} entry providing the excerpt information
-                  for the \texttt{doody} entry. Note the format of the
-                  \texttt{pages} field},
+  annotation   = {A collection entry providing the excerpt information
+                  for the doody entry. Note the format of the
+                  pages field},
 }
 
 ---

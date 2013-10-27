@@ -47,9 +47,9 @@ NOTES:
   doi          = {10.1063/1.2172593},
   hyphenation  = {american},
   indextitle   = {Computation of ionic solvation free energies},
-  annotation   = {An \texttt{article} entry with an \texttt{eid} and a
-                  \texttt{doi} field. Note that the \textsc{doi} is transformed
-                  into a clickable link if \texttt{hyperref} support has been
+  annotation   = {An article entry with an eid and a
+                  doi field. Note that the \textsc{doi} is transformed
+                  into a clickable link if hyperref support has been
                   enabled},
   abstract     = {The computation of ionic solvation free energies from
                   atomistic simulations is a surprisingly difficult problem that

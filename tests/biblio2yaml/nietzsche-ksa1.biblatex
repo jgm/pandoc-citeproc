@@ -49,9 +49,9 @@ de Gruyter.
   indextitle   = {S{\"a}mtliche Werke I},
   shorttitle   = {S{\"a}mtliche Werke I},
   annotation   = {A single volume from the critical edition of Nietzsche's
-                  works. This \texttt{book} entry explicitly refers to the first
-                  volume only. Note the \texttt{title} and \texttt{maintitle}
-                  fields. Also note the \texttt{sorttitle} and \texttt{sortyear}
+                  works. This book entry explicitly refers to the first
+                  volume only. Note the title and maintitle
+                  fields. Also note the sorttitle and sortyear
                   fields. We want this entry to be listed after the entry
                   referring to the entire edition},
 }

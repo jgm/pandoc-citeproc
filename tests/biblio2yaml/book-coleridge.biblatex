@@ -6,7 +6,7 @@ Combine biblatex “volume = 7” and “part = 2” to CSL “volume: 7.2”
 }
 
 @book{coleridge,
-	Annotation = {One (partial) volume of a multivolume book. This is a \texttt{book} entry with a \texttt{volume} and a \texttt{part} field which explicitly refers to the second (physical) part of the seventh (logical) volume. Also note the \texttt{series} and \texttt{number} fields},
+	Annotation = {One (partial) volume of a multivolume book. This is a book entry with a volume and a part field which explicitly refers to the second (physical) part of the seventh (logical) volume. Also note the series and number fields},
 	Author = {Coleridge, Samuel Taylor},
 	Date = 1983,
 	Editor = {Coburn, Kathleen and Engell, James and Bate, W. Jackson},

@@ -51,10 +51,10 @@ NOTES:
   indexsorttitle= {De Anima dans la tradition grecque},
   indextitle   = {\emph{De Anima} dans la tradition gr{\`e}cque, Le},
   shorttitle   = {\emph{De Anima} dans la tradition gr{\`e}cque},
-  annotation   = {This is a typical \texttt{inproceedings} entry. Note the
-                  \texttt{booksubtitle}, \texttt{shorttitle},
-                  \texttt{indextitle}, and \texttt{indexsorttitle} fields. Also
-                  note the \texttt{eventdate} field.},
+  annotation   = {This is a typical inproceedings entry. Note the
+                  booksubtitle, shorttitle,
+                  indextitle, and indexsorttitle fields. Also
+                  note the eventdate field.},
 }
 
 ---

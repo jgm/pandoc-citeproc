@@ -36,8 +36,8 @@ NOTES:
   hyphenation  = {american},
   related      = {moore},
   relatedtype  = {reprintfrom},
-  annotation   = {A reprint of Moore's law. Note the \texttt{related} and
-                  \texttt{relatedtype} fields},
+  annotation   = {A reprint of Moore's law. Note the related and
+                  relatedtype fields},
 }
 
 ---

@@ -49,9 +49,9 @@ NOTES:
   editoratype  = {redactor},
   indextitle   = {Regesta Pontificum Romanorum},
   shorttitle   = {Regesta Pontificum Romanorum},
-  annotation   = {A \texttt{collection} entry with \texttt{edition} and
-                  \texttt{volumes} fields. Note the \texttt{editora} and
-                  \texttt{editoratype} fields},
+  annotation   = {A collection entry with edition and
+                  volumes fields. Note the editora and
+                  editoratype fields},
   hyphenation  = {latin},
 }
 

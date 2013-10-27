@@ -32,11 +32,11 @@ l’utilisant. French patent request.
   type         = {patreqfr},
   hyphenation  = {french},
   indextitle   = {Estimateur d'un d{\'e}faut de fonctionnement},
-  annotation   = {This is a \texttt{patent} entry for a French patent request
-                  with a full date. The number is given in the \texttt{number}
-                  field. Note the format of the \texttt{type} and \texttt{date}
-                  fields in the database file. Compare \texttt{almendro},
-                  \texttt{laufenberg}, and \texttt{sorace}},
+  annotation   = {This is a patent entry for a French patent request
+                  with a full date. The number is given in the number
+                  field. Note the format of the type and date
+                  fields in the database file. Compare almendro,
+                  laufenberg, and sorace},
 }
 
 ---

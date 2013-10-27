@@ -33,11 +33,11 @@ NOTES:
   date         = 1998,
   location     = {countryfr and countryuk and countryde},
   hyphenation  = {german},
-  annotation   = {This is a \texttt{patent} entry with a \texttt{location}
-                  field. The number is given in the \texttt{number} field. Note
-                  the format of the \texttt{location} field in the database
-                  file. Compare \texttt{laufenberg}, \texttt{sorace}, and
-                  \texttt{kowalik}},
+  annotation   = {This is a patent entry with a location
+                  field. The number is given in the number field. Note
+                  the format of the location field in the database
+                  file. Compare laufenberg, sorace, and
+                  kowalik},
 }
 
 ---

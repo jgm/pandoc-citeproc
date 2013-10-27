@@ -36,9 +36,9 @@ NOTES:
   volume       = 15,
   pages        = {168-190},
   hyphenation  = {american},
-  annotation   = {An \texttt{article} entry with a \texttt{series} and a
-                  \texttt{volume} field. Note the format of the series. If the
-                  value of the \texttt{series} field is an integer, this number
+  annotation   = {An article entry with a series and a
+                  volume field. Note the format of the series. If the
+                  value of the series field is an integer, this number
                   is printed as an ordinal and the string \enquote*{series} is
                   appended automatically},
 }

@@ -40,9 +40,9 @@ science fiction*. Westport, Conn.; London: Greenwood.
   crossref     = {westfahl:frontier},
   hyphenation  = {american},
   indextitle   = {True Frontier, The},
-  annotation   = {A cross-referenced article from a \texttt{collection}. This is
-                  an \texttt{incollection} entry with a \texttt{crossref}
-                  field. Note the \texttt{subtitle} and \texttt{indextitle}
+  annotation   = {A cross-referenced article from a collection. This is
+                  an incollection entry with a crossref
+                  field. Note the subtitle and indextitle
                   fields},
 }
 
@@ -56,9 +56,9 @@ science fiction*. Westport, Conn.; London: Greenwood.
   hyphenation  = {american},
   booktitle    = {Space and Beyond},
   booksubtitle = {The Frontier Theme in Science Fiction},
-  annotation   = {This is a \texttt{collection} entry. Note the format of the
-                  \texttt{location} field as well as the \texttt{subtitle} and
-                  \texttt{booksubtitle} fields},
+  annotation   = {This is a collection entry. Note the format of the
+                  location field as well as the subtitle and
+                  booksubtitle fields},
 }
 ---
 references:

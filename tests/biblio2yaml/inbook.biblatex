@@ -7,7 +7,7 @@ TODO / citeproc: in biblatex "inbook" entries, citeproc should suppress bookauth
 @string{dtv = {Deutscher Taschenbuch-Verlag}}
 
 @inbook{kant:kpv,
-	Annotation = {An edition of Kant's \emph{Collected Works}, volume five. This is an \texttt{inbook} entry which explicitly refers to the \emph{Critique of Practical Reason} only, not to the entire fifth volume. Note the \texttt{author} and \texttt{bookauthor} fields in the database file. By default, the \texttt{bookauthor} is omitted if the values of the \texttt{author} and \texttt{bookauthor} fields are identical},
+	Annotation = {An edition of Kant's \emph{Collected Works}, volume five. This is an inbook entry which explicitly refers to the \emph{Critique of Practical Reason} only, not to the entire fifth volume. Note the author and bookauthor fields in the database file. By default, the bookauthor is omitted if the values of the author and bookauthor fields are identical},
 	Author = {Kant, Immanuel},
 	Bookauthor = {Kant, Immanuel},
 	Booktitle = {Kritik der praktischen Vernunft. Kritik der Urtheilskraft},
@@ -23,7 +23,7 @@ TODO / citeproc: in biblatex "inbook" entries, citeproc should suppress bookauth
 	Volume = 5}
 
 @inbook{kant:ku,
-	Annotation = {An edition of Kant's \emph{Collected Works}, volume five. This is an \texttt{inbook} entry which explicitly refers to the \emph{Critique of Judgment} only, not to the entire fifth volume},
+	Annotation = {An edition of Kant's \emph{Collected Works}, volume five. This is an inbook entry which explicitly refers to the \emph{Critique of Judgment} only, not to the entire fifth volume},
 	Author = {Kant, Immanuel},
 	Bookauthor = {Kant, Immanuel},
 	Booktitle = {Kritik der praktischen Vernunft. Kritik der Urtheilskraft},
@@ -38,7 +38,7 @@ TODO / citeproc: in biblatex "inbook" entries, citeproc should suppress bookauth
 	Volume = 5}
 
 @inbook{nietzsche:historie,
-	Annotation = {A single essay from the critical edition of Nietzsche's works. This \texttt{inbook} entry explicitly refers to an essay found in the first volume. Note the \texttt{title}, \texttt{booktitle}, and \texttt{maintitle} fields. Also note the \texttt{sorttitle} and \texttt{sortyear} fields. We want this entry to be listed after the entry referring to the entire first volume},
+	Annotation = {A single essay from the critical edition of Nietzsche's works. This inbook entry explicitly refers to an essay found in the first volume. Note the title, booktitle, and maintitle fields. Also note the sorttitle and sortyear fields. We want this entry to be listed after the entry referring to the entire first volume},
 	Author = {Nietzsche, Friedrich},
 	Bookauthor = {Nietzsche, Friedrich},
 	Booktitle = {Die Geburt der Tragödie. Unzeitgemäße Betrachtungen I--IV. Nachgelassene Schriften 1870--1973},

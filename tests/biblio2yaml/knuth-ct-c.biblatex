@@ -35,8 +35,8 @@ C). Reading, Mass.: Addison-Wesley.
   indextitle   = {METAFONTbook, The},
   shorttitle   = {{METAFONTbook}},
   annotation   = {The third volume of a five-volume book. Note the
-                  \texttt{sorttitle} and \texttt{sortyear} fields as well as the
-                  \texttt{indextitle} field},
+                  sorttitle and sortyear fields as well as the
+                  indextitle field},
 }
 
 ---

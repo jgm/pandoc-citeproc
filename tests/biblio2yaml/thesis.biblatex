@@ -4,7 +4,7 @@ TODO: Uppercase letters follwing hyphens need to be converted to lowercase, too 
 }
 
 @thesis{geer,
-	Annotation = {This is a typical \texttt{thesis} entry for a PhD thesis. Note the \texttt{type} field in the database file which uses a localization key. Also note the format of the printed name and compare the \texttt{useprefix} option in the \texttt{options} field as well as \texttt{vangennep}},
+	Annotation = {This is a typical thesis entry for a PhD thesis. Note the type field in the database file which uses a localization key. Also note the format of the printed name and compare the useprefix option in the options field as well as vangennep},
 	Author = {de Geer, Ingrid},
 	Date = 1985,
 	Hyphenation = {british},
@@ -16,7 +16,7 @@ TODO: Uppercase letters follwing hyphens need to be converted to lowercase, too 
 	Type = {phdthesis}}
 
 @thesis{loh,
-	Annotation = {This is a typical \texttt{thesis} entry for an MA thesis. Note the \texttt{type} field in the database file which uses a localization key},
+	Annotation = {This is a typical thesis entry for an MA thesis. Note the type field in the database file which uses a localization key},
 	Author = {Loh, Nin C.},
 	Date = 1992,
 	Hyphenation = {american},

@@ -33,9 +33,9 @@ cultural cognition. *American Anthropologist, new series*, *93*(1),
   volume       = 93,
   number       = 1,
   pages        = {9-27},
-  annotation   = {An \texttt{article} entry with \texttt{series},
-                  \texttt{volume}, and \texttt{number} fields. Note the format
-                  of the \texttt{series} which is a localization key},
+  annotation   = {An article entry with series,
+                  volume, and number fields. Note the format
+                  of the series which is a localization key},
 }
 
 ---

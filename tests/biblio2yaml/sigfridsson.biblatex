@@ -41,10 +41,10 @@ NOTES:
   doi          = {10.1002/(SICI)1096-987X(199803)19:4<377::AID-JCC1>3.0.CO;2-P},
   hyphenation  = {american},
   indextitle   = {Methods for deriving atomic charges},
-  annotation   = {An \texttt{article} entry with \texttt{volume},
-                  \texttt{number}, and \texttt{doi} fields. Note that the
+  annotation   = {An article entry with volume,
+                  number, and doi fields. Note that the
                   \textsc{doi} is transformed into a clickable link if
-                  \texttt{hyperref} support has been enabled},
+                  hyperref support has been enabled},
   abstract     = {Four methods for deriving partial atomic charges from the
                   quantum chemical electrostatic potential (CHELP, CHELPG,
                   Merz-Kollman, and RESP) have been compared and critically

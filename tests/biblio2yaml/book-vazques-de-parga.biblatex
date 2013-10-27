@@ -5,7 +5,7 @@ Note handling of Author = {Vázques{ de }Parga, Luis}
 }
 
 @book{vazques-de-parga,
-	Annotation = {A multivolume book cited as a whole. This is a \texttt{book} entry with \texttt{volumes}, \texttt{note}, \texttt{sorttitle}, and \texttt{indextitle} fields},
+	Annotation = {A multivolume book cited as a whole. This is a book entry with volumes, note, sorttitle, and indextitle fields},
 	Author = {Vázques{ de }Parga, Luis and Lacarra, José María and Uría Ríu, Juan},
 	Date = 1993,
 	Hyphenation = {spanish},

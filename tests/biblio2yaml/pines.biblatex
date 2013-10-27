@@ -42,8 +42,8 @@ Harvard University Press.
   indextitle   = {Limitations of Human Knowledge According to {Al-Farabi}, {ibn
                   Bajja}, and {Maimonides}, The},
   shorttitle   = {Limitations of Human Knowledge},
-  annotation   = {A typical \texttt{incollection} entry. Note the
-                  \texttt{indextitle} field},
+  annotation   = {A typical incollection entry. Note the
+                  indextitle field},
 }
 
 ---

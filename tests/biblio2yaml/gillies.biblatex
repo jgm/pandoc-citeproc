@@ -38,8 +38,8 @@ NOTES:
   volume       = 9,
   pages        = {46-67},
   hyphenation  = {british},
-  annotation   = {An \texttt{article} entry with a \texttt{series} and a
-                  \texttt{volume} field. Note that format of the \texttt{series}
+  annotation   = {An article entry with a series and a
+                  volume field. Note that format of the series
                   field in the database file},
 }
 

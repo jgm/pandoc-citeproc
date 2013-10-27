@@ -43,10 +43,10 @@ NOTES:
   hyphenation  = {american},
   indextitle   = {Epistle on the Possibility of Conjunction, The},
   shorttitle   = {Possibility of Conjunction},
-  annotation   = {A \texttt{book} entry with a \texttt{series} and a
-                  \texttt{number}. Note the concatenation of the \texttt{editor}
-                  and \texttt{translator} fields as well as the
-                  \texttt{indextitle} field},
+  annotation   = {A book entry with a series and a
+                  number. Note the concatenation of the editor
+                  and translator fields as well as the
+                  indextitle field},
 }
 
 ---

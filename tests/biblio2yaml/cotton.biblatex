@@ -31,9 +31,9 @@ Cotton, F. A., Wilkinson, G., Murillio, C. A., & Bochmann, M. (1999).
   publisher    = {Wiley},
   location     = {Chichester},
   hyphenation  = {british},
-  annotation   = {A \texttt{book} entry with \arabic{author} authors and an
-                  \texttt{edition} field. By default, long \texttt{author} and
-                  \texttt{editor} lists are automatically truncated. This is
+  annotation   = {A book entry with \arabic{author} authors and an
+                  edition field. By default, long author and
+                  editor lists are automatically truncated. This is
                   configurable},
 }
 

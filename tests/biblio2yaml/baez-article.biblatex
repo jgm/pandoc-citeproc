@@ -37,11 +37,11 @@ NOTES:
   eprint       = {math/0307200v3},
   eprinttype   = {arxiv},
   hyphenation  = {american},
-  annotation   = {An \texttt{article} with \texttt{eprint} and
-                  \texttt{eprinttype} fields. Note that the arXiv reference is
-                  transformed into a clickable link if \texttt{hyperref} support
+  annotation   = {An article with eprint and
+                  eprinttype fields. Note that the arXiv reference is
+                  transformed into a clickable link if hyperref support
                   has been enabled.  Compare \texttt{baez\slash online}, which
-                  is the same item given as an \texttt{online} entry},
+                  is the same item given as an online entry},
 }
 
 ---

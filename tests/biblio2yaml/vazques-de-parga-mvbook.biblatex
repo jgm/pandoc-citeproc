@@ -39,9 +39,9 @@ NOTES:
   sorttitle    = {Peregrinaciones a Santiago de Compostela},
   indextitle   = {Peregrinaciones a Santiago de Compostela, Las},
   shorttitle   = {Peregrinaciones},
-  annotation   = {A multivolume book cited as a whole. This is a \texttt{book}
-                  entry with \texttt{volumes}, \texttt{note},
-                  \texttt{sorttitle}, and \texttt{indextitle} fields},
+  annotation   = {A multivolume book cited as a whole. This is a book
+                  entry with volumes, note,
+                  sorttitle, and indextitle fields},
 }
 
 ---

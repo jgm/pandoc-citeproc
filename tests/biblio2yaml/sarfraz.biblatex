@@ -33,7 +33,7 @@ for automatic capturing of the font outlines. *Computers and Graphics*,
   pages        = {795-804},
   issn         = {0097-8493},
   journal      = {Computers and Graphics},
-  annotation   = {An \texttt{article} entry with an \texttt{issn} field},
+  annotation   = {An article entry with an issn field},
 }
 
 ---

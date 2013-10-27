@@ -2,7 +2,7 @@
 adapted from http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/examples/biblatex-examples.bib
 
 @book{averroes/bland,
-	Annotation = {A \texttt{book} entry with a \texttt{series} and a \texttt{number}. Note the concatenation of the \texttt{editor} and \texttt{translator} fields as well as the \texttt{indextitle} field},
+	Annotation = {A book entry with a series and a number. Note the concatenation of the editor and translator fields as well as the indextitle field},
 	Author = {Averroes},
 	Date = 1982,
 	Editor = {Bland, Kalman P.},
@@ -18,7 +18,7 @@ adapted from http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/examples/
 	Translator = {Bland, Kalman P.}}
 
 @book{averroes/hannes,
-	Annotation = {An annotated edition. Note the concatenation of the \texttt{editor}, \texttt{translator}, and \texttt{annotator} fields. Also note the \texttt{shorttitle}, \texttt{indextitle}, \texttt{sorttitle}, and \texttt{indexsorttitle} fields},
+	Annotation = {An annotated edition. Note the concatenation of the editor, translator, and annotator fields. Also note the shorttitle, indextitle, sorttitle, and indexsorttitle fields},
 	Annotator = {Hannes, Ludwig},
 	Author = {Averroes},
 	Date = 1892,
@@ -35,7 +35,7 @@ adapted from http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/examples/
 	Translator = {Hannes, Ludwig}}
 
 @book{averroes/hercz,
-	Annotation = {A \texttt{book} entry. Note the concatenation of the \texttt{editor} and \texttt{translator} fields as well as the \texttt{indextitle} and \texttt{indexsorttitle} fields},
+	Annotation = {A book entry. Note the concatenation of the editor and translator fields as well as the indextitle and indexsorttitle fields},
 	Author = {Averroes},
 	Date = 1869,
 	Editor = {Hercz, J.},

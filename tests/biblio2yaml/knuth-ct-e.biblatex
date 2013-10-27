@@ -33,7 +33,7 @@ typesetting* (Vol. E). Reading, Mass.: Addison-Wesley.
   sortyear     = {1986-4},
   sorttitle    = {Computers & Typesetting E},
   annotation   = {The fifth volume of a five-volume book. Note the
-                  \texttt{sorttitle} and \texttt{sortyear} fields},
+                  sorttitle and sortyear fields},
 }
 
 ---

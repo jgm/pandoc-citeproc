@@ -34,9 +34,9 @@ Guinea* (8th ed.). London: Routledge and Kegan Paul.
   subtitle     = {An account of native enterprise and adventure in the
                   {Archipelagoes of Melanesian New Guinea}},
   shorttitle   = {Argonauts},
-  annotation   = {This is a \texttt{book} entry. Note the format of the
-                  \texttt{publisher} and \texttt{edition} fields as well as the
-                  \texttt{subtitle} field},
+  annotation   = {This is a book entry. Note the format of the
+                  publisher and edition fields as well as the
+                  subtitle field},
 }
 
 ---

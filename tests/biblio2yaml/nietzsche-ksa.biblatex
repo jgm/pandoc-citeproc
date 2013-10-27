@@ -44,11 +44,11 @@ NOTES:
   indexsorttitle= {Samtliche Werke},
   subtitle     = {Kritische Studienausgabe},
   annotation   = {The critical edition of Nietzsche's works. This is a
-                  \texttt{book} entry referring to a 15-volume work as a
-                  whole. Note the \texttt{volumes} field and the format of the
-                  \texttt{publisher} and \texttt{location} fields in the
-                  database file. Also note the \texttt{sorttitle} and
-                  \texttt{sortyear} fields which are used to fine-tune the
+                  book entry referring to a 15-volume work as a
+                  whole. Note the volumes field and the format of the
+                  publisher and location fields in the
+                  database file. Also note the sorttitle and
+                  sortyear fields which are used to fine-tune the
                   sorting order of the bibliography. We want this item listed
                   first in the bibliography},
 }

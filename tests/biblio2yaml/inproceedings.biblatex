@@ -3,7 +3,7 @@
 @string{cup = {Cambridge University Press}}
 
 @inproceedings{moraux,
-	Annotation = {This is a typical \texttt{inproceedings} entry. Note the \texttt{booksubtitle}, \texttt{shorttitle}, \texttt{indextitle}, and \texttt{indexsorttitle} fields. Also note the \texttt{eventdate} field.},
+	Annotation = {This is a typical inproceedings entry. Note the booksubtitle, shorttitle, indextitle, and indexsorttitle fields. Also note the eventdate field.},
 	Author = {Moraux, Paul},
 	Booktitle = {Aristotle on Mind and the Senses},
 	Booktitleaddon = {Proceedings of the Seventh Symposium Aristotelicum},

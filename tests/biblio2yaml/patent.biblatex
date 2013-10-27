@@ -4,7 +4,7 @@ TODO: Is there a CSL counterpart for the biblatex field "holder"?}
 
 
 @patent{almendro,
-	Annotation = {This is a \texttt{patent} entry with a \texttt{location} field. The number is given in the \texttt{number} field. Note the format of the \texttt{location} field in the database file. Compare \texttt{laufenberg}, \texttt{sorace}, and \texttt{kowalik}},
+	Annotation = {This is a patent entry with a location field. The number is given in the number field. Note the format of the location field in the database file. Compare laufenberg, sorace, and kowalik},
 	Author = {Almendro, José L. and Martín, Jacinto and Sánchez, Alberto and Nozal, Fernando},
 	Date = 1998,
 	Hyphenation = {german},
@@ -13,7 +13,7 @@ TODO: Is there a CSL counterpart for the biblatex field "holder"?}
 	Title = {Elektromagnetisches Signalhorn}}
 
 @patent{kowalik,
-	Annotation = {This is a \texttt{patent} entry for a French patent request with a full date. The number is given in the \texttt{number} field. Note the format of the \texttt{type} and \texttt{date} fields in the database file. Compare \texttt{almendro}, \texttt{laufenberg}, and \texttt{sorace}},
+	Annotation = {This is a patent entry for a French patent request with a full date. The number is given in the number field. Note the format of the type and date fields in the database file. Compare almendro, laufenberg, and sorace},
 	Author = {Kowalik, F. and Isard, M.},
 	Date = {1995-01-11},
 	Hyphenation = {french},
@@ -23,7 +23,7 @@ TODO: Is there a CSL counterpart for the biblatex field "holder"?}
 	Type = {patreqfr}}
 
 @patent{laufenberg,
-	Annotation = {This is a \texttt{patent} entry with a \texttt{holder} field. Note the format of the \texttt{type} and \texttt{location} fields in the database file. Compare \texttt{almendro}, \texttt{sorace}, and \texttt{kowalik}},
+	Annotation = {This is a patent entry with a holder field. Note the format of the type and location fields in the database file. Compare almendro, sorace, and kowalik},
 	Author = {Laufenberg, Xaver and Eynius, Dominique and Suelzle, Helmut and Usbeck, Stephan and Spaeth, Matthias and Neuser-Hoffmann, Miriam and Myrzik, Christian and Schmid, Manfred and Nietfeld, Franz and Thiel, Alexander and Braun, Harald and Ebner, Norbert},
 	Date = {2006-09-13},
 	File = {http://v3.espacenet.com/textdoc?IDX=EP1700367},
@@ -41,7 +41,7 @@ TODO: Is there a CSL counterpart for the biblatex field "holder"?}
                   for operating a device of this type.}}
 
 @patent{sorace,
-	Annotation = {This is a \texttt{patent} entry with a \texttt{holder} field. Note the format of the \texttt{type} and \texttt{date} fields in the database file. Compare \texttt{almendro}, \texttt{laufenberg}, and \texttt{kowalik}},
+	Annotation = {This is a patent entry with a holder field. Note the format of the type and date fields in the database file. Compare almendro, laufenberg, and kowalik},
 	Author = {Sorace, Ronald E. and Reinhardt, Victor S. and Vaughn, Steven A.},
 	Date = {1997-09-16},
 	Date-Modified = {2013-10-16 13:44:15 +0000},

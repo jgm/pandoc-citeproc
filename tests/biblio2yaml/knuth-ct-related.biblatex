@@ -43,8 +43,8 @@ NOTES:
   related      = {knuth:ct:a,knuth:ct:b,knuth:ct:c,knuth:ct:d,knuth:ct:e},
   relatedtype  = {multivolume},
   annotation   = {A five-volume book cited as a whole and related to its
-                  individual volumes. Note the \texttt{related} and
-                  \texttt{relatedtype} fields},
+                  individual volumes. Note the related and
+                  relatedtype fields},
 }
 
 ---

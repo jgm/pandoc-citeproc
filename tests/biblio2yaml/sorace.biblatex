@@ -30,10 +30,10 @@ High-speed digital-to-RF converter. U.S. patent.
   holder       = {{Hughes Aircraft Company}},
   type         = {patentus},
   hyphenation  = {american},
-  annotation   = {This is a \texttt{patent} entry with a \texttt{holder} field.
-                  Note the format of the \texttt{type} and \texttt{date} fields
-                  in the database file. Compare \texttt{almendro},
-                  \texttt{laufenberg}, and \texttt{kowalik}},
+  annotation   = {This is a patent entry with a holder field.
+                  Note the format of the type and date fields
+                  in the database file. Compare almendro,
+                  laufenberg, and kowalik},
 }
 
 ---

@@ -42,8 +42,8 @@ NOTES:
   indexsorttitle= {Intention und Intentionalitat in der Scholastik, bei Brentano
                   und Husserl},
   shorttitle   = {Intention und Intentionalit{\"a}t},
-  annotation   = {An \texttt{article} entry. Note the \texttt{sorttitle} and
-                  \texttt{indexsorttitle} fields and the markup of the quotes in
+  annotation   = {An article entry. Note the sorttitle and
+                  indexsorttitle fields and the markup of the quotes in
                   the database file},
 }
 

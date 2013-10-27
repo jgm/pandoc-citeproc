@@ -44,7 +44,7 @@ NOTES:
   shorthand    = {KU},
   hyphenation  = {german},
   annotation   = {An edition of Kant's \emph{Collected Works}, volume five. This
-                  is an \texttt{inbook} entry which explicitly refers to the
+                  is an inbook entry which explicitly refers to the
                   \emph{Critique of Judgment} only, not to the entire fifth
                   volume},
 }

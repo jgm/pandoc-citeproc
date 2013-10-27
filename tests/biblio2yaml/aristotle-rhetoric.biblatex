@@ -45,8 +45,8 @@ NOTES:
   indextitle   = {Rhetoric of {Aristotle}, The},
   shorttitle   = {Rhetoric},
   annotation   = {A commented edition. Note the concatenation of the
-                  \texttt{editor} and \texttt{commentator} fields as well as the
-                  \texttt{volumes}, \texttt{sorttitle}, and \texttt{indextitle}
+                  editor and commentator fields as well as the
+                  volumes, sorttitle, and indextitle
                   fields},
 }
 

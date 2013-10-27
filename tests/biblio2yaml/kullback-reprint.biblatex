@@ -39,8 +39,8 @@ York: Dover Publications.
   origyear     = 1959,
   origpublisher= {John Wiley \& Sons},
   hyphenation  = {american},
-  annotation   = {A reprint of the \texttt{kullback} entry. Note the format of
-                  \texttt{origyear} and \texttt{origpublisher}. These fields are
+  annotation   = {A reprint of the kullback entry. Note the format of
+                  origyear and origpublisher. These fields are
                   not used by the standard bibliography styles},
 }
 

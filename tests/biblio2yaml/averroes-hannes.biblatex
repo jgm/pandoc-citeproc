@@ -45,10 +45,10 @@ NOTES:
   indextitle   = {{\"U}ber die M{\"o}glichkeit der Conjunktion},
   shorttitle   = {{\"U}ber die M{\"o}glichkeit der Conjunktion},
   annotation   = {An annotated edition. Note the concatenation of the
-                  \texttt{editor}, \texttt{translator}, and \texttt{annotator}
-                  fields. Also note the \texttt{shorttitle},
-                  \texttt{indextitle}, \texttt{sorttitle}, and
-                  \texttt{indexsorttitle} fields},
+                  editor, translator, and annotator
+                  fields. Also note the shorttitle,
+                  indextitle, sorttitle, and
+                  indexsorttitle fields},
 }
 
 ---

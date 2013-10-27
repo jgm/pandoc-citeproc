@@ -30,9 +30,9 @@ Tucson: The University of Arizona Press.
   sorttitle    = {Ghost of John Wayne and Other Stories},
   indextitle   = {Ghost of {John Wayne} and Other Stories, The},
   shorttitle   = {Ghost of {John Wayne}},
-  annotation   = {A collection of short stories. This is a \texttt{book} entry.
-                  Note the \texttt{sorttitle} and \texttt{indextitle} fields in
-                  the database file. There's also an \texttt{isbn} field},
+  annotation   = {A collection of short stories. This is a book entry.
+                  Note the sorttitle and indextitle fields in
+                  the database file. There's also an isbn field},
 }
 
 ---

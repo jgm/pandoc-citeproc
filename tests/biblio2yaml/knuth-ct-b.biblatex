@@ -35,8 +35,8 @@ B). Reading, Mass.: Addison-Wesley.
   indexsorttitle= {TeX: The Program},
   shorttitle   = {\TeX},
   annotation   = {The second volume of a five-volume book. Note the
-                  \texttt{sorttitle} and \texttt{sortyear} fields. Also note the
-                  \texttt{indexsorttitle} field},
+                  sorttitle and sortyear fields. Also note the
+                  indexsorttitle field},
 }
 
 ---

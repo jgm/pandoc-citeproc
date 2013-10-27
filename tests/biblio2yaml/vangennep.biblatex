@@ -30,9 +30,9 @@ van Gennep, A. (1909). *Les rites de passage*. Paris: Nourry.
   sorttitle    = {Rites de passage},
   indextitle   = {Rites de passage, Les},
   shorttitle   = {Rites de passage},
-  annotation   = {A \texttt{book} entry. Note the format of the printed name and
-                  compare the \texttt{useprefix} option in the \texttt{options}
-                  field as well as \texttt{brandt} and \texttt{geer}},
+  annotation   = {A book entry. Note the format of the printed name and
+                  compare the useprefix option in the options
+                  field as well as brandt and geer},
 }
 
 ---

@@ -32,9 +32,9 @@ Oxford: International Union of Crystallography; Oxford University Press.
   sorttitle    = {Basics of crystallography and diffraction},
   indextitle   = {Basics of crystallography and diffraction, The},
   shorttitle   = {Crystallography and diffraction},
-  annotation   = {A \texttt{book} entry. Note the \texttt{sorttitle} and
-                  \texttt{indextitle} fields as well as the format of the
-                  \texttt{publisher} field},
+  annotation   = {A book entry. Note the sorttitle and
+                  indextitle fields as well as the format of the
+                  publisher field},
 }
 
 ---

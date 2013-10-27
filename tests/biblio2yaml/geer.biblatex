@@ -33,11 +33,11 @@ Uppsala Universitet, Uppsala.
   location     = {Uppsala},
   options      = {useprefix=false},
   hyphenation  = {british},
-  annotation   = {This is a typical \texttt{thesis} entry for a PhD thesis. Note
-                  the \texttt{type} field in the database file which uses a
+  annotation   = {This is a typical thesis entry for a PhD thesis. Note
+                  the type field in the database file which uses a
                   localization key. Also note the format of the printed name and
-                  compare the \texttt{useprefix} option in the \texttt{options}
-                  field as well as \texttt{vangennep}},
+                  compare the useprefix option in the options
+                  field as well as vangennep},
 }
 
 ---

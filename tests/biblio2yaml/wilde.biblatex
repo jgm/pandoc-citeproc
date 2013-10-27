@@ -36,7 +36,7 @@ NOTES:
   publisher    = {Leonard Smithers {and} Company},
   eprint       = {4HIWAAAAYAAJ},
   eprinttype   = {googlebooks},
-  annotation   = {A \texttt{book} with \texttt{eprint} and \texttt{eprinttype}
+  annotation   = {A book with eprint and eprinttype
                   fields.},
 }
 
