@@ -156,6 +156,7 @@ fixBegins = unlines . map fixLine . lines
 
 -- adjust the spans so we fit what the test suite expects.
 adjustSpans :: Inline -> [Inline]
+adjustSpans (Span ("",[],[]) xs) = xs
 adjustSpans (Span ("",["nocase"],[]) xs) = xs
 adjustSpans (Span ("",["citeproc-no-output"],[]) _) =
   [Str "[CSL STYLE ERROR: reference with no printed form.]"]
