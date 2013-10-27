@@ -16,7 +16,7 @@ module Text.CSL.Input.Bibtex
     )
     where
 
-import Text.Parsec hiding (optional, (<|>), many)
+import Text.Parsec hiding (optional, (<|>), many, State)
 import Control.Applicative
 import Text.Pandoc
 import Text.Pandoc.Walk (walk)
@@ -24,10 +24,11 @@ import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
                            dropBlanks, split)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper, isDigit, isLower, isAlphaNum,
-                  isPunctuation)
+import Data.Char (toLower, isUpper, isLower, toUpper, isDigit,
+                  isAlphaNum, isPunctuation)
 import Control.Monad
 import Control.Monad.RWS
+import Control.Monad.State
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
 
@@ -591,33 +592,37 @@ bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = fmap fst $ evalRWST m entry (BibState True (Lang "en" "US"))
 
 unTitlecase :: [Block] -> [Block]
-unTitlecase [Para ils]  = [Para $ untc $ splitStrWhen isPunctuation ils]
-unTitlecase [Plain ils] = [Para $ untc $ splitStrWhen isPunctuation ils]
-unTitlecase xs          = xs
+unTitlecase bs =
+  case bs of
+       [Para ils]  -> [Para $ go ils]
+       [Plain ils] -> [Para $ go ils]
+       _           -> bs
+  where go xs = evalState (untc $ splitStrWhen isPunctuation xs) False
 
-untc :: [Inline] -> [Inline]
-untc [] = []
-untc (x:xs) = x : go xs
-  where go (Space : Str (y:ys) : zs)
-           | isUpper y = Space : Str (toLower y : ys) : go zs
-        go (Str [w] : Str (y:ys) : zs)
-           | isPunctuation w && isUpper y =
-             Str [w] : Str (toLower y : ys) : go zs
-        go (Quoted qt ys : zs)  = Quoted qt (untc ys) : go zs
-        go (Emph ys : zs)       = Emph (untc ys) : go zs
-        go (Strong ys : zs   )  = Strong (untc ys) : go zs
-        go (Span _ ys : zs)
-          | hasLowercaseWord ys = Span ("",["nocase"],[]) ys : go zs
-        go (z : zs)             = z : go zs
-        go []                   = []
-        hasLowercaseWord = any isLowercaseWord .
-                            splitWhen (\y -> y == Space || y == Str "-")
-        isLowercaseWord (Str (y:_):_)   = isLower y
-        isLowercaseWord (Quoted _ ys:_) = hasLowercaseWord ys
-        isLowercaseWord (Emph ys:_)     = hasLowercaseWord ys
-        isLowercaseWord (Strong ys:_)   = hasLowercaseWord ys
-        isLowercaseWord (Span _ ys:_)   = hasLowercaseWord ys
-        isLowercaseWord _               = False
+untc :: [Inline] -> State Bool [Inline]
+untc = mapM go
+  where go Space            = put True >> return Space
+        go (Str [x])
+          | isPunctuation x = put True >> return (Str [x])
+        go (Str (x:xs))
+          | isUpper x       = do
+               atWordBoundary <- get
+               if atWordBoundary
+                  then put False >> return (Str (toLower x : xs))
+                  else return (Str (x:xs))
+        go (Quoted qt xs)   = Quoted qt <$> untc xs
+        go (Emph xs)        = Emph <$> untc xs
+        go (Strong xs)      = Strong <$> untc xs
+        go (Span ("",[],[]) xs)   = do
+               atWordBoundary <- get
+               if atWordBoundary && hasLowercaseWord xs
+                  then put False >> return (Span ("",["nocase"],[]) xs)
+                  else return (Span ("",[],[]) xs)
+        go (Span attr xs)   = Span attr <$> untc xs
+        go x = return x
+        hasLowercaseWord = any startsWithLowercase . splitStrWhen isPunctuation
+        startsWithLowercase (Str (x:_)) = isLower x
+        startsWithLowercase _           = False
 
 toLocale :: String -> String
 toLocale "english"    = "en-US" -- "en-EN" unavailable in CSL
