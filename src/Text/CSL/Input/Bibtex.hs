@@ -22,7 +22,7 @@ import Text.Pandoc
 import Text.Pandoc.Walk (walk)
 import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
                            dropBlanks, split)
-import Data.List (intercalate, intersperse)
+import Data.List (intercalate)
 import Data.Maybe
 import Data.Char (toLower, isUpper, toUpper, isDigit, isLower, isAlphaNum,
                   isPunctuation)
@@ -597,17 +597,27 @@ unTitlecase xs          = xs
 
 untc :: [Inline] -> [Inline]
 untc [] = []
-untc (x:xs) = x : map go xs
-  where go (Str (y:ys)) | isUpper y = Str $ toLower y : ys
-        go (Quoted qt ys) = Quoted qt $ map go ys
-        go (Emph ys)   = Emph $ map go ys
-        go (Strong ys) = Strong $ map go ys
-        go (Span _ ys)
-          | hasLowercaseWord ys = Span ("",["nocase"],[]) ys
-        go z            = z
-        hasLowercaseWord = any isLowercaseWord
-        isLowercaseWord (Str (y:_)) = isLower y
-        isLowercaseWord _           = False
+untc (x:xs) = x : go xs
+  where go (Space : Str (y:ys) : zs)
+           | isUpper y = Space : Str (toLower y : ys) : go zs
+        go (Str [w] : Str (y:ys) : zs)
+           | isPunctuation w && isUpper y =
+             Str [w] : Str (toLower y : ys) : go zs
+        go (Quoted qt ys : zs)  = Quoted qt (untc ys) : go zs
+        go (Emph ys : zs)       = Emph (untc ys) : go zs
+        go (Strong ys : zs   )  = Strong (untc ys) : go zs
+        go (Span _ ys : zs)
+          | hasLowercaseWord ys = Span ("",["nocase"],[]) ys : go zs
+        go (z : zs)             = z : go zs
+        go []                   = []
+        hasLowercaseWord = any isLowercaseWord .
+                            splitWhen (\y -> y == Space || y == Str "-")
+        isLowercaseWord (Str (y:_):_)   = isLower y
+        isLowercaseWord (Quoted _ ys:_) = hasLowercaseWord ys
+        isLowercaseWord (Emph ys:_)     = hasLowercaseWord ys
+        isLowercaseWord (Strong ys:_)   = hasLowercaseWord ys
+        isLowercaseWord (Span _ ys:_)   = hasLowercaseWord ys
+        isLowercaseWord _               = False
 
 toLocale :: String -> String
 toLocale "english"    = "en-US" -- "en-EN" unavailable in CSL
