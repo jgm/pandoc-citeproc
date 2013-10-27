@@ -38,8 +38,9 @@ blocksToString =
 
 adjustSpans :: Inline -> [Inline]
 adjustSpans (Span ("",[],[]) xs) = xs
-adjustSpans (RawInline (Format "latex") s) =
-  bottomUp (concatMap adjustSpans) $ parseRawLaTeX s
+adjustSpans (RawInline (Format "latex") s)
+  | s == "\\hyphen" = [Str "-"]
+  | otherwise = bottomUp (concatMap adjustSpans) $ parseRawLaTeX s
 adjustSpans (SmallCaps xs) =
   [Span ("",[],[("style","font-variant:small-caps;")]) xs]
 adjustSpans x = [x]
@@ -55,7 +56,6 @@ parseRawLaTeX ('\\':xs) =
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
          f "mkbibquote" ils = [Quoted DoubleQuote ils]
          f "bibstring" [Str s] = [Code ("",["bibstring"],[]) s]
-         f "hyphen" [] = [Str "-"]
          f _            ils = [Span nullAttr ils]
 parseRawLaTeX _ = []
 
