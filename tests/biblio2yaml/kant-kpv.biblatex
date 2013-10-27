@@ -56,8 +56,8 @@ NOTES:
 ---
 references:
 - title-short: Kritik der praktischen Vernunft
-  annote: "An edition of Kant’s <i>Collected Works</i>, volume five. This is
-    an inbook entry which explicitly refers to the <i>Critique of Practical Reason</i>
+  annote: "An edition of Kant’s *Collected Works*, volume five. This is
+    an inbook entry which explicitly refers to the *Critique of Practical Reason*
     only, not to the entire fifth volume. Note the author and bookauthor fields in
     the database file. By default, the bookauthor is omitted if the values of the
     author and bookauthor fields are identical"

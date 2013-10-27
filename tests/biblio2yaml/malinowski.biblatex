@@ -45,7 +45,8 @@ references:
   annote: This is a book entry. Note the format of the publisher and edition fields
     as well as the subtitle field
   title: ! 'Argonauts of the Western Pacific: An account of native enterprise and
-    adventure in the Archipelagoes of Melanesian New Guinea'
+    adventure in the <span class="nocase">Archipelagoes of Melanesian New
+    Guinea</span>'
   id: malinowski
   issued:
     year: 1972
