@@ -258,7 +258,6 @@ library
                       Text.CSL.Input.MODS
                       Text.CSL.Input.Bibutils
                       Text.CSL.Input.Bibtex
-                      Text.CSL.Input.Pandoc
                       Text.CSL.Output.Pandoc
                       Text.CSL.Output.Plain
                       Text.CSL.Data
