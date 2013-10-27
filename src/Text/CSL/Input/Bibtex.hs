@@ -907,9 +907,13 @@ itemToReference lang bibtex = bib $ do
   -- url, doi, isbn, etc.:
   -- note that with eprinttype = arxiv, we take eprint to be a partial url
   url' <- getRawField "url"
-       <|> (getRawField "eprinttype" >>= \x ->
-            guard (map toLower x == "arxiv") >>
-            ("http://arxiv.org/abs/" ++) <$> getRawField "eprint")
+       <|> (do etype <- getRawField "eprinttype"
+               eprint <- getRawField "eprint"
+               case map toLower etype of
+                    "arxiv"       -> return $ "http://arxiv.org/abs/" ++ eprint
+                    "googlebooks" -> return $ "http://books.google.com?id=" ++
+                                        eprint
+                    _             -> mzero)
        <|> return ""
   -- the doi: prefix causes citeproc-hs to create a link
   doi' <- (("doi:" ++) <$> getRawField "doi") <|> return ""
