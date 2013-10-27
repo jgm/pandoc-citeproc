@@ -38,7 +38,22 @@ blocksToString =
 
 adjustSpans :: Inline -> [Inline]
 adjustSpans (Span ("",[],[]) xs) = xs
+adjustSpans (RawInline (Format "latex") s) = parseRawLaTeX s
 adjustSpans x = [x]
+
+parseRawLaTeX :: String -> [Inline]
+parseRawLaTeX ('\\':xs) =
+  case readLaTeX def{readerParseRaw = True} contents of
+       Pandoc _ [Para ys]  -> f command ys
+       Pandoc _ [Plain ys] -> f command ys
+       _                   -> []
+   where (command', contents') = break (=='{') xs
+         command  = trim command'
+         contents = drop 1 $ reverse $ drop 1 $ reverse contents'
+         f "mkbibquote" ils = [Quoted DoubleQuote ils]
+         f "bibstring" [Str s] = [Code ("",["bibstring"],[]) s]
+         f _            ils = [Span nullAttr ils]
+parseRawLaTeX _ = []
 
 inlinesToString :: [Inline] -> String
 inlinesToString = trim . blocksToString . (:[]) . Plain
