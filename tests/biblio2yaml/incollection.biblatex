@@ -3,7 +3,7 @@
 @string{hup = {Harvard University Press}}
 
 @incollection{brandt,
-	Annotation = {An incollection entry with a series and a number. Note the format of the printed name and compare the useprefix option in the options field as well as vangennep. Also note the \texttt{indextitle, and indexsorttitle fields}},
+	Annotation = {An incollection entry with a series and a number. Note the format of the printed name and compare the useprefix option in the options field as well as vangennep. Also note the indextitle, and indexsorttitle fields},
 	Author = {von Brandt, Ahasver and Hoffmann, Erich},
 	Booktitle = {Europa im Hoch- und Spätmittelalter},
 	Date = 1987,
