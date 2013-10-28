@@ -167,6 +167,12 @@ adjustSpans (Span ("",[],[]) xs) = xs
 adjustSpans (Span ("",["nocase"],[]) xs) = xs
 adjustSpans (Span ("",["citeproc-no-output"],[]) _) =
   [Str "[CSL STYLE ERROR: reference with no printed form.]"]
+adjustSpans (Emph xs) =
+  RawInline (Format "html") "<i>" : xs ++ [RawInline (Format "html") "</i>"]
+adjustSpans (Strong xs) =
+  RawInline (Format "html") "<b>" : xs ++ [RawInline (Format "html") "</b>"]
+adjustSpans (SmallCaps xs) =
+  RawInline (Format "html") "<span style=\"font-variant:small-caps;\">" : xs ++ [RawInline (Format "html") "</span>"]
 adjustSpans x = [x]
 
 showDiff :: String -> String -> IO ()
