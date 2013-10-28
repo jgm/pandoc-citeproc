@@ -21,8 +21,6 @@ module Text.CSL.Output.Pandoc
     , initInline
     , tailFirstInlineStr
     , toCapital
-    , startWithPunct
-    , endWithPunct
     ) where
 
 import Data.Char ( toUpper, toLower, isPunctuation )
@@ -262,10 +260,6 @@ isPunctuationInQuote = or . query punctIn'
       punctIn' n
           | ("punctuation-in-quote","true") <- n = [True]
           | otherwise                            = [False]
-
-endWithPunct, startWithPunct :: [Inline] -> Bool
-endWithPunct   = and . map (`elem` ".,;:!?") . lastInline
-startWithPunct = and . map (`elem` ".,;:!?") . headInline
 
 convertQuoted :: Style -> [Inline] -> [Inline]
 convertQuoted s = convertQuoted'

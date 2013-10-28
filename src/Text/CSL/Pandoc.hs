@@ -13,7 +13,7 @@ import Data.Aeson
 import Data.List
 import Data.Char ( isDigit, isPunctuation )
 import qualified Data.Map as M
-import Text.CSL hiding ( Cite(..), Citation(..), endWithPunct )
+import Text.CSL hiding ( Cite(..), Citation(..))
 import Text.CSL.Data (getDefaultCSL)
 import qualified Text.CSL as CSL ( Cite(..) )
 import Text.Parsec hiding (State, (<|>))
@@ -162,9 +162,6 @@ mvPunct (Space : x : ys) | isNote x, startWithPunct ys =
 mvPunct (Space : x : ys) | isNote x = x : ys
 mvPunct xs = xs
 
--- A replacement for citeproc-hs's endWithPunct, which wrongly treats
--- a sentence ending in '.)' as not ending with punctuation, leading
--- to an extra period.
 endWithPunct :: [Inline] -> Bool
 endWithPunct [] = True
 endWithPunct xs@(_:_) = case reverse (stringify [last xs]) of
@@ -173,6 +170,9 @@ endWithPunct xs@(_:_) = case reverse (stringify [last xs]) of
                               (c:_) | isEndPunct c     -> True
                                     | otherwise        -> False
   where isEndPunct c = c `elem` ".,;:!?"
+
+startWithPunct :: [Inline] -> Bool
+startWithPunct = and . map (`elem` ".,;:!?") . headInline
 
 deNote :: Pandoc -> Pandoc
 deNote = topDown go

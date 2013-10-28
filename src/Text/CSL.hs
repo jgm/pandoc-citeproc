@@ -71,8 +71,6 @@ module Text.CSL
     , initInline
     , tailFirstInlineStr
     , toCapital
-    , startWithPunct
-    , endWithPunct
     ) where
 
 import Text.CSL.Proc
