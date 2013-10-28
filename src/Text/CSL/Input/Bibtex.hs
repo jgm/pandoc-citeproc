@@ -31,6 +31,7 @@ import Control.Monad.RWS
 import Control.Monad.State
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
+import Text.CSL.Util (trim)
 
 blocksToString  :: [Block]  -> String
 blocksToString =
@@ -305,9 +306,6 @@ bookTrans z =
        "indexsorttitle" -> []
        _                -> [z]
 
-trim :: String -> String
-trim = unwords . words
-
 data Lang = Lang String String  -- e.g. "en" "US"
 
 resolveKey :: Lang -> String -> String
@@ -577,7 +575,7 @@ latex' s = resolveBibStrings bs
   where Pandoc _ bs = readLaTeX def{readerParseRaw = True} s
 
 latex :: String -> Bib String
-latex s = blocksToString <$> latex' (trim s)
+latex s = (trim . blocksToString) <$> latex' (trim s)
 
 latexTitle :: String -> Bib String
 latexTitle s = do
