@@ -529,8 +529,11 @@ toAuthor opts ils =
           , literal         = ""
           , commaSuffix     = usecomma
           }
-  where useprefix = maybe False (== "true") $ lookup "useprefix" opts
-        usecomma = maybe False (== "true") $ lookup "juniorcomma" opts
+  where useprefix = isyes $ lookup "useprefix" opts
+        usecomma  = isyes $ lookup "juniorcomma" opts
+        isyes (Just "true") = True
+        isyes (Just "")     = True
+        isyes _      = False
         commaParts = map words' $ splitWhen (== Str ",")
                                 $ splitStrWhen
                                   (\c -> c == ',' || c == '\160') ils
