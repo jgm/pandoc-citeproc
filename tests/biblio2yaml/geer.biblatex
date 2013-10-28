@@ -46,9 +46,9 @@ references:
     the database file which uses a localization key. Also note the format of the printed
     name and compare the useprefix option in the options field as well as vangennep
   genre: PhD thesis
-  title: "Earl, saint, bishop, skald – and music: The Orkney earldom of the
+  title: "Earl, saint, bishop, skald – and music: The Orkney earldom of the
     twelfth century. A musicological study"
-  title-short: Earl, saint, bishop, skald – and music
+  title-short: Earl, saint, bishop, skald – and music
   id: geer
   issued:
     year: 1985
