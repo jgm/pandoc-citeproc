@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
     ScopedTypeVariables #-}
 import System.Exit
+import qualified Control.Exception as E
 import Text.Pandoc
 import Data.Char (isSpace, toLower)
 import System.Environment (getArgs)
@@ -82,6 +83,7 @@ data TestResult =
     Passed
   | Skipped
   | Failed
+  | Errored
   deriving (Show, Eq)
 
 testDir :: FilePath
@@ -93,8 +95,13 @@ escapeHtml ('&':xs) = "&#38;" ++ escapeHtml xs
 escapeHtml ('<':xs) = "&#60;" ++ escapeHtml xs
 escapeHtml (x:xs)   = x : escapeHtml xs
 
+handleError :: FilePath -> E.SomeException -> IO TestResult
+handleError path e = do
+  putStrLn $ "[ERROR] " ++ path ++ "\n" ++ show e
+  return Errored
+
 runTest :: FilePath -> IO TestResult
-runTest path = do
+runTest path = E.handle (handleError path) $ do
   raw <- BL.readFile path
   let testCase = either error id $ eitherDecode raw
   let procOpts = ProcOpts (testBibopts testCase)
@@ -201,8 +208,10 @@ main = do
   let numpasses  = length $ filter (== Passed) results
   let numskipped = length $ filter (== Skipped) results
   let numfailures = length $ filter (== Failed) results
+  let numerrors = length $ filter (== Errored) results
   putStrLn $ show numpasses ++ " passed; " ++ show numfailures ++
-              " failed; " ++ show numskipped ++ " skipped."
+              " failed; " ++ show numskipped ++ " skipped; " ++
+              show numerrors ++ " errored."
   exitWith $ if numfailures == 0
                 then ExitSuccess
                 else ExitFailure numfailures
