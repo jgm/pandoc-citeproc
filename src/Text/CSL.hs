@@ -67,10 +67,6 @@ module Text.CSL
     , renderPlainStrict
     , renderPandoc
     , renderPandoc'
-    , headInline
-    , initInline
-    , tailFirstInlineStr
-    , toCapital
     ) where
 
 import Text.CSL.Proc

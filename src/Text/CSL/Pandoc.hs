@@ -14,6 +14,8 @@ import Data.List
 import Data.Char ( isDigit, isPunctuation )
 import qualified Data.Map as M
 import Text.CSL hiding ( Cite(..), Citation(..))
+import Text.CSL.Output.Pandoc ( headInline, tailFirstInlineStr, initInline,
+                                toCapital )
 import Text.CSL.Data (getDefaultCSL)
 import qualified Text.CSL as CSL ( Cite(..) )
 import Text.Parsec hiding (State, (<|>))
