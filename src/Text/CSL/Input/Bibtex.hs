@@ -529,11 +529,8 @@ toAuthor opts ils =
           , literal         = ""
           , commaSuffix     = usecomma
           }
-  where useprefix = isyes $ lookup "useprefix" opts
-        usecomma  = isyes $ lookup "juniorcomma" opts
-        isyes (Just "true") = True
-        isyes (Just "")     = True
-        isyes _      = False
+  where useprefix = isSet "useprefix" opts
+        usecomma  = isSet "juniorcomma" opts
         commaParts = map words' $ splitWhen (== Str ",")
                                 $ splitStrWhen
                                   (\c -> c == ',' || c == '\160') ils
@@ -566,6 +563,12 @@ toAuthor opts ils =
         (von, lastname) = case (reverse rvon, reverse rlast) of
                                (ws@(_:_),[]) -> (init ws, [last ws])
                                (ws, vs)      -> (ws, vs)
+
+isSet :: String -> Options -> Bool
+isSet key opts = case lookup key opts of
+                      Just "true" -> True
+                      Just ""     -> True
+                      _           -> False
 
 splitStrWhen :: (Char -> Bool) -> [Inline] -> [Inline]
 splitStrWhen _ [] = []
@@ -927,7 +930,7 @@ itemToReference lang bibtex = bib $ do
 
   -- url, doi, isbn, etc.:
   -- note that with eprinttype = arxiv, we take eprint to be a partial url
-  url' <- getRawField "url"
+  url' <- (guard (lookup "url" opts /= Just "false") >> getRawField "url")
        <|> (do etype <- getRawField "eprinttype"
                eprint <- getRawField "eprint"
                case map toLower etype of
@@ -936,7 +939,8 @@ itemToReference lang bibtex = bib $ do
                                         eprint
                     _             -> mzero)
        <|> return ""
-  doi' <- getRawField "doi" <|> return ""
+  doi' <- (guard (lookup "doi" opts /= Just "false") >> getRawField "doi")
+         <|> return ""
   isbn' <- getRawField "isbn" <|> return ""
   issn' <- getRawField "issn" <|> return ""
   callNumber' <- getRawField "library" <|> return ""
