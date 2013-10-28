@@ -16,8 +16,7 @@
 
 module Text.CSL.Input.MODS where
 
-import Text.CSL.Eval ( split )
-import Text.CSL.Util ( (<+>), tail' )
+import Text.CSL.Util ( (<+>), tail', split )
 import Text.CSL.Pickle
 import Text.CSL.Reference
 import Text.CSL.Style ( betterThan )

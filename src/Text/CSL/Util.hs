@@ -7,6 +7,10 @@ module Text.CSL.Util
   , capitalize
   , head'
   , tail'
+  , last'
+  , words'
+  , trim
+  , split
   , parseBool
   , parseString
   , mb
@@ -20,6 +24,7 @@ import qualified Data.Text as T
 import Data.Char (toLower, toUpper)
 import Data.Traversable (mapM)
 import Text.Pandoc.Shared (safeRead)
+import Data.List.Split (wordsBy)
 
 readNum :: String -> Int
 readNum s = case reads s of
@@ -52,6 +57,26 @@ head' = take 1
 
 tail' :: Eq a => [a] -> [a]
 tail' = drop 1
+
+last' :: [a] -> [a]
+last' = foldl (\_ x -> [x]) []
+
+-- | Like words, but doesn't break on nonbreaking spaces etc.
+words' :: String -> [String]
+words' = wordsBy (\c -> c == ' ' || c == '\t' || c == '\r' || c == '\n')
+
+-- | Remove leading and trailing space (including newlines) from string.
+trim :: String -> String
+trim = triml . trimr
+  where triml = dropWhile (`elem` " \r\n\t")
+        trimr = reverse . triml . reverse
+
+split :: (Char -> Bool) -> String -> [String]
+split _ [] = []
+split f s  = let (l, s') = break f s
+             in  trim l : case s' of
+                            []      -> []
+                            (_:s'') -> split f s''
 
 -- | Parse JSON Boolean or Number as Bool.
 parseBool :: Value -> Parser Bool

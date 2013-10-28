@@ -21,7 +21,7 @@ import Data.Char ( toLower )
 import Data.List
 import Data.Ord  ( comparing )
 import Data.Maybe ( mapMaybe )
-import Text.CSL.Eval hiding ( trim )
+import Text.CSL.Eval
 import Text.CSL.Util ( head', tail', capitalize )
 import Text.CSL.Output.Plain
 import Text.CSL.Proc.Collapse
@@ -316,7 +316,7 @@ localModifiers s b c
       isPunct = and . map (flip elem ".,;:!? ")
       check o = case cleanOutput o of
                   [] -> ONull
-                  x  -> case trim x of
+                  x  -> case trim' x of
                           [] -> ONull
                           x' -> Output x' emptyFormatting
       hasOutput o
@@ -325,15 +325,15 @@ localModifiers s b c
           | OSpace      <- o = [False]
           | ONull       <- o = [False]
           | otherwise        = [True]
-      trim [] = []
-      trim (o:os)
+      trim' [] = []
+      trim' (o:os)
           | Output ot f <- o, p <- prefix f,  p /= []
-          , isPunct p         = trim $ Output ot f { prefix = []} : os
+          , isPunct p         = trim' $ Output ot f { prefix = []} : os
           | Output ot f <- o  = if or (query hasOutput ot)
-                                then Output (trim ot) f : os
-                                else Output       ot  f : trim os
-          | ODel _      <- o  = trim os
-          | OSpace      <- o  = trim os
+                                then Output (trim' ot) f : os
+                                else Output       ot  f : trim' os
+          | ODel _      <- o  = trim' os
+          | OSpace      <- o  = trim' os
           | OStr    x f <- o  = OStr x (if isPunct (prefix f)
                                         then f { prefix = []} else f) : os
           | otherwise         = o:os

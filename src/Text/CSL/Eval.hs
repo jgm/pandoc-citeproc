@@ -16,7 +16,6 @@
 module Text.CSL.Eval
     ( evalLayout
     , evalSorting
-    , last', split, trim
     , module Text.CSL.Eval.Common
     , module Text.CSL.Eval.Output
     ) where
@@ -35,7 +34,7 @@ import Text.CSL.Eval.Names
 import Text.CSL.Output.Plain
 import Text.CSL.Reference
 import Text.CSL.Style
-import Text.CSL.Util ( readNum, head' )
+import Text.CSL.Util ( readNum, head', last' )
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the
@@ -397,16 +396,3 @@ chicagoRange sa sb
         sb' = reverse sb
         comp a b = let b' = takeWhile isDigit b
                    in take (length b') a == b'
-
-last' :: [a] -> [a]
-last' = foldl (\_ x -> [x]) []
-
-trim :: String -> String
-trim = unwords . words
-
-split :: (Char -> Bool) -> String -> [String]
-split _ [] = []
-split f s  = let (l, s') = break f s
-             in  trim l : case s' of
-                            []      -> []
-                            (_:s'') -> split f s''

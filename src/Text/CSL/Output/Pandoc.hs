@@ -27,7 +27,7 @@ module Text.CSL.Output.Pandoc
 
 import Data.Char ( toUpper, toLower, isPunctuation )
 import Data.Maybe ( fromMaybe )
-import Text.CSL.Util ( head', tail', capitalize )
+import Text.CSL.Util ( head', tail', words', capitalize )
 import Text.CSL.Style
 import Text.Pandoc.Definition
 import Text.Pandoc.XML (fromEntities)
@@ -127,8 +127,8 @@ renderFo sty fo
           | noCase fm                         = [Span ("",["nocase"],[]) a]
           | "lowercase"        <- textCase fm = map (setCase' $ map toLower) a
           | "uppercase"        <- textCase fm = map (setCase' $ map toUpper) a
-          | "capitalize-all"   <- textCase fm = map (setCase  $ unwords . map toCap      . words) a
-          | "title"            <- textCase fm = map (setCase  $ unwords . map toTitleCap . words) a
+          | "capitalize-all"   <- textCase fm = map (setCase  $ unwords . map toCap      . words') a
+          | "title"            <- textCase fm = map (setCase  $ unwords . map toTitleCap . words') a
           | "capitalize-first" <- textCase fm = [setCase capitalize i] ++ is
           | "sentence"         <- textCase fm = [setCase toCap      i] ++
                                                 map (setCase $ map toLower) is
