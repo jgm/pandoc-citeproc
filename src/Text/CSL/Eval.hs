@@ -24,7 +24,6 @@ import Control.Arrow
 import Control.Applicative ( (<$>) )
 import Control.Monad.State
 import Data.Char ( toLower, isDigit, isLetter )
-import Data.List
 import Data.Maybe
 
 import Text.CSL.Eval.Common
@@ -163,10 +162,9 @@ evalElement el
                              "url"         -> getStringVar "url" >>= \k ->
                                               if null k then return [] else return [OUrl (k,k) fm]
                              "doi"         -> getStringVar "doi" >>= \d ->
-                                              if "doi:" `isPrefixOf` d
-                                                 then let d' = drop 4 d in
-                                                      return [OUrl ("http://dx.doi.org/" ++ d', d') fm]
-                                                 else return [OStr d  fm]
+                                              if null d
+                                                 then return []
+                                                 else return [OUrl ("http://dx.doi.org/" ++ d, d) fm]
                              _             -> gets (env >>> options &&& abbrevs) >>= \(opts,as) ->
                                               getVar [] (getFormattedValue opts as f fm s) s >>= \r ->
                                               consumeVariable s >> return r
