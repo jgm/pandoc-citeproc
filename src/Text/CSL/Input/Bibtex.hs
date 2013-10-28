@@ -936,8 +936,7 @@ itemToReference lang bibtex = bib $ do
                                         eprint
                     _             -> mzero)
        <|> return ""
-  -- the doi: prefix causes citeproc-hs to create a link
-  doi' <- (("doi:" ++) <$> getRawField "doi") <|> return ""
+  doi' <- getRawField "doi" <|> return ""
   isbn' <- getRawField "isbn" <|> return ""
   issn' <- getRawField "issn" <|> return ""
   callNumber' <- getRawField "library" <|> return ""
