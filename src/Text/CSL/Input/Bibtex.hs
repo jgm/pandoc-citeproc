@@ -409,10 +409,10 @@ parseDate s = do
              [y,m]   -> (y, m, "")
              [y,m,d] -> (y, m, d)
              _       -> ("", "", "")
-  return RefDate { year   = year'
-                 , month  = month'
+  return RefDate { year   = dropWhile (=='0') year'
+                 , month  = dropWhile (=='0') month'
                  , season = ""
-                 , day    = day'
+                 , day    = dropWhile (=='0') day'
                  , other  = ""
                  , circa  = ""
                  }
