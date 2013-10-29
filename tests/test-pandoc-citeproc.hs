@@ -24,18 +24,28 @@ main = do
            `fmap` getDirectoryContents "tests/biblio2yaml"
   biblio2yamlTests <- mapM biblio2yamlTest fs
   let allTests = citeprocTests ++ biblio2yamlTests
-  let numTests = length allTests
-  let passingTests = length $ filter (== True) allTests
-  err $ "Passed " ++ show passingTests ++ " out of " ++ show numTests ++
-        " tests."
-  if all id citeprocTests && all id biblio2yamlTests
-     then exitWith ExitSuccess
-     else exitWith $ ExitFailure 1
+  let numpasses  = length $ filter (== Passed) allTests
+  let numskipped = length $ filter (== Skipped) allTests
+  let numfailures = length $ filter (== Failed) allTests
+  let numerrors = length $ filter (== Errored) allTests
+  putStrLn $ show numpasses ++ " passed; " ++ show numfailures ++
+              " failed; " ++ show numskipped ++ " skipped; " ++
+              show numerrors ++ " errored."
+  exitWith $ if numfailures == 0
+                then ExitSuccess
+                else ExitFailure $ numfailures + numerrors
 
 err :: String -> IO ()
 err = hPutStrLn stderr
 
-testCase :: String -> IO Bool
+data TestResult =
+    Passed
+  | Skipped
+  | Failed
+  | Errored
+  deriving (Show, Eq)
+
+testCase :: String -> IO TestResult
 testCase csl = do
   hPutStr stderr $ "[" ++ csl ++ ".in.json] "
   indata <- BL.readFile $ "tests/" ++ csl ++ ".in.json"
@@ -59,16 +69,16 @@ testCase csl = do
                                              , confCompare = compare } )
                        expectedDoc
        if result' == expected'
-          then err "PASSED" >> return True
+          then err "PASSED" >> return Passed
           else do
             err $ "FAILED"
             showDiff expected' result'
-            return False
+            return Failed
      else do
        err "ERROR"
        err $ "Error status " ++ show ec
        err $ UTF8.toStringLazy errout
-       return False
+       return Errored
 
 showDiff :: BL.ByteString -> BL.ByteString -> IO ()
 showDiff expected' result' =
@@ -82,7 +92,7 @@ showDiff expected' result' =
     rawSystem "diff" ["-u","expected","actual"]
     setCurrentDirectory oldDir
 
-biblio2yamlTest :: String -> IO Bool
+biblio2yamlTest :: String -> IO TestResult
 biblio2yamlTest fp = do
   hPutStr stderr $ "[biblio2yaml/" ++ fp ++ "] "
   let yamlf = "tests/biblio2yaml/" ++ fp
@@ -110,13 +120,13 @@ biblio2yamlTest fp = do
                                            , confCompare = compare } )
                      expectedDoc
        if expected' == result'
-          then err "PASSED" >> return True
+          then err "PASSED" >> return Passed
           else do
             err $ "FAILED"
             showDiff expected' result'
-            return False
+            return Failed
      else do
        err "ERROR"
        err $ "Error status " ++ show ec
        err $ UTF8.toStringLazy errout
-       return False
+       return Errored

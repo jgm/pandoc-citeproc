@@ -220,4 +220,4 @@ main = do
               show numerrors ++ " errored."
   exitWith $ if numfailures == 0
                 then ExitSuccess
-                else ExitFailure numfailures
+                else ExitFailure $ numfailures + numerrors
