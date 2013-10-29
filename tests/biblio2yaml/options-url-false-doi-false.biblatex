@@ -1,0 +1,54 @@
+@comment{
+
+Entry contains url and doi fields; these should be discarded since the
+options field specifies url=false, doi=false.
+
+Exception: As in standard biblatex, in online entries url should never be
+discarded, even if options contains url=false.
+
+}
+
+@article{item1,
+    Author = {Author, Andy},
+    Date = {2012},
+    Doi = {1234/5678.90},
+    Journal = {Journal},
+    Options = {url=false, doi=false},
+    Title = {Title, Any Entry Type Except online},
+    Url = {http://foo.bar}
+}
+
+@online{item2,
+    Author = {Author, Andy},
+    Date = {2012},
+    Doi = {1234/5678.90},
+    Journal = {Journal},
+    Options = {url=false, doi=false},
+    Title = {Title, Entry Type online},
+    Url = {http://foo.bar}
+}
+
+---
+references:
+- title: Title, any entry type except online
+  id: item1
+  issued:
+    year: 2012
+  author:
+    given:
+    - Andy
+    family: Author
+  container-title: Journal
+  type: article-journal
+- title: Title, entry type online
+  id: item2
+  issued:
+    year: 2012
+  author:
+    given:
+    - Andy
+    family: Author
+  container-title: Journal
+  type: webpage
+  url: http://foo.bar
+...

@@ -930,7 +930,8 @@ itemToReference lang bibtex = bib $ do
 
   -- url, doi, isbn, etc.:
   -- note that with eprinttype = arxiv, we take eprint to be a partial url
-  url' <- (guard (lookup "url" opts /= Just "false") >> getRawField "url")
+  url' <- (guard (et == "online" || lookup "url" opts /= Just "false")
+           >> getRawField "url")
        <|> (do etype <- getRawField "eprinttype"
                eprint <- getRawField "eprint"
                case map toLower etype of

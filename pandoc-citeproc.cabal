@@ -202,6 +202,7 @@ data-files:         chicago-author-date.csl
                     tests/biblio2yaml/worman.biblatex
                     tests/biblio2yaml/knuth-ct-d.biblatex
                     tests/biblio2yaml/yoon.biblatex
+                    tests/biblio2yaml/options-url-false-doi-false.biblatex
 
                     -- documentation
                     README.md
