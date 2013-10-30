@@ -34,14 +34,14 @@ import Text.Pandoc.XML (fromEntities)
 -- the native 'Pandoc' formats (i.e. immediately readable by pandoc).
 renderPandoc :: Style -> [FormattedOutput] -> [Inline]
 renderPandoc s
-    = proc (convertQuoted s) . proc' (clean s $ isPunctuationInQuote s) .
+    = proc (convertQuoted s) . proc' (clean $ isPunctuationInQuote s) .
       flipFlop . render
 
 -- | Same as 'renderPandoc', but the output is wrapped in a pandoc
 -- paragraph block.
 renderPandoc' :: Style -> [FormattedOutput] -> Block
 renderPandoc' s
-    = Para . proc (convertQuoted s) . proc' (clean s $ isPunctuationInQuote s) .
+    = Para . proc (convertQuoted s) . proc' (clean $ isPunctuationInQuote s) .
       flipFlop . render
 
 -- | For the testsuite: we use 'Link' and 'Strikeout' to store
@@ -176,16 +176,16 @@ cleanStrict (i:is)
     , Str sb:xs <- is = Str (sa ++ sb) : cleanStrict xs
     | otherwise       =              i : cleanStrict is
 
-clean :: Style -> Bool -> [Inline] -> [Inline]
-clean _ _ []  = []
-clean s b (i:is)
-    | Superscript x <- i = split (isLink  "baseline") (return . Superscript) x ++ clean s b is
-    | Subscript   x <- i = split (isLink  "baseline") (return . Subscript  ) x ++ clean s b is
-    | SmallCaps   x <- i = split (isLink  "nodecor" ) (return . SmallCaps  ) x ++ clean s b is
-    | Emph        x <- i = split (isLink' "emph"    ) (return . Emph       ) x ++ clean s b is
-    | Strong      x <- i = split (isLink' "strong"  ) (return . Strong     ) x ++ clean s b is
-    | Link      x t <- i = clean' b (Link x t : clean s b is)
-    | otherwise          = clean' b (i        : clean s b is)
+clean :: Bool -> [Inline] -> [Inline]
+clean _ []  = []
+clean b (i:is)
+    | Superscript x <- i = split (isLink  "baseline") (return . Superscript) x ++ clean b is
+    | Subscript   x <- i = split (isLink  "baseline") (return . Subscript  ) x ++ clean b is
+    | SmallCaps   x <- i = split (isLink  "nodecor" ) (return . SmallCaps  ) x ++ clean b is
+    | Emph        x <- i = split (isLink' "emph"    ) (return . Emph       ) x ++ clean b is
+    | Strong      x <- i = split (isLink' "strong"  ) (return . Strong     ) x ++ clean b is
+    | Link      x t <- i = clean' b (Link x t : clean b is)
+    | otherwise          = clean' b (i        : clean b is)
     where
       unwrap f ls
           | Link x _ : _ <- ls = clean' b x
