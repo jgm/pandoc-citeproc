@@ -71,7 +71,7 @@ evalSorting :: EvalMode -> [Locale] -> [MacroMap] -> [Option] ->
 evalSorting m l ms opts ss as r
     = map (format . sorting) ss
     where
-      render       = renderPlainStrict . formatOutputList
+      render       = renderPlain . formatOutputList
       format (s,e) = applaySort s . render $ uncurry eval e
       eval     o e = evalLayout (Layout emptyFormatting [] [e]) m False l ms o as r
       applaySort c s

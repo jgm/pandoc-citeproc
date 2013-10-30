@@ -64,7 +64,6 @@ module Text.CSL
     -- * The output and the rendering functions
     , FormattedOutput (..)
     , renderPlain
-    , renderPlainStrict
     , renderPandoc
     , renderPandoc'
     ) where
@@ -150,7 +149,7 @@ import Text.CSL.Output.Plain
 -- >   m <- readBiblioFile "mybibdb.bib"
 -- >   s <- readCSLFile "apa-x.csl"
 -- >   let result = citeproc procOpts s m $ [cites]
--- >   putStrLn . unlines . map (renderPlainStrict) . citations $ result
+-- >   putStrLn . unlines . map renderPlain . citations $ result
 --
 -- The result would be:
 --

@@ -58,7 +58,7 @@ addDelim d = foldr (\x xs -> if length xs < 1 then x : xs else check x xs) []
     where
       check x xs
           | ONull <- x = xs
-          | otherwise  = let text = renderPlainStrict . formatOutputList
+          | otherwise  = let text = renderPlain . formatOutputList
                          in  if d /= [] && text [x] /= [] && text xs /= []
                              then if head d == last (text [x]) && head d `elem` ".,;:!?"
                                   then x : ODel (tail d) : xs
