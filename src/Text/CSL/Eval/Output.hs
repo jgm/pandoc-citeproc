@@ -92,6 +92,10 @@ rtfTags =
     ,("sub"                    , ("sub" , ef {verticalAlign = "sub"       }))
     ,("span class=\"nocase\""  , ("span", ef {noCase        = True        }))
     ,("span class=\"nodecor\"" , ("span", ef {noDecor       = True        }))
+    ,("span style=\"font-variant:small-caps;\""
+                               , ("span", ef {fontVariant   = "small-caps"}))
+    ,("span style=\"font-variant:normal;\""
+                               , ("span", ef {fontVariant   = "normal"}))
     ]
     where
       ef = emptyFormatting

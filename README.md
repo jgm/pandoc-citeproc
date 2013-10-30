@@ -43,6 +43,11 @@ bibutils.
     MEDLINE           .medline
     Copac             .copac
     JSON citeproc     .json
+    YAML citeproc     .yaml
+
+    Note that the YAML bibliography should be a YAML object with a
+    field `references` containing a list of YAML references.  This is
+    the format created by the `biblio2yaml` tool.
 
 `references`:  A YAML list of references.  Each reference is a YAML
 object.  The format is essentially CSL JSON format.  Here is an example:

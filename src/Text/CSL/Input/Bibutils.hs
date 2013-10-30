@@ -17,16 +17,18 @@ module Text.CSL.Input.Bibutils
     , BibFormat (..)
     ) where
 
-import Text.Pandoc.UTF8 ( fromStringLazy )
+import Text.Pandoc.UTF8 ( fromStringLazy, fromString )
 import Data.Char
 import System.FilePath ( takeExtension )
 import Text.CSL.Pickle
 import Text.CSL.Reference
 import Text.CSL.Input.MODS
 import Text.CSL.Input.Bibtex
+import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Data.Aeson
-import Control.Applicative ( (<$>) )
+import qualified Data.Map as M
+import qualified Data.Yaml as Yaml
 
 #ifdef USE_BIBUTILS
 import qualified Control.Exception as E
@@ -46,10 +48,11 @@ import Text.Bibutils
 readBiblioFile :: FilePath -> IO [Reference]
 readBiblioFile f
     = case getExt f of
-        ".json"     -> (either error return . eitherDecode)
-                          <$> BL.readFile f
-        ".native"   -> (either error return . eitherDecode)
-                          <$> BL.readFile f
+        ".json"     -> BL.readFile f >>= either error return . eitherDecode
+        ".native"   -> BL.readFile f >>= either error return . eitherDecode
+        ".yaml"     -> BL.readFile f >>=
+         (either error return . Yaml.decodeEither .  B.concat . BL.toChunks) >>=
+         (maybe (return []) return . M.lookup "references")
         ".bib"      -> readBibtexInput False f
         ".bibtex"   -> readBibtexInput True f
         ".biblatex" -> readBibtexInput False f
@@ -71,6 +74,7 @@ readBiblioFile f
 data BibFormat
     = Mods
     | Json
+    | Yaml
     | Native
 #ifdef USE_BIBUTILS
     | Bibtex
@@ -87,6 +91,8 @@ readBiblioString :: BibFormat -> String -> IO [Reference]
 readBiblioString b s
     | Mods      <- b = return $ readXmlString xpModsCollection (fromStringLazy s)
     | Json      <- b = either error return $ eitherDecode $ fromStringLazy s
+    | Yaml      <- b = (maybe [] id . M.lookup "references") `fmap`
+                       (either error return $ Yaml.decodeEither $ fromString s)
     | Native    <- b = either error return $ eitherDecode $ fromStringLazy s
     | Bibtex    <- b = readBibtexInputString True s
     | BibLatex  <- b = readBibtexInputString False s
