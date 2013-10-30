@@ -1,0 +1,10 @@
+@book{item1,
+	Title = {The Title \textnormal{of this book}},
+}
+
+---
+references:
+- id: item1
+  type: book
+  title: 'The title <span style="font-style:normal;">of this book</span>'
+...

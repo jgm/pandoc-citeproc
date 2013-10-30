@@ -57,6 +57,7 @@ parseRawLaTeX lang ('\\':xs) =
          command  = trim command'
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
          f "mkbibquote" ils = [Quoted DoubleQuote ils]
+         f "textnormal" ils = [Span ("",[],[("style","font-style:normal;")]) ils]
          f "bibstring" [Str s] = [Str $ resolveKey lang s]
          f _            ils = [Span nullAttr ils]
 parseRawLaTeX _ _ = []
@@ -393,6 +394,28 @@ getTitle f = do
   case lookup f fs of
        Just x  -> latexTitle x
        Nothing -> notFound f
+
+getShortTitle :: Bool -> String -> Bib String
+getShortTitle requireColon f = do
+  fs <- asks fields
+  utc <- gets untitlecase
+  let processTitle = if utc then unTitlecase True else id
+  case lookup f fs of
+       Just x  -> case processTitle $ latex' x of
+                       bs | not requireColon || containsColon bs ->
+                                  trim <$> (blocksToString $ upToColon bs)
+                          | otherwise -> return []
+       Nothing -> notFound f
+
+containsColon :: [Block] -> Bool
+containsColon [Para  xs] = (Str ":") `elem` xs
+containsColon [Plain xs] = containsColon [Para xs]
+containsColon _          = False
+
+upToColon :: [Block] -> [Block]
+upToColon [Para  xs] = [Para $ takeWhile (/= (Str ":")) xs]
+upToColon [Plain xs] = upToColon [Para xs]
+upToColon bs         = bs
 
 getDates :: String -> Bib [RefDate]
 getDates f = getField f >>= parseDates
@@ -866,12 +889,9 @@ itemToReference lang bibtex = bib $ do
                         <|> return ""
   seriesTitle' <- resolveKey lang <$> getTitle "series" <|> return ""
   shortTitle' <- getTitle "shorttitle"
-               <|> return (takeWhile (/=':') $
-                           if not (null subtitle')
-                              then title'
-                              else if ':' `elem` title'
-                                   then title'
-                                   else "")
+               <|> if not (null subtitle')
+                      then getShortTitle False "title"
+                      else getShortTitle True  "title"
 
   eventTitle' <- getTitle "eventtitle" <|> return ""
   origTitle' <- getTitle "origtitle" <|> return ""
