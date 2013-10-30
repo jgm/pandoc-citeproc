@@ -48,7 +48,7 @@ renderPandoc' s
 -- "nocase" and "nodecor" rich text formatting classes.
 renderPandoc_ :: Style -> [FormattedOutput] -> [Inline]
 renderPandoc_ s
-    = proc (convertQuoted s) . proc (clean' s $ isPunctuationInQuote s) .
+    = proc (convertQuoted s) . proc (clean' $ isPunctuationInQuote s) .
       flipFlop . render
 
 render :: [FormattedOutput] -> [Inline]
@@ -184,11 +184,11 @@ clean s b (i:is)
     | SmallCaps   x <- i = split (isLink  "nodecor" ) (return . SmallCaps  ) x ++ clean s b is
     | Emph        x <- i = split (isLink' "emph"    ) (return . Emph       ) x ++ clean s b is
     | Strong      x <- i = split (isLink' "strong"  ) (return . Strong     ) x ++ clean s b is
-    | Link      x t <- i = clean' s b (Link x t : clean s b is)
-    | otherwise          = clean' s b (i        : clean s b is)
+    | Link      x t <- i = clean' b (Link x t : clean s b is)
+    | otherwise          = clean' b (i        : clean s b is)
     where
       unwrap f ls
-          | Link x _ : _ <- ls = clean' s b x
+          | Link x _ : _ <- ls = clean' b x
           |        _ : _ <- ls = f ls
           | otherwise          = []
       isLink l il
@@ -201,21 +201,21 @@ clean s b (i:is)
       split f g xs = let (y, r) = break f xs
                      in concatMap (unwrap g) [y, head' r] ++ split f g (tail' r)
 
-clean' :: Style -> Bool -> [Inline] -> [Inline]
-clean' _ _   []  = []
-clean' s b (i:is)
+clean' :: Bool -> [Inline] -> [Inline]
+clean' _   []  = []
+clean' b (i:is)
     | Link inls (y,z) <- i, y == "inquote"
     , y == z    = case headInline is of
                     [x] -> if x `elem` ".," && b
                            then if lastInline inls `elem` [".",",",";",":","!","?"]
-                                then quote DoubleQuote inls                : clean' s b (tailInline is)
-                                else quote DoubleQuote (inls ++ [Str [x]]) : clean' s b (tailInline is)
-                           else quote DoubleQuote inls : clean' s b is
-                    _   ->      quote DoubleQuote inls : clean' s b is
-    | Quoted t inls <- i = quote t inls : clean' s b is
+                                then quote DoubleQuote inls                : clean' b (tailInline is)
+                                else quote DoubleQuote (inls ++ [Str [x]]) : clean' b (tailInline is)
+                           else quote DoubleQuote inls : clean' b is
+                    _   ->      quote DoubleQuote inls : clean' b is
+    | Quoted t inls <- i = quote t inls : clean' b is
     | otherwise = if lastInline [i] == headInline is && isPunct
-                  then i : clean' s b (tailInline is)
-                  else i : clean' s b is
+                  then i : clean' b (tailInline is)
+                  else i : clean' b is
     where
       quote t x = Quoted t (reverseQuoted t x)
       isPunct = and . map (flip elem ".,;:!? ") $ headInline is
