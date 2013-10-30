@@ -19,7 +19,6 @@ module Text.CSL.Input.Bibtex
 import Text.Parsec hiding (optional, (<|>), many, State)
 import Control.Applicative
 import Text.Pandoc
-import Text.Pandoc.Walk (walk)
 import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
                            dropBlanks, split)
 import Data.List (intercalate)
@@ -34,21 +33,22 @@ import Text.CSL.Reference
 import Text.CSL.Util (trim)
 
 blocksToString  :: [Block]  -> Bib String
-blocksToString = return .
-  writeMarkdown def{ writerWrapText = False } . Pandoc nullMeta .
-    bottomUp (concatMap adjustSpans)
+blocksToString bs = do
+  lang <- gets localeLang
+  return $ writeMarkdown def{ writerWrapText = False } $ Pandoc nullMeta $
+           bottomUp (concatMap (adjustSpans lang)) bs
 
-adjustSpans :: Inline -> [Inline]
-adjustSpans (Span ("",[],[]) xs) = xs
-adjustSpans (RawInline (Format "latex") s)
+adjustSpans :: Lang -> Inline -> [Inline]
+adjustSpans _ (Span ("",[],[]) xs) = xs
+adjustSpans lang (RawInline (Format "latex") s)
   | s == "\\hyphen" = [Str "-"]
-  | otherwise = bottomUp (concatMap adjustSpans) $ parseRawLaTeX s
-adjustSpans (SmallCaps xs) =
+  | otherwise = bottomUp (concatMap (adjustSpans lang)) $ parseRawLaTeX lang s
+adjustSpans _ (SmallCaps xs) =
   [Span ("",[],[("style","font-variant:small-caps;")]) xs]
-adjustSpans x = [x]
+adjustSpans _ x = [x]
 
-parseRawLaTeX :: String -> [Inline]
-parseRawLaTeX ('\\':xs) =
+parseRawLaTeX :: Lang -> String -> [Inline]
+parseRawLaTeX lang ('\\':xs) =
   case readLaTeX def{readerParseRaw = True} contents of
        Pandoc _ [Para ys]  -> f command ys
        Pandoc _ [Plain ys] -> f command ys
@@ -57,9 +57,9 @@ parseRawLaTeX ('\\':xs) =
          command  = trim command'
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
          f "mkbibquote" ils = [Quoted DoubleQuote ils]
-         f "bibstring" [Str s] = [Code ("",["bibstring"],[]) s]
+         f "bibstring" [Str s] = [Str $ resolveKey lang s]
          f _            ils = [Span nullAttr ils]
-parseRawLaTeX _ = []
+parseRawLaTeX _ _ = []
 
 inlinesToString :: [Inline] -> Bib String
 inlinesToString ils = trim <$> (blocksToString) [Plain ils]
@@ -383,8 +383,8 @@ getPeriodicalTitle :: String -> Bib String
 getPeriodicalTitle f = do
   fs <- asks fields
   case lookup f fs of
-       Just x  -> latex' (trim x) >>=
-                   fmap trim . blocksToString .  unTitlecase False
+       Just x  -> trim <$>
+                  (blocksToString $ unTitlecase False $ latex' $ trim x)
        Nothing -> notFound f
 
 getTitle :: String -> Bib String
@@ -393,15 +393,6 @@ getTitle f = do
   case lookup f fs of
        Just x  -> latexTitle x
        Nothing -> notFound f
-
-resolveBibStrings :: [Block] -> Bib [Block]
-resolveBibStrings bs = do
-  lang <- gets localeLang
-  return $ walk (convBibString lang) bs
-
-convBibString :: Lang -> Inline -> Inline
-convBibString lang (Code ("",["bibstring"],[]) s) = Str (resolveKey lang s)
-convBibString _ x = x
 
 getDates :: String -> Bib [RefDate]
 getDates f = getField f >>= parseDates
@@ -484,7 +475,7 @@ getLiteralList :: String -> Bib [String]
 getLiteralList f = do
   fs <- asks fields
   case lookup f fs of
-       Just x  -> latex' x >>= toLiteralList
+       Just x  -> toLiteralList $ latex' x
        Nothing -> notFound f
 
 -- separates items with semicolons
@@ -588,21 +579,21 @@ splitStrWhen p (Str xs : ys)
   | any p xs = map Str ((split . dropBlanks) (whenElt p) xs) ++ splitStrWhen p ys
 splitStrWhen p (x : ys) = x : splitStrWhen p ys
 
-latex' :: String -> Bib [Block]
-latex' s = resolveBibStrings bs
+latex' :: String -> [Block]
+latex' s = bs
   where Pandoc _ bs = readLaTeX def{readerParseRaw = True} s
 
 latex :: String -> Bib String
-latex s = latex' (trim s) >>= fmap trim . blocksToString
+latex s = trim <$> (blocksToString $ latex' $ trim s)
 
 latexTitle :: String -> Bib String
 latexTitle s = do
   utc <- gets untitlecase
   let processTitle = if utc then unTitlecase True else id
-  latex' s >>= fmap trim . blocksToString . processTitle
+  trim <$> (blocksToString $ processTitle $ latex' s)
 
 latexAuthors :: Options -> String -> Bib [Agent]
-latexAuthors opts s = latex' (trim s) >>= toAuthorList opts
+latexAuthors opts = toAuthorList opts . latex' . trim
 
 bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = fmap fst $ evalRWST m entry (BibState True (Lang "en" "US"))
