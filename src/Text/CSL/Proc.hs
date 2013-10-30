@@ -73,13 +73,13 @@ procOpts = ProcOpts (Select [] [])
 -- | With a 'Style', a list of 'Reference's and the list of citation
 -- groups (the list of citations with their locator), produce the
 -- 'FormattedOutput' for each citation group.
-processCitations :: ProcOpts -> Style -> [Reference] -> Citations -> [[FormattedOutput]]
+processCitations :: ProcOpts -> Style -> [Reference] -> Citations -> [FormattedOutput]
 processCitations ops s rs
     = citations . citeproc ops s rs
 
 -- | With a 'Style' and the list of 'Reference's produce the
 -- 'FormattedOutput' for the bibliography.
-processBibliography :: ProcOpts -> Style -> [Reference] -> [[FormattedOutput]]
+processBibliography :: ProcOpts -> Style -> [Reference] -> [FormattedOutput]
 processBibliography ops s rs
     = bibliography $ citeproc ops s rs [map (\r -> emptyCite { citeId = refId r}) rs]
 
@@ -269,9 +269,9 @@ procGroup (Style {citation = ct, csMacros = ms , styleLocale = l,
 formatBiblioLayout :: Formatting -> Delimiter -> [Output] -> [Output]
 formatBiblioLayout  f d = appendOutput f . addDelim d
 
-formatCitLayout :: Style -> CitationGroup -> [FormattedOutput]
+formatCitLayout :: Style -> CitationGroup -> FormattedOutput
 formatCitLayout s (CG co f d cs)
-    | [a] <- co = formatAuth a : formatCits (fst >>> citeId &&& citeHash >>> setAsSupAu $ a) cs
+    | [a] <- co = formatAuth a ++ formatCits (fst >>> citeId &&& citeHash >>> setAsSupAu $ a) cs
     | otherwise = formatCits id cs
     where
       formatAuth   = formatOutput . localMod

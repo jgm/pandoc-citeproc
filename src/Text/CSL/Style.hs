@@ -513,8 +513,8 @@ data CitationGroup = CG [(Cite, Output)] Formatting Delimiter [(Cite, Output)] d
 
 data BiblioData
     = BD
-      { citations    :: [[FormattedOutput]]
-      , bibliography :: [[FormattedOutput]]
+      { citations    :: [FormattedOutput]
+      , bibliography :: [FormattedOutput]
       } deriving ( Show )
 
 -- | A record with all the data to produce the 'FormattedOutput' of a
