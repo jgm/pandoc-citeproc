@@ -379,6 +379,14 @@ getField f = do
        Just x  -> latex x
        Nothing -> notFound f
 
+getPeriodicalTitle :: String -> Bib String
+getPeriodicalTitle f = do
+  fs <- asks fields
+  case lookup f fs of
+       Just x  -> (trim . blocksToString . unTitlecase False) <$>
+                      latex' (trim x)
+       Nothing -> notFound f
+
 getTitle :: String -> Bib String
 getTitle f = do
   fs <- asks fields
@@ -586,7 +594,7 @@ latex s = (trim . blocksToString) <$> latex' (trim s)
 latexTitle :: String -> Bib String
 latexTitle s = do
   utc <- gets untitlecase
-  let processTitle = if utc then unTitlecase else id
+  let processTitle = if utc then unTitlecase True else id
   (trim . blocksToString . processTitle) `fmap` latex' s
 
 latexAuthors :: Options -> String -> Bib [Agent]
@@ -595,34 +603,36 @@ latexAuthors opts s = latex' (trim s) >>= toAuthorList opts
 bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = fmap fst $ evalRWST m entry (BibState True (Lang "en" "US"))
 
-unTitlecase :: [Block] -> [Block]
-unTitlecase bs =
+unTitlecase :: Bool -> [Block] -> [Block]
+unTitlecase xform bs =
   case bs of
        [Para ils]  -> [Para $ go ils]
        [Plain ils] -> [Para $ go ils]
        _           -> bs
-  where go xs = evalState (untc $ splitStrWhen isPunctuation xs) False
+  where go xs = evalState (untc xform $ splitStrWhen isPunctuation xs) False
 
-untc :: [Inline] -> State Bool [Inline]
-untc = mapM go
+untc :: Bool -> [Inline] -> State Bool [Inline]
+untc xform = mapM go
   where go Space            = put True >> return Space
         go (Str [x])
           | isPunctuation x = put True >> return (Str [x])
         go (Str (x:xs))
-          | isUpper x       = do
+          | isUpper x = do
                atWordBoundary <- get
                if atWordBoundary
-                  then put False >> return (Str (toLower x : xs))
+                  then do
+                    put False
+                    return $ Str $ (if xform then toLower x else x) : xs
                   else return (Str (x:xs))
-        go (Quoted qt xs)   = Quoted qt <$> untc xs
-        go (Emph xs)        = Emph <$> untc xs
-        go (Strong xs)      = Strong <$> untc xs
+        go (Quoted qt xs)   = Quoted qt <$> untc xform xs
+        go (Emph xs)        = Emph <$> untc xform xs
+        go (Strong xs)      = Strong <$> untc xform xs
         go (Span ("",[],[]) xs)   = do
                atWordBoundary <- get
                if atWordBoundary && hasLowercaseWord xs
                   then put False >> return (Span ("",["nocase"],[]) xs)
                   else return (Span ("",[],[]) xs)
-        go (Span attr xs)   = Span attr <$> untc xs
+        go (Span attr xs)   = Span attr <$> untc xform xs
         go x = return x
         hasLowercaseWord = any startsWithLowercase . splitStrWhen isPunctuation
         startsWithLowercase (Str (x:_)) = isLower x
@@ -833,21 +843,21 @@ itemToReference lang bibtex = bib $ do
   volumeTitleAddon' <- (getTitle "maintitle" >> guard hasVolumes
                                    >> getTitle "booktitleaddon")
                        <|> return ""
-  containerTitle' <- (guard isPeriodical >> getField "title")
+  containerTitle' <- (guard isPeriodical >> getPeriodicalTitle "title")
                   <|> getTitle "maintitle"
                   <|> (guard (not isContainer) >>
                        guard (null volumeTitle') >> getTitle "booktitle")
-                  <|> getField "journaltitle"
-                  <|> getField "journal"
+                  <|> getPeriodicalTitle "journaltitle"
+                  <|> getPeriodicalTitle "journal"
                   <|> return ""
-  containerSubtitle' <- (guard isPeriodical >> getField "subtitle")
+  containerSubtitle' <- (guard isPeriodical >> getPeriodicalTitle "subtitle")
                        <|> getTitle "mainsubtitle"
                        <|> (guard (not isContainer) >>
                             guard (null volumeSubtitle') >>
                              getTitle "booksubtitle")
-                       <|> getField "journalsubtitle"
+                       <|> getPeriodicalTitle "journalsubtitle"
                        <|> return ""
-  containerTitleAddon' <- (guard isPeriodical >> getField "titleaddon")
+  containerTitleAddon' <- (guard isPeriodical >> getPeriodicalTitle "titleaddon")
                        <|> getTitle "maintitleaddon"
                        <|> (guard (not isContainer) >>
                             guard (null volumeTitleAddon') >>
@@ -856,8 +866,8 @@ itemToReference lang bibtex = bib $ do
   containerTitleShort' <- (guard isPeriodical >> getField "shorttitle")
                         <|> (guard (not isContainer) >>
                              getTitle "booktitleshort")
-                        <|> getField "journaltitleshort"
-                        <|> getField "shortjournal"
+                        <|> getPeriodicalTitle "journaltitleshort"
+                        <|> getPeriodicalTitle "shortjournal"
                         <|> return ""
   seriesTitle' <- resolveKey lang <$> getTitle "series" <|> return ""
   shortTitle' <- getTitle "shorttitle"
