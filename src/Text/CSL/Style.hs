@@ -408,22 +408,22 @@ type FormattedOutput = [Inline]
 formattingToAttr :: Formatting -> Attr
 formattingToAttr f = ("", [], kvs)
   where kvs = filter (\(_, v) -> not (null v))
-         [ ("prefix", prefix f)
-         , ("suffix", suffix f)
-         , ("font-family", fontFamily f)
-         , ("font-style", fontStyle f)
-         , ("font-variant", fontVariant f)
-         , ("font-weight", fontWeight f)
-         , ("text-decoration", textDecoration f)
-         , ("vertical-align", verticalAlign f)
-         , ("text-case", textCase f)
-         , ("display", display f)
-         , ("quotes", case quotes f of{ NativeQuote -> "native-quote";
+         [ ("csl-prefix", prefix f)
+         , ("csl-suffix", suffix f)
+         , ("csl-font-family", fontFamily f)
+         , ("csl-font-style", fontStyle f)
+         , ("csl-font-variant", fontVariant f)
+         , ("csl-font-weight", fontWeight f)
+         , ("csl-text-decoration", textDecoration f)
+         , ("csl-vertical-align", verticalAlign f)
+         , ("csl-text-case", textCase f)
+         , ("csl-display", display f)
+         , ("csl-quotes", case quotes f of{ NativeQuote -> "native-quote";
                                         ParsedQuote -> "parsed-quote";
                                         NoQuote     -> ""})
-         , ("strip-periods", if stripPeriods f then "true" else "")
-         , ("no-case", if noCase f then "true" else "")
-         , ("no-decor", if noDecor f then "true" else "")
+         , ("csl-strip-periods", if stripPeriods f then "true" else "")
+         , ("csl-no-case", if noCase f then "true" else "")
+         , ("csl-no-decor", if noDecor f then "true" else "")
          ]
 
 data CiteprocError
