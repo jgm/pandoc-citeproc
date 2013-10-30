@@ -49,7 +49,6 @@ readBiblioFile :: FilePath -> IO [Reference]
 readBiblioFile f
     = case getExt f of
         ".json"     -> BL.readFile f >>= either error return . eitherDecode
-        ".native"   -> BL.readFile f >>= either error return . eitherDecode
         ".yaml"     -> BL.readFile f >>=
          (either error return . Yaml.decodeEither .  B.concat . BL.toChunks) >>=
          (maybe (return []) return . M.lookup "references")
@@ -75,7 +74,6 @@ data BibFormat
     = Mods
     | Json
     | Yaml
-    | Native
 #ifdef USE_BIBUTILS
     | Bibtex
     | BibLatex
@@ -93,7 +91,6 @@ readBiblioString b s
     | Json      <- b = either error return $ eitherDecode $ fromStringLazy s
     | Yaml      <- b = (maybe [] id . M.lookup "references") `fmap`
                        (either error return $ Yaml.decodeEither $ fromString s)
-    | Native    <- b = either error return $ eitherDecode $ fromStringLazy s
     | Bibtex    <- b = readBibtexInputString True s
     | BibLatex  <- b = readBibtexInputString False s
 #ifdef USE_BIBUTILS
