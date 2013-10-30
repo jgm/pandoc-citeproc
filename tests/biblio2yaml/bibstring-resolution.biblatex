@@ -1,0 +1,13 @@
+@book{item1,
+	Title = {The Title: \bibstring{newseries}},
+        Hyphenation = {english}
+}
+
+---
+references:
+- id: item1
+  type: book
+  title: "The title: new series"
+  title-short: The title
+  language: en-US
+...
