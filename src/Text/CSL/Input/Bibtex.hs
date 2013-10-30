@@ -33,8 +33,8 @@ import System.Environment (getEnvironment)
 import Text.CSL.Reference
 import Text.CSL.Util (trim)
 
-blocksToString  :: [Block]  -> String
-blocksToString =
+blocksToString  :: [Block]  -> Bib String
+blocksToString = return .
   writeMarkdown def{ writerWrapText = False } . Pandoc nullMeta .
     bottomUp (concatMap adjustSpans)
 
@@ -61,8 +61,8 @@ parseRawLaTeX ('\\':xs) =
          f _            ils = [Span nullAttr ils]
 parseRawLaTeX _ = []
 
-inlinesToString :: [Inline] -> String
-inlinesToString = trim . blocksToString . (:[]) . Plain
+inlinesToString :: [Inline] -> Bib String
+inlinesToString ils = trim <$> (blocksToString) [Plain ils]
 
 data Item = Item{ identifier :: String
                 , entryType  :: String
@@ -383,8 +383,8 @@ getPeriodicalTitle :: String -> Bib String
 getPeriodicalTitle f = do
   fs <- asks fields
   case lookup f fs of
-       Just x  -> (trim . blocksToString . unTitlecase False) <$>
-                      latex' (trim x)
+       Just x  -> latex' (trim x) >>=
+                   fmap trim . blocksToString .  unTitlecase False
        Nothing -> notFound f
 
 getTitle :: String -> Bib String
@@ -496,18 +496,18 @@ splitByAnd = splitOn [Space, Str "and", Space]
 
 toLiteralList :: [Block] -> Bib [String]
 toLiteralList [Para xs] =
-  return $ map inlinesToString $ splitByAnd xs
+  mapM inlinesToString $ splitByAnd xs
 toLiteralList [Plain xs] = toLiteralList [Para xs]
 toLiteralList _ = mzero
 
 toAuthorList :: Options -> [Block] -> Bib [Agent]
 toAuthorList opts [Para xs] =
-  return $ map (toAuthor opts) $ splitByAnd xs
+  mapM (toAuthor opts) $ splitByAnd xs
 toAuthorList opts [Plain xs] = toAuthorList opts [Para xs]
 toAuthorList _ _ = mzero
 
-toAuthor :: Options -> [Inline] -> Agent
-toAuthor _ [Str "others"] =
+toAuthor :: Options -> [Inline] -> Bib Agent
+toAuthor _ [Str "others"] = return $
     Agent { givenName       = []
           , droppingPart    = ""
           , nonDroppingPart = ""
@@ -516,19 +516,49 @@ toAuthor _ [Str "others"] =
           , literal         = "others"
           , commaSuffix     = False
           }
-toAuthor _ [Span ("",[],[]) ils] = -- corporate author
+toAuthor _ [Span ("",[],[]) ils] = do
+  literal' <- inlinesToString ils
+  return $ -- corporate author
     Agent { givenName       = []
           , droppingPart    = ""
           , nonDroppingPart = ""
           , familyName      = ""
           , nameSuffix      = ""
-          , literal         = inlinesToString ils
+          , literal         = literal'
           , commaSuffix     = False
           }
 -- First von Last
 -- von Last, First
 -- von Last, Jr ,First
-toAuthor opts ils =
+toAuthor opts ils = do
+  let useprefix = isSet "useprefix" opts
+  let usecomma  = isSet "juniorcomma" opts
+  let words' = wordsBy (\x -> x == Space || x == Str "\160")
+  let commaParts = map words' $ splitWhen (== Str ",")
+                              $ splitStrWhen (\c -> c == ',' || c == '\160') ils
+  let (first, vonlast, jr) =
+          case commaParts of
+               --- First is the longest sequence of white-space separated
+               -- words starting with an uppercase and that is not the
+               -- whole string. von is the longest sequence of whitespace
+               -- separated words whose last word starts with lower case
+               -- and that is not the whole string.
+               [fvl]      -> let (caps', rest') = span isCapitalized fvl
+                             in  if null rest' && not (null caps')
+                                 then (init caps', [last caps'], [])
+                                 else (caps', rest', [])
+               [vl,f]     -> (f, vl, [])
+               (vl:j:f:_) -> (f, vl, j )
+               []         -> ([], [], [])
+  let (rlast, rvon) = span isCapitalized $ reverse vonlast
+  let (von, lastname) = case (reverse rvon, reverse rlast) of
+                             (ws@(_:_),[]) -> (init ws, [last ws])
+                             (ws, vs)      -> (ws, vs)
+  prefix <- inlinesToString $ intercalate [Space] von
+  family <- inlinesToString $ intercalate [Space] lastname
+  suffix <- inlinesToString $ intercalate [Space] jr
+  givens <- mapM inlinesToString first
+  return $
     Agent { givenName       = givens
           , droppingPart    = if useprefix then "" else prefix
           , nonDroppingPart = if useprefix then prefix else ""
@@ -537,40 +567,14 @@ toAuthor opts ils =
           , literal         = ""
           , commaSuffix     = usecomma
           }
-  where useprefix = isSet "useprefix" opts
-        usecomma  = isSet "juniorcomma" opts
-        commaParts = map words' $ splitWhen (== Str ",")
-                                $ splitStrWhen
-                                  (\c -> c == ',' || c == '\160') ils
-        words' = wordsBy (\x -> x == Space || x == Str "\160")
-        isCapitalized (Str (c:cs) : rest)
-          | isUpper c = True
-          | isDigit c = isCapitalized (Str cs : rest)
-          | otherwise = False
-        isCapitalized (_:rest) = isCapitalized rest
-        isCapitalized [] = True
-        prefix = inlinesToString $ intercalate [Space] von
-        family = inlinesToString $ intercalate [Space] lastname
-        suffix = inlinesToString $ intercalate [Space] jr
-        givens = map inlinesToString first
-        (first, vonlast, jr) =
-            case commaParts of
-                 --- First is the longest sequence of white-space separated
-                 -- words starting with an uppercase and that is not the
-                 -- whole string. von is the longest sequence of whitespace
-                 -- separated words whose last word starts with lower case
-                 -- and that is not the whole string.
-                 [fvl]      -> let (caps', rest') = span isCapitalized fvl
-                               in  if null rest' && not (null caps')
-                                   then (init caps', [last caps'], [])
-                                   else (caps', rest', [])
-                 [vl,f]     -> (f, vl, [])
-                 (vl:j:f:_) -> (f, vl, j )
-                 []         -> ([], [], [])
-        (rlast, rvon) = span isCapitalized $ reverse vonlast
-        (von, lastname) = case (reverse rvon, reverse rlast) of
-                               (ws@(_:_),[]) -> (init ws, [last ws])
-                               (ws, vs)      -> (ws, vs)
+
+isCapitalized :: [Inline] -> Bool
+isCapitalized (Str (c:cs) : rest)
+  | isUpper c = True
+  | isDigit c = isCapitalized (Str cs : rest)
+  | otherwise = False
+isCapitalized (_:rest) = isCapitalized rest
+isCapitalized [] = True
 
 isSet :: String -> Options -> Bool
 isSet key opts = case lookup key opts of
@@ -589,13 +593,13 @@ latex' s = resolveBibStrings bs
   where Pandoc _ bs = readLaTeX def{readerParseRaw = True} s
 
 latex :: String -> Bib String
-latex s = (trim . blocksToString) <$> latex' (trim s)
+latex s = latex' (trim s) >>= fmap trim . blocksToString
 
 latexTitle :: String -> Bib String
 latexTitle s = do
   utc <- gets untitlecase
   let processTitle = if utc then unTitlecase True else id
-  (trim . blocksToString . processTitle) `fmap` latex' s
+  latex' s >>= fmap trim . blocksToString . processTitle
 
 latexAuthors :: Options -> String -> Bib [Agent]
 latexAuthors opts s = latex' (trim s) >>= toAuthorList opts
