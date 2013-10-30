@@ -35,31 +35,31 @@ import Text.Pandoc.XML (fromEntities)
 renderPandoc :: Style -> [FormattedOutput] -> [Inline]
 renderPandoc s
     = proc (convertQuoted s) . proc' (clean s $ isPunctuationInQuote s) .
-      flipFlop . render s
+      flipFlop . render
 
 -- | Same as 'renderPandoc', but the output is wrapped in a pandoc
 -- paragraph block.
 renderPandoc' :: Style -> [FormattedOutput] -> Block
 renderPandoc' s
     = Para . proc (convertQuoted s) . proc' (clean s $ isPunctuationInQuote s) .
-      flipFlop . render s
+      flipFlop . render
 
 -- | For the testsuite: we use 'Link' and 'Strikeout' to store
 -- "nocase" and "nodecor" rich text formatting classes.
 renderPandoc_ :: Style -> [FormattedOutput] -> [Inline]
 renderPandoc_ s
     = proc (convertQuoted s) . proc (clean' s $ isPunctuationInQuote s) .
-      flipFlop . render s
+      flipFlop . render
 
-render :: Style -> [FormattedOutput] -> [Inline]
-render _ [] = []
-render s (x:[])   = renderFo s x
-render s (x:y:os) = let a = renderFo s x
-                        b = renderFo s y
+render :: [FormattedOutput] -> [Inline]
+render [] = []
+render (x:[])   =   renderFo x
+render (x:y:os) =   let a = renderFo x
+                        b = renderFo y
                         isPunct = and . map (flip elem ".!?") in
                     if isPunct (lastInline a) && isPunct (headInline b)
-                    then a ++ render s (tailFO [y] ++ os)
-                    else a ++ render s (y:os)
+                    then a ++ render (tailFO [y] ++ os)
+                    else a ++ render (y:os)
 
 tailFO :: [FormattedOutput] -> [FormattedOutput]
 tailFO [] = []
@@ -73,10 +73,10 @@ tailFO (f:fs)
     where
       tailFm fm = fm { prefix = tail $ prefix fm }
 
-renderFo :: Style -> FormattedOutput -> [Inline]
-renderFo _ (FPan i) = i
-renderFo _ (FDel s) = toStr s
-renderFo sty fo
+renderFo ::  FormattedOutput -> [Inline]
+renderFo (FPan i) = i
+renderFo (FDel s) = toStr s
+renderFo fo
     | FS str fm                  <- fo = toPandoc fm $ toStr str
     | FN str fm                  <- fo = toPandoc fm $ toStr $ rmZeros str
     | FO     fm xs               <- fo = toPandoc fm $ rest xs
@@ -99,7 +99,7 @@ renderFo sty fo
       toPandoc f i = addSuffix f $ toStr (prefix f) ++
                      (quote f . format f . proc cleanStrict $ i)
       format     f = font_variant f . font f . text_case f
-      rest      xs = render sty xs
+      rest      xs = render xs
       quote    f i = if i /= [] && quotes f /= NoQuote
                      then if quotes f == NativeQuote
                           then [escape "inquote"   . valign f $ i]
