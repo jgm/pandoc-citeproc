@@ -25,7 +25,7 @@ import Data.Generics ( Typeable, Data, everywhere
                      , everywhere', everything, mkT, mkQ )
 import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
-import Text.Pandoc.Definition ( Inline, Target )
+import Text.Pandoc.Definition hiding (Citation, Cite)
 import Data.Char (isPunctuation)
 import Text.CSL.Util (mb, parseBool, (.#?), (.#:), readNum)
 import qualified Data.Text as T
@@ -403,16 +403,28 @@ data CSCategory = CSCategory String String String deriving ( Show, Read, Eq, Typ
 
 -- | The formatted output, produced after post-processing the
 -- evaluated citations.
-data FormattedOutput
-    = FO          Formatting [FormattedOutput]          -- ^ List of 'FormatOutput' items
-    | FN   String Formatting                            -- ^ Formatted number
-    | FS   String Formatting                            -- ^ Formatted string
-    | FErr CiteprocError                                -- ^ Warning
-    | FDel String                                       -- ^ Delimeter string
-    | FUrl Target Formatting                            -- ^ Formatted URL
-    | FPan [Inline]                                     -- ^ Pandoc inline elements
-    | FNull                                             -- ^ Null formatting item
-      deriving ( Eq, Show )
+type FormattedOutput = [Inline]
+
+formattingToAttr :: Formatting -> Attr
+formattingToAttr f = ("", [], kvs)
+  where kvs = filter (\(_, v) -> not (null v))
+         [ ("prefix", prefix f)
+         , ("suffix", suffix f)
+         , ("font-family", fontFamily f)
+         , ("font-style", fontStyle f)
+         , ("font-variant", fontVariant f)
+         , ("font-weight", fontWeight f)
+         , ("text-decoration", textDecoration f)
+         , ("vertical-align", verticalAlign f)
+         , ("text-case", textCase f)
+         , ("display", display f)
+         , ("quotes", case quotes f of{ NativeQuote -> "native-quote";
+                                        ParsedQuote -> "parsed-quote";
+                                        NoQuote     -> ""})
+         , ("strip-periods", if stripPeriods f then "true" else "")
+         , ("no-case", if noCase f then "true" else "")
+         , ("no-decor", if noDecor f then "true" else "")
+         ]
 
 data CiteprocError
    = NoOutput
@@ -539,48 +551,46 @@ instance Eq NameData where
     (==) (ND ka ca _ _)
          (ND kb cb _ _) = ka == kb && ca == cb
 
-formatOutputList :: [Output] -> [FormattedOutput]
-formatOutputList = filterUseless . map formatOutput
-    where
-      filterUseless [] = []
-      filterUseless (o:os)
-          | FO _ [] <- o =                          filterUseless os
-          | FO f xs <- o
-          , isEmpty f    =      filterUseless xs ++ filterUseless os
-          | FO f xs <- o = case filterUseless xs of
-                             []      ->             filterUseless os
-                             xs'     -> FO  f xs' : filterUseless os
-          | FNull   <- o =                          filterUseless os
-          | otherwise    =                      o : filterUseless os
-          where
-            isEmpty f = f == emptyFormatting
+formatOutputList :: [Output] -> FormattedOutput
+formatOutputList = concatMap formatOutput
 
 -- | Convert evaluated 'Output' into 'FormattedOutput', ready for the
 -- output filters.
 formatOutput :: Output -> FormattedOutput
-formatOutput o
-    | OSpace             <- o = FDel " "
-    | OPan     i         <- o = FPan i
-    | ODel     []        <- o = FNull
-    | ODel     s         <- o = FDel s
-    | OStr     []      _ <- o = FNull
-    | OStr     s       f <- o = FS s         f
-    | OErr     e         <- o = FErr e
-    | OLabel   []      _ <- o = FNull
-    | OLabel   s       f <- o = FS s         f
-    | ODate    os        <- o = FO emptyFormatting (format os)
-    | OYear    s _     f <- o = FS s         f
-    | OYearSuf s _ _   f <- o = FS s         f
-    | ONum     i       f <- o = FS (show  i) f
-    | OCitNum  i       f <- o = FN (add00 i) f
-    | OUrl     s       f <- o = FUrl s       f
-    | OName  _ s _     f <- o = FO f               (format  s)
-    | OContrib _ _ s _ _ <- o = FO emptyFormatting (format  s)
-    | OLoc     os      f <- o = FO f               (format os)
-    | Output   os      f <- o = FO f               (format os)
-    | otherwise               = FNull
+formatOutput o =
+  case o of
+      OSpace              -> [Space]
+      OPan     i          -> i
+      ODel     []         -> []
+      ODel     " "        -> [Space]
+      ODel     s          -> [Str s]
+      OStr     []      _  -> []
+      OStr     s       f  -> case formattingToAttr f of
+                                     ("",[],[]) -> [Str s]
+                                     attr       -> [Span attr [Str s]]
+      OErr NoOutput       -> [Span ("",["citeproc-no-output"],[])
+                                     [Strong [Str "???"]]]
+      OErr (ReferenceNotFound r)
+                          -> [Span ("",["citeproc-not-found"],
+                                            [("data-reference-id",r)])
+                                     [Strong [Str "???"]]]
+      OLabel   []      _  -> []
+      OLabel   s       f  -> formatOutput (OStr s f)
+      ODate    os         -> format os
+      OYear    s _     f  -> formatOutput (OStr s f)
+      OYearSuf s _ _   f  -> formatOutput (OStr s f)
+      ONum     i       f  -> formatOutput (OStr (show i) f)
+      OCitNum  i       f  -> formatOutput (OStr (add00 i) f)
+      OUrl     s       f  -> [Link (formatOutput (OStr (fst s) f)) s]
+      OName  _ os _    f  -> formatOutput (Output os f)
+      OContrib _ _ os _ _ -> format os
+      OLoc     os      f  -> formatOutput (Output os f)
+      Output   os      f  -> case formattingToAttr f of
+                                     ("",[],[]) -> format os
+                                     attr       -> [Span attr $ format os]
+      _                   -> []
     where
-      format = map formatOutput
+      format = concatMap formatOutput
       add00  = reverse . take 5 . flip (++) (repeat '0') . reverse . show
 
 -- | Map the evaluated output of a citation group.
