@@ -137,7 +137,7 @@ metaValueToJSON blockWriter _ (MetaBlocks bs) = liftM toJSON $ blockWriter bs
 metaValueToJSON _ inlineWriter (MetaInlines bs) = liftM toJSON $ inlineWriter bs
 
 -- | Substitute 'Cite' elements with formatted citations.
-processCite :: Style -> M.Map [Citation] [FormattedOutput] -> Inline -> Inline
+processCite :: Style -> M.Map [Citation] FormattedOutput -> Inline -> Inline
 processCite s cs (Cite t _) =
    case M.lookup t cs of
         Just (x:xs)

@@ -16,20 +16,27 @@
 module Text.CSL.Output.Pandoc
     ( renderPandoc
     , renderPandoc'
-    , renderPandoc_
     , headInline
     , initInline
     , tailFirstInlineStr
     , toCapital
     ) where
 
-import Data.Char ( toUpper, toLower, isPunctuation )
+-- import Data.Char ( toUpper, toLower, isPunctuation )
 import Data.Maybe ( fromMaybe )
 import Text.CSL.Util ( head', tail', words', capitalize )
 import Text.CSL.Style
 import Text.Pandoc.Definition
-import Text.Pandoc.XML (fromEntities)
+-- import Text.Pandoc.XML (fromEntities)
 
+-- TODO - this is a placeholder
+renderPandoc :: Style -> FormattedOutput -> [Inline]
+renderPandoc _ = id
+
+renderPandoc' :: Style -> FormattedOutput -> Block
+renderPandoc' _ = Para
+
+{-
 -- | With a 'Style' and the formatted output generate a 'String' in
 -- the native 'Pandoc' formats (i.e. immediately readable by pandoc).
 renderPandoc :: Style -> [FormattedOutput] -> [Inline]
@@ -276,6 +283,8 @@ convertQuoted s = convertQuoted'
           | (Quoted SingleQuote t:xs) <- o = Str singleQuotesO : t ++ Str singleQuotesC : convertQuoted' xs
           | (x                   :xs) <- o = x : convertQuoted' xs
           | otherwise                      = []
+
+-}
 
 headInline :: [Inline] -> String
 headInline [] = []
