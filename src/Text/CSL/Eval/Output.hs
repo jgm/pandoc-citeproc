@@ -259,24 +259,3 @@ toStr = intersperse Space . map Str . wordsBy (==' ') . tweak . fromEntities
           |' ':'?':xs <- s = "\8239?" ++ tweak xs
           | x :xs     <- s = x : tweak xs
           | otherwise  = []
-
-formattingToAttr :: Formatting -> Attr
-formattingToAttr f = ("", [], kvs)
-  where kvs = filter (\(_, v) -> not (null v))
-         [ ("csl-prefix", prefix f)
-         , ("csl-suffix", suffix f)
-         , ("csl-font-family", fontFamily f)
-         , ("csl-font-style", fontStyle f)
-         , ("csl-font-variant", fontVariant f)
-         , ("csl-font-weight", fontWeight f)
-         , ("csl-text-decoration", textDecoration f)
-         , ("csl-vertical-align", verticalAlign f)
-         , ("csl-text-case", textCase f)
-         , ("csl-display", display f)
-         , ("csl-quotes", case quotes f of{ NativeQuote -> "native-quote";
-                                        ParsedQuote -> "parsed-quote";
-                                        NoQuote     -> ""})
-         , ("csl-strip-periods", if stripPeriods f then "true" else "")
-         , ("csl-no-case", if noCase f then "true" else "")
-         , ("csl-no-decor", if noDecor f then "true" else "")
-         ]
