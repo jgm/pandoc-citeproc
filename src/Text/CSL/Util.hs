@@ -10,21 +10,29 @@ module Text.CSL.Util
   , last'
   , words'
   , trim
-  , split
   , parseBool
   , parseString
   , mb
   , (.#?)
   , (.#:)
+  , onBlocks
+  , titlecase
+  , unTitlecase
+  , protectCase
+  , splitStrWhen
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Data.Char (toLower, toUpper)
-import Data.Traversable (mapM)
+import Control.Applicative ((<$>), (<*>), pure)
+import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation)
+import qualified Data.Traversable
 import Text.Pandoc.Shared (safeRead)
-import Data.List.Split (wordsBy)
+import Text.Pandoc.Walk (walk)
+import Text.Pandoc
+import Data.List.Split (wordsBy, whenElt, dropBlanks, split)
+import Control.Monad.State
 
 readNum :: String -> Int
 readNum s = case reads s of
@@ -71,13 +79,6 @@ trim = triml . trimr
   where triml = dropWhile (`elem` " \r\n\t")
         trimr = reverse . triml . reverse
 
-split :: (Char -> Bool) -> String -> [String]
-split _ [] = []
-split f s  = let (l, s') = break f s
-             in  trim l : case s' of
-                            []      -> []
-                            (_:s'') -> split f s''
-
 -- | Parse JSON Boolean or Number as Bool.
 parseBool :: Value -> Parser Bool
 parseBool (Bool b)   = return b
@@ -107,4 +108,78 @@ x .#? y = (x .:? y) >>= mb parseString
 
 (.#:) :: Object -> Text -> Parser String
 x .#: y = (x .: y) >>= parseString
+
+onBlocks :: ([Inline] -> [Inline]) -> [Block] -> [Block]
+onBlocks f bs = walk f' bs
+  where f' (Para ils)  = Para (f ils)
+        f' (Plain ils) = Plain (f ils)
+        f' x           = x
+
+hasLowercaseWord :: [Inline] -> Bool
+hasLowercaseWord = any startsWithLowercase . splitStrWhen isPunctuation
+  where startsWithLowercase (Str (x:_)) = isLower x
+        startsWithLowercase _           = False
+
+unTitlecase :: [Inline] -> [Inline]
+unTitlecase = caseTransform untc
+  where untc (Str (x:xs))
+          | isUpper x = Str (toLower x : xs)
+        untc (Span ("",[],[]) xs)
+          | hasLowercaseWord xs = Span ("",["nocase"],[]) xs
+        untc x = x
+
+protectCase :: [Inline] -> [Inline]
+protectCase = caseTransform protect
+  where protect (Span ("",[],[]) xs)
+          | hasLowercaseWord xs = Span ("",["nocase"],[]) xs
+        protect x = x
+
+titlecase :: [Inline] -> [Inline]
+titlecase = caseTransform tc
+  where tc (Str (x:xs))
+          | isLower x && not (isShortWord (x:xs)) = Str (toUpper x : xs)
+          where isShortWord  s = s `elem` ["a","an","and","as","at","but","by","down","for","from"
+                                          ,"in","into","nor","of","on","onto","or","over","so"
+                                          ,"the","till","to","up","via","with","yet"]
+        tc (Span ("",[],[]) xs)
+          | hasLowercaseWord xs = Span ("",["nocase"],[]) xs
+        tc x = x
+
+caseTransform :: (Inline -> Inline) -> [Inline] -> [Inline]
+caseTransform xform xs = evalState (caseTransform' xform $ splitStrWhen isPunctuation xs) False
+
+caseTransform' :: (Inline -> Inline) -> [Inline] -> State Bool [Inline]
+caseTransform' xform = mapM go
+  where go Space            = put True >> return Space
+        go LineBreak        = put True >> return Space
+        go (Str [x])
+          | isPunctuation x = put True >> return (Str [x])
+        go (Str (x:xs))
+          | isUpper x = do
+               atWordBoundary <- get
+               if atWordBoundary
+                  then do
+                    put False
+                    return $ xform $ Str (x:xs)
+                  else return $ Str (x:xs)
+        go (Span ("",classes,[]) xs) | null classes || classes == ["nocase"] = do
+               atWordBoundary <- get
+               if atWordBoundary
+                  then do
+                    put False
+                    return $ xform (Span ("",[],[]) xs)
+                  else return (Span ("",[],[]) xs)
+        go (Quoted qt xs)   = Quoted qt <$> caseTransform' xform xs
+        go (Emph xs)        = Emph <$> caseTransform' xform xs
+        go (Strong xs)      = Strong <$> caseTransform' xform xs
+        go (Link xs t)      = Link <$> caseTransform' xform xs <*> pure t
+        go (Image xs t)     = Link <$> caseTransform' xform xs <*> pure t
+        go (Span attr xs)   = Span attr <$> caseTransform' xform xs
+        go x = return x
+
+splitStrWhen :: (Char -> Bool) -> [Inline] -> [Inline]
+splitStrWhen _ [] = []
+splitStrWhen p (Str xs : ys)
+  | any p xs = map Str ((split . dropBlanks) (whenElt p) xs) ++ splitStrWhen p ys
+splitStrWhen p (x : ys) = x : splitStrWhen p ys
 

@@ -23,8 +23,7 @@ module Text.CSL.Output.Pandoc
     ) where
 
 -- import Data.Char ( toUpper, toLower, isPunctuation )
-import Data.Maybe ( fromMaybe )
-import Text.CSL.Util ( head', tail', words', capitalize )
+import Text.CSL.Util ( head', tail', capitalize )
 import Text.CSL.Style
 import Text.Pandoc.Definition
 -- import Text.Pandoc.XML (fromEntities)

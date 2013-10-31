@@ -62,7 +62,7 @@ module Text.CSL
     , BiblioData (..)
 
     -- * The output and the rendering functions
-    , FormattedOutput (..)
+    , FormattedOutput
     , renderPlain
     , renderPandoc
     , renderPandoc'

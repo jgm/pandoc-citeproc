@@ -19,18 +19,15 @@ module Text.CSL.Input.Bibtex
 import Text.Parsec hiding (optional, (<|>), many, State)
 import Control.Applicative
 import Text.Pandoc
-import Data.List.Split (splitOn, splitWhen, wordsBy, whenElt,
-                           dropBlanks, split)
+import Data.List.Split (splitOn, splitWhen, wordsBy)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper, isLower, toUpper, isDigit,
-                  isAlphaNum, isPunctuation)
+import Data.Char (toLower, isUpper, toUpper, isDigit, isAlphaNum )
 import Control.Monad
 import Control.Monad.RWS
-import Control.Monad.State
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
-import Text.CSL.Util (trim)
+import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen)
 
 blocksToString  :: [Block]  -> Bib String
 blocksToString bs = do
@@ -385,7 +382,7 @@ getPeriodicalTitle f = do
   fs <- asks fields
   case lookup f fs of
        Just x  -> trim <$>
-                  (blocksToString $ unTitlecase False $ latex' $ trim x)
+                  (blocksToString $ onBlocks protectCase $ latex' $ trim x)
        Nothing -> notFound f
 
 getTitle :: String -> Bib String
@@ -399,7 +396,7 @@ getShortTitle :: Bool -> String -> Bib String
 getShortTitle requireColon f = do
   fs <- asks fields
   utc <- gets untitlecase
-  let processTitle = if utc then unTitlecase True else id
+  let processTitle = if utc then onBlocks unTitlecase else id
   case lookup f fs of
        Just x  -> case processTitle $ latex' x of
                        bs | not requireColon || containsColon bs ->
@@ -596,12 +593,6 @@ isSet key opts = case lookup key opts of
                       Just ""     -> True
                       _           -> False
 
-splitStrWhen :: (Char -> Bool) -> [Inline] -> [Inline]
-splitStrWhen _ [] = []
-splitStrWhen p (Str xs : ys)
-  | any p xs = map Str ((split . dropBlanks) (whenElt p) xs) ++ splitStrWhen p ys
-splitStrWhen p (x : ys) = x : splitStrWhen p ys
-
 latex' :: String -> [Block]
 latex' s = bs
   where Pandoc _ bs = readLaTeX def{readerParseRaw = True} s
@@ -612,7 +603,7 @@ latex s = trim <$> (blocksToString $ latex' $ trim s)
 latexTitle :: String -> Bib String
 latexTitle s = do
   utc <- gets untitlecase
-  let processTitle = if utc then unTitlecase True else id
+  let processTitle = if utc then onBlocks unTitlecase else id
   trim <$> (blocksToString $ processTitle $ latex' s)
 
 latexAuthors :: Options -> String -> Bib [Agent]
@@ -620,41 +611,6 @@ latexAuthors opts = toAuthorList opts . latex' . trim
 
 bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = fmap fst $ evalRWST m entry (BibState True (Lang "en" "US"))
-
-unTitlecase :: Bool -> [Block] -> [Block]
-unTitlecase xform bs =
-  case bs of
-       [Para ils]  -> [Para $ go ils]
-       [Plain ils] -> [Para $ go ils]
-       _           -> bs
-  where go xs = evalState (untc xform $ splitStrWhen isPunctuation xs) False
-
-untc :: Bool -> [Inline] -> State Bool [Inline]
-untc xform = mapM go
-  where go Space            = put True >> return Space
-        go (Str [x])
-          | isPunctuation x = put True >> return (Str [x])
-        go (Str (x:xs))
-          | isUpper x = do
-               atWordBoundary <- get
-               if atWordBoundary
-                  then do
-                    put False
-                    return $ Str $ (if xform then toLower x else x) : xs
-                  else return (Str (x:xs))
-        go (Quoted qt xs)   = Quoted qt <$> untc xform xs
-        go (Emph xs)        = Emph <$> untc xform xs
-        go (Strong xs)      = Strong <$> untc xform xs
-        go (Span ("",[],[]) xs)   = do
-               atWordBoundary <- get
-               if atWordBoundary && hasLowercaseWord xs
-                  then put False >> return (Span ("",["nocase"],[]) xs)
-                  else return (Span ("",[],[]) xs)
-        go (Span attr xs)   = Span attr <$> untc xform xs
-        go x = return x
-        hasLowercaseWord = any startsWithLowercase . splitStrWhen isPunctuation
-        startsWithLowercase (Str (x:_)) = isLower x
-        startsWithLowercase _           = False
 
 toLocale :: String -> String
 toLocale "english"    = "en-US" -- "en-EN" unavailable in CSL

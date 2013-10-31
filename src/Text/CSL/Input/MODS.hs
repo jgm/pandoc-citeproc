@@ -16,7 +16,8 @@
 
 module Text.CSL.Input.MODS where
 
-import Text.CSL.Util ( (<+>), tail', split )
+import Data.List.Split ( wordsBy )
+import Text.CSL.Util ( (<+>), tail' )
 import Text.CSL.Pickle
 import Text.CSL.Reference
 import Text.CSL.Style ( betterThan )
@@ -389,7 +390,7 @@ readDate s = (parseDate         $ takeWhile (/= '/') s) ++
 
 -- | Possible formats: "YYYY", "YYYY-MM", "YYYY-MM-DD".
 parseDate :: String -> [RefDate]
-parseDate s = case split (== '-') (unwords $ words s) of
+parseDate s = case wordsBy (== '-') (unwords $ words s) of
                 [y,m,d] -> [RefDate y m [] d  [] []]
                 [y,m]   -> [RefDate y m [] [] [] []]
                 [y]     -> if and (map isDigit y)
