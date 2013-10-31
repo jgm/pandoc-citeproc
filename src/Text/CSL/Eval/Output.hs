@@ -17,6 +17,7 @@ module Text.CSL.Eval.Output where
 
 import Text.CSL.Output.Plain
 import Text.CSL.Style
+import Text.Pandoc.Definition
 import Text.ParserCombinators.Parsec hiding ( State (..) )
 import Control.Applicative ((<*))
 
@@ -138,3 +139,66 @@ rtfParser fm s
         _ <- string a
         contents <- manyTill parser (try $ string b >> notFollowedBy letter)
         return (Output contents (emptyFormatting {quotes = ParsedQuote}))
+
+formatOutputList :: [Output] -> FormattedOutput
+formatOutputList = concatMap formatOutput
+
+-- | Convert evaluated 'Output' into 'FormattedOutput', ready for the
+-- output filters.
+formatOutput :: Output -> FormattedOutput
+formatOutput o =
+  case o of
+      OSpace              -> [Space]
+      OPan     i          -> i
+      ODel     []         -> []
+      ODel     " "        -> [Space]
+      ODel     s          -> [Str s]
+      OStr     []      _  -> []
+      OStr     s       f  -> case formattingToAttr f of
+                                     ("",[],[]) -> [Str s]
+                                     attr       -> [Span attr [Str s]]
+      OErr NoOutput       -> [Span ("",["citeproc-no-output"],[])
+                                     [Strong [Str "???"]]]
+      OErr (ReferenceNotFound r)
+                          -> [Span ("",["citeproc-not-found"],
+                                            [("data-reference-id",r)])
+                                     [Strong [Str "???"]]]
+      OLabel   []      _  -> []
+      OLabel   s       f  -> formatOutput (OStr s f)
+      ODate    os         -> format os
+      OYear    s _     f  -> formatOutput (OStr s f)
+      OYearSuf s _ _   f  -> formatOutput (OStr s f)
+      ONum     i       f  -> formatOutput (OStr (show i) f)
+      OCitNum  i       f  -> formatOutput (OStr (add00 i) f)
+      OUrl     s       f  -> [Link (formatOutput (OStr (fst s) f)) s]
+      OName  _ os _    f  -> formatOutput (Output os f)
+      OContrib _ _ os _ _ -> format os
+      OLoc     os      f  -> formatOutput (Output os f)
+      Output   os      f  -> case formattingToAttr f of
+                                     ("",[],[]) -> format os
+                                     attr       -> [Span attr $ format os]
+      _                   -> []
+    where
+      format = concatMap formatOutput
+      add00  = reverse . take 5 . flip (++) (repeat '0') . reverse . show
+
+formattingToAttr :: Formatting -> Attr
+formattingToAttr f = ("", [], kvs)
+  where kvs = filter (\(_, v) -> not (null v))
+         [ ("csl-prefix", prefix f)
+         , ("csl-suffix", suffix f)
+         , ("csl-font-family", fontFamily f)
+         , ("csl-font-style", fontStyle f)
+         , ("csl-font-variant", fontVariant f)
+         , ("csl-font-weight", fontWeight f)
+         , ("csl-text-decoration", textDecoration f)
+         , ("csl-vertical-align", verticalAlign f)
+         , ("csl-text-case", textCase f)
+         , ("csl-display", display f)
+         , ("csl-quotes", case quotes f of{ NativeQuote -> "native-quote";
+                                        ParsedQuote -> "parsed-quote";
+                                        NoQuote     -> ""})
+         , ("csl-strip-periods", if stripPeriods f then "true" else "")
+         , ("csl-no-case", if noCase f then "true" else "")
+         , ("csl-no-decor", if noDecor f then "true" else "")
+         ]
