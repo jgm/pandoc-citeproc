@@ -121,7 +121,7 @@ hasLowercaseWord = any startsWithLowercase . splitStrWhen isPunctuation
         startsWithLowercase _           = False
 
 unTitlecase :: [Inline] -> [Inline]
-unTitlecase = caseTransform untc
+unTitlecase zs = evalState (caseTransform untc $ splitStrWhen isPunctuation zs) False
   where untc (Str (x:xs))
           | isUpper x = Str (toLower x : xs)
         untc (Span ("",[],[]) xs)
@@ -129,33 +129,29 @@ unTitlecase = caseTransform untc
         untc x = x
 
 protectCase :: [Inline] -> [Inline]
-protectCase = caseTransform protect
+protectCase zs = evalState (caseTransform protect $ splitStrWhen isPunctuation zs) False
   where protect (Span ("",[],[]) xs)
           | hasLowercaseWord xs = Span ("",["nocase"],[]) xs
         protect x = x
 
 titlecase :: [Inline] -> [Inline]
-titlecase = caseTransform tc
+titlecase zs = evalState (caseTransform tc $ splitStrWhen isPunctuation zs) True
   where tc (Str (x:xs))
           | isLower x && not (isShortWord (x:xs)) = Str (toUpper x : xs)
           where isShortWord  s = s `elem` ["a","an","and","as","at","but","by","down","for","from"
                                           ,"in","into","nor","of","on","onto","or","over","so"
                                           ,"the","till","to","up","via","with","yet"]
-        tc (Span ("",[],[]) xs)
-          | hasLowercaseWord xs = Span ("",["nocase"],[]) xs
+        tc (Span ("",["nocase"],[]) xs) = Span ("",["nocase"],[]) xs
         tc x = x
 
-caseTransform :: (Inline -> Inline) -> [Inline] -> [Inline]
-caseTransform xform xs = evalState (caseTransform' xform $ splitStrWhen isPunctuation xs) False
-
-caseTransform' :: (Inline -> Inline) -> [Inline] -> State Bool [Inline]
-caseTransform' xform = mapM go
+caseTransform :: (Inline -> Inline) -> [Inline] -> State Bool [Inline]
+caseTransform xform = mapM go
   where go Space            = put True >> return Space
         go LineBreak        = put True >> return Space
+        go (Str [])         = return $ Str []
         go (Str [x])
           | isPunctuation x = put True >> return (Str [x])
-        go (Str (x:xs))
-          | isUpper x = do
+        go (Str (x:xs)) = do
                atWordBoundary <- get
                if atWordBoundary
                   then do
@@ -167,14 +163,14 @@ caseTransform' xform = mapM go
                if atWordBoundary
                   then do
                     put False
-                    return $ xform (Span ("",[],[]) xs)
-                  else return (Span ("",[],[]) xs)
-        go (Quoted qt xs)   = Quoted qt <$> caseTransform' xform xs
-        go (Emph xs)        = Emph <$> caseTransform' xform xs
-        go (Strong xs)      = Strong <$> caseTransform' xform xs
-        go (Link xs t)      = Link <$> caseTransform' xform xs <*> pure t
-        go (Image xs t)     = Link <$> caseTransform' xform xs <*> pure t
-        go (Span attr xs)   = Span attr <$> caseTransform' xform xs
+                    return $ xform (Span ("",classes,[]) xs)
+                  else return (Span ("",classes,[]) xs)
+        go (Quoted qt xs)   = Quoted qt <$> caseTransform xform xs
+        go (Emph xs)        = Emph <$> caseTransform xform xs
+        go (Strong xs)      = Strong <$> caseTransform xform xs
+        go (Link xs t)      = Link <$> caseTransform xform xs <*> pure t
+        go (Image xs t)     = Link <$> caseTransform xform xs <*> pure t
+        go (Span attr xs)   = Span attr <$> caseTransform xform xs
         go x = return x
 
 splitStrWhen :: (Char -> Bool) -> [Inline] -> [Inline]
