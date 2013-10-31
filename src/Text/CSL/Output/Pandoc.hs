@@ -18,6 +18,8 @@ module Text.CSL.Output.Pandoc
     , renderPandoc'
     , headInline
     , initInline
+    , lastInline
+    , tailInline
     , tailFirstInlineStr
     , toCapital
     ) where

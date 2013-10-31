@@ -16,10 +16,14 @@
 module Text.CSL.Eval.Output where
 
 import Text.CSL.Output.Plain
+import Text.CSL.Output.Pandoc (lastInline)
 import Text.CSL.Style
 import Text.Pandoc.Definition
+import Text.Pandoc.XML (fromEntities)
 import Text.ParserCombinators.Parsec hiding ( State (..) )
 import Control.Applicative ((<*))
+import Data.List.Split (wordsBy)
+import Data.List (intersperse)
 
 output :: Formatting -> String -> [Output]
 output fm s
@@ -55,12 +59,11 @@ rmEmptyOutput o
     | otherwise        = o
 
 addDelim :: String -> [Output] -> [Output]
-addDelim d = foldr (\x xs -> if length xs < 1 then x : xs else check x xs) []
+addDelim d = foldr (\x xs -> if null xs then x : xs else check x xs) []
     where
-      check x xs
-          | ONull <- x = xs
-          | otherwise  = let text = renderPlain . formatOutputList
-                         in  if d /= [] && text [x] /= [] && text xs /= []
+      check ONull xs   = xs
+      check x     xs   = let text = renderPlain . formatOutputList
+                         in  if not (null d) && text [x] /= [] && text xs /= []
                              then if head d == last (text [x]) && head d `elem` ".,;:!?"
                                   then x : ODel (tail d) : xs
                                   else x : ODel       d  : xs
@@ -154,9 +157,10 @@ formatOutput o =
       ODel     " "        -> [Space]
       ODel     s          -> [Str s]
       OStr     []      _  -> []
-      OStr     s       f  -> case formattingToAttr f of
-                                     ("",[],[]) -> [Str s]
-                                     attr       -> [Span attr [Str s]]
+      OStr     s       f  -> addFormatting f [Str s]
+                             -- case formattingToAttr f of
+                             --        ("",[],[]) -> [Str s]
+                             --        attr       -> [Span attr [Str s]]
       OErr NoOutput       -> [Span ("",["citeproc-no-output"],[])
                                      [Strong [Str "???"]]]
       OErr (ReferenceNotFound r)
@@ -174,13 +178,41 @@ formatOutput o =
       OName  _ os _    f  -> formatOutput (Output os f)
       OContrib _ _ os _ _ -> format os
       OLoc     os      f  -> formatOutput (Output os f)
-      Output   os      f  -> case formattingToAttr f of
-                                     ("",[],[]) -> format os
-                                     attr       -> [Span attr $ format os]
+      Output   os      f  -> addFormatting f $ format os
+                           -- case formattingToAttr f of
+                           --          ("",[],[]) -> format os
+                             --        attr       -> [Span attr $ format os]
       _                   -> []
     where
       format = concatMap formatOutput
       add00  = reverse . take 5 . flip (++) (repeat '0') . reverse . show
+
+addFormatting :: Formatting -> FormattedOutput -> FormattedOutput
+addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
+  where pref = case prefix f of { "" -> id; x -> (Str x :) }
+        addSuffix i
+          | case suffix f of {(c:_) | c `elem` ".?!" -> True; _ -> False}
+          , case lastInline i of {(c:_) | c `elem` ".?!" -> True; _ -> False}
+                                  = i ++ toStr (tail $ suffix f)
+          | not (null (suffix f)) = i ++ toStr (       suffix f)
+          | otherwise             = i
+        quote = id -- TODO
+        font_variant = id -- TODO
+        font = id -- TODO
+        text_case = id -- TODO
+
+toStr :: String -> [Inline]
+toStr = intersperse Space . map Str . wordsBy (==' ') . tweak . fromEntities
+    where
+      tweak s
+          |'«':' ':xs <- s = "«\8239" ++ tweak xs
+          |' ':'»':xs <- s = "\8239»" ++ tweak xs
+          |' ':';':xs <- s = "\8239;" ++ tweak xs
+          |' ':':':xs <- s = "\8239:" ++ tweak xs
+          |' ':'!':xs <- s = "\8239!" ++ tweak xs
+          |' ':'?':xs <- s = "\8239?" ++ tweak xs
+          | x :xs     <- s = x : tweak xs
+          | otherwise  = []
 
 formattingToAttr :: Formatting -> Attr
 formattingToAttr f = ("", [], kvs)
