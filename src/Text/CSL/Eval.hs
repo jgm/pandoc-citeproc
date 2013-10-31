@@ -33,7 +33,7 @@ import Text.CSL.Eval.Names
 import Text.CSL.Output.Plain
 import Text.CSL.Reference
 import Text.CSL.Style
-import Text.CSL.Util ( readNum, head', last', proc, proc', query )
+import Text.CSL.Util ( readNum, head', last', proc, proc', query, betterThan )
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the

@@ -17,10 +17,9 @@
 module Text.CSL.Input.MODS where
 
 import Data.List.Split ( wordsBy )
-import Text.CSL.Util ( (<+>), tail' )
+import Text.CSL.Util ( (<+>), tail', betterThan )
 import Text.CSL.Pickle
 import Text.CSL.Reference
-import Text.CSL.Style ( betterThan )
 import qualified Data.ByteString.Lazy as B
 import Data.Char ( isDigit, isLower )
 import qualified Data.Map as M

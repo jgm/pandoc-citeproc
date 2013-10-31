@@ -26,7 +26,8 @@ import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
 import Text.Pandoc.Definition hiding (Citation, Cite)
 import Data.Char (isPunctuation)
-import Text.CSL.Util (mb, parseBool, (.#?), (.#:), readNum, proc', query)
+import Text.CSL.Util (mb, parseBool, (.#?), (.#:), readNum, proc', query,
+                      betterThan)
 import qualified Data.Text as T
 
 #ifdef UNICODE_COLLATION
@@ -648,10 +649,6 @@ hasYearSuf = not . null . query getYearSuf
           getYearSuf o
               | OYearSuf _ _ _ _ <- o = ["a"]
               | otherwise             = []
-
-betterThan :: [a] -> [a] -> [a]
-betterThan [] b = b
-betterThan a  _ = a
 
 -- following was Text.CSL.Parser:
 

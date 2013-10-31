@@ -23,6 +23,7 @@ module Text.CSL.Util
   , proc
   , proc'
   , query
+  , betterThan
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -200,3 +201,7 @@ proc' f = everywhere' (mkT f)
 -- | A generic query function.
 query :: (Typeable a, Data b) => (a -> [c]) -> b -> [c]
 query f = everything (++) ([] `mkQ` f)
+
+betterThan :: [a] -> [a] -> [a]
+betterThan [] b = b
+betterThan a  _ = a
