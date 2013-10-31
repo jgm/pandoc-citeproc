@@ -372,3 +372,30 @@ hasYearSuf = not . null . query getYearSuf
           getYearSuf o
               | OYearSuf _ _ _ _ <- o = ["a"]
               | otherwise             = []
+
+-- | Removes all given names form a 'OName' element with 'proc'.
+rmGivenNames :: Output -> Output
+rmGivenNames o
+    | OName i s _ f <- o = OName i s [] f
+    | otherwise          = o
+
+rmNameHash :: Output -> Output
+rmNameHash o
+    | OName _ s ss f <- o = OName [] s ss f
+    | otherwise           = o
+
+-- | Add, with 'proc', a give name to the family name. Needed for
+-- disambiguation.
+addGivenNames :: [Output] -> [Output]
+addGivenNames
+    = addGN True
+    where
+      addGN _ [] = []
+      addGN b (o:os)
+          | OName i _ xs f <- o
+          , xs /= []  = if b then OName i (head xs) (tail xs) f : addGN False os else o:os
+          | otherwise = o : addGN b os
+
+-- | Map the evaluated output of a citation group.
+mapGroupOutput :: (Output -> [a]) -> CitationGroup -> [a]
+mapGroupOutput f (CG _ _ _ os) = concatMap f $ map snd os
