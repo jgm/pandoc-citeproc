@@ -25,17 +25,20 @@ module Text.CSL.Output.Pandoc
     ) where
 
 -- import Data.Char ( toUpper, toLower, isPunctuation )
-import Text.CSL.Util ( head', tail', capitalize )
+import Text.CSL.Util ( head', tail', capitalize, proc, proc', query )
+import Data.Maybe ( fromMaybe )
 import Text.CSL.Style
 import Text.Pandoc.Definition
--- import Text.Pandoc.XML (fromEntities)
+import Text.Pandoc.XML (fromEntities)
 
 -- TODO - this is a placeholder
 renderPandoc :: Style -> FormattedOutput -> [Inline]
-renderPandoc _ = id
+renderPandoc sty
+    = proc (convertQuoted sty) . proc' (clean' $ isPunctuationInQuote sty)
+      -- . flipFlop
 
 renderPandoc' :: Style -> FormattedOutput -> Block
-renderPandoc' _ = Para
+renderPandoc' sty = Para . renderPandoc sty
 
 {-
 -- | With a 'Style' and the formatted output generate a 'String' in
@@ -208,22 +211,26 @@ clean b (i:is)
       split _ _ [] = []
       split f g xs = let (y, r) = break f xs
                      in concatMap (unwrap g) [y, head' r] ++ split f g (tail' r)
+-}
+
 
 clean' :: Bool -> [Inline] -> [Inline]
 clean' _   []  = []
-clean' b (i:is)
-    | Link inls (y,z) <- i, y == "inquote"
-    , y == z    = case headInline is of
+clean' b (i:is) =
+  case (i:is) of
+      (Span ("",[],kvs) inls : _)
+         | lookup "csl-inquote" kvs == Just "true" ->
+             case headInline is of
                     [x] -> if x `elem` ".," && b
                            then if lastInline inls `elem` [".",",",";",":","!","?"]
                                 then quote DoubleQuote inls                : clean' b (tailInline is)
                                 else quote DoubleQuote (inls ++ [Str [x]]) : clean' b (tailInline is)
                            else quote DoubleQuote inls : clean' b is
                     _   ->      quote DoubleQuote inls : clean' b is
-    | Quoted t inls <- i = quote t inls : clean' b is
-    | otherwise = if lastInline [i] == headInline is && isPunct
-                  then i : clean' b (tailInline is)
-                  else i : clean' b is
+      (Quoted t inls : _) -> quote t inls : clean' b is
+      _      -> if lastInline [i] == headInline is && isPunct
+                   then i : clean' b (tailInline is)
+                   else i : clean' b is
     where
       quote t x = Quoted t (reverseQuoted t x)
       isPunct = and . map (flip elem ".,;:!? ") $ headInline is
@@ -236,6 +243,7 @@ clean' b (i:is)
                 , SingleQuote <- t = Quoted DoubleQuote (reverseQuoted DoubleQuote qs)
                 | otherwise        = q
 
+{-
 flipFlop :: [Inline] -> [Inline]
 flipFlop [] = []
 flipFlop (i:is)
@@ -261,6 +269,7 @@ flipFlop (i:is)
                                          then Link ls ("strong","strong")
                                          else e
                 | otherwise            = e
+-}
 
 isPunctuationInQuote :: Style -> Bool
 isPunctuationInQuote = or . query punctIn'
@@ -284,8 +293,6 @@ convertQuoted s = convertQuoted'
           | (Quoted SingleQuote t:xs) <- o = Str singleQuotesO : t ++ Str singleQuotesC : convertQuoted' xs
           | (x                   :xs) <- o = x : convertQuoted' xs
           | otherwise                      = []
-
--}
 
 headInline :: [Inline] -> String
 headInline [] = []
