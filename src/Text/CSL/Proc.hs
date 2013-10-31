@@ -22,7 +22,7 @@ import Data.List
 import Data.Ord  ( comparing )
 import Data.Maybe ( mapMaybe )
 import Text.CSL.Eval
-import Text.CSL.Util ( head', tail', capitalize )
+import Text.CSL.Util ( head', tail', capitalize, proc, proc', query )
 import Text.CSL.Output.Plain
 import Text.CSL.Proc.Collapse
 import Text.CSL.Proc.Disamb

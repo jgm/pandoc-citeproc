@@ -19,7 +19,7 @@ module Text.CSL.Proc.Collapse where
 import Control.Arrow ( (&&&), (>>>), second )
 import Data.Char
 import Data.List ( groupBy )
-
+import Text.CSL.Util ( query, proc, proc' )
 import Text.CSL.Eval
 import Text.CSL.Proc.Disamb
 import Text.CSL.Style

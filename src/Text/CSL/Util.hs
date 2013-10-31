@@ -20,6 +20,9 @@ module Text.CSL.Util
   , unTitlecase
   , protectCase
   , splitStrWhen
+  , proc
+  , proc'
+  , query
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -33,6 +36,8 @@ import Text.Pandoc.Walk (walk)
 import Text.Pandoc
 import Data.List.Split (wordsBy, whenElt, dropBlanks, split)
 import Control.Monad.State
+import Data.Generics ( Typeable, Data, everywhere
+                     , everywhere', everything, mkT, mkQ )
 
 readNum :: String -> Int
 readNum s = case reads s of
@@ -183,3 +188,15 @@ splitStrWhen p (Str xs : ys)
   | any p xs = map Str ((split . dropBlanks) (whenElt p) xs) ++ splitStrWhen p ys
 splitStrWhen p (x : ys) = x : splitStrWhen p ys
 
+-- | A generic processing function.
+proc :: (Typeable a, Data b) => (a -> a) -> b -> b
+proc f = everywhere (mkT f)
+
+-- | A generic processing function: process a data structure in
+-- top-down manner.
+proc' :: (Typeable a, Data b) => (a -> a) -> b -> b
+proc' f = everywhere' (mkT f)
+
+-- | A generic query function.
+query :: (Typeable a, Data b) => (a -> [c]) -> b -> [c]
+query f = everything (++) ([] `mkQ` f)

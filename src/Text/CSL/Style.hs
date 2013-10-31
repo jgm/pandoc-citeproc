@@ -21,13 +21,12 @@ import Data.Aeson hiding (Number)
 import Control.Arrow
 import Control.Applicative hiding (Const)
 import Data.List ( nubBy, isPrefixOf, isInfixOf )
-import Data.Generics ( Typeable, Data, everywhere
-                     , everywhere', everything, mkT, mkQ )
+import Data.Generics ( Data, Typeable )
 import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
 import Text.Pandoc.Definition hiding (Citation, Cite)
 import Data.Char (isPunctuation)
-import Text.CSL.Util (mb, parseBool, (.#?), (.#:), readNum)
+import Text.CSL.Util (mb, parseBool, (.#?), (.#:), readNum, proc', query)
 import qualified Data.Text as T
 
 #ifdef UNICODE_COLLATION
@@ -405,27 +404,6 @@ data CSCategory = CSCategory String String String deriving ( Show, Read, Eq, Typ
 -- evaluated citations.
 type FormattedOutput = [Inline]
 
-formattingToAttr :: Formatting -> Attr
-formattingToAttr f = ("", [], kvs)
-  where kvs = filter (\(_, v) -> not (null v))
-         [ ("csl-prefix", prefix f)
-         , ("csl-suffix", suffix f)
-         , ("csl-font-family", fontFamily f)
-         , ("csl-font-style", fontStyle f)
-         , ("csl-font-variant", fontVariant f)
-         , ("csl-font-weight", fontWeight f)
-         , ("csl-text-decoration", textDecoration f)
-         , ("csl-vertical-align", verticalAlign f)
-         , ("csl-text-case", textCase f)
-         , ("csl-display", display f)
-         , ("csl-quotes", case quotes f of{ NativeQuote -> "native-quote";
-                                        ParsedQuote -> "parsed-quote";
-                                        NoQuote     -> ""})
-         , ("csl-strip-periods", if stripPeriods f then "true" else "")
-         , ("csl-no-case", if noCase f then "true" else "")
-         , ("csl-no-decor", if noDecor f then "true" else "")
-         ]
-
 data CiteprocError
    = NoOutput
    | ReferenceNotFound String
@@ -551,6 +529,8 @@ instance Eq NameData where
     (==) (ND ka ca _ _)
          (ND kb cb _ _) = ka == kb && ca == cb
 
+-- TODO move out of Style?
+
 formatOutputList :: [Output] -> FormattedOutput
 formatOutputList = concatMap formatOutput
 
@@ -593,22 +573,30 @@ formatOutput o =
       format = concatMap formatOutput
       add00  = reverse . take 5 . flip (++) (repeat '0') . reverse . show
 
+formattingToAttr :: Formatting -> Attr
+formattingToAttr f = ("", [], kvs)
+  where kvs = filter (\(_, v) -> not (null v))
+         [ ("csl-prefix", prefix f)
+         , ("csl-suffix", suffix f)
+         , ("csl-font-family", fontFamily f)
+         , ("csl-font-style", fontStyle f)
+         , ("csl-font-variant", fontVariant f)
+         , ("csl-font-weight", fontWeight f)
+         , ("csl-text-decoration", textDecoration f)
+         , ("csl-vertical-align", verticalAlign f)
+         , ("csl-text-case", textCase f)
+         , ("csl-display", display f)
+         , ("csl-quotes", case quotes f of{ NativeQuote -> "native-quote";
+                                        ParsedQuote -> "parsed-quote";
+                                        NoQuote     -> ""})
+         , ("csl-strip-periods", if stripPeriods f then "true" else "")
+         , ("csl-no-case", if noCase f then "true" else "")
+         , ("csl-no-decor", if noDecor f then "true" else "")
+         ]
+
 -- | Map the evaluated output of a citation group.
 mapGroupOutput :: (Output -> [a]) -> CitationGroup -> [a]
 mapGroupOutput f (CG _ _ _ os) = concatMap f $ map snd os
-
--- | A generic processing function.
-proc :: (Typeable a, Data b) => (a -> a) -> b -> b
-proc f = everywhere (mkT f)
-
--- | A generic processing function: process a data structure in
--- top-down manner.
-proc' :: (Typeable a, Data b) => (a -> a) -> b -> b
-proc' f = everywhere' (mkT f)
-
--- | A generic query function.
-query :: (Typeable a, Data b) => (a -> [c]) -> b -> [c]
-query f = everything (++) ([] `mkQ` f)
 
 -- | Removes all given names form a 'OName' element with 'proc'.
 rmGivenNames :: Output -> Output
