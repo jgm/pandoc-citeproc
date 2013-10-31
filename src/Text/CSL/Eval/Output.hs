@@ -196,10 +196,23 @@ addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
                                   = i ++ toStr (tail $ suffix f)
           | not (null (suffix f)) = i ++ toStr (       suffix f)
           | otherwise             = i
-        quote = id -- TODO
+        quote []  = []
+        quote ils = case quotes f of
+                         NoQuote     -> valign ils
+                         NativeQuote ->
+                                  [Span ("",[],[("csl-inquote","true")]) ils]
+                         _           -> [Quoted DoubleQuote $ valign ils]
         font_variant = id -- TODO
         font = id -- TODO
         text_case = id -- TODO
+        valign [] = []
+        valign ils
+          | "sup"      <- verticalAlign f = [Superscript ils]
+          | "sub"      <- verticalAlign f = [Subscript   ils]
+          | "baseline" <- verticalAlign f =
+                              [Span ("",[],[("csl-baseline","true")]) ils]
+          | otherwise                     = ils
+
 
 toStr :: String -> [Inline]
 toStr = intersperse Space . map Str . wordsBy (==' ') . tweak . fromEntities
