@@ -622,34 +622,6 @@ addGivenNames
           , xs /= []  = if b then OName i (head xs) (tail xs) f : addGN False os else o:os
           | otherwise = o : addGN b os
 
--- | Add the year suffix to the year. Needed for disambiguation.
-addYearSuffix :: Output -> Output
-addYearSuffix o
-    | OYear y k     f <- o = Output [OYear y k emptyFormatting,OYearSuf [] k [] emptyFormatting] f
-    | ODate  (x:xs)   <- o = if or $ map hasYear xs
-                             then Output (x : [addYearSuffix $ ODate xs]) emptyFormatting
-                             else addYearSuffix (Output (x:xs) emptyFormatting)
-    | Output (x:xs) f <- o = if or $ map hasYearSuf (x : xs)
-                             then Output (x : xs) f
-                             else if hasYear x
-                                  then Output (addYearSuffix x : xs) f
-                                  else Output (x : [addYearSuffix $ Output xs emptyFormatting]) f
-    | otherwise            = o
-
-hasYear :: Output -> Bool
-hasYear = not . null . query getYear
-    where getYear o
-              | OYear _ _ _ <- o = [o]
-              | otherwise        = []
-
-
-hasYearSuf :: Output -> Bool
-hasYearSuf = not . null . query getYearSuf
-    where getYearSuf :: Output -> [String]
-          getYearSuf o
-              | OYearSuf _ _ _ _ <- o = ["a"]
-              | otherwise             = []
-
 -- following was Text.CSL.Parser:
 
 -- | Read and parse a CSL style file into a localized sytle.
