@@ -30,7 +30,28 @@ import qualified Data.Vector as V
 import Data.Char (toUpper, toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Util ((<+>))
-import Text.CSL.Util ((.#?), parseString, safeRead, readNum)
+import Text.CSL.Util ((.#?), parseString, safeRead, readNum, trim)
+import Text.Pandoc (readHtml, def, Pandoc(..), Block(..), Inline,
+                    nullMeta, writeHtmlString)
+import qualified Text.Pandoc.Walk as Walk
+
+newtype Formatted = Formatted { unFormatted :: [Inline] }
+
+instance FromJSON Formatted where
+  parseJSON = fmap readCSLString . parseString
+
+readCSLString :: String -> Formatted
+readCSLString s = Formatted $
+                  case readHtml def s of
+                        Pandoc _ [Plain ils]   -> ils
+                        Pandoc _ [Para  ils]   -> ils
+                        Pandoc _ x             -> Walk.query (:[]) x
+
+instance ToJSON Formatted where
+  toJSON = toJSON . writeCSLString
+
+writeCSLString :: Formatted -> String
+writeCSLString (Formatted ils) = trim $ writeHtmlString def $ Pandoc nullMeta [Plain ils]
 
 -- | An existential type to wrap the different types a 'Reference' is
 -- made of. This way we can create a map to make queries easier.
