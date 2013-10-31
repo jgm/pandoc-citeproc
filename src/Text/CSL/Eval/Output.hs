@@ -18,7 +18,10 @@ module Text.CSL.Eval.Output where
 import Text.CSL.Output.Plain
 import Text.CSL.Output.Pandoc (lastInline)
 import Text.CSL.Style
+import Data.Char (toLower, toUpper)
+import Text.CSL.Util (capitalize, titlecase, unTitlecase)
 import Text.Pandoc.Definition
+import Text.Pandoc.Walk (walk)
 import Text.Pandoc.XML (fromEntities)
 import Text.ParserCombinators.Parsec hiding ( State (..) )
 import Control.Applicative ((<*))
@@ -202,9 +205,39 @@ addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
                          NativeQuote ->
                                   [Span ("",[],[("csl-inquote","true")]) ils]
                          _           -> [Quoted DoubleQuote $ valign ils]
-        font_variant = id -- TODO
-        font = id -- TODO
-        text_case = id -- TODO
+        font_variant ils =
+          case fontVariant f of
+               "small-caps"  -> [SmallCaps ils]
+               _             -> ils
+
+        font ils
+          | noDecor f                  = [Span ("",[],[("csl-nodecor","true")]) ils]
+          | otherwise = case fontStyle f of
+                             "italic"  -> [Emph ils]
+                             "oblique" -> [Emph ils]
+                             "bold"    -> [Strong ils]
+                             _         -> ils
+
+        text_case [] = []
+        text_case ils@(i:is)
+          | noCase f  = [Span ("",["nocase"],[]) ils]
+          | otherwise =
+              case textCase f of
+                   "lowercase"        -> walk lowercaseStr ils
+                   "uppercase"        -> walk uppercaseStr ils
+                   "capitalize-all"   -> walk capitalizeStr ils
+                   "title"            -> titlecase ils
+                   "capitalize-first" -> walk capitalizeStr i : is
+                   "sentence"         -> unTitlecase ils
+                   _                  -> ils
+
+        lowercaseStr (Str xs)  = Str $ map toLower xs
+        lowercaseStr x         = x
+        uppercaseStr (Str xs)  = Str $ map toUpper xs
+        uppercaseStr x         = x
+        capitalizeStr (Str xs) = Str $ capitalize xs
+        capitalizeStr x        = x
+
         valign [] = []
         valign ils
           | "sup"      <- verticalAlign f = [Superscript ils]
