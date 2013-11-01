@@ -22,7 +22,6 @@ import Data.Char
 import System.FilePath ( takeExtension )
 import Text.CSL.Pickle
 import Text.CSL.Reference
-import Text.CSL.Input.MODS
 import Text.CSL.Input.Bibtex
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
@@ -66,17 +65,15 @@ readBiblioFile f
         _           -> error $ "citeproc: the format of the bibliographic database could not be recognized\n" ++
                               "using the file extension."
 #else
-        ".mods"     -> readModsCollectionFile f
         _           -> error $ "citeproc: Bibliography format not supported.\n" ++
 #endif
 
 data BibFormat
-    = Mods
-    | Json
+    = Json
     | Yaml
-#ifdef USE_BIBUTILS
     | Bibtex
     | BibLatex
+#ifdef USE_BIBUTILS
     | Ris
     | Endnote
     | EndnotXml
@@ -87,7 +84,6 @@ data BibFormat
 
 readBiblioString :: BibFormat -> String -> IO [Reference]
 readBiblioString b s
-    | Mods      <- b = return $ readXmlString xpModsCollection (fromStringLazy s)
     | Json      <- b = either error return $ eitherDecode $ fromStringLazy s
     | Yaml      <- b = (maybe [] id . M.lookup "references") `fmap`
                        (either error return $ Yaml.decodeEither $ fromString s)
@@ -113,12 +109,12 @@ readBiblioString b s
 #ifdef USE_BIBUTILS
 readBiblioFile' :: FilePath -> BiblioIn -> IO [Reference]
 readBiblioFile' fin bin
-    | bin == mods_in = readModsCollectionFile fin
+    | bin == biblatex_in = readBibtexInput False fin
     | otherwise      = E.handle handleBibfileError
                        $ withTempDir "citeproc"
                        $ \tdir -> do
                             let tfile = tdir </> "bibutils-tmp"
-                            param <- bibl_initparams bin mods_out "hs-bibutils"
+                            param <- bibl_initparams bin biblatex_out "hs-bibutils"
                             bibl  <- bibl_init
                             unsetBOM        param
                             setCharsetIn    param bibl_charset_unicode
@@ -127,7 +123,7 @@ readBiblioFile' fin bin
                             _ <- bibl_write param bibl tfile
                             bibl_free bibl
                             bibl_freeparams param
-                            refs <- readModsCollectionFile tfile
+                            refs <- readBibtexInput False tfile
                             return $! refs
   where handleBibfileError :: E.SomeException -> IO [Reference]
         handleBibfileError e = error $ "Error reading " ++ fin ++ "\n" ++ show e
