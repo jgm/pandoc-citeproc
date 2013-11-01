@@ -218,6 +218,10 @@ source-repository head
 flag small_base
   description: Choose the new smaller, split-up base package.
 
+flag bibutils
+  description: Use Chris Putnam's Bibutils.
+  default:     True
+
 flag network
   description: Use network and HTTP to retrieve csl file from URIs.
   default:     True
@@ -253,6 +257,7 @@ library
                       Text.CSL.Proc.Disamb
                       Text.CSL.Reference
                       Text.CSL.Style
+                      Text.CSL.Input.MODS
                       Text.CSL.Input.Bibutils
                       Text.CSL.Input.Bibtex
                       Text.CSL.Output.Pandoc
@@ -266,6 +271,11 @@ library
                       bytestring, filepath, pandoc-types >= 1.12.3, tagsoup,
                       aeson, text, vector, texmath >= 0.6.4, split,
                       yaml >= 0.8, pandoc >= 1.12.1
+
+    if flag(bibutils)
+       build-depends:   hs-bibutils >= 0.3
+       default-extensions: CPP
+       cpp-options:     -DUSE_BIBUTILS
 
     if flag(network)
        build-depends: network >= 2, HTTP >= 4000.0.9

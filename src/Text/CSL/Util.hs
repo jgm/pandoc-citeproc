@@ -27,7 +27,6 @@ module Text.CSL.Util
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
-import Data.Monoid
 import Data.Text (Text)
 import qualified Data.Text as T
 import Control.Applicative ((<$>), (<*>), pure)
@@ -203,5 +202,6 @@ proc' f = everywhere' (mkT f)
 query :: (Typeable a, Data b) => (a -> [c]) -> b -> [c]
 query f = everything (++) ([] `mkQ` f)
 
-betterThan :: (Eq m, Monoid m) => m -> m -> m
-betterThan a b = if a == mempty then b else a
+betterThan :: [a] -> [a] -> [a]
+betterThan [] b = b
+betterThan a  _ = a

@@ -28,6 +28,8 @@ module Text.CSL
       readBiblioFile
     , BibFormat (..)
     , readBiblioString
+    , readModsFile
+    , readModsCollectionFile
 
     -- ** Reference Representation
     , Reference (..)
@@ -70,6 +72,7 @@ import Text.CSL.Proc
 import Text.CSL.Reference
 import Text.CSL.Style
 import Text.CSL.Input.Bibutils
+import Text.CSL.Input.MODS
 import Text.CSL.Output.Pandoc
 import Text.CSL.Output.Plain
 
