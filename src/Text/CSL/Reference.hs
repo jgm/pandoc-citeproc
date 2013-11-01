@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, PatternGuards, OverloadedStrings,
   DeriveDataTypeable, ExistentialQuantification, FlexibleInstances,
-  ScopedTypeVariables #-}
+  ScopedTypeVariables, GeneralizedNewtypeDeriving #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Reference
@@ -20,26 +20,40 @@ module Text.CSL.Reference where
 import Data.List  ( elemIndex, isPrefixOf )
 import Data.Maybe ( fromMaybe             )
 import Data.Generics
+import Data.Monoid
 import Data.Aeson hiding (Value)
 import qualified Data.Aeson as Aeson
 import Data.Aeson.Types (Parser, Pair)
 import Control.Applicative ((<$>), (<*>), (<|>), pure)
-import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import Data.Char (toUpper, toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
-import Text.CSL.Util ((<+>))
-import Text.CSL.Util ((.#?), parseString, safeRead, readNum, trim)
-import Text.Pandoc (readHtml, def, Pandoc(..), Block(..), Inline,
+import Text.CSL.Util (parseString, trim, safeRead, readNum, (.#?))
+import Text.Pandoc (readHtml, def, Pandoc(..), Block(..), Inline(..),
                     nullMeta, writeHtmlString)
 import qualified Text.Pandoc.Walk as Walk
+import qualified Text.Pandoc.Builder as B
+import Data.String
 
+-- We use a newtype wrapper so we can have custom ToJSON, FromJSON
+-- instances.
 newtype Formatted = Formatted { unFormatted :: [Inline] }
+  deriving ( Show, Read, Eq, Data, Typeable, Monoid )
 
 instance FromJSON Formatted where
   parseJSON = fmap readCSLString . parseString
 
+instance ToJSON Formatted where
+  toJSON = toJSON . writeCSLString
+
+instance IsString Formatted where
+  fromString = Formatted . B.toList . B.text
+
+nonempty :: Formatted -> Bool
+nonempty (Formatted ils) = not (null ils)
+
+-- Eventually this can incorporate special CSL-specific features.
 readCSLString :: String -> Formatted
 readCSLString s = Formatted $
                   case readHtml def s of
@@ -47,9 +61,7 @@ readCSLString s = Formatted $
                         Pandoc _ [Para  ils]   -> ils
                         Pandoc _ x             -> Walk.query (:[]) x
 
-instance ToJSON Formatted where
-  toJSON = toJSON . writeCSLString
-
+-- Eventually this can incorporate special CSL-specific features.
 writeCSLString :: Formatted -> String
 writeCSLString (Formatted ils) = trim $ writeHtmlString def $ Pandoc nullMeta [Plain ils]
 
@@ -89,28 +101,24 @@ isValueSet val
 data Empty = Empty deriving ( Typeable, Data )
 
 data Agent
-    = Agent { givenName       :: [String]
-            , droppingPart    ::  String
-            , nonDroppingPart ::  String
-            , familyName      ::  String
-            , nameSuffix      ::  String
-            , literal         ::  String
+    = Agent { givenName       :: [Formatted]
+            , droppingPart    ::  Formatted
+            , nonDroppingPart ::  Formatted
+            , familyName      ::  Formatted
+            , nameSuffix      ::  Formatted
+            , literal         ::  Formatted
             , commaSuffix     ::  Bool
             }
-      deriving ( Read, Eq, Typeable, Data )
-
-instance Show Agent where
-    show (Agent g d n f s [] _) = (foldr (<+>) [] g) <+> d <+> n <+> f <+> s
-    show (Agent _ _ _ _ _ l  _) = l
+      deriving ( Show, Read, Eq, Typeable, Data )
 
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
               (v .: "given" <|> ((:[]) <$> v .: "given") <|> pure []) <*>
-              v .:?  "dropping-particle" .!= "" <*>
-              v .:? "non-dropping-particle" .!= "" <*>
-              v .:? "family" .!= "" <*>
-              v .:? "suffix" .!= "" <*>
-              v .:? "literal" .!= "" <*>
+              v .:?  "dropping-particle" .!= mempty <*>
+              v .:? "non-dropping-particle" .!= mempty <*>
+              v .:? "family" .!= mempty <*>
+              v .:? "suffix" .!= mempty <*>
+              v .:? "literal" .!= mempty <*>
               v .:? "comma-suffix" .!= False
   parseJSON _ = fail "Could not parse Agent"
 
@@ -122,52 +130,45 @@ instance ToJSON Agent where
     , "family" .= familyName agent
     , "suffix" .= nameSuffix agent
     , "literal" .= literal agent
-    ] ++ ["comma-suffix" .= commaSuffix agent | not (null (nameSuffix agent))]
+    ] ++ ["comma-suffix" .= commaSuffix agent | nonempty (nameSuffix agent)]
 
 instance FromJSON [Agent] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
   parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
-  parseJSON (String t) = parseJSON (String t) >>= mkAgent
   parseJSON _ = fail "Could not parse [Agent]"
 
 instance ToJSON [Agent] where
   toJSON [x] = toJSON x
   toJSON xs  = Array (V.fromList $ map toJSON xs)
 
-mkAgent :: Text -> Parser [Agent]
-mkAgent t =
-  case reverse (words $ T.unpack t) of
-       (x:ys) -> return [Agent (reverse ys) [] [] x [] [] False]
-       []     -> fail "Empty text cannot produce [Agent]"
-
-
 data RefDate =
-    RefDate { year   :: String
-            , month  :: String
-            , season :: String
-            , day    :: String
-            , other  :: String
-            , circa  :: String
+    RefDate { year   :: Formatted
+            , month  :: Formatted
+            , season :: Formatted
+            , day    :: Formatted
+            , other  :: Formatted
+            , circa  :: Formatted
             } deriving ( Show, Read, Eq, Typeable, Data )
 
 instance FromJSON RefDate where
   parseJSON (Array v) =
      case fromJSON (Array v) of
-          Success [y]     -> RefDate <$> parseString y <*>
-                    pure "" <*> pure "" <*> pure "" <*> pure "" <*> pure ""
-          Success [y,m]   -> RefDate <$> parseString y <*> parseString m <*>
-                    pure "" <*> pure "" <*> pure "" <*> pure ""
-          Success [y,m,d] -> RefDate <$> parseString y <*> parseString m <*>
-                    pure "" <*> parseString d <*> pure "" <*> pure ""
+          Success [y]     -> RefDate <$> parseJSON y <*>
+                    pure mempty <*> pure mempty <*> pure mempty <*>
+                    pure mempty <*> pure mempty
+          Success [y,m]   -> RefDate <$> parseJSON y <*> parseJSON m <*>
+                    pure mempty <*> pure mempty <*> pure mempty <*> pure mempty
+          Success [y,m,d] -> RefDate <$> parseJSON y <*> parseJSON m <*>
+                    pure mempty <*> parseJSON d <*> pure mempty <*> pure mempty
           Error e         -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
   parseJSON (Object v) = RefDate <$>
-              v .#? "year" .!= "" <*>
-              v .#? "month" .!= "" <*>
-              v .#? "season" .!= "" <*>
-              v .#? "day" .!= "" <*>
-              v .#? "other" .!= "" <*>
-              v .#? "circa" .!= ""
+              v .:? "year" .!= mempty <*>
+              v .:? "month" .!= mempty <*>
+              v .:? "season" .!= mempty <*>
+              v .:? "day" .!= mempty <*>
+              v .:? "other" .!= mempty <*>
+              v .:? "circa" .!= mempty
   parseJSON _ = fail "Could not parse RefDate"
 
 instance ToJSON RefDate where
@@ -195,8 +196,10 @@ instance ToJSON [RefDate] where
 
 mkRefDate :: String -> Parser [RefDate]
 mkRefDate xs
-  | all isDigit xs = return [RefDate xs "" "" "" "" ""]
-  | otherwise      = return [RefDate "" "" "" "" xs ""]
+  | all isDigit xs = return [RefDate (Formatted [Str xs])
+                          mempty mempty mempty mempty mempty]
+  | otherwise      = return [RefDate mempty mempty mempty mempty
+                          (Formatted [Str xs]) mempty]
 
 data RefType
     = NoType
@@ -297,46 +300,46 @@ data Reference =
     , originalDate        :: [RefDate]
     , submitted           :: [RefDate]
 
-    , title               :: String
-    , titleShort          :: String
-    , reviewedTitle       :: String
-    , containerTitle      :: String
-    , volumeTitle         :: String
-    , collectionTitle     :: String
-    , containerTitleShort :: String
-    , collectionNumber    :: String --Int
-    , originalTitle       :: String
-    , publisher           :: String
-    , originalPublisher   :: String
-    , publisherPlace      :: String
-    , originalPublisherPlace :: String
-    , authority           :: String
-    , jurisdiction        :: String
-    , archive             :: String
-    , archivePlace        :: String
-    , archiveLocation     :: String
-    , event               :: String
-    , eventPlace          :: String
-    , page                :: String
-    , pageFirst           :: String
-    , numberOfPages       :: String
-    , version             :: String
-    , volume              :: String
-    , numberOfVolumes     :: String --Int
-    , issue               :: String
-    , chapterNumber       :: String
-    , medium              :: String
-    , status              :: String
-    , edition             :: String
-    , section             :: String
-    , source              :: String
-    , genre               :: String
-    , note                :: String
-    , annote              :: String
-    , abstract            :: String
-    , keyword             :: String
-    , number              :: String
-    , references          :: String
+    , title               :: Formatted
+    , titleShort          :: Formatted
+    , reviewedTitle       :: Formatted
+    , containerTitle      :: Formatted
+    , volumeTitle         :: Formatted
+    , collectionTitle     :: Formatted
+    , containerTitleShort :: Formatted
+    , collectionNumber    :: Formatted --Int
+    , originalTitle       :: Formatted
+    , publisher           :: Formatted
+    , originalPublisher   :: Formatted
+    , publisherPlace      :: Formatted
+    , originalPublisherPlace :: Formatted
+    , authority           :: Formatted
+    , jurisdiction        :: Formatted
+    , archive             :: Formatted
+    , archivePlace        :: Formatted
+    , archiveLocation     :: Formatted
+    , event               :: Formatted
+    , eventPlace          :: Formatted
+    , page                :: Formatted
+    , pageFirst           :: Formatted
+    , numberOfPages       :: Formatted
+    , version             :: Formatted
+    , volume              :: Formatted
+    , numberOfVolumes     :: Formatted --Int
+    , issue               :: Formatted
+    , chapterNumber       :: Formatted
+    , medium              :: Formatted
+    , status              :: Formatted
+    , edition             :: Formatted
+    , section             :: Formatted
+    , source              :: Formatted
+    , genre               :: Formatted
+    , note                :: Formatted
+    , annote              :: Formatted
+    , abstract            :: Formatted
+    , keyword             :: Formatted
+    , number              :: Formatted
+    , references          :: Formatted
     , url                 :: String
     , doi                 :: String
     , isbn                :: String
@@ -377,53 +380,53 @@ instance FromJSON Reference where
        v .:? "container" .!= [] <*>
        v .:? "original-date" .!= [] <*>
        v .:? "submitted" .!= [] <*>
-       v .:? "title" .!= "" <*>
-       v .:? "title-short" .!= "" <*>
-       v .:? "reviewed-title" .!= "" <*>
-       v .:? "container-title" .!= "" <*>
-       v .:? "volume-title" .!= "" <*>
-       v .:? "collection-title" .!= "" <*>
-       v .:? "container-title-short" .!= "" <*>
-       v .:? "collection-number" .!= "" <*>
-       v .:? "original-title" .!= "" <*>
-       v .:? "publisher" .!= "" <*>
-       v .:? "original-publisher" .!= "" <*>
-       v .:? "publisher-place" .!= "" <*>
-       v .:? "original-publisher-place" .!= "" <*>
-       v .:? "authority" .!= "" <*>
-       v .:? "jurisdiction" .!= "" <*>
-       v .:? "archive" .!= "" <*>
-       v .:? "archive-place" .!= "" <*>
-       v .:? "archive-location" .!= "" <*>
-       v .:? "event" .!= "" <*>
-       v .:? "event-place" .!= "" <*>
-       v .#? "page" .!= "" <*>
-       v .#? "page-first" .!= "" <*>
-       v .#? "number-of-pages" .!= "" <*>
-       v .#? "version" .!= "" <*>
-       v .#? "volume" .!= "" <*>
-       v .#? "number-of-volumes" .!= "" <*>
-       v .#? "issue" .!= "" <*>
-       v .#? "chapter-number" .!= "" <*>
-       v .#? "medium" .!= "" <*>
-       v .#? "status" .!= "" <*>
-       v .#? "edition" .!= "" <*>
-       v .#? "section" .!= "" <*>
-       v .:? "source" .!= "" <*>
-       v .:? "genre" .!= "" <*>
-       v .:? "note" .!= "" <*>
-       v .:? "annote" .!= "" <*>
-       v .:? "abstract" .!= "" <*>
-       v .:? "keyword" .!= "" <*>
-       v .#? "number" .!= "" <*>
-       v .:? "references" .!= "" <*>
+       v .:? "title" .!= mempty <*>
+       v .:? "title-short" .!= mempty <*>
+       v .:? "reviewed-title" .!= mempty <*>
+       v .:? "container-title" .!= mempty <*>
+       v .:? "volume-title" .!= mempty <*>
+       v .:? "collection-title" .!= mempty <*>
+       v .:? "container-title-short" .!= mempty <*>
+       v .:? "collection-number" .!= mempty <*>
+       v .:? "original-title" .!= mempty <*>
+       v .:? "publisher" .!= mempty <*>
+       v .:? "original-publisher" .!= mempty <*>
+       v .:? "publisher-place" .!= mempty <*>
+       v .:? "original-publisher-place" .!= mempty <*>
+       v .:? "authority" .!= mempty <*>
+       v .:? "jurisdiction" .!= mempty <*>
+       v .:? "archive" .!= mempty <*>
+       v .:? "archive-place" .!= mempty <*>
+       v .:? "archive-location" .!= mempty <*>
+       v .:? "event" .!= mempty <*>
+       v .:? "event-place" .!= mempty <*>
+       v .:? "page" .!= mempty <*>
+       v .:? "page-first" .!= mempty <*>
+       v .:? "number-of-pages" .!= mempty <*>
+       v .:? "version" .!= mempty <*>
+       v .:? "volume" .!= mempty <*>
+       v .:? "number-of-volumes" .!= mempty <*>
+       v .:? "issue" .!= mempty <*>
+       v .:? "chapter-number" .!= mempty <*>
+       v .:? "medium" .!= mempty <*>
+       v .:? "status" .!= mempty <*>
+       v .:? "edition" .!= mempty <*>
+       v .:? "section" .!= mempty <*>
+       v .:? "source" .!= mempty <*>
+       v .:? "genre" .!= mempty <*>
+       v .:? "note" .!= mempty <*>
+       v .:? "annote" .!= mempty <*>
+       v .:? "abstract" .!= mempty <*>
+       v .:? "keyword" .!= mempty <*>
+       v .:? "number" .!= mempty <*>
+       v .:? "references" .!= mempty <*>
        v .:? "url" .!= "" <*>
        v .:? "doi" .!= "" <*>
        v .:? "isbn" .!= "" <*>
        v .:? "issn" .!= "" <*>
        v .:? "pmcid" .!= "" <*>
        v .:? "pmid" .!= "" <*>
-       v .#? "call-number" .!= "" <*>
+       v .:? "call-number" .!= "" <*>
        v .:? "dimensions" .!= "" <*>
        v .:? "scale" .!= "" <*>
        v .:? "categories" .!= [] <*>
@@ -539,46 +542,46 @@ emptyReference =
     , originalDate        = []
     , submitted           = []
 
-    , title               = []
-    , titleShort          = []
-    , reviewedTitle       = []
-    , containerTitle      = []
-    , volumeTitle         = []
-    , collectionTitle     = []
-    , containerTitleShort = []
-    , collectionNumber    = []
-    , originalTitle       = []
-    , publisher           = []
-    , originalPublisher   = []
-    , publisherPlace      = []
-    , originalPublisherPlace = []
-    , authority           = []
-    , jurisdiction        = []
-    , archive             = []
-    , archivePlace        = []
-    , archiveLocation     = []
-    , event               = []
-    , eventPlace          = []
-    , page                = []
-    , pageFirst           = []
-    , numberOfPages       = []
-    , version             = []
-    , volume              = []
-    , numberOfVolumes     = []
-    , issue               = []
-    , chapterNumber       = []
-    , medium              = []
-    , status              = []
-    , edition             = []
-    , section             = []
-    , source              = []
-    , genre               = []
-    , note                = []
-    , annote              = []
-    , abstract            = []
-    , keyword             = []
-    , number              = []
-    , references          = []
+    , title               = mempty
+    , titleShort          = mempty
+    , reviewedTitle       = mempty
+    , containerTitle      = mempty
+    , volumeTitle         = mempty
+    , collectionTitle     = mempty
+    , containerTitleShort = mempty
+    , collectionNumber    = mempty
+    , originalTitle       = mempty
+    , publisher           = mempty
+    , originalPublisher   = mempty
+    , publisherPlace      = mempty
+    , originalPublisherPlace = mempty
+    , authority           = mempty
+    , jurisdiction        = mempty
+    , archive             = mempty
+    , archivePlace        = mempty
+    , archiveLocation     = mempty
+    , event               = mempty
+    , eventPlace          = mempty
+    , page                = mempty
+    , pageFirst           = mempty
+    , numberOfPages       = mempty
+    , version             = mempty
+    , volume              = mempty
+    , numberOfVolumes     = mempty
+    , issue               = mempty
+    , chapterNumber       = mempty
+    , medium              = mempty
+    , status              = mempty
+    , edition             = mempty
+    , section             = mempty
+    , source              = mempty
+    , genre               = mempty
+    , note                = mempty
+    , annote              = mempty
+    , abstract            = mempty
+    , keyword             = mempty
+    , number              = mempty
+    , references          = mempty
     , url                 = []
     , doi                 = []
     , isbn                = []
@@ -637,7 +640,8 @@ processCites rs cs
                     []  -> r
       getRef  c = case filter ((==) (citeId c) . refId) rs of
                     x:_ -> procRef $ setPageFirst x
-                    []  -> emptyReference { title = citeId c ++ " not found!" }
+                    []  -> emptyReference { title =
+                            fromString $ citeId c ++ " not found!" }
 
       procGr _ [] = []
       procGr a (x:xs) = let (a',res) = procCs a x
@@ -664,9 +668,12 @@ processCites rs cs
             isLocSet = citeLocator c /= ""
 
 setPageFirst :: Reference -> Reference
-setPageFirst r = if ('–' `elem` page r || '-' `elem` page r)
-                 then r { pageFirst = takeWhile (not . flip elem "–-") $ page r}
-                 else r
+setPageFirst ref =
+  let Formatted ils = page ref
+      ils' = takeWhile (\i -> i /= Str "–" && i /= Str "-") ils
+  in  if ils == ils'
+         then ref
+         else ref{ pageFirst = Formatted ils' }
 
 setNearNote :: Style -> [[Cite]] -> [[Cite]]
 setNearNote s cs
