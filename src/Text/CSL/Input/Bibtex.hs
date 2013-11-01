@@ -28,20 +28,22 @@ import Control.Monad.RWS
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
 import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen)
+import qualified Text.Pandoc.Walk as Walk
 
-blocksToString  :: [Block]  -> Bib String
-blocksToString bs = do
-  lang <- gets localeLang
-  return $ writeMarkdown def{ writerWrapText = False } $ Pandoc nullMeta $
-           bottomUp (concatMap (adjustSpans lang)) bs
+blocksToFormatted  :: [Block]  -> Bib Formatted
+blocksToFormatted bs =
+  case bs of
+       [Plain xs]  -> inlinesToFormatted xs
+       [Para  xs]  -> inlinesToFormatted xs
+       _           -> inlinesToFormatted $ Walk.query (:[]) bs
 
 adjustSpans :: Lang -> Inline -> [Inline]
-adjustSpans _ (Span ("",[],[]) xs) = xs
+adjustSpans _ (Span (mempty,[],[]) xs) = xs
 adjustSpans lang (RawInline (Format "latex") s)
   | s == "\\hyphen" = [Str "-"]
   | otherwise = bottomUp (concatMap (adjustSpans lang)) $ parseRawLaTeX lang s
 adjustSpans _ (SmallCaps xs) =
-  [Span ("",[],[("style","font-variant:small-caps;")]) xs]
+  [Span (mempty,[],[("style","font-variant:small-caps;")]) xs]
 adjustSpans _ x = [x]
 
 parseRawLaTeX :: Lang -> String -> [Inline]
@@ -54,13 +56,15 @@ parseRawLaTeX lang ('\\':xs) =
          command  = trim command'
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
          f "mkbibquote" ils = [Quoted DoubleQuote ils]
-         f "textnormal" ils = [Span ("",[],[("style","font-style:normal;")]) ils]
+         f "textnormal" ils = [Span (mempty,[],[("style","font-style:normal;")]) ils]
          f "bibstring" [Str s] = [Str $ resolveKey lang s]
          f _            ils = [Span nullAttr ils]
 parseRawLaTeX _ _ = []
 
-inlinesToString :: [Inline] -> Bib String
-inlinesToString ils = trim <$> (blocksToString) [Plain ils]
+inlinesToFormatted :: [Inline] -> Bib Formatted
+inlinesToFormatted ils = do
+  lang <- gets localeLang
+  return $ Formatted $ bottomUp (concatMap (adjustSpans lang)) ils
 
 data Item = Item{ identifier :: String
                 , entryType  :: String
@@ -76,7 +80,7 @@ readBibtexInputString isBibtex bibstring = do
   let lang = case lookup "LANG" env of
                   Just x  -> case splitWhen (\c -> c == '.' || c == '_') x of
                                    (w:z:_) -> Lang w z
-                                   [w]     -> Lang w ""
+                                   [w]     -> Lang w mempty
                                    _       -> Lang "en" "US"
                   Nothing -> Lang "en" "US"
   let items = case runParser (bibEntries <* eof) [] "stdin" bibstring of
@@ -382,7 +386,7 @@ getPeriodicalTitle f = do
   fs <- asks fields
   case lookup f fs of
        Just x  -> trim <$>
-                  (blocksToString $ onBlocks protectCase $ latex' $ trim x)
+                  (blocksToFormatted $ onBlocks protectCase $ latex' $ trim x)
        Nothing -> notFound f
 
 getTitle :: String -> Bib String
@@ -400,7 +404,7 @@ getShortTitle requireColon f = do
   case lookup f fs of
        Just x  -> case processTitle $ latex' x of
                        bs | not requireColon || containsColon bs ->
-                                  trim <$> (blocksToString $ upToColon bs)
+                                  trim <$> (blocksToFormatted $ upToColon bs)
                           | otherwise -> return []
        Nothing -> notFound f
 
@@ -424,16 +428,16 @@ parseDate :: Monad m => String -> m RefDate
 parseDate s = do
   let (year', month', day') =
         case splitWhen (== '-') s of
-             [y]     -> (y, "", "")
-             [y,m]   -> (y, m, "")
+             [y]     -> (y, mempty, mempty)
+             [y,m]   -> (y, m, mempty)
              [y,m,d] -> (y, m, d)
-             _       -> ("", "", "")
+             _       -> (mempty, mempty, mempty)
   return RefDate { year   = dropWhile (=='0') year'
                  , month  = dropWhile (=='0') month'
-                 , season = ""
+                 , season = mempty
                  , day    = dropWhile (=='0') day'
-                 , other  = ""
-                 , circa  = ""
+                 , other  = mempty
+                 , circa  = mempty
                  }
 
 isNumber :: String -> Bool
@@ -450,30 +454,30 @@ fixLeadingDash xs = xs
 getOldDates :: String -> Bib [RefDate]
 getOldDates prefix = do
   year' <- fixLeadingDash <$> getField (prefix ++ "year")
-  month' <- (parseMonth <$> getField (prefix ++ "month")) <|> return ""
-  day' <- getField (prefix ++ "day") <|> return ""
-  endyear' <- fixLeadingDash <$> getField (prefix ++ "endyear") <|> return ""
-  endmonth' <- getField (prefix ++ "endmonth") <|> return ""
-  endday' <- getField (prefix ++ "endday") <|> return ""
-  let start' = RefDate { year   = if isNumber year' then year' else ""
+  month' <- (parseMonth <$> getField (prefix ++ "month")) <|> return mempty
+  day' <- getField (prefix ++ "day") <|> return mempty
+  endyear' <- fixLeadingDash <$> getField (prefix ++ "endyear") <|> return mempty
+  endmonth' <- getField (prefix ++ "endmonth") <|> return mempty
+  endday' <- getField (prefix ++ "endday") <|> return mempty
+  let start' = RefDate { year   = if isNumber year' then year' else mempty
                        , month  = month'
-                       , season = ""
+                       , season = mempty
                        , day    = day'
-                       , other  = if isNumber year' then "" else year'
-                       , circa  = ""
+                       , other  = if isNumber year' then mempty else year'
+                       , circa  = mempty
                        }
   let end' = if null endyear'
                 then []
                 else [RefDate { year   = if isNumber endyear'
                                             then endyear'
-                                            else ""
+                                            else mempty
                               , month  = endmonth'
                               , day    = endday'
-                              , season = ""
+                              , season = mempty
                               , other  = if isNumber endyear'
-                                            then ""
+                                            then mempty
                                             else endyear'
-                              , circa  = ""
+                              , circa  = mempty
                               }]
   return (start':end')
 
@@ -507,7 +511,7 @@ splitByAnd = splitOn [Space, Str "and", Space]
 
 toLiteralList :: [Block] -> Bib [String]
 toLiteralList [Para xs] =
-  mapM inlinesToString $ splitByAnd xs
+  mapM inlinesToFormatted $ splitByAnd xs
 toLiteralList [Plain xs] = toLiteralList [Para xs]
 toLiteralList _ = mzero
 
@@ -520,21 +524,21 @@ toAuthorList _ _ = mzero
 toAuthor :: Options -> [Inline] -> Bib Agent
 toAuthor _ [Str "others"] = return $
     Agent { givenName       = []
-          , droppingPart    = ""
-          , nonDroppingPart = ""
-          , familyName      = ""
-          , nameSuffix      = ""
+          , droppingPart    = mempty
+          , nonDroppingPart = mempty
+          , familyName      = mempty
+          , nameSuffix      = mempty
           , literal         = "others"
           , commaSuffix     = False
           }
-toAuthor _ [Span ("",[],[]) ils] = do
-  literal' <- inlinesToString ils
+toAuthor _ [Span (mempty,[],[]) ils] = do
+  literal' <- inlinesToFormatted ils
   return $ -- corporate author
     Agent { givenName       = []
-          , droppingPart    = ""
-          , nonDroppingPart = ""
-          , familyName      = ""
-          , nameSuffix      = ""
+          , droppingPart    = mempty
+          , nonDroppingPart = mempty
+          , familyName      = mempty
+          , nameSuffix      = mempty
           , literal         = literal'
           , commaSuffix     = False
           }
@@ -565,17 +569,17 @@ toAuthor opts ils = do
   let (von, lastname) = case (reverse rvon, reverse rlast) of
                              (ws@(_:_),[]) -> (init ws, [last ws])
                              (ws, vs)      -> (ws, vs)
-  prefix <- inlinesToString $ intercalate [Space] von
-  family <- inlinesToString $ intercalate [Space] lastname
-  suffix <- inlinesToString $ intercalate [Space] jr
-  givens <- mapM inlinesToString first
+  prefix <- inlinesToFormatted $ intercalate [Space] von
+  family <- inlinesToFormatted $ intercalate [Space] lastname
+  suffix <- inlinesToFormatted $ intercalate [Space] jr
+  givens <- mapM inlinesToFormatted first
   return $
     Agent { givenName       = givens
-          , droppingPart    = if useprefix then "" else prefix
-          , nonDroppingPart = if useprefix then prefix else ""
+          , droppingPart    = if useprefix then mempty else prefix
+          , nonDroppingPart = if useprefix then prefix else mempty
           , familyName      = family
           , nameSuffix      = suffix
-          , literal         = ""
+          , literal         = mempty
           , commaSuffix     = usecomma
           }
 
@@ -590,7 +594,7 @@ isCapitalized [] = True
 isSet :: String -> Options -> Bool
 isSet key opts = case lookup key opts of
                       Just "true" -> True
-                      Just ""     -> True
+                      Just mempty     -> True
                       _           -> False
 
 latex' :: String -> [Block]
@@ -598,13 +602,13 @@ latex' s = bs
   where Pandoc _ bs = readLaTeX def{readerParseRaw = True} s
 
 latex :: String -> Bib String
-latex s = trim <$> (blocksToString $ latex' $ trim s)
+latex s = trim <$> (blocksToFormatted $ latex' $ trim s)
 
 latexTitle :: String -> Bib String
 latexTitle s = do
   utc <- gets untitlecase
   let processTitle = if utc then onBlocks unTitlecase else id
-  trim <$> (blocksToString $ processTitle $ latex' s)
+  trim <$> (blocksToFormatted $ processTitle $ latex' s)
 
 latexAuthors :: Options -> String -> Bib [Agent]
 latexAuthors opts = toAuthorList opts . latex' . trim
@@ -676,9 +680,9 @@ toLocale "latin"      = "la"
 toLocale x            = x
 
 concatWith :: Char -> [String] -> String
-concatWith sep xs = foldl go "" xs
+concatWith sep xs = foldl go mempty xs
   where go :: String -> String -> String
-        go accum "" = accum
+        go accum mempty = accum
         go accum s  = case reverse accum of
                            []    -> s
                            (x:_) | x `elem` "!?.,:;" -> accum ++ " " ++ s
@@ -703,70 +707,70 @@ itemToReference lang bibtex = bib $ do
   guard $ et /= "xdata"
   opts <- (parseOptions <$> getRawField "options") <|> return []
   let getAuthorList' = getAuthorList opts
-  st <- getRawField "entrysubtype" <|> return ""
+  st <- getRawField "entrysubtype" <|> return mempty
   let (reftype, refgenre) = case et of
        "article"
-         | st == "magazine"  -> (ArticleMagazine,"")
-         | st == "newspaper" -> (ArticleNewspaper,"")
-         | otherwise         -> (ArticleJournal,"")
-       "book"            -> (Book,"")
-       "booklet"         -> (Pamphlet,"")
-       "bookinbook"      -> (Book,"")
-       "collection"      -> (Book,"")
-       "electronic"      -> (Webpage,"")
-       "inbook"          -> (Chapter,"")
-       "incollection"    -> (Chapter,"")
-       "inreference "    -> (Chapter,"")
-       "inproceedings"   -> (PaperConference,"")
-       "manual"          -> (Book,"")
+         | st == "magazine"  -> (ArticleMagazine,mempty)
+         | st == "newspaper" -> (ArticleNewspaper,mempty)
+         | otherwise         -> (ArticleJournal,mempty)
+       "book"            -> (Book,mempty)
+       "booklet"         -> (Pamphlet,mempty)
+       "bookinbook"      -> (Book,mempty)
+       "collection"      -> (Book,mempty)
+       "electronic"      -> (Webpage,mempty)
+       "inbook"          -> (Chapter,mempty)
+       "incollection"    -> (Chapter,mempty)
+       "inreference "    -> (Chapter,mempty)
+       "inproceedings"   -> (PaperConference,mempty)
+       "manual"          -> (Book,mempty)
        "mastersthesis"   -> (Thesis, resolveKey lang "mathesis")
-       "misc"            -> (NoType,"")
-       "mvbook"          -> (Book,"")
-       "mvcollection"    -> (Book,"")
-       "mvproceedings"   -> (Book,"")
-       "mvreference"     -> (Book,"")
-       "online"          -> (Webpage,"")
-       "patent"          -> (Patent,"")
+       "misc"            -> (NoType,mempty)
+       "mvbook"          -> (Book,mempty)
+       "mvcollection"    -> (Book,mempty)
+       "mvproceedings"   -> (Book,mempty)
+       "mvreference"     -> (Book,mempty)
+       "online"          -> (Webpage,mempty)
+       "patent"          -> (Patent,mempty)
        "periodical"
-         | st == "magazine"  -> (ArticleMagazine,"")
-         | st == "newspaper" -> (ArticleNewspaper,"")
-         | otherwise         -> (ArticleJournal,"")
+         | st == "magazine"  -> (ArticleMagazine,mempty)
+         | st == "newspaper" -> (ArticleNewspaper,mempty)
+         | otherwise         -> (ArticleJournal,mempty)
        "phdthesis"       -> (Thesis, resolveKey lang "phdthesis")
-       "proceedings"     -> (Book,"")
-       "reference"       -> (Book,"")
-       "report"          -> (Report,"")
-       "suppbook"        -> (Chapter,"")
-       "suppcollection"  -> (Chapter,"")
+       "proceedings"     -> (Book,mempty)
+       "reference"       -> (Book,mempty)
+       "report"          -> (Report,mempty)
+       "suppbook"        -> (Chapter,mempty)
+       "suppcollection"  -> (Chapter,mempty)
        "suppperiodical"
-         | st == "magazine"  -> (ArticleMagazine,"")
-         | st == "newspaper" -> (ArticleNewspaper,"")
-         | otherwise         -> (ArticleJournal,"")
-       "techreport"      -> (Report,"")
-       "thesis"          -> (Thesis,"")
-       "unpublished"     -> (Manuscript,"")
-       "www"             -> (Webpage,"")
+         | st == "magazine"  -> (ArticleMagazine,mempty)
+         | st == "newspaper" -> (ArticleNewspaper,mempty)
+         | otherwise         -> (ArticleJournal,mempty)
+       "techreport"      -> (Report,mempty)
+       "thesis"          -> (Thesis,mempty)
+       "unpublished"     -> (Manuscript,mempty)
+       "www"             -> (Webpage,mempty)
        -- biblatex, "unsupporEd"
-       "artwork"         -> (Graphic,"")
-       "audio"           -> (Song,"")         -- for audio *recordings*
-       "commentary"      -> (Book,"")
-       "image"           -> (Graphic,"")      -- or "figure" ?
-       "jurisdiction"    -> (LegalCase,"")
-       "legislation"     -> (Legislation,"")  -- or "bill" ?
-       "legal"           -> (Treaty,"")
-       "letter"          -> (PersonalCommunication,"")
-       "movie"           -> (MotionPicture,"")
-       "music"           -> (Song,"")         -- for musical *recordings*
-       "performance"     -> (Speech,"")
-       "review"          -> (Review,"")       -- or "review-book" ?
-       "software"        -> (Book,"")         -- for lack of any better match
-       "standard"        -> (Legislation,"")
-       "video"           -> (MotionPicture,"")
+       "artwork"         -> (Graphic,mempty)
+       "audio"           -> (Song,mempty)         -- for audio *recordings*
+       "commentary"      -> (Book,mempty)
+       "image"           -> (Graphic,mempty)      -- or "figure" ?
+       "jurisdiction"    -> (LegalCase,mempty)
+       "legislation"     -> (Legislation,mempty)  -- or "bill" ?
+       "legal"           -> (Treaty,mempty)
+       "letter"          -> (PersonalCommunication,mempty)
+       "movie"           -> (MotionPicture,mempty)
+       "music"           -> (Song,mempty)         -- for musical *recordings*
+       "performance"     -> (Speech,mempty)
+       "review"          -> (Review,mempty)       -- or "review-book" ?
+       "software"        -> (Book,mempty)         -- for lack of any better match
+       "standard"        -> (Legislation,mempty)
+       "video"           -> (MotionPicture,mempty)
        -- biblatex-apa:
-       "data"            -> (Dataset,"")
-       "letters"         -> (PersonalCommunication,"")
-       "newsarticle"     -> (ArticleNewspaper,"")
-       _                 -> (NoType,"")
-  reftype' <- resolveKey lang <$> getField "type" <|> return ""
+       "data"            -> (Dataset,mempty)
+       "letters"         -> (PersonalCommunication,mempty)
+       "newsarticle"     -> (ArticleNewspaper,mempty)
+       _                 -> (NoType,mempty)
+  reftype' <- resolveKey lang <$> getField "type" <|> return mempty
 
   let isContainer = et `elem` ["book","collection","proceedings","reference",
                      "mvbook","mvcollection","mvproceedings", "mvreference",
@@ -776,13 +780,13 @@ itemToReference lang bibtex = bib $ do
   let defaultHyphenation = case lang of
                                 Lang x y -> x ++ "-" ++ y
   hyphenation <- ((toLocale . map toLower) <$> getRawField "hyphenation")
-                <|> return ""
+                <|> return mempty
 
   -- authors:
   author' <- getAuthorList' "author" <|> return []
   containerAuthor' <- getAuthorList' "bookauthor" <|> return []
   translator' <- getAuthorList' "translator" <|> return []
-  editortype <- getRawField "editortype" <|> return ""
+  editortype <- getRawField "editortype" <|> return mempty
   editor'' <- getAuthorList' "editor" <|> return []
   director'' <- getAuthorList' "director" <|> return []
   let (editor', director') = case editortype of
@@ -800,57 +804,57 @@ itemToReference lang bibtex = bib $ do
                      else hyphenation
   let la = case splitWhen (== '-') hyphenation' of
                       (x:_) -> x
-                      []    -> ""
+                      []    -> mempty
   modify $ \s -> s{ untitlecase = la == "en" }
   title' <- getTitle (if isPeriodical then "issuetitle" else "title")
-           <|> return ""
+           <|> return mempty
   subtitle' <- getTitle (if isPeriodical then "issuesubtitle" else "subtitle")
-              <|> return ""
+              <|> return mempty
   titleaddon' <- getTitle "titleaddon"
-               <|> return ""
+               <|> return mempty
   volumeTitle' <- (getTitle "maintitle" >> guard hasVolumes
                     >> getTitle "booktitle")
-                  <|> return ""
+                  <|> return mempty
   volumeSubtitle' <- (getTitle "maintitle" >> guard hasVolumes
                       >> getTitle "booksubtitle")
-                     <|> return ""
+                     <|> return mempty
   volumeTitleAddon' <- (getTitle "maintitle" >> guard hasVolumes
                                    >> getTitle "booktitleaddon")
-                       <|> return ""
+                       <|> return mempty
   containerTitle' <- (guard isPeriodical >> getPeriodicalTitle "title")
                   <|> getTitle "maintitle"
                   <|> (guard (not isContainer) >>
                        guard (null volumeTitle') >> getTitle "booktitle")
                   <|> getPeriodicalTitle "journaltitle"
                   <|> getPeriodicalTitle "journal"
-                  <|> return ""
+                  <|> return mempty
   containerSubtitle' <- (guard isPeriodical >> getPeriodicalTitle "subtitle")
                        <|> getTitle "mainsubtitle"
                        <|> (guard (not isContainer) >>
                             guard (null volumeSubtitle') >>
                              getTitle "booksubtitle")
                        <|> getPeriodicalTitle "journalsubtitle"
-                       <|> return ""
+                       <|> return mempty
   containerTitleAddon' <- (guard isPeriodical >> getPeriodicalTitle "titleaddon")
                        <|> getTitle "maintitleaddon"
                        <|> (guard (not isContainer) >>
                             guard (null volumeTitleAddon') >>
                              getTitle "booktitleaddon")
-                       <|> return ""
+                       <|> return mempty
   containerTitleShort' <- (guard isPeriodical >> getField "shorttitle")
                         <|> (guard (not isContainer) >>
                              getTitle "booktitleshort")
                         <|> getPeriodicalTitle "journaltitleshort"
                         <|> getPeriodicalTitle "shortjournal"
-                        <|> return ""
-  seriesTitle' <- resolveKey lang <$> getTitle "series" <|> return ""
+                        <|> return mempty
+  seriesTitle' <- resolveKey lang <$> getTitle "series" <|> return mempty
   shortTitle' <- getTitle "shorttitle"
                <|> if not (null subtitle')
                       then getShortTitle False "title"
                       else getShortTitle True  "title"
 
-  eventTitle' <- getTitle "eventtitle" <|> return ""
-  origTitle' <- getTitle "origtitle" <|> return ""
+  eventTitle' <- getTitle "eventtitle" <|> return mempty
+  origTitle' <- getTitle "origtitle" <|> return mempty
 
   -- publisher
   pubfields <- mapM (\f -> Just `fmap`
@@ -860,49 +864,49 @@ itemToReference lang bibtex = bib $ do
                       <|> return Nothing)
          ["school","institution","organization", "howpublished","publisher"]
   let publisher' = intercalate "; " [p | Just p <- pubfields]
-  origpublisher' <- getField "origpublisher" <|> return ""
+  origpublisher' <- getField "origpublisher" <|> return mempty
 
 -- places
-  venue' <- getField "venue" <|> return ""
+  venue' <- getField "venue" <|> return mempty
   address' <- (if bibtex
                then getField "address"
                else getLiteralList' "address"
                      <|> (guard (et /= "patent") >>
                           getLiteralList' "location"))
-              <|> return ""
+              <|> return mempty
   origLocation' <- (if bibtex
                     then getField "origlocation"
                     else getLiteralList' "origlocation")
-                  <|> return ""
+                  <|> return mempty
   jurisdiction' <- if et == "patent"
                    then ((intercalate "; " . map (resolveKey lang)) <$>
-                           getLiteralList "location") <|> return ""
-                   else return ""
+                           getLiteralList "location") <|> return mempty
+                   else return mempty
 
   -- locators
-  pages' <- getField "pages" <|> return ""
-  volume' <- getField "volume" <|> return ""
-  part' <- getField "part" <|> return ""
-  volumes' <- getField "volumes" <|> return ""
-  pagetotal' <- getField "pagetotal" <|> return ""
-  chapter' <- getField "chapter" <|> return ""
-  edition' <- getField "edition" <|> return ""
-  version' <- getField "version" <|> return ""
+  pages' <- getField "pages" <|> return mempty
+  volume' <- getField "volume" <|> return mempty
+  part' <- getField "part" <|> return mempty
+  volumes' <- getField "volumes" <|> return mempty
+  pagetotal' <- getField "pagetotal" <|> return mempty
+  chapter' <- getField "chapter" <|> return mempty
+  edition' <- getField "edition" <|> return mempty
+  version' <- getField "version" <|> return mempty
   (number', collectionNumber', issue') <-
-     (getField "number" <|> return "") >>= \x ->
+     (getField "number" <|> return mempty) >>= \x ->
        if et `elem` ["book","collection","proceedings","reference",
                      "mvbook","mvcollection","mvproceedings", "mvreference",
                      "bookinbook","inbook", "incollection","inproceedings",
                      "inreference", "suppbook","suppcollection"]
-       then return ("",x,"")
+       then return (mempty,x,mempty)
        else if isArticle
             then (getField "issue" >>= \y ->
-                                    return ("","",concatWith ',' [x,y]))
-               <|> return ("","",x)
-            else return (x,"","")
+                                    return (mempty,mempty,concatWith ',' [x,y]))
+               <|> return (mempty,mempty,x)
+            else return (x,mempty,mempty)
 
   -- dates
-  issued' <- getDates "date" <|> getOldDates "" <|> return []
+  issued' <- getDates "date" <|> getOldDates mempty <|> return []
   eventDate' <- getDates "eventdate" <|> getOldDates "event"
               <|> return []
   origDate' <- getDates "origdate" <|> getOldDates "orig"
@@ -920,30 +924,30 @@ itemToReference lang bibtex = bib $ do
                     "googlebooks" -> return $ "http://books.google.com?id=" ++
                                         eprint
                     _             -> mzero)
-       <|> return ""
+       <|> return mempty
   doi' <- (guard (lookup "doi" opts /= Just "false") >> getRawField "doi")
-         <|> return ""
-  isbn' <- getRawField "isbn" <|> return ""
-  issn' <- getRawField "issn" <|> return ""
-  callNumber' <- getRawField "library" <|> return ""
+         <|> return mempty
+  isbn' <- getRawField "isbn" <|> return mempty
+  issn' <- getRawField "issn" <|> return mempty
+  callNumber' <- getRawField "library" <|> return mempty
 
   -- notes
   annotation' <- getField "annotation" <|> getField "annote"
-                   <|> return ""
-  abstract' <- getField "abstract" <|> return ""
-  keywords' <- getField "keywords" <|> return ""
+                   <|> return mempty
+  abstract' <- getField "abstract" <|> return mempty
+  keywords' <- getField "keywords" <|> return mempty
   note' <- if et == "periodical"
-           then return ""
-           else (getField "note" <|> return "")
+           then return mempty
+           else (getField "note" <|> return mempty)
   addendum' <- if bibtex
-               then return ""
+               then return mempty
                else getField "addendum"
-                 <|> return ""
+                 <|> return mempty
   pubstate' <- resolveKey lang `fmap`
                  (  getRawField "pubstate"
                 <|> case issued' of
                          (x:_) | other x == "forthcoming" -> return "forthcoming"
-                         _ -> return ""
+                         _ -> return mempty
                  )
 
   let convertEnDash = map (\c -> if c == '–' then '-' else c)
@@ -984,8 +988,8 @@ itemToReference lang bibtex = bib $ do
                                       then if null containerTitle'
                                               then seriesTitle'
                                               else ", " ++ seriesTitle'
-                                      else ""
-         , collectionTitle     = if isArticle then "" else seriesTitle'
+                                      else mempty
+         , collectionTitle     = if isArticle then mempty else seriesTitle'
          , volumeTitle         = concatWith '.' [
                                       concatWith ':' [ volumeTitle'
                                                      , volumeSubtitle']
