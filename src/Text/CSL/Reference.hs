@@ -31,7 +31,7 @@ import Data.Char (toUpper, toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Util (parseString, trim, safeRead, readNum, (.#?))
 import Text.Pandoc (readHtml, def, Pandoc(..), Block(..), Inline(..),
-                    nullMeta, writeHtmlString)
+                    nullMeta, writeHtmlString, WriterOptions(..), Format(..), bottomUp)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.Builder as B
 import Data.String
@@ -60,7 +60,22 @@ readCSLString s = Formatted $
 
 -- Eventually this can incorporate special CSL-specific features.
 writeCSLString :: Formatted -> String
-writeCSLString (Formatted ils) = trim $ writeHtmlString def $ Pandoc nullMeta [Plain ils]
+writeCSLString (Formatted ils) =
+  trim $ writeHtmlString def{writerWrapText = False}
+       $ Pandoc nullMeta [Plain $ bottomUp (concatMap adjustCSL) ils]
+
+adjustCSL :: Inline -> [Inline]
+adjustCSL (Span ("",[],[]) xs) = xs
+adjustCSL (Span ("",["citeproc-no-output"],[]) _) =
+  [Str "[CSL STYLE ERROR: reference with no printed form.]"]
+adjustCSL (Emph xs) =
+  RawInline (Format "html") "<i>" : xs ++ [RawInline (Format "html") "</i>"]
+adjustCSL (Strong xs) =
+  RawInline (Format "html") "<b>" : xs ++ [RawInline (Format "html") "</b>"]
+adjustCSL (SmallCaps xs) =
+  RawInline (Format "html") "<span style=\"font-variant:small-caps;\">" : xs ++ [RawInline (Format "html") "</span>"]
+adjustCSL (Str "&") = [RawInline (Format "html") "&#38;"]
+adjustCSL x = [x]
 
 -- | An existential type to wrap the different types a 'Reference' is
 -- made of. This way we can create a map to make queries easier.
@@ -151,12 +166,12 @@ data RefDate =
 instance FromJSON RefDate where
   parseJSON (Array v) =
      case fromJSON (Array v) of
-          Success [y]     -> RefDate <$> parseJSON y <*>
+          Success [y]     -> RefDate <$> parseString y <*>
                     pure "" <*> pure "" <*> pure "" <*> pure "" <*> pure ""
-          Success [y,m]   -> RefDate <$> parseJSON y <*> parseJSON m <*>
+          Success [y,m]   -> RefDate <$> parseString y <*> parseString m <*>
                     pure "" <*> pure "" <*> pure "" <*> pure ""
-          Success [y,m,d] -> RefDate <$> parseJSON y <*> parseJSON m <*>
-                    pure "" <*> parseJSON d <*> pure "" <*> pure ""
+          Success [y,m,d] -> RefDate <$> parseString y <*> parseString m <*>
+                    pure "" <*> parseString d <*> pure "" <*> pure ""
           Error e         -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
   parseJSON (Object v) = RefDate <$>
