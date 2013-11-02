@@ -25,6 +25,7 @@ import Control.Applicative ( (<$>) )
 import Control.Monad.State
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
+import Text.Pandoc.Definition (Inline(Str, Space))
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
@@ -48,7 +49,8 @@ evalLayout (Layout _ _ es) em b l m o a r
                   [] -> if (isSorting $ em)
                         then []
                         else [noOutputError]
-                  x | title r == citeId cit ++ " not found!" -> [noBibDataError $ cit]
+                  x | title r == Formatted [Str (citeId cit), Space, Str "not", Space,
+                                   Str "found!"]             -> [noBibDataError $ cit]
                     | otherwise                              -> suppTC x
       locale = case l of
                  [x] -> x

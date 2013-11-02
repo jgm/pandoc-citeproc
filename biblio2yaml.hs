@@ -69,8 +69,7 @@ data Option =
 
 readFormat :: String -> Maybe BibFormat
 readFormat = go . map toLower
-  where go "mods"     = Just Mods
-        go "biblatex" = Just BibLatex
+  where go "biblatex" = Just BibLatex
         go "bib"      = Just BibLatex
         go "bibtex"   = Just Bibtex
         go "ris"      = Just Ris
