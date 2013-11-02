@@ -64,6 +64,8 @@ evalLayout (Layout _ _ es) em b l m o a r
                  EvalBiblio  c -> c
       initSt = EvalState (mkRefMap r) (Env cit (localeTerms locale) m
                          (localeDate locale) o [] a) [] em b False [] [] False [] [] []
+      -- TODO: is this needed? shouldn't the style specify titlecase or not
+      -- depending on the locale?
       suppTC = let getLang = take 2 . map toLower in
                case (getLang $ localeLang locale, getLang $ language r) of
                  (_,  "en") -> id
@@ -225,8 +227,8 @@ getFormattedValue o as f fm s val
     | Just v <- fromValue val :: Maybe Formatted =
        if v == mempty
           then []
-          else {- TODO getAbbr -}
-               [OPan $ walk value' $ unFormatted v]  {- TODO map Space to OSpace? -}
+          else {- TODO getAbbr -  TODO map Space to OSpace? -}
+               [Output [OPan $ walk value' $ unFormatted v] fm]
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe CNum      = if v == 0 then [] else [OCitNum (unCNum v) fm]
     | Just v <- fromValue val :: Maybe [RefDate] = formatDate (EvalSorting emptyCite) [] [] sortDate v
