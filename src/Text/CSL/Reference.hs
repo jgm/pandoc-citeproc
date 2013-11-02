@@ -139,33 +139,32 @@ instance ToJSON [Agent] where
   toJSON xs  = Array (V.fromList $ map toJSON xs)
 
 data RefDate =
-    RefDate { year   :: Formatted
-            , month  :: Formatted
-            , season :: Formatted
-            , day    :: Formatted
-            , other  :: Formatted
-            , circa  :: Formatted
+    RefDate { year   :: String
+            , month  :: String
+            , season :: String
+            , day    :: String
+            , other  :: String
+            , circa  :: String
             } deriving ( Show, Read, Eq, Typeable, Data )
 
 instance FromJSON RefDate where
   parseJSON (Array v) =
      case fromJSON (Array v) of
           Success [y]     -> RefDate <$> parseJSON y <*>
-                    pure mempty <*> pure mempty <*> pure mempty <*>
-                    pure mempty <*> pure mempty
+                    pure "" <*> pure "" <*> pure "" <*> pure "" <*> pure ""
           Success [y,m]   -> RefDate <$> parseJSON y <*> parseJSON m <*>
-                    pure mempty <*> pure mempty <*> pure mempty <*> pure mempty
+                    pure "" <*> pure "" <*> pure "" <*> pure ""
           Success [y,m,d] -> RefDate <$> parseJSON y <*> parseJSON m <*>
-                    pure mempty <*> parseJSON d <*> pure mempty <*> pure mempty
+                    pure "" <*> parseJSON d <*> pure "" <*> pure ""
           Error e         -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
   parseJSON (Object v) = RefDate <$>
-              v .:? "year" .!= mempty <*>
-              v .:? "month" .!= mempty <*>
-              v .:? "season" .!= mempty <*>
-              v .:? "day" .!= mempty <*>
-              v .:? "other" .!= mempty <*>
-              v .:? "circa" .!= mempty
+              v .:? "year" .!= "" <*>
+              v .:? "month" .!= "" <*>
+              v .:? "season" .!= "" <*>
+              v .:? "day" .!= "" <*>
+              v .:? "other" .!= "" <*>
+              v .:? "circa" .!= ""
   parseJSON _ = fail "Could not parse RefDate"
 
 instance ToJSON RefDate where
@@ -193,10 +192,8 @@ instance ToJSON [RefDate] where
 
 mkRefDate :: String -> Parser [RefDate]
 mkRefDate xs
-  | all isDigit xs = return [RefDate (Formatted [Str xs])
-                          mempty mempty mempty mempty mempty]
-  | otherwise      = return [RefDate mempty mempty mempty mempty
-                          (Formatted [Str xs]) mempty]
+  | all isDigit xs = return [RefDate xs "" "" "" "" ""]
+  | otherwise      = return [RefDate "" "" "" "" xs ""]
 
 data RefType
     = NoType

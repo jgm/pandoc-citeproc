@@ -21,6 +21,7 @@ import Data.Char
 import Data.List
 import Data.List.Split
 import Data.Maybe
+import Data.Monoid
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
@@ -107,24 +108,24 @@ formatDate em k tm dp date
       addZero n = if length n == 1 then '0' : n else n
       addZeros  = reverse . take 5 . flip (++) (repeat '0') . reverse
       formatDatePart False (RefDate y m e d _ _) (DatePart n f _ fm)
-          | "year"  <- n, y /= [] = return $ OYear (formatYear  f    y) k fm
-          | "month" <- n, m /= [] = output fm      (formatMonth f fm m)
-          | "day"   <- n, d /= [] = output fm      (formatDay   f m  d)
-          | "month" <- n, m == []
-                        , e /= [] = output fm $ term f ("season-0" ++ e)
+          | "year"  <- n, y /= mempty = return $ OYear (formatYear  f    y) k fm
+          | "month" <- n, m /= mempty = output fm      (formatMonth f fm m)
+          | "day"   <- n, d /= mempty = output fm      (formatDay   f m  d)
+          | "month" <- n, m == mempty
+                        , e /= mempty = output fm $ term f ("season-0" ++ e)
 
       formatDatePart True (RefDate y m e d _ _) (DatePart n f rd fm)
-          | "year"  <- n, y /= [] = OYear (formatYear  f y) k (fm {suffix = []}) : formatDelim
-          | "month" <- n, m /= [] = output (fm {suffix = []}) (formatMonth f fm m) ++ formatDelim
-          | "day"   <- n, d /= [] = output (fm {suffix = []}) (formatDay   f m  d) ++ formatDelim
-          | "month" <- n, m == []
-                        , e /= [] = output (fm {suffix = []}) (term f $ "season-0" ++ e) ++ formatDelim
+          | "year"  <- n, y /= mempty = OYear (formatYear  f y) k (fm {suffix = []}) : formatDelim
+          | "month" <- n, m /= mempty = output (fm {suffix = []}) (formatMonth f fm m) ++ formatDelim
+          | "day"   <- n, d /= mempty = output (fm {suffix = []}) (formatDay   f m  d) ++ formatDelim
+          | "month" <- n, m == mempty
+                        , e /= mempty = output (fm {suffix = []}) (term f $ "season-0" ++ e) ++ formatDelim
           where
             formatDelim = if rd == "-" then [OPan [Str "\x2013"]] else [OPan [Str rd]]
 
       formatDatePart _ (RefDate _ _ _ _ o _) (DatePart n _ _ fm)
-          | "year"  <- n, o /= [] = output fm o
-          | otherwise             = []
+          | "year"  <- n, o /= mempty = output fm o
+          | otherwise                 = []
 
       formatYear f y
           | "short" <- f = drop 2 y

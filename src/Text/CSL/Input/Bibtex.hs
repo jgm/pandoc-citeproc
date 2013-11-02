@@ -19,11 +19,11 @@ module Text.CSL.Input.Bibtex
 import Text.Parsec hiding (optional, (<|>), many, State)
 import Control.Applicative
 import Text.Pandoc
+import Text.Pandoc.Shared (stringify)
 import Data.List.Split (splitOn, splitWhen, wordsBy)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper, isDigit, isAlphaNum,
-                  isPunctuation )
+import Data.Char (toLower, isUpper, toUpper, isDigit, isAlphaNum)
 import Control.Monad
 import Control.Monad.RWS
 import System.Environment (getEnvironment)
@@ -424,30 +424,26 @@ upToColon [Plain xs] = upToColon [Para xs]
 upToColon bs         = bs
 
 getDates :: String -> Bib [RefDate]
-getDates f = getField f >>= parseDates . splitStrWhen isPunctuation . unFormatted
+getDates f = getRawField f >>= parseDates
 
-parseDates :: Monad m => [Inline] -> m [RefDate]
-parseDates = mapM parseDate . splitWhen (== Str "/")
+parseDates :: Monad m => String-> m [RefDate]
+parseDates = mapM parseDate . splitWhen (== '/')
 
-parseDate :: Monad m => [Inline] -> m RefDate
+parseDate :: Monad m => String -> m RefDate
 parseDate s = do
   let (year', month', day') =
-        case splitWhen (== Str "-") s of
+        case splitWhen (== '-') s of
              [y]     -> (y, mempty, mempty)
              [y,m]   -> (y, m, mempty)
              [y,m,d] -> (y, m, d)
              _       -> (mempty, mempty, mempty)
-  return RefDate { year   = Formatted $ dropLeadingZeros year'
-                 , month  = Formatted $ dropLeadingZeros month'
+  return RefDate { year   = dropWhile (=='0') year'
+                 , month  = dropWhile (=='0') month'
                  , season = mempty
-                 , day    = Formatted $ dropLeadingZeros day'
+                 , day    = dropWhile (=='0') day'
                  , other  = mempty
                  , circa  = mempty
                  }
-
-dropLeadingZeros :: [Inline] -> [Inline]
-dropLeadingZeros (Str ('0':xs) : rest) = dropLeadingZeros (Str xs : rest)
-dropLeadingZeros xs = xs
 
 isNumber :: String -> Bool
 isNumber ('-':d:ds) = all isDigit (d:ds)
@@ -463,51 +459,31 @@ fixLeadingDash xs = xs
 getOldDates :: String -> Bib [RefDate]
 getOldDates prefix = do
   year' <- fixLeadingDash <$> getRawField (prefix ++ "year")
-  month' <- (parseMonth <$> getRawField (prefix ++ "month")) <|> return mempty
+  month' <- (parseMonth <$> getRawField (prefix ++ "month")) <|> return ""
   day' <- getRawField (prefix ++ "day") <|> return mempty
-  endyear' <- fixLeadingDash <$> getRawField (prefix ++ "endyear") <|> return mempty
-  endmonth' <- getRawField (prefix ++ "endmonth") <|> return mempty
-  endday' <- getRawField (prefix ++ "endday") <|> return mempty
-  let start' = RefDate { year   = if isNumber year'
-                                     then Formatted [Str year']
-                                     else mempty
-                       , month  = if null month'
-                                     then mempty
-                                     else Formatted [Str month']
-                       , season = mempty
-                       , day    = if null day'
-                                     then mempty
-                                     else Formatted [Str day']
-                       , other  = if isNumber year'
-                                     then mempty
-                                     else Formatted [Str year']
-                       , circa  = mempty
+  endyear' <- fixLeadingDash <$> getRawField (prefix ++ "endyear") <|> return ""
+  endmonth' <- getRawField (prefix ++ "endmonth") <|> return ""
+  endday' <- getRawField (prefix ++ "endday") <|> return ""
+  let start' = RefDate { year   = if isNumber year' then year' else ""
+                       , month  = month'
+                       , season = ""
+                       , day    = day'
+                       , other  = if isNumber year' then "" else year'
+                       , circa  = ""
                        }
   let end' = if null endyear'
                 then []
-                else [RefDate { year   = if isNumber endyear'
-                                            then Formatted [Str endyear']
-                                            else mempty
-                              , month  = if null endmonth'
-                                            then mempty
-                                            else Formatted [Str endmonth']
-                              , day    = if null endday'
-                                            then mempty
-                                            else Formatted [Str endday']
+                else [RefDate { year   = if isNumber endyear' then endyear' else ""
+                              , month  = endmonth'
+                              , day    = endday'
                               , season = mempty
-                              , other  = if isNumber endyear'
-                                            then mempty
-                                            else Formatted [Str endyear']
+                              , other  = if isNumber endyear' then "" else endyear'
                               , circa  = mempty
                               }]
   return (start':end')
 
 getRawField :: String -> Bib String
-getRawField f = do
-  fs <- asks fields
-  case lookup f fs of
-       Just x  -> return x
-       Nothing -> notFound f
+getRawField f = (stringify . unFormatted) <$> getField f
 
 getAuthorList :: Options -> String -> Bib [Agent]
 getAuthorList opts  f = do
@@ -971,7 +947,7 @@ itemToReference lang bibtex = bib $ do
   pubstate' <- resolveKey lang `fmap`
                  (  getField "pubstate"
                 <|> case issued' of
-                         (x:_) | other x == Formatted [Str "forthcoming"] ->
+                         (x:_) | other x == "forthcoming" ->
                                      return (Formatted [Str "forthcoming"])
                          _ -> return mempty
                  )
