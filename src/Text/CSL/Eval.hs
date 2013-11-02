@@ -26,6 +26,7 @@ import Control.Monad.State
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
 import Text.Pandoc.Definition (Inline(Str, Space))
+import Text.Pandoc.Walk (walk)
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
@@ -220,7 +221,8 @@ evalIfThen i ei e
 getFormattedValue :: [Option] -> Abbreviations -> Form -> Formatting -> String -> Value -> [Output]
 getFormattedValue o as f fm s val
     | Just v <- fromValue val :: Maybe String    = rtfParser fm . getAbbr $ value v
-    | Just v <- fromValue val :: Maybe Formatted = {- TODO getAbbr -} [OPan $ unFormatted v]  {- TODO map Space to OSpace? -}
+    | Just v <- fromValue val :: Maybe Formatted = {- TODO getAbbr -}
+                [OPan $ walk value' $ unFormatted v]  {- TODO map Space to OSpace? -}
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe CNum      = if v == 0 then [] else [OCitNum (unCNum v) fm]
     | Just v <- fromValue val :: Maybe [RefDate] = formatDate (EvalSorting emptyCite) [] [] sortDate v
@@ -229,6 +231,8 @@ getFormattedValue o as f fm s val
     | otherwise                                  = []
     where
       value     = if stripPeriods fm then filter (/= '.') else id
+      value' (Str x) = Str (value x)
+      value' x       = x
       getAbbr v = if f == Short
                   then let ab = getAbbreviation as s v in
                        if null ab then v else ab
