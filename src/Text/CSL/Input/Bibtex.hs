@@ -22,7 +22,8 @@ import Text.Pandoc
 import Data.List.Split (splitOn, splitWhen, wordsBy)
 import Data.List (intercalate)
 import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper, isDigit, isAlphaNum )
+import Data.Char (toLower, isUpper, toUpper, isDigit, isAlphaNum,
+                  isPunctuation )
 import Control.Monad
 import Control.Monad.RWS
 import System.Environment (getEnvironment)
@@ -38,12 +39,12 @@ blocksToFormatted bs =
        _           -> inlinesToFormatted $ Walk.query (:[]) bs
 
 adjustSpans :: Lang -> Inline -> [Inline]
-adjustSpans _ (Span (mempty,[],[]) xs) = xs
+adjustSpans _ (Span ("",[],[]) xs) = xs
 adjustSpans lang (RawInline (Format "latex") s)
   | s == "\\hyphen" = [Str "-"]
   | otherwise = bottomUp (concatMap (adjustSpans lang)) $ parseRawLaTeX lang s
 adjustSpans _ (SmallCaps xs) =
-  [Span (mempty,[],[("style","font-variant:small-caps;")]) xs]
+  [Span ("",[],[("style","font-variant:small-caps;")]) xs]
 adjustSpans _ x = [x]
 
 parseRawLaTeX :: Lang -> String -> [Inline]
@@ -56,8 +57,8 @@ parseRawLaTeX lang ('\\':xs) =
          command  = trim command'
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
          f "mkbibquote" ils = [Quoted DoubleQuote ils]
-         f "textnormal" ils = [Span (mempty,[],[("style","font-style:normal;")]) ils]
-         f "bibstring" [Str s] = [Str $ resolveKey lang s]
+         f "textnormal" ils = [Span ("",[],[("style","font-style:normal;")]) ils]
+         f "bibstring" [Str s] = [Str $ resolveKey' lang s]
          f _            ils = [Span nullAttr ils]
 parseRawLaTeX _ _ = []
 
@@ -310,8 +311,13 @@ bookTrans z =
 
 data Lang = Lang String String  -- e.g. "en" "US"
 
-resolveKey :: Lang -> String -> String
-resolveKey (Lang "en" "US") k =
+resolveKey :: Lang -> Formatted -> Formatted
+resolveKey lang (Formatted ils) = Formatted (Walk.walk go ils)
+  where go (Str s) = Str $ resolveKey' lang s
+        go x       = x
+
+resolveKey' :: Lang -> String -> String
+resolveKey' (Lang "en" "US") k =
   case k of
        "inpreparation" -> "in preparation"
        "submitted"     -> "submitted"
@@ -347,7 +353,7 @@ resolveKey (Lang "en" "US") k =
        "newseries"     -> "new series"
        "oldseries"     -> "old series"
        _               -> k
-resolveKey _ k = resolveKey (Lang "en" "US") k
+resolveKey' _ k = resolveKey' (Lang "en" "US") k
 
 parseMonth :: String -> String
 parseMonth "jan" = "1"
@@ -374,29 +380,28 @@ type Bib = RWST Item () BibState Maybe
 notFound :: String -> Bib a
 notFound f = fail $ f ++ " not found"
 
-getField :: String -> Bib String
+getField :: String -> Bib Formatted
 getField f = do
   fs <- asks fields
   case lookup f fs of
        Just x  -> latex x
        Nothing -> notFound f
 
-getPeriodicalTitle :: String -> Bib String
+getPeriodicalTitle :: String -> Bib Formatted
 getPeriodicalTitle f = do
   fs <- asks fields
   case lookup f fs of
-       Just x  -> trim <$>
-                  (blocksToFormatted $ onBlocks protectCase $ latex' $ trim x)
+       Just x  -> blocksToFormatted $ onBlocks protectCase $ latex' $ trim x
        Nothing -> notFound f
 
-getTitle :: String -> Bib String
+getTitle :: String -> Bib Formatted
 getTitle f = do
   fs <- asks fields
   case lookup f fs of
        Just x  -> latexTitle x
        Nothing -> notFound f
 
-getShortTitle :: Bool -> String -> Bib String
+getShortTitle :: Bool -> String -> Bib Formatted
 getShortTitle requireColon f = do
   fs <- asks fields
   utc <- gets untitlecase
@@ -404,8 +409,8 @@ getShortTitle requireColon f = do
   case lookup f fs of
        Just x  -> case processTitle $ latex' x of
                        bs | not requireColon || containsColon bs ->
-                                  trim <$> (blocksToFormatted $ upToColon bs)
-                          | otherwise -> return []
+                                  blocksToFormatted $ upToColon bs
+                          | otherwise -> return mempty
        Nothing -> notFound f
 
 containsColon :: [Block] -> Bool
@@ -419,26 +424,30 @@ upToColon [Plain xs] = upToColon [Para xs]
 upToColon bs         = bs
 
 getDates :: String -> Bib [RefDate]
-getDates f = getField f >>= parseDates
+getDates f = getField f >>= parseDates . splitStrWhen isPunctuation . unFormatted
 
-parseDates :: Monad m => String -> m [RefDate]
-parseDates s = mapM parseDate $ splitWhen (=='/') s
+parseDates :: Monad m => [Inline] -> m [RefDate]
+parseDates = mapM parseDate . splitWhen (== Str "/")
 
-parseDate :: Monad m => String -> m RefDate
+parseDate :: Monad m => [Inline] -> m RefDate
 parseDate s = do
   let (year', month', day') =
-        case splitWhen (== '-') s of
+        case splitWhen (== Str "-") s of
              [y]     -> (y, mempty, mempty)
              [y,m]   -> (y, m, mempty)
              [y,m,d] -> (y, m, d)
              _       -> (mempty, mempty, mempty)
-  return RefDate { year   = dropWhile (=='0') year'
-                 , month  = dropWhile (=='0') month'
+  return RefDate { year   = Formatted $ dropLeadingZeros year'
+                 , month  = Formatted $ dropLeadingZeros month'
                  , season = mempty
-                 , day    = dropWhile (=='0') day'
+                 , day    = Formatted $ dropLeadingZeros day'
                  , other  = mempty
                  , circa  = mempty
                  }
+
+dropLeadingZeros :: [Inline] -> [Inline]
+dropLeadingZeros (Str ('0':xs) : rest) = dropLeadingZeros (Str xs : rest)
+dropLeadingZeros xs = xs
 
 isNumber :: String -> Bool
 isNumber ('-':d:ds) = all isDigit (d:ds)
@@ -453,30 +462,42 @@ fixLeadingDash xs = xs
 
 getOldDates :: String -> Bib [RefDate]
 getOldDates prefix = do
-  year' <- fixLeadingDash <$> getField (prefix ++ "year")
-  month' <- (parseMonth <$> getField (prefix ++ "month")) <|> return mempty
-  day' <- getField (prefix ++ "day") <|> return mempty
-  endyear' <- fixLeadingDash <$> getField (prefix ++ "endyear") <|> return mempty
-  endmonth' <- getField (prefix ++ "endmonth") <|> return mempty
-  endday' <- getField (prefix ++ "endday") <|> return mempty
-  let start' = RefDate { year   = if isNumber year' then year' else mempty
-                       , month  = month'
+  year' <- fixLeadingDash <$> getRawField (prefix ++ "year")
+  month' <- (parseMonth <$> getRawField (prefix ++ "month")) <|> return mempty
+  day' <- getRawField (prefix ++ "day") <|> return mempty
+  endyear' <- fixLeadingDash <$> getRawField (prefix ++ "endyear") <|> return mempty
+  endmonth' <- getRawField (prefix ++ "endmonth") <|> return mempty
+  endday' <- getRawField (prefix ++ "endday") <|> return mempty
+  let start' = RefDate { year   = if isNumber year'
+                                     then Formatted [Str year']
+                                     else mempty
+                       , month  = if null month'
+                                     then mempty
+                                     else Formatted [Str month']
                        , season = mempty
-                       , day    = day'
-                       , other  = if isNumber year' then mempty else year'
+                       , day    = if null day'
+                                     then mempty
+                                     else Formatted [Str day']
+                       , other  = if isNumber year'
+                                     then mempty
+                                     else Formatted [Str year']
                        , circa  = mempty
                        }
   let end' = if null endyear'
                 then []
                 else [RefDate { year   = if isNumber endyear'
-                                            then endyear'
+                                            then Formatted [Str endyear']
                                             else mempty
-                              , month  = endmonth'
-                              , day    = endday'
+                              , month  = if null endmonth'
+                                            then mempty
+                                            else Formatted [Str endmonth']
+                              , day    = if null endday'
+                                            then mempty
+                                            else Formatted [Str endday']
                               , season = mempty
                               , other  = if isNumber endyear'
                                             then mempty
-                                            else endyear'
+                                            else Formatted [Str endyear']
                               , circa  = mempty
                               }]
   return (start':end')
@@ -495,7 +516,7 @@ getAuthorList opts  f = do
        Just x  -> latexAuthors opts x
        Nothing -> notFound f
 
-getLiteralList :: String -> Bib [String]
+getLiteralList :: String -> Bib [Formatted]
 getLiteralList f = do
   fs <- asks fields
   case lookup f fs of
@@ -503,13 +524,14 @@ getLiteralList f = do
        Nothing -> notFound f
 
 -- separates items with semicolons
-getLiteralList' :: String -> Bib String
-getLiteralList' f = intercalate "; " <$> getLiteralList f
+getLiteralList' :: String -> Bib Formatted
+getLiteralList' f = (Formatted . intercalate [Str ";", Space] . map unFormatted)
+  <$> getLiteralList f
 
 splitByAnd :: [Inline] -> [[Inline]]
 splitByAnd = splitOn [Space, Str "and", Space]
 
-toLiteralList :: [Block] -> Bib [String]
+toLiteralList :: [Block] -> Bib [Formatted]
 toLiteralList [Para xs] =
   mapM inlinesToFormatted $ splitByAnd xs
 toLiteralList [Plain xs] = toLiteralList [Para xs]
@@ -528,10 +550,10 @@ toAuthor _ [Str "others"] = return $
           , nonDroppingPart = mempty
           , familyName      = mempty
           , nameSuffix      = mempty
-          , literal         = "others"
+          , literal         = Formatted [Str "others"]
           , commaSuffix     = False
           }
-toAuthor _ [Span (mempty,[],[]) ils] = do
+toAuthor _ [Span ("",[],[]) ils] = do
   literal' <- inlinesToFormatted ils
   return $ -- corporate author
     Agent { givenName       = []
@@ -594,21 +616,21 @@ isCapitalized [] = True
 isSet :: String -> Options -> Bool
 isSet key opts = case lookup key opts of
                       Just "true" -> True
-                      Just mempty     -> True
+                      Just s      -> s == mempty
                       _           -> False
 
 latex' :: String -> [Block]
 latex' s = bs
   where Pandoc _ bs = readLaTeX def{readerParseRaw = True} s
 
-latex :: String -> Bib String
-latex s = trim <$> (blocksToFormatted $ latex' $ trim s)
+latex :: String -> Bib Formatted
+latex s = blocksToFormatted $ latex' $ trim s
 
-latexTitle :: String -> Bib String
+latexTitle :: String -> Bib Formatted
 latexTitle s = do
   utc <- gets untitlecase
   let processTitle = if utc then onBlocks unTitlecase else id
-  trim <$> (blocksToFormatted $ processTitle $ latex' s)
+  blocksToFormatted $ processTitle $ latex' s
 
 latexAuthors :: Options -> String -> Bib [Agent]
 latexAuthors opts = toAuthorList opts . latex' . trim
@@ -679,14 +701,17 @@ toLocale "vietnamese" = "vi-VN"
 toLocale "latin"      = "la"
 toLocale x            = x
 
-concatWith :: Char -> [String] -> String
-concatWith sep xs = foldl go mempty xs
-  where go :: String -> String -> String
-        go accum mempty = accum
+concatWith :: Char -> [Formatted] -> Formatted
+concatWith sep = Formatted . foldl go mempty . map unFormatted
+  where go :: [Inline] -> [Inline] -> [Inline]
+        go accum [] = accum
         go accum s  = case reverse accum of
                            []    -> s
-                           (x:_) | x `elem` "!?.,:;" -> accum ++ " " ++ s
-                                 | otherwise         -> accum ++ [sep, ' '] ++ s
+                           (Str x:_)
+                             | not (null x) && last x `elem` "!?.,:;"
+                                          -> accum ++ (Space : s)
+                             | otherwise  -> accum ++ (Str [sep] : Space : s)
+                           xs    -> accum ++ xs
 
 type Options = [(String, String)]
 
@@ -723,7 +748,7 @@ itemToReference lang bibtex = bib $ do
        "inreference "    -> (Chapter,mempty)
        "inproceedings"   -> (PaperConference,mempty)
        "manual"          -> (Book,mempty)
-       "mastersthesis"   -> (Thesis, resolveKey lang "mathesis")
+       "mastersthesis"   -> (Thesis, Formatted [Str $ resolveKey' lang "mathesis"])
        "misc"            -> (NoType,mempty)
        "mvbook"          -> (Book,mempty)
        "mvcollection"    -> (Book,mempty)
@@ -735,7 +760,7 @@ itemToReference lang bibtex = bib $ do
          | st == "magazine"  -> (ArticleMagazine,mempty)
          | st == "newspaper" -> (ArticleNewspaper,mempty)
          | otherwise         -> (ArticleJournal,mempty)
-       "phdthesis"       -> (Thesis, resolveKey lang "phdthesis")
+       "phdthesis"       -> (Thesis, Formatted [Str $ resolveKey' lang "phdthesis"])
        "proceedings"     -> (Book,mempty)
        "reference"       -> (Book,mempty)
        "report"          -> (Report,mempty)
@@ -824,21 +849,21 @@ itemToReference lang bibtex = bib $ do
   containerTitle' <- (guard isPeriodical >> getPeriodicalTitle "title")
                   <|> getTitle "maintitle"
                   <|> (guard (not isContainer) >>
-                       guard (null volumeTitle') >> getTitle "booktitle")
+                       guard (volumeTitle' == mempty) >> getTitle "booktitle")
                   <|> getPeriodicalTitle "journaltitle"
                   <|> getPeriodicalTitle "journal"
                   <|> return mempty
   containerSubtitle' <- (guard isPeriodical >> getPeriodicalTitle "subtitle")
                        <|> getTitle "mainsubtitle"
                        <|> (guard (not isContainer) >>
-                            guard (null volumeSubtitle') >>
+                            guard (volumeSubtitle' == mempty) >>
                              getTitle "booksubtitle")
                        <|> getPeriodicalTitle "journalsubtitle"
                        <|> return mempty
   containerTitleAddon' <- (guard isPeriodical >> getPeriodicalTitle "titleaddon")
                        <|> getTitle "maintitleaddon"
                        <|> (guard (not isContainer) >>
-                            guard (null volumeTitleAddon') >>
+                            guard (volumeTitleAddon' == mempty) >>
                              getTitle "booktitleaddon")
                        <|> return mempty
   containerTitleShort' <- (guard isPeriodical >> getField "shorttitle")
@@ -849,7 +874,7 @@ itemToReference lang bibtex = bib $ do
                         <|> return mempty
   seriesTitle' <- resolveKey lang <$> getTitle "series" <|> return mempty
   shortTitle' <- getTitle "shorttitle"
-               <|> if not (null subtitle')
+               <|> if subtitle' /= mempty
                       then getShortTitle False "title"
                       else getShortTitle True  "title"
 
@@ -863,7 +888,7 @@ itemToReference lang bibtex = bib $ do
                         else getLiteralList' f)
                       <|> return Nothing)
          ["school","institution","organization", "howpublished","publisher"]
-  let publisher' = intercalate "; " [p | Just p <- pubfields]
+  let publisher' = concatWith ';' [p | Just p <- pubfields]
   origpublisher' <- getField "origpublisher" <|> return mempty
 
 -- places
@@ -879,7 +904,7 @@ itemToReference lang bibtex = bib $ do
                     else getLiteralList' "origlocation")
                   <|> return mempty
   jurisdiction' <- if et == "patent"
-                   then ((intercalate "; " . map (resolveKey lang)) <$>
+                   then ((concatWith ';' . map (resolveKey lang)) <$>
                            getLiteralList "location") <|> return mempty
                    else return mempty
 
@@ -944,13 +969,15 @@ itemToReference lang bibtex = bib $ do
                else getField "addendum"
                  <|> return mempty
   pubstate' <- resolveKey lang `fmap`
-                 (  getRawField "pubstate"
+                 (  getField "pubstate"
                 <|> case issued' of
-                         (x:_) | other x == "forthcoming" -> return "forthcoming"
+                         (x:_) | other x == Formatted [Str "forthcoming"] ->
+                                     return (Formatted [Str "forthcoming"])
                          _ -> return mempty
                  )
 
-  let convertEnDash = map (\c -> if c == '–' then '-' else c)
+  let convertEnDash (Str s) = Str (map (\c -> if c == '–' then '-' else c) s)
+      convertEnDash x       = x
 
   return $ emptyReference
          { refId               = id'
@@ -984,10 +1011,12 @@ itemToReference lang bibtex = bib $ do
                                       concatWith ':' [ containerTitle'
                                                      , containerSubtitle']
                                     , containerTitleAddon' ]
-                                   ++ if isArticle && not (null seriesTitle')
-                                      then if null containerTitle'
+                                   `mappend`
+                                   if isArticle && seriesTitle' /= mempty
+                                      then if containerTitle' == mempty
                                               then seriesTitle'
-                                              else ", " ++ seriesTitle'
+                                              else (Formatted [Str ",",Space])
+                                                    `mappend` seriesTitle'
                                       else mempty
          , collectionTitle     = if isArticle then mempty else seriesTitle'
          , volumeTitle         = concatWith '.' [
@@ -1004,12 +1033,14 @@ itemToReference lang bibtex = bib $ do
          , jurisdiction        = jurisdiction'
          , event               = eventTitle'
          , eventPlace          = venue'
-         , page                = convertEnDash pages'
+         , page                = Formatted $
+                                 Walk.walk convertEnDash $ unFormatted pages'
          -- , pageFirst           = undefined -- :: String
          , numberOfPages       = pagetotal'
          , version             = version'
-         , volume              = intercalate "." $ filter (not . null)
-                                     [volume',part']
+         , volume              = Formatted $ intercalate [Str "."]
+                                 $ filter (not . null)
+                                 [unFormatted volume', unFormatted part']
          , numberOfVolumes     = volumes'
          , issue               = issue'
          , chapterNumber       = chapter'
@@ -1018,7 +1049,7 @@ itemToReference lang bibtex = bib $ do
          , edition             = edition'
          -- , section             = undefined -- :: String
          -- , source              = undefined -- :: String
-         , genre               = if null refgenre
+         , genre               = if refgenre == mempty
                                     then reftype'
                                     else refgenre
          , note                = concatWith '.' [note', addendum']

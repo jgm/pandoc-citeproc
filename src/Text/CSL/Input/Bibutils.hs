@@ -20,7 +20,6 @@ module Text.CSL.Input.Bibutils
 import Text.Pandoc.UTF8 ( fromStringLazy, fromString )
 import Data.Char
 import System.FilePath ( takeExtension )
-import Text.CSL.Pickle
 import Text.CSL.Reference
 import Text.CSL.Input.Bibtex
 import qualified Data.ByteString as B
@@ -114,7 +113,7 @@ readBiblioFile' fin bin
                        $ withTempDir "citeproc"
                        $ \tdir -> do
                             let tfile = tdir </> "bibutils-tmp"
-                            param <- bibl_initparams bin biblatex_out "hs-bibutils"
+                            param <- bibl_initparams bin bibtex_out "hs-bibutils"
                             bibl  <- bibl_init
                             unsetBOM        param
                             setCharsetIn    param bibl_charset_unicode
@@ -123,7 +122,7 @@ readBiblioFile' fin bin
                             _ <- bibl_write param bibl tfile
                             bibl_free bibl
                             bibl_freeparams param
-                            refs <- readBibtexInput False tfile
+                            refs <- readBibtexInput True tfile
                             return $! refs
   where handleBibfileError :: E.SomeException -> IO [Reference]
         handleBibfileError e = error $ "Error reading " ++ fin ++ "\n" ++ show e

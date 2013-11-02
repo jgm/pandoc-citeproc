@@ -50,9 +50,6 @@ instance ToJSON Formatted where
 instance IsString Formatted where
   fromString = Formatted . B.toList . B.text
 
-nonempty :: Formatted -> Bool
-nonempty (Formatted ils) = not (null ils)
-
 -- Eventually this can incorporate special CSL-specific features.
 readCSLString :: String -> Formatted
 readCSLString s = Formatted $
@@ -130,7 +127,7 @@ instance ToJSON Agent where
     , "family" .= familyName agent
     , "suffix" .= nameSuffix agent
     , "literal" .= literal agent
-    ] ++ ["comma-suffix" .= commaSuffix agent | nonempty (nameSuffix agent)]
+    ] ++ ["comma-suffix" .= commaSuffix agent | nameSuffix agent /= mempty]
 
 instance FromJSON [Agent] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
