@@ -98,12 +98,12 @@ isValueSet val
 data Empty = Empty deriving ( Typeable, Data )
 
 data Agent
-    = Agent { givenName       :: [Formatted]
-            , droppingPart    ::  Formatted
-            , nonDroppingPart ::  Formatted
-            , familyName      ::  Formatted
-            , nameSuffix      ::  Formatted
-            , literal         ::  Formatted
+    = Agent { givenName       :: [String]
+            , droppingPart    ::  String
+            , nonDroppingPart ::  String
+            , familyName      ::  String
+            , nameSuffix      ::  String
+            , literal         ::  String
             , commaSuffix     ::  Bool
             }
       deriving ( Show, Read, Eq, Typeable, Data )
@@ -111,11 +111,11 @@ data Agent
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
               (v .: "given" <|> ((:[]) <$> v .: "given") <|> pure []) <*>
-              v .:?  "dropping-particle" .!= mempty <*>
-              v .:? "non-dropping-particle" .!= mempty <*>
-              v .:? "family" .!= mempty <*>
-              v .:? "suffix" .!= mempty <*>
-              v .:? "literal" .!= mempty <*>
+              v .:?  "dropping-particle" .!= "" <*>
+              v .:? "non-dropping-particle" .!= "" <*>
+              v .:? "family" .!= "" <*>
+              v .:? "suffix" .!= "" <*>
+              v .:? "literal" .!= "" <*>
               v .:? "comma-suffix" .!= False
   parseJSON _ = fail "Could not parse Agent"
 

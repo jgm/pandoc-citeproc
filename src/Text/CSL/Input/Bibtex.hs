@@ -67,6 +67,9 @@ inlinesToFormatted ils = do
   lang <- gets localeLang
   return $ Formatted $ bottomUp (concatMap (adjustSpans lang)) ils
 
+inlinesToString :: [Inline] -> Bib String
+inlinesToString ils = (stringify . unFormatted) <$> inlinesToFormatted ils
+
 data Item = Item{ identifier :: String
                 , entryType  :: String
                 , fields     :: [(String, String)]
@@ -526,11 +529,11 @@ toAuthor _ [Str "others"] = return $
           , nonDroppingPart = mempty
           , familyName      = mempty
           , nameSuffix      = mempty
-          , literal         = Formatted [Str "others"]
+          , literal         = "others"
           , commaSuffix     = False
           }
 toAuthor _ [Span ("",[],[]) ils] = do
-  literal' <- inlinesToFormatted ils
+  literal' <- inlinesToString ils
   return $ -- corporate author
     Agent { givenName       = []
           , droppingPart    = mempty
@@ -567,17 +570,17 @@ toAuthor opts ils = do
   let (von, lastname) = case (reverse rvon, reverse rlast) of
                              (ws@(_:_),[]) -> (init ws, [last ws])
                              (ws, vs)      -> (ws, vs)
-  prefix <- inlinesToFormatted $ intercalate [Space] von
-  family <- inlinesToFormatted $ intercalate [Space] lastname
-  suffix <- inlinesToFormatted $ intercalate [Space] jr
-  givens <- mapM inlinesToFormatted first
+  prefix <- inlinesToString $ intercalate [Space] von
+  family <- inlinesToString $ intercalate [Space] lastname
+  suffix <- inlinesToString $ intercalate [Space] jr
+  givens <- mapM inlinesToString first
   return $
     Agent { givenName       = givens
-          , droppingPart    = if useprefix then mempty else prefix
-          , nonDroppingPart = if useprefix then prefix else mempty
+          , droppingPart    = if useprefix then "" else prefix
+          , nonDroppingPart = if useprefix then prefix else ""
           , familyName      = family
           , nameSuffix      = suffix
-          , literal         = mempty
+          , literal         = ""
           , commaSuffix     = usecomma
           }
 
