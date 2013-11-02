@@ -31,7 +31,8 @@ import Data.Char (toUpper, toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Util (parseString, trim, safeRead, readNum, (.#?))
 import Text.Pandoc (readHtml, def, Pandoc(..), Block(..), Inline(..),
-                    nullMeta, writeHtmlString, WriterOptions(..), Format(..), bottomUp)
+                    nullMeta, writeHtmlString, WriterOptions(..), ReaderOptions(..),
+                    Format(..), bottomUp)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.Builder as B
 import Data.String
@@ -53,7 +54,7 @@ instance IsString Formatted where
 -- Eventually this can incorporate special CSL-specific features.
 readCSLString :: String -> Formatted
 readCSLString s = Formatted $
-                  case readHtml def s of
+                  case readHtml def{ readerSmart = True } s of
                         Pandoc _ [Plain ils]   -> ils
                         Pandoc _ [Para  ils]   -> ils
                         Pandoc _ x             -> Walk.query (:[]) x
