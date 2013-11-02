@@ -349,9 +349,7 @@ data Formatting
       , stripPeriods   :: Bool
       , noCase         :: Bool
       , noDecor        :: Bool
-      } deriving ( Read, Eq, Ord, Typeable, Data )
-
-instance Show Formatting where show _ = "emptyFormatting"
+      } deriving ( Show, Read, Eq, Ord, Typeable, Data )
 
 rmTitleCase :: Formatting -> Formatting
 rmTitleCase f
@@ -362,7 +360,7 @@ data Quote
     = NativeQuote
     | ParsedQuote
     | NoQuote
-    deriving ( Read, Eq, Ord, Typeable, Data )
+    deriving ( Show, Read, Eq, Ord, Typeable, Data )
 
 emptyFormatting :: Formatting
 emptyFormatting
