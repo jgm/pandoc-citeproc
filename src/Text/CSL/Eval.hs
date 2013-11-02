@@ -23,6 +23,7 @@ module Text.CSL.Eval
 import Control.Arrow
 import Control.Applicative ( (<$>) )
 import Control.Monad.State
+import Data.Monoid (mappend, mconcat, mempty, (<>))
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
 import Text.Pandoc.Definition (Inline(Str, Space))
@@ -221,8 +222,11 @@ evalIfThen i ei e
 getFormattedValue :: [Option] -> Abbreviations -> Form -> Formatting -> String -> Value -> [Output]
 getFormattedValue o as f fm s val
     | Just v <- fromValue val :: Maybe String    = rtfParser fm . getAbbr $ value v
-    | Just v <- fromValue val :: Maybe Formatted = {- TODO getAbbr -}
-                [OPan $ walk value' $ unFormatted v]  {- TODO map Space to OSpace? -}
+    | Just v <- fromValue val :: Maybe Formatted =
+       if v == mempty
+          then []
+          else {- TODO getAbbr -}
+               [OPan $ walk value' $ unFormatted v]  {- TODO map Space to OSpace? -}
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe CNum      = if v == 0 then [] else [OCitNum (unCNum v) fm]
     | Just v <- fromValue val :: Maybe [RefDate] = formatDate (EvalSorting emptyCite) [] [] sortDate v
