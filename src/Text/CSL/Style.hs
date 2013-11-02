@@ -352,9 +352,7 @@ data Formatting
       } deriving ( Show, Read, Eq, Ord, Typeable, Data )
 
 rmTitleCase :: Formatting -> Formatting
-rmTitleCase f
-    | Formatting _ _ _ _ _ _ _ _ "title" _ _ _ _ _ <- f = f {textCase = []}
-    | otherwise                                         = f
+rmTitleCase f = f{ textCase = if textCase f == "title" then "" else textCase f  }
 
 data Quote
     = NativeQuote
