@@ -88,6 +88,7 @@ fromValue (Value a) = cast a
 isValueSet :: Value -> Bool
 isValueSet val
     | Just v <- fromValue val :: Maybe String    = v /= []
+    | Just v <- fromValue val :: Maybe Formatted = v /= mempty
     | Just v <- fromValue val :: Maybe [Agent]   = v /= []
     | Just v <- fromValue val :: Maybe [RefDate] = v /= []
     | Just v <- fromValue val :: Maybe Int       = v /= 0
