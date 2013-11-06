@@ -486,7 +486,11 @@ getOldDates prefix = do
   return (start':end')
 
 getRawField :: String -> Bib String
-getRawField f = (stringify . unFormatted) <$> getField f
+getRawField f = do
+  fs <- asks fields
+  case lookup f fs of
+       Just x  -> return x
+       Nothing -> notFound f
 
 getAuthorList :: Options -> String -> Bib [Agent]
 getAuthorList opts  f = do
