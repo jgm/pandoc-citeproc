@@ -246,17 +246,18 @@ library
     hs-source-dirs:   src
     exposed-modules:  Text.CSL.Pandoc
                       Text.CSL
+                      Text.CSL.Reference
+                      Text.CSL.Style
                       Text.CSL.Eval
                       Text.CSL.Eval.Common
                       Text.CSL.Eval.Date
                       Text.CSL.Eval.Names
                       Text.CSL.Eval.Output
                       Text.CSL.Pickle
+                      Text.CSL.Parser
                       Text.CSL.Proc
                       Text.CSL.Proc.Collapse
                       Text.CSL.Proc.Disamb
-                      Text.CSL.Reference
-                      Text.CSL.Style
                       Text.CSL.Input.Bibutils
                       Text.CSL.Input.Bibtex
                       Text.CSL.Output.Pandoc
@@ -328,11 +329,12 @@ executable biblio2yaml
 
 executable test-citeproc
   Main-Is:        test-citeproc.hs
+  Other-Modules:  JSON
+  Hs-Source-Dirs: tests
   if flag(test_citeproc)
     Buildable:    True
   else
     Buildable:    False
-  Hs-Source-Dirs: tests
   build-depends:  base >= 4, aeson-pretty, aeson, directory, text,
                   pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
@@ -343,8 +345,9 @@ executable test-citeproc
 test-suite test-pandoc-citeproc
   Type:           exitcode-stdio-1.0
   Main-Is:        test-pandoc-citeproc.hs
+  Other-Modules:  JSON
   Hs-Source-Dirs: tests
-  build-depends:  base >= 4, aeson-pretty, aeson, directory,
+  build-depends:  base >= 4, aeson-pretty, aeson, directory, text,
                   pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8

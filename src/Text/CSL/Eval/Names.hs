@@ -23,7 +23,7 @@ import Data.Maybe ( isJust )
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
-import Text.CSL.Util ( readNum, (<^>), (<+>), query )
+import Text.CSL.Util ( readNum, (<^>), (<+>), query, toRead )
 import Text.CSL.Reference
 import Text.CSL.Style
 import Text.Pandoc.Definition

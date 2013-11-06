@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
     ScopedTypeVariables #-}
+import JSON
 import System.Exit
 import qualified Control.Exception as E
 import Text.Pandoc

@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ScopedTypeVariables, PatternGuards #-}
 module Text.CSL.Util
   ( safeRead
   , readNum
@@ -24,6 +24,9 @@ module Text.CSL.Util
   , proc'
   , query
   , betterThan
+  , readable
+  , toShow
+  , toRead
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -205,3 +208,22 @@ query f = everything (++) ([] `mkQ` f)
 betterThan :: [a] -> [a] -> [a]
 betterThan [] b = b
 betterThan a  _ = a
+
+readable :: (Read a, Show b) => (String -> a, b -> String)
+readable =  (read . toRead, toShow . show)
+
+toShow :: String -> String
+toShow = foldr g [] . f
+    where g    x xs  = if isUpper x then '-' : toLower x : xs else x : xs
+          f (  x:xs) = toLower x : xs
+          f       [] = []
+
+toRead :: String -> String
+toRead    []  = []
+toRead (s:ss) = toUpper s : camel ss
+    where
+      camel x
+          | '-':y:ys <- x = toUpper y : camel ys
+          | '_':y:ys <- x = toUpper y : camel ys
+          |     y:ys <- x =         y : camel ys
+          | otherwise     = []

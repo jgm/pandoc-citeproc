@@ -23,7 +23,7 @@ module Text.CSL.Eval
 import Control.Arrow
 import Control.Applicative ( (<$>) )
 import Control.Monad.State
-import Data.Monoid (mappend, mconcat, mempty, (<>))
+import Data.Monoid (mempty)
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
 import Text.Pandoc.Definition (Inline(Str, Space))
