@@ -1,6 +1,6 @@
 {-# LANGUAGE PatternGuards, OverloadedStrings, FlexibleInstances,
     ScopedTypeVariables, CPP #-}
-module Text.CSL.Pandoc (processCites, processCites') where
+module Text.CSL.Pandoc (processCites, processCites', convertRefs) where
 
 import Text.Pandoc
 import Text.Pandoc.Walk
@@ -8,16 +8,20 @@ import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
 import Control.Applicative ((<|>))
-import qualified Data.Traversable as Traversable
 import Data.Aeson
 import Data.List
 import Data.Char ( isDigit, isPunctuation )
 import qualified Data.Map as M
-import Text.CSL hiding ( Cite(..), Citation(..))
+import Text.CSL.Reference hiding (processCites, Value)
+import Text.CSL.Input.Bibutils (readBiblioFile, convertRefs)
+import Text.CSL.Style hiding (Cite(..), Citation(..))
+import Text.CSL.Proc
+import Text.CSL.Output.Pandoc (renderPandoc, renderPandoc')
+import qualified Text.CSL.Style as CSL
+import Text.CSL.Parser
 import Text.CSL.Output.Pandoc ( headInline, tailFirstInlineStr, initInline,
                                 toCapital )
 import Text.CSL.Data (getDefaultCSL)
-import qualified Text.CSL as CSL ( Cite(..) )
 import Text.Parsec hiding (State, (<|>))
 import Control.Monad
 import Control.Monad.State
@@ -108,33 +112,6 @@ decodeEntities ('&':xs) =
                                        Nothing -> '&' : decodeEntities xs
            _      -> '&' : decodeEntities xs
 decodeEntities (x:xs) = x : decodeEntities xs
-
-convertRefs :: Maybe MetaValue -> Either String [Reference]
-convertRefs Nothing = Right []
-convertRefs (Just v) =
-  case metaValueToJSON blocksToMarkdown inlinesToMarkdown v >>= fromJSON of
-       Data.Aeson.Error s   -> Left s
-       Success x            -> Right x
-
-blocksToMarkdown :: (Functor m, Monad m) => [Block] -> m String
-blocksToMarkdown bs = return $ writeMarkdown def $ Pandoc nullMeta bs
-
-inlinesToMarkdown :: (Functor m, Monad m) => [Inline] -> m String
-inlinesToMarkdown ils = blocksToMarkdown [Plain ils]
-
-metaValueToJSON :: Monad m
-                => ([Block] -> m String)
-                -> ([Inline] -> m String)
-                -> MetaValue
-                -> m Value
-metaValueToJSON blockWriter inlineWriter (MetaMap metamap) = liftM toJSON $
-  Traversable.mapM (metaValueToJSON blockWriter inlineWriter) metamap
-metaValueToJSON blockWriter inlineWriter (MetaList xs) = liftM toJSON $
-  Traversable.mapM (metaValueToJSON blockWriter inlineWriter) xs
-metaValueToJSON _ _ (MetaBool b) = return $ toJSON b
-metaValueToJSON _ _ (MetaString s) = return $ toJSON s
-metaValueToJSON blockWriter _ (MetaBlocks bs) = liftM toJSON $ blockWriter bs
-metaValueToJSON _ inlineWriter (MetaInlines bs) = liftM toJSON $ inlineWriter bs
 
 -- | Substitute 'Cite' elements with formatted citations.
 processCite :: Style -> M.Map [Citation] FormattedOutput -> Inline -> Inline

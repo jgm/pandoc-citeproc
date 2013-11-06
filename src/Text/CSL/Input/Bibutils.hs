@@ -15,18 +15,19 @@ module Text.CSL.Input.Bibutils
     ( readBiblioFile
     , readBiblioString
     , BibFormat (..)
+    , convertRefs
     ) where
 
-import Text.Pandoc.UTF8 ( fromStringLazy, fromString )
+import Text.Pandoc.UTF8 ( fromStringLazy )
+import qualified Data.Traversable as Traversable
+import Control.Monad (liftM)
+import Text.Pandoc
 import Data.Char
 import System.FilePath ( takeExtension )
-import Text.CSL.Reference
+import Text.CSL.Reference hiding ( Value )
 import Text.CSL.Input.Bibtex
-import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Data.Aeson
-import qualified Data.Map as M
-import qualified Data.Yaml as Yaml
 
 #ifdef USE_BIBUTILS
 import qualified Control.Exception as E
@@ -47,9 +48,7 @@ readBiblioFile :: FilePath -> IO [Reference]
 readBiblioFile f
     = case getExt f of
         ".json"     -> BL.readFile f >>= either error return . eitherDecode
-        ".yaml"     -> BL.readFile f >>=
-         (either error return . Yaml.decodeEither .  B.concat . BL.toChunks) >>=
-         (maybe (return []) return . M.lookup "references")
+        ".yaml"     -> readFile f >>= either error return . readYamlBib
         ".bib"      -> readBibtexInput False f
         ".bibtex"   -> readBibtexInput True f
         ".biblatex" -> readBibtexInput False f
@@ -84,8 +83,7 @@ data BibFormat
 readBiblioString :: BibFormat -> String -> IO [Reference]
 readBiblioString b s
     | Json      <- b = either error return $ eitherDecode $ fromStringLazy s
-    | Yaml      <- b = (maybe [] id . M.lookup "references") `fmap`
-                       (either error return $ Yaml.decodeEither $ fromString s)
+    | Yaml      <- b = either error return $ readYamlBib s
     | Bibtex    <- b = readBibtexInputString True s
     | BibLatex  <- b = readBibtexInputString False s
 #ifdef USE_BIBUTILS
@@ -145,3 +143,34 @@ createTempDir num baseName = do
 
 getExt :: String -> String
 getExt = takeExtension . map toLower
+
+readYamlBib :: String -> Either String [Reference]
+readYamlBib s = convertRefs $ lookupMeta "references" meta
+  where  Pandoc meta _ = readMarkdown def{readerStandalone = True} s
+
+convertRefs :: Maybe MetaValue -> Either String [Reference]
+convertRefs Nothing = Right []
+convertRefs (Just v) =
+  case metaValueToJSON blocksToMarkdown inlinesToMarkdown v >>= fromJSON of
+       Data.Aeson.Error s   -> Left s
+       Success x            -> Right x
+
+blocksToMarkdown :: (Functor m, Monad m) => [Block] -> m String
+blocksToMarkdown bs = return $ writeMarkdown def $ Pandoc nullMeta bs
+
+inlinesToMarkdown :: (Functor m, Monad m) => [Inline] -> m String
+inlinesToMarkdown ils = blocksToMarkdown [Plain ils]
+
+metaValueToJSON :: Monad m
+                => ([Block] -> m String)
+                -> ([Inline] -> m String)
+                -> MetaValue
+                -> m Value
+metaValueToJSON blockWriter inlineWriter (MetaMap metamap) = liftM toJSON $
+  Traversable.mapM (metaValueToJSON blockWriter inlineWriter) metamap
+metaValueToJSON blockWriter inlineWriter (MetaList xs) = liftM toJSON $
+  Traversable.mapM (metaValueToJSON blockWriter inlineWriter) xs
+metaValueToJSON _ _ (MetaBool b) = return $ toJSON b
+metaValueToJSON _ _ (MetaString s) = return $ toJSON s
+metaValueToJSON blockWriter _ (MetaBlocks bs) = liftM toJSON $ blockWriter bs
+metaValueToJSON _ inlineWriter (MetaInlines bs) = liftM toJSON $ inlineWriter bs

@@ -31,8 +31,8 @@ import Data.Char (toUpper, toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Util (parseString, trim, safeRead, readNum, (.#?))
 import Text.Pandoc (readHtml, def, Pandoc(..), Block(..), Inline(..),
-                    nullMeta, writeHtmlString, WriterOptions(..), ReaderOptions(..),
-                    Format(..), bottomUp)
+                    nullMeta, writeMarkdown, WriterOptions(..),
+                    ReaderOptions(..), Format(..), bottomUp)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.Builder as B
 import Data.String
@@ -51,7 +51,12 @@ instance ToJSON Formatted where
 instance IsString Formatted where
   fromString = Formatted . B.toList . B.text
 
--- Eventually this can incorporate special CSL-specific features.
+-- Note:  FromJSON reads HTML, ToJSON writes Markdown.
+-- This means that they aren't proper inverses of each other, which
+-- is odd, but it makes sense given the uses here.  FromJSON is used
+-- for reading JSON citeproc bibliographies.  ToJSON is used to create
+-- pandoc metadata bibliographies.
+
 readCSLString :: String -> Formatted
 readCSLString s = Formatted $
                   case readHtml def{ readerSmart = True } s of
@@ -59,23 +64,17 @@ readCSLString s = Formatted $
                         Pandoc _ [Para  ils]   -> ils
                         Pandoc _ x             -> Walk.query (:[]) x
 
--- Eventually this can incorporate special CSL-specific features.
 writeCSLString :: Formatted -> String
 writeCSLString (Formatted ils) =
-  trim $ writeHtmlString def{writerWrapText = False}
+  trim $ writeMarkdown def{writerWrapText = False}
        $ Pandoc nullMeta [Plain $ bottomUp (concatMap adjustCSL) ils]
 
 adjustCSL :: Inline -> [Inline]
 adjustCSL (Span ("",[],[]) xs) = xs
 adjustCSL (Span ("",["citeproc-no-output"],[]) _) =
   [Str "[CSL STYLE ERROR: reference with no printed form.]"]
-adjustCSL (Emph xs) =
-  RawInline (Format "html") "<i>" : xs ++ [RawInline (Format "html") "</i>"]
-adjustCSL (Strong xs) =
-  RawInline (Format "html") "<b>" : xs ++ [RawInline (Format "html") "</b>"]
 adjustCSL (SmallCaps xs) =
   RawInline (Format "html") "<span style=\"font-variant:small-caps;\">" : xs ++ [RawInline (Format "html") "</span>"]
-adjustCSL (Str "&") = [RawInline (Format "html") "&#38;"]
 adjustCSL x = [x]
 
 -- | An existential type to wrap the different types a 'Reference' is
