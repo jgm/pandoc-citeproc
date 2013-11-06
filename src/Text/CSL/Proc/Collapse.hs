@@ -187,21 +187,21 @@ collapseYearSufRanged = process
                              else map (\y -> if y == 0 then ONull else flip OStr f . return . chr $ y) x
 
 addCiteAffixes :: Cite -> Output -> Output
-addCiteAffixes = format
-    where
-      format c x = if isNumStyle [x]
-                   then x
-                   else flip Output emptyFormatting $
-                             addCiteAff citePrefix True  c ++ [x] ++
-                             addCiteAff citeSuffix False c
-      addCiteAff g x c =
-          case g c of
+addCiteAffixes c x =
+  if isNumStyle [x]
+      then x
+      else flip Output emptyFormatting $
+            addCiteAff True (citePrefix c) ++ [x] ++
+            addCiteAff False (citeSuffix c)
+  where
+      addCiteAff isprefix y =
+          case y of
             PlainText  []    -> []
-            PlainText  p | x -> [Output (rtfParser emptyFormatting p) emptyFormatting, OSpace]
-            PlainText  p     -> [Output (rtfParser emptyFormatting p) emptyFormatting]
+            PlainText  p     -> Output (rtfParser emptyFormatting p)
+                                  emptyFormatting :
+                                  if isprefix then [OSpace] else []
             PandocText []    -> []
-            PandocText p | x -> [OPan p, OSpace]
-            PandocText p     -> [OPan p]
+            PandocText p     -> OPan p : if isprefix then [OSpace] else []
 
 isNumStyle :: [Output] -> Bool
 isNumStyle = null . query authorOrDate . proc rmLocator
