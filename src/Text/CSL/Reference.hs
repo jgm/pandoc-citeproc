@@ -74,7 +74,14 @@ adjustCSL (Span ("",[],[]) xs) = xs
 adjustCSL (Span ("",["citeproc-no-output"],[]) _) =
   [Str "[CSL STYLE ERROR: reference with no printed form.]"]
 adjustCSL (SmallCaps xs) =
-  RawInline (Format "html") "<span style=\"font-variant:small-caps;\">" : xs ++ [RawInline (Format "html") "</span>"]
+  RawInline (Format "html") "<span style=\"font-variant:small-caps;\">" : xs
+    ++ [RawInline (Format "html") "</span>"]
+adjustCSL (Subscript xs) =
+  RawInline (Format "html") "<span style=\"vertical-align:sub;\">" : xs
+    ++ [RawInline (Format "html") "</span>"]
+adjustCSL (Superscript xs) =
+  RawInline (Format "html") "<span style=\"vertical-align:sup;\">" : xs
+    ++ [RawInline (Format "html") "</span>"]
 adjustCSL x = [x]
 
 -- | An existential type to wrap the different types a 'Reference' is
