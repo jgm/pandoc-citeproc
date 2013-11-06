@@ -693,8 +693,7 @@ concatWith sep = Formatted . foldl go mempty . map unFormatted
                            (Str x:_)
                              | not (null x) && last x `elem` "!?.,:;"
                                           -> accum ++ (Space : s)
-                             | otherwise  -> accum ++ (Str [sep] : Space : s)
-                           xs    -> accum ++ xs
+                           _     -> accum ++ (Str [sep] : Space : s)
 
 type Options = [(String, String)]
 
