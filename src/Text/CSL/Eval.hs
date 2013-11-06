@@ -105,7 +105,7 @@ evalElement :: Element -> State EvalState [Output]
 evalElement el
     | Choose i ei e         <- el = evalIfThen i ei e
     | Macro    s   fm       <- el = return . appendOutput fm =<< evalElements =<< getMacro s
-    | Const    s   fm       <- el = return $ rtfParser fm s
+    | Const    s   fm       <- el = return $ oStr' s fm
     | Number   s f fm       <- el = formatNumber f fm s =<< getStringVar s
     | Variable s f fm d     <- el = return . addDelim d =<< concatMapM (getVariable f fm) s
     | Group        fm d l   <- el = when' ((/=) [] <$> tryGroup l) $
@@ -223,7 +223,7 @@ evalIfThen i ei e
 
 getFormattedValue :: [Option] -> Abbreviations -> Form -> Formatting -> String -> Value -> [Output]
 getFormattedValue o as f fm s val
-    | Just v <- fromValue val :: Maybe String    = rtfParser fm . getAbbr $ value v
+    | Just v <- fromValue val :: Maybe String    = (:[]) . flip OStr fm . getAbbr $ value v
     | Just v <- fromValue val :: Maybe Formatted =
        if v == mempty
           then []
@@ -252,7 +252,7 @@ formatTitle :: String -> Form -> Formatting -> State EvalState [Output]
 formatTitle s f fm
     | Short <- f
     , isTitleVar      s = try (getIt $ s ++ "-short") $ getIt s
-    | isTitleShortVar s = try (getIt s) $ return . rtfParser fm =<< getTitleShort s
+    | isTitleShortVar s = try (getIt s) $ return . (:[]) . flip OStr fm =<< getTitleShort s
     | otherwise         = getIt s
     where
       try g h = g >>= \r -> if r == [] then h else return r

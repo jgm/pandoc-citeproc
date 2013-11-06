@@ -23,8 +23,6 @@ import Text.CSL.Util (capitalize, titlecase, unTitlecase)
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc.XML (fromEntities)
-import Text.ParserCombinators.Parsec hiding ( State (..) )
-import Control.Applicative ((<*))
 import Data.List.Split (wordsBy)
 import Data.List (intersperse)
 
@@ -83,68 +81,12 @@ oStr s = oStr' s emptyFormatting
 
 oStr' :: String -> Formatting -> [Output]
 oStr' [] _ = []
-oStr' s  f = rtfParser f s
+oStr' s  f = [OStr s f]
 
 (<++>) :: [Output] -> [Output] -> [Output]
 [] <++> o  = o
 o  <++> [] = o
 o1 <++> o2 = o1 ++ [OSpace] ++ o2
-
-rtfTags :: [(String, (String,Formatting))]
-rtfTags =
-    [("b"                      , ("b"   , ef {fontWeight    = "bold"      }))
-    ,("i"                      , ("i"   , ef {fontStyle     = "italic"    }))
-    ,("sc"                     , ("sc"  , ef {fontVariant   = "small-caps"}))
-    ,("sup"                    , ("sup" , ef {verticalAlign = "sup"       }))
-    ,("sub"                    , ("sub" , ef {verticalAlign = "sub"       }))
-    ,("span class=\"nocase\""  , ("span", ef {noCase        = True        }))
-    ,("span class=\"nodecor\"" , ("span", ef {noDecor       = True        }))
-    ,("span style=\"font-variant:small-caps;\""
-                               , ("span", ef {fontVariant   = "small-caps"}))
-    ,("span style=\"font-variant:normal;\""
-                               , ("span", ef {fontVariant   = "normal"}))
-    ]
-    where
-      ef = emptyFormatting
-
-rtfParser :: Formatting -> String -> [Output]
-rtfParser _ [] = []
-rtfParser fm s
-    = either (const [OStr s fm]) (return . flip Output fm) $
-      parse (manyTill parser eof) "" s
-    where
-      parser = parseText <|> parseQuotes <|> parseMarkup
-
-      parseText = do
-        let amper = try $ char '&' <* notFollowedBy (char '#')
-            apos  = char '\''
-            regChar = noneOf "<'\"`“‘&"
-        many1 (regChar <|> amper <|> apos) >>= \x ->
-                        return (OStr x emptyFormatting)
-
-      parseMarkup = do
-        m   <- char '<' >> manyTill anyChar (char '>')
-        case lookup m rtfTags of
-             Just tf -> do let ct = try $ string $ "</" ++ fst tf ++ ">"
-                           contents <- manyTill parser ct
-                           return (Output contents (snd tf))
-             Nothing -> do return (OStr ("<" ++ m ++ ">") emptyFormatting)
-
-      parseQuotes = choice [parseQ "'" "'"
-                           ,parseQ "\"" "\""
-                           ,parseQ "``" "''"
-                           ,parseQ "`" "'"
-                           ,parseQ "“" "”"
-                           ,parseQ "‘" "’"
-                           ,parseQ "&#39;" "&#39;"
-                           ,parseQ "&#34;" "&#34;"
-                           ,parseQ "&quot;" "&quot;"
-                           ,parseQ "&apos;" "&apos;"
-                           ]
-      parseQ a b = try $ do
-        _ <- string a
-        contents <- manyTill parser (try $ string b >> notFollowedBy letter)
-        return (Output contents (emptyFormatting {quotes = ParsedQuote}))
 
 formatOutputList :: [Output] -> FormattedOutput
 formatOutputList = concatMap formatOutput
