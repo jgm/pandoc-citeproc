@@ -197,9 +197,8 @@ addCiteAffixes c x =
       addCiteAff isprefix y =
           case y of
             PlainText  []    -> []
-            PlainText  p     -> Output (oStr' p emptyFormatting)
-                                  emptyFormatting :
-                                  if isprefix then [OSpace] else []
+            PlainText  p     -> OStr p emptyFormatting
+                                : if isprefix then [OSpace] else []
             PandocText []    -> []
             PandocText p     -> OPan p : if isprefix then [OSpace] else []
 
