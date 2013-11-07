@@ -18,6 +18,8 @@ import qualified Data.ByteString.Char8 as B
 import qualified Text.Pandoc.UTF8 as UTF8
 import Text.Pandoc.Process (pipeProcess)
 import qualified Data.Yaml as Yaml (decode)
+import Text.Pandoc (writeNative, readNative, def)
+import Text.CSL.Pandoc (processCites')
 
 main = do
   citeprocTests <- mapM testCase ["chicago-author-date", "ieee", "mhra"]
@@ -49,37 +51,18 @@ data TestResult =
 testCase :: String -> IO TestResult
 testCase csl = do
   hPutStr stderr $ "[" ++ csl ++ ".in.json] "
-  indata <- BL.readFile $ "tests/" ++ csl ++ ".in.json"
-  expected <- BL.readFile $ "tests/" ++ csl ++ ".expected.json"
-  (ec, result, errout) <- pipeProcess
-                     (Just [("LANG","en_US.UTF-8"),("HOME",".")])
-                     "dist/build/pandoc-citeproc/pandoc-citeproc"
-                     [] indata
-  if ec == ExitSuccess
-     then do
-       let resultDoc :: Maybe Pandoc
-           resultDoc = Aeson.decode result
-       let expectedDoc :: Maybe Pandoc
-           expectedDoc = Aeson.decode expected
-       let result' = maybe BL.empty
-                     ( encodePretty' Config{ confIndent = 2
-                                           , confCompare = compare } )
-                     resultDoc
-       let expected' = maybe BL.empty
-                       ( encodePretty' Config{ confIndent = 2
-                                             , confCompare = compare } )
-                       expectedDoc
-       if result' == expected'
-          then err "PASSED" >> return Passed
-          else do
-            err $ "FAILED"
-            showDiff expected' result'
-            return Failed
+  indataNative <- readFile $ "tests/" ++ csl ++ ".in.native"
+  expectedNative <- readFile $ "tests/" ++ csl ++ ".expected.native"
+  let inDoc = read indataNative
+  outDoc <- processCites' inDoc
+  let expectedDoc = read expectedNative
+  if outDoc == expectedDoc
+     then err "PASSED" >> return Passed
      else do
-       err "ERROR"
-       err $ "Error status " ++ show ec
-       err $ UTF8.toStringLazy errout
-       return Errored
+        err $ "FAILED"
+        showDiff (UTF8.fromStringLazy $ writeNative def expectedDoc)
+                 (UTF8.fromStringLazy $ writeNative def outDoc)
+        return Failed
 
 showDiff :: BL.ByteString -> BL.ByteString -> IO ()
 showDiff expected' result' =

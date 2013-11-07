@@ -77,12 +77,12 @@ data-files:         chicago-author-date.csl
                     locales/locales-zh-CN.xml
                     locales/locales-zh-TW.xml
                     -- tests
-                    tests/chicago-author-date.in.json
-                    tests/chicago-author-date.expected.json
-                    tests/ieee.in.json
-                    tests/ieee.expected.json
-                    tests/mhra.in.json
-                    tests/mhra.expected.json
+                    tests/chicago-author-date.in.native
+                    tests/chicago-author-date.expected.native
+                    tests/ieee.in.native
+                    tests/ieee.expected.native
+                    tests/mhra.in.native
+                    tests/mhra.expected.native
                     tests/biblio.bib
                     tests/chicago-author-date.csl
                     tests/ieee.csl
