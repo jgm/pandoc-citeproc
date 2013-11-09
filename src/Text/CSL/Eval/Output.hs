@@ -22,9 +22,8 @@ import Data.Char (toLower, toUpper)
 import Text.CSL.Util (capitalize, titlecase, unTitlecase)
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk (walk)
+import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.XML (fromEntities)
-import Data.List.Split (wordsBy)
-import Data.List (intersperse)
 
 output :: Formatting -> String -> [Output]
 output fm s
@@ -123,6 +122,7 @@ formatOutput o =
       OName  _ os _    f  -> formatOutput (Output os f)
       OContrib _ _ os _ _ -> format os
       OLoc     os      f  -> formatOutput (Output os f)
+      Output   []      _  -> []
       Output   os      f  -> addFormatting f $ format os
                            -- case formattingToAttr f of
                            --          ("",[],[]) -> format os
@@ -188,16 +188,14 @@ addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
                               [Span ("",[],[("csl-baseline","true")]) ils]
           | otherwise                     = ils
 
-
 toStr :: String -> [Inline]
-toStr = intersperse Space . map Str . wordsBy (==' ') . tweak . fromEntities
+toStr = B.toList . B.text . tweak . fromEntities
     where
-      tweak s
-          |'«':' ':xs <- s = "«\8239" ++ tweak xs
-          |' ':'»':xs <- s = "\8239»" ++ tweak xs
-          |' ':';':xs <- s = "\8239;" ++ tweak xs
-          |' ':':':xs <- s = "\8239:" ++ tweak xs
-          |' ':'!':xs <- s = "\8239!" ++ tweak xs
-          |' ':'?':xs <- s = "\8239?" ++ tweak xs
-          | x :xs     <- s = x : tweak xs
-          | otherwise  = []
+      tweak ('«':' ':xs) = "«\8239" ++ tweak xs
+      tweak (' ':'»':xs) = "\8239»" ++ tweak xs
+      tweak (' ':';':xs) = "\8239;" ++ tweak xs
+      tweak (' ':':':xs) = "\8239:" ++ tweak xs
+      tweak (' ':'!':xs) = "\8239!" ++ tweak xs
+      tweak (' ':'?':xs) = "\8239?" ++ tweak xs
+      tweak ( x :xs    ) = x : tweak xs
+      tweak []           = []
