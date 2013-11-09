@@ -90,12 +90,6 @@ data TestResult =
 testDir :: FilePath
 testDir = "citeproc-test" </> "processor-tests" </> "machines"
 
-escapeHtml :: String -> String
-escapeHtml [] = []
-escapeHtml ('&':xs) = "&#38;" ++ escapeHtml xs
-escapeHtml ('<':xs) = "&#60;" ++ escapeHtml xs
-escapeHtml (x:xs)   = x : escapeHtml xs
-
 handleError :: FilePath -> E.SomeException -> IO TestResult
 handleError path e = do
   putStrLn $ "[ERROR] " ++ path ++ "\n" ++ show e
@@ -113,7 +107,7 @@ runTest path = E.handle (handleError path) $ do
   let cites'   = if null cites
                     then [map (\ref -> emptyCite{ citeId = refId ref}) refs]
                     else cites
-  let expected = fixBegins $ trimEnd $ testResult testCase
+  let expected = adjustEntities $ fixBegins $ trimEnd $ testResult testCase
   let mode     = testMode testCase
   let assemble BibliographyMode xs =
          "<div class=\"csl-bib-body\">\n" ++
@@ -151,6 +145,12 @@ inlinesToString ils =
   writeHtmlString def{ writerWrapText = False }
     $ bottomUp (concatMap adjustSpans)
     $ Pandoc nullMeta [Plain ils]
+
+-- We want &amp; instead of &#38; etc.
+adjustEntities :: String -> String
+adjustEntities ('&':'#':'3':'8':';':xs) = "&amp;" ++ adjustEntities xs
+adjustEntities (x:xs) = x : adjustEntities xs
+adjustEntities []     = []
 
 -- citeproc-js test suite expects "citations" to be formatted like
 -- .. [0] Smith (2007)
