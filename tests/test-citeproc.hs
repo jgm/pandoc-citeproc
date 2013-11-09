@@ -196,7 +196,7 @@ withDirectory fp action = do
 
 main :: IO ()
 main = do
-  args <- getArgs
+  args <- fmap (map (map toLower)) getArgs
   let matchesPattern x = if null args
                             then True
                             else let x' = map toLower x
