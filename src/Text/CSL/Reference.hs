@@ -29,7 +29,7 @@ import qualified Data.Text as T
 import qualified Data.Vector as V
 import Data.Char (toUpper, toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
-import Text.CSL.Util (parseString, trim, safeRead, readNum, (.#?))
+import Text.CSL.Util (parseString, trimr, safeRead, readNum, (.#?))
 import Text.Pandoc (readHtml, def, Pandoc(..), Block(..), Inline(..),
                     nullMeta, writeMarkdown, WriterOptions(..),
                     ReaderOptions(..), Format(..), bottomUp)
@@ -66,8 +66,8 @@ readCSLString s = Formatted $
 
 writeCSLString :: Formatted -> String
 writeCSLString (Formatted ils) =
-  trim $ writeMarkdown def{writerWrapText = False}
-       $ Pandoc nullMeta [Plain $ bottomUp (concatMap adjustCSL) ils]
+  trimr $ writeMarkdown def{writerWrapText = False}
+        $ Pandoc nullMeta [Plain $ bottomUp (concatMap adjustCSL) ils]
 
 adjustCSL :: Inline -> [Inline]
 adjustCSL (Span ("",[],[]) xs) = xs
