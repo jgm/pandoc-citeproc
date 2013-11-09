@@ -292,15 +292,15 @@ addAffixes f os
     | [ONull] <- os = []
     | otherwise     = pref ++ suff
     where
-      pref = if prefix f /= []
+      pref = if not (null (prefix f))
              then [OStr (prefix f) emptyFormatting] ++ os
              else os
-      suff = if suffix f /= [] &&
-             elem (head $ suffix f) ",.:?!" &&
-             [head $ suffix f] == lastOutput
-             then [OStr (tail $ suffix f) emptyFormatting]
-             else suff'
-      suff' = if suffix f /= [] then [OStr (suffix f) emptyFormatting] else []
+      suff = case reverse (suffix f) of
+                  (c:cs)
+                    | c `elem` ",.:?!"
+                    , [c] == lastOutput -> [OStr (reverse cs) emptyFormatting]
+                  [] -> []
+                  _  -> [OStr (suffix f) emptyFormatting]
       lastOutput = case renderPlain (formatOutputList os) of
                      [] -> ""
                      x  -> [last x]
