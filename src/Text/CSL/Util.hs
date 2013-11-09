@@ -10,6 +10,8 @@ module Text.CSL.Util
   , last'
   , words'
   , trim
+  , triml
+  , trimr
   , parseBool
   , parseString
   , mb
@@ -85,8 +87,12 @@ words' = wordsBy (\c -> c == ' ' || c == '\t' || c == '\r' || c == '\n')
 -- | Remove leading and trailing space (including newlines) from string.
 trim :: String -> String
 trim = triml . trimr
-  where triml = dropWhile (`elem` " \r\n\t")
-        trimr = reverse . triml . reverse
+
+triml :: String -> String
+triml = dropWhile (`elem` " \r\n\t")
+
+trimr :: String -> String
+trimr = reverse . triml . reverse
 
 -- | Parse JSON Boolean or Number as Bool.
 parseBool :: Value -> Parser Bool
