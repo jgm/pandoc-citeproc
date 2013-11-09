@@ -31,6 +31,9 @@ import Text.CSL.Style
 import Data.Aeson
 import Control.Applicative ((<|>))
 
+-- import Debug.Trace
+-- tr' x = Debug.Trace.trace (show x) x
+
 data ProcOpts
     = ProcOpts
       { bibOpts :: BibOpts
@@ -295,12 +298,12 @@ addAffixes f os
       pref = if not (null (prefix f))
              then [OStr (prefix f) emptyFormatting] ++ os
              else os
-      suff = case reverse (suffix f) of
+      suff = case suffix f of
                   (c:cs)
                     | c `elem` ",.:?!"
-                    , [c] == lastOutput -> [OStr (reverse cs) emptyFormatting]
+                    , [c] == lastOutput -> [OStr cs emptyFormatting]
                   [] -> []
-                  _  -> [OStr (suffix f) emptyFormatting]
+                  cs  -> [OStr cs emptyFormatting]
       lastOutput = case renderPlain (formatOutputList os) of
                      [] -> ""
                      x  -> [last x]
