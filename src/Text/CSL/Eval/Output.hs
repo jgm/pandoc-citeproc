@@ -130,7 +130,7 @@ formatOutput o =
       _                   -> []
     where
       format = concatMap formatOutput
-      add00  = reverse . take 5 . flip (++) (repeat '0') . reverse . show
+      add00  = show -- TODO why was this here??  reverse . take 5 . flip (++) (repeat '0') . reverse . show
 
 addFormatting :: Formatting -> FormattedOutput -> FormattedOutput
 addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
