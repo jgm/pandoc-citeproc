@@ -19,7 +19,7 @@ module Text.CSL.Style where
 import Data.Aeson hiding (Number)
 import Control.Arrow
 import Control.Applicative hiding (Const)
-import Data.List ( nubBy, isPrefixOf, isInfixOf )
+import Data.List ( nubBy, isPrefixOf, isInfixOf, intercalate )
 import Data.Generics ( Data, Typeable )
 import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
@@ -335,7 +335,31 @@ data Formatting
       , stripPeriods   :: Bool
       , noCase         :: Bool
       , noDecor        :: Bool
-      } deriving ( Show, Read, Eq, Ord, Typeable, Data )
+      } deriving ( Read, Eq, Ord, Typeable, Data )
+
+-- custom instance to make debugging output less busy
+instance Show Formatting where
+  show x
+    | x == emptyFormatting = "emptyFormatting"
+    | otherwise            = "emptyFormatting{"
+        ++ intercalate ", "
+           [ k ++ " = " ++ f x |
+             (k, f) <- [("prefix", show . prefix)
+                       ,("suffix", show . suffix)
+                       ,("fontFamily", show . fontFamily)
+                       ,("fontStyle", show . fontStyle)
+                       ,("fontVariant", show . fontVariant)
+                       ,("fontWeight", show . fontWeight)
+                       ,("textDecoration", show . textDecoration)
+                       ,("verticalAlign", show . verticalAlign)
+                       ,("textCase", show . textCase)
+                       ,("display", show . display)
+                       ,("quotes", show . quotes)
+                       ,("stripPeriods", show . stripPeriods)
+                       ,("noCase", show . noCase)
+                       ,("noDecor", show . noDecor)],
+             f x /= f emptyFormatting ]
+        ++ "}"
 
 rmTitleCase :: Formatting -> Formatting
 rmTitleCase f = f{ textCase = if textCase f == "title" then "" else textCase f  }
