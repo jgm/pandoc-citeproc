@@ -228,6 +228,8 @@ isEtAl b os p as
 -- 'Bool' indicate whether we are formatting the first name or not.
 formatName :: EvalMode -> Bool -> Form -> Formatting -> [Option] -> [NamePart] -> Agent -> [Output]
 formatName m b f fm ops np n
+    -- TODO awkward to use serialized string version of an Agent here;
+    -- why not make OName take an Agent instead of a String??
     | literal n /= [] = return $ OName (show n)  institution     []         fm
     | Short      <- f = return $ OName (show n)  shortName       disambdata fm
     | otherwise       = return $ OName (show n) (longName given) disambdata fm
