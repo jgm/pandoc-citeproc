@@ -100,11 +100,11 @@ renderFo fo
     | otherwise = []
     where
       addSuffix f i
-          | suffix f /= []
+          | not (null (suffix f))
           , elem (head $ suffix f) ".?!"
-          , lastInline i /= []
+          , not (null (lastInline i))
           , last (lastInline i)`elem` ".?!" = i ++ toStr (tail $ suffix f)
-          | suffix f /= []                  = i ++ toStr (       suffix f)
+          | null (suffix f)                 = i ++ toStr (       suffix f)
           | otherwise                       = i
 
       toPandoc f i = addSuffix f $ toStr (prefix f) ++
@@ -165,18 +165,17 @@ renderFo fo
       escape s x = Link x (s,s) -- we use a link to store some data
 
 toStr :: String -> [Inline]
-toStr = toStr' . fromEntities
+toStr = B.toList . B.text . tweak . fromEntities
     where
-      toStr' s
-          |'«':' ':xs <- s = toStr' ("«\8239" ++ xs)
-          |' ':'»':xs <- s = toStr' ("\8239»" ++ xs)
-          |' ':';':xs <- s = toStr' ("\8239;" ++ xs)
-          |' ':':':xs <- s = toStr' ("\8239:" ++ xs)
-          |' ':'!':xs <- s = toStr' ("\8239!" ++ xs)
-          |' ':'?':xs <- s = toStr' ("\8239?" ++ xs)
-          |' ':xs <- s = Space   : toStr' xs
-          | x :xs <- s = Str [x] : toStr' xs
-          | otherwise  = []
+      tweak s
+          |'«':' ':xs <- s = "«\8239" ++ tweak xs
+          |' ':'»':xs <- s = "\8239»" ++ tweak xs
+          |' ':';':xs <- s = "\8239;" ++ tweak xs
+          |' ':':':xs <- s = "\8239:" ++ tweak xs
+          |' ':'!':xs <- s = "\8239!" ++ tweak xs
+          |' ':'?':xs <- s = "\8239?" ++ tweak xs
+          | x :xs     <- s = x : tweak xs
+          | []        <- s = []
 
 cleanStrict :: [Inline] -> [Inline]
 cleanStrict []  = []
