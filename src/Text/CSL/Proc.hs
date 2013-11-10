@@ -30,9 +30,10 @@ import Text.CSL.Reference
 import Text.CSL.Style
 import Data.Aeson
 import Control.Applicative ((<|>))
+import Text.Pandoc.Definition (Inline(Space))
 
--- import Debug.Trace
--- tr' x = Debug.Trace.trace (show x) x
+import Debug.Trace
+tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
 
 data ProcOpts
     = ProcOpts
@@ -274,16 +275,18 @@ formatBiblioLayout  f d = appendOutput f . addDelim d
 
 formatCitLayout :: Style -> CitationGroup -> FormattedOutput
 formatCitLayout s (CG co f d cs)
-    | [a] <- co = formatAuth a ++ formatCits (fst >>> citeId &&& citeHash >>> setAsSupAu $ a) cs
+    | [a] <- co = formatAuth a ++ [Space] ++
+                  formatCits (fst >>> citeId &&& citeHash >>> setAsSupAu $ a) cs
     | otherwise = formatCits id cs
     where
       formatAuth   = formatOutput . localMod
       formatCits g = formatOutputList . appendOutput formatting . addAffixes f .
-                     addDelim d . map (fst &&& localMod >>> uncurry addCiteAffixes) . g
+                     addDelim d .
+                     map (fst &&& localMod >>> uncurry addCiteAffixes) . g
       formatting   = unsetAffixes f
-      localMod     = if cs /= []
-                     then uncurry $ localModifiers s (co /= [])
-                     else snd
+      localMod     = if null cs
+                     then snd
+                     else uncurry $ localModifiers s (not $ null co)
       setAsSupAu h = map $ \(c,o) -> if (citeId c, citeHash c) == h
                                      then flip (,) o c { authorInText   = False
                                                        , suppressAuthor = True }
