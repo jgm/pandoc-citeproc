@@ -186,5 +186,7 @@ whenElse b f g = b >>= \ bool -> if bool then f else g
 concatMapM :: (Monad m, Functor m, Eq b) => (a -> m [b]) -> [a] -> m [b]
 concatMapM f l = concat . filter (/=[]) <$> mapM f l
 
+{-
 trace ::  String -> State EvalState ()
 trace d = modify $ \s -> s { debug = d : debug s }
+-}

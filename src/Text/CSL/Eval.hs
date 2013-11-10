@@ -106,7 +106,12 @@ evalElement el
     | Choose i ei e         <- el = evalIfThen i ei e
     | Macro    s   fm       <- el = return . appendOutput fm =<< evalElements =<< getMacro s
     | Const    s   fm       <- el = return $ oStr' s fm
-    | Number   s f fm       <- el = formatNumber f fm s =<< getStringVar s
+                                    -- NOTE: this conditional seems needed for
+                                    -- locator_SimpleLocators.json:
+    | Number   s f fm       <- el = if s == "locator"
+                                       then getLocVar >>= formatRange fm . snd
+                                       else formatNumber f fm s =<<
+                                            getStringVar s
     | Variable s f fm d     <- el = return . addDelim d =<< concatMapM (getVariable f fm) s
     | Group        fm d l   <- el = when' ((/=) [] <$> tryGroup l) $
                                     return . outputList fm d =<< evalElements l
@@ -160,7 +165,7 @@ evalElement el
       getMacro         s = maybe [] id . lookup s <$> gets (macros . env)
       getVariable f fm s = if isTitleVar s || isTitleShortVar s
                            then consumeVariable s >> formatTitle s f fm else
-                           case (map toLower s) of
+                           case map toLower s of
                              "year-suffix" -> getStringVar "ref-id" >>= \k  ->
                                               return . return $ OYearSuf [] k [] fm
                              "page"        -> getStringVar "page" >>= formatRange fm
