@@ -18,7 +18,7 @@ import qualified Data.ByteString.Char8 as B
 import qualified Text.Pandoc.UTF8 as UTF8
 import Text.Pandoc.Process (pipeProcess)
 import qualified Data.Yaml as Yaml (decode)
-import Text.Pandoc (writeNative, readNative, def)
+import Text.Pandoc (writeNative, readNative, writeHtmlString, def)
 import Text.CSL.Pandoc (processCites')
 
 main = do
@@ -60,8 +60,8 @@ testCase csl = do
      then err "PASSED" >> return Passed
      else do
         err $ "FAILED"
-        showDiff (UTF8.fromStringLazy $ writeNative def expectedDoc)
-                 (UTF8.fromStringLazy $ writeNative def outDoc)
+        showDiff (UTF8.fromStringLazy $ writeHtmlString def expectedDoc)
+                 (UTF8.fromStringLazy $ writeHtmlString def outDoc)
         return Failed
 
 showDiff :: BL.ByteString -> BL.ByteString -> IO ()
