@@ -31,6 +31,7 @@ import Text.CSL.Style
 import Data.Aeson
 import Control.Applicative ((<|>))
 import Text.Pandoc.Definition (Inline(Space))
+import Text.Pandoc.Shared (stringify)
 
 import Debug.Trace
 tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
@@ -275,14 +276,20 @@ formatBiblioLayout  f d = appendOutput f . addDelim d
 
 formatCitLayout :: Style -> CitationGroup -> FormattedOutput
 formatCitLayout s (CG co f d cs)
-    | [a] <- co = formatAuth a ++ [Space] ++
-                  formatCits (fst >>> citeId &&& citeHash >>> setAsSupAu $ a) cs
-    | otherwise = formatCits id cs
+    | [a] <- co = combine (formatAuth a)
+                  (formatCits $
+                   (fst >>> citeId &&& citeHash >>> setAsSupAu $ a) $ cs)
+    | otherwise = formatCits cs
     where
+      combine x y  = case stringify y of
+                           (c:_) | c `elem` ", ;:" -> x ++ y
+                           ""                      -> x
+                           _ | null x              -> y
+                             | otherwise           -> x ++ (Space:y)
       formatAuth   = formatOutput . localMod
-      formatCits g = formatOutputList . appendOutput formatting . addAffixes f .
+      formatCits   = formatOutputList . appendOutput formatting . addAffixes f .
                      addDelim d .
-                     map (fst &&& localMod >>> uncurry addCiteAffixes) . g
+                     map (fst &&& localMod >>> uncurry addCiteAffixes)
       formatting   = unsetAffixes f
       localMod     = if null cs
                      then snd
