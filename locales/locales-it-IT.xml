@@ -124,6 +124,10 @@
       <single>pagina</single>
       <multiple>pagine</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>pagina</single>
+      <multiple>pagine</multiple>
+    </term>
     <term name="paragraph">
       <single>capoverso</single>
       <multiple>capoversi</multiple>
@@ -160,6 +164,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">op.</term>
     <term name="page" form="short">
+      <single>pag.</single>
+      <multiple>pagg.</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>pag.</single>
       <multiple>pagg.</multiple>
     </term>

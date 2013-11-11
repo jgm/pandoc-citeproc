@@ -130,6 +130,10 @@
       <single>страница</single>
       <multiple>страници</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>страница</single>
+      <multiple>страници</multiple>
+    </term>
     <term name="paragraph">
       <single>параграф</single>
       <multiple>параграфи</multiple>
@@ -166,6 +170,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">оп</term>
     <term name="page" form="short">
+      <single>с</single>
+      <multiple>с-ци</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>с</single>
       <multiple>с-ци</multiple>
     </term>

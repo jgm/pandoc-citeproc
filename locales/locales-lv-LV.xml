@@ -139,6 +139,10 @@
       <single>lappuse</single>
       <multiple>lappuses</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>lappuse</single>
+      <multiple>lappuses</multiple>
+    </term>
     <term name="paragraph">
       <single>rindkopa</single>
       <multiple>rindkopas</multiple>
@@ -175,6 +179,10 @@
     <term name="note" form="short">piez.</term>
     <term name="opus" form="short">op.</term>
     <term name="page" form="short">
+      <single>lpp.</single>
+      <multiple>lpp.</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>lpp.</single>
       <multiple>lpp.</multiple>
     </term>

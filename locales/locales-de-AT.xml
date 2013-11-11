@@ -124,6 +124,10 @@
       <single>Seite</single>
       <multiple>Seiten</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>Seite</single>
+      <multiple>Seiten</multiple>
+    </term>
     <term name="paragraph">
       <single>Absatz</single>
       <multiple>Absätze</multiple>
@@ -160,6 +164,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">op.</term>
     <term name="page" form="short">
+      <single>S.</single>
+      <multiple>S.</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>S.</single>
       <multiple>S.</multiple>
     </term>

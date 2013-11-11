@@ -124,6 +124,10 @@
       <single>lehekülg</single>
       <multiple>leheküljed</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>lehekülg</single>
+      <multiple>leheküljed</multiple>
+    </term>
     <term name="paragraph">
       <single>lõik</single>
       <multiple>lõigud</multiple>
@@ -160,6 +164,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">op</term>
     <term name="page" form="short">
+      <single>lk</single>
+      <multiple>lk</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>lk</single>
       <multiple>lk</multiple>
     </term>

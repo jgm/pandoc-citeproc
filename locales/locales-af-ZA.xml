@@ -130,6 +130,10 @@
       <single>bladsy</single>
       <multiple>bladsye</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>bladsy</single>
+      <multiple>bladsye</multiple>
+    </term>
     <term name="paragraph">
       <single>paragraaf</single>
       <multiple>paragrawe</multiple>
@@ -166,6 +170,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">op</term>
     <term name="page" form="short">
+      <single>bl</single>
+      <multiple>bll</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>bl</single>
       <multiple>bll</multiple>
     </term>

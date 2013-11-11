@@ -130,6 +130,10 @@
       <single>trang</single>
       <multiple>trang</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>trang</single>
+      <multiple>trang</multiple>
+    </term>
     <term name="paragraph">
       <single>đoạn văn</single>
       <multiple>đoạn văn</multiple>
@@ -166,6 +170,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">op</term>
     <term name="page" form="short">
+      <single>tr</single>
+      <multiple>tr</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>tr</single>
       <multiple>tr</multiple>
     </term>

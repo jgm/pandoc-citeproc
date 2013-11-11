@@ -130,6 +130,10 @@
       <single>페이지</single>
       <multiple>페이지</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>페이지</single>
+      <multiple>페이지</multiple>
+    </term>
     <term name="paragraph">
       <single>단락</single>
       <multiple>단락</multiple>
@@ -166,6 +170,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">op</term>
     <term name="page" form="short">
+      <single>p</single>
+      <multiple>pp</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>p</single>
       <multiple>pp</multiple>
     </term>

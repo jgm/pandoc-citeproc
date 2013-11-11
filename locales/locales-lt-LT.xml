@@ -131,6 +131,10 @@
       <single>puslapis</single>
       <multiple>puslapiai</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>puslapis</single>
+      <multiple>puslapiai</multiple>
+    </term>
     <term name="paragraph">
       <single>pastraipa</single>
       <multiple>pastraipos</multiple>
@@ -167,6 +171,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">op.</term>
     <term name="page" form="short">
+      <single>p.</single>
+      <multiple>p.</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>p.</single>
       <multiple>p.</multiple>
     </term>

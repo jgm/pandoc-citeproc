@@ -124,6 +124,10 @@
       <single>صفحة</single>
       <multiple>صفحات</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>صفحة</single>
+      <multiple>صفحات</multiple>
+    </term>
     <term name="paragraph">
       <single>فقرة</single>
       <multiple>فقرات</multiple>
@@ -160,6 +164,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">نوتة موسيقية</term>
     <term name="page" form="short">
+      <single>ص</single>
+      <multiple>ص.ص.</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>ص</single>
       <multiple>ص.ص.</multiple>
     </term>

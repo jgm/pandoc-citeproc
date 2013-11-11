@@ -22,17 +22,17 @@
     <term name="anonymous">anonim</term>
     <term name="anonymous" form="short">anon.</term>
     <term name="at">na</term>
-    <term name="available at">available at</term>
+    <term name="available at">dostępne na</term>
     <term name="by">przez</term>
-    <term name="circa">circa</term>
-    <term name="circa" form="short">ca</term>
+    <term name="circa">około</term>
+    <term name="circa" form="short">ok</term>
     <term name="cited">cytowane</term>
     <term name="edition">
       <single>wydanie</single>
       <multiple>wydania</multiple>
     </term>
     <term name="edition" form="short">wyd.</term>
-    <term name="et-al">et al.</term>
+    <term name="et-al">i in.</term>
     <term name="forthcoming">w przygotowaniu</term>
     <term name="from">z</term>
     <term name="ibid">ibid.</term>
@@ -54,8 +54,8 @@
       <multiple>ref.</multiple>
     </term>
     <term name="retrieved">pobrano</term>
-    <term name="scale">scale</term>
-    <term name="version">version</term>
+    <term name="scale">skala</term>
+    <term name="version">wersja</term>
 
     <!-- ANNO DOMINI; BEFORE CHRIST -->
     <term name="ad">n.e.</term>
@@ -124,6 +124,10 @@
       <single>strona</single>
       <multiple>strony</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>strona</single>
+      <multiple>strony</multiple>
+    </term>
     <term name="paragraph">
       <single>akapit</single>
       <multiple>akapity</multiple>
@@ -163,6 +167,10 @@
       <single>s.</single>
       <multiple>ss.</multiple>
     </term>
+    <term name="number-of-pages" form="short">
+      <single>s.</single>
+      <multiple>ss.</multiple>
+    </term>
     <term name="paragraph" form="short">akap.</term>
     <term name="part" form="short">cz.</term>
     <term name="section" form="short">sekc.</term>
@@ -191,8 +199,8 @@
 
     <!-- LONG ROLE FORMS -->
     <term name="director">
-      <single>director</single>
-      <multiple>directors</multiple>
+      <single>reżyser</single>
+      <multiple>reżyserzy</multiple>
     </term>
     <term name="editor">
       <single>redaktor</single>
@@ -203,8 +211,8 @@
       <multiple>edytorzy</multiple>
     </term>
     <term name="illustrator">
-      <single>illustrator</single>
-      <multiple>illustrators</multiple>
+      <single>ilustrator</single>
+      <multiple>ilustratorzy</multiple>
     </term>
     <term name="translator">
       <single>tłumacz</single>
@@ -217,8 +225,8 @@
 
     <!-- SHORT ROLE FORMS -->
     <term name="director" form="short">
-      <single>dir.</single>
-      <multiple>dirs.</multiple>
+      <single>dyr.</single>
+      <multiple>dyr.</multiple>
     </term>
     <term name="editor" form="short">
       <single>red.</single>
@@ -229,37 +237,37 @@
       <multiple>red.</multiple>
     </term>
     <term name="illustrator" form="short">
-      <single>ill.</single>
-      <multiple>ills.</multiple>
+      <single>il.</single>
+      <multiple>il.</multiple>
     </term>
     <term name="translator" form="short">
       <single>tłum.</single>
       <multiple>tłum.</multiple>
     </term>
     <term name="editortranslator" form="short">
-      <single>red. &amp; tłum.</single>
-      <multiple>red. &amp; tłum.</multiple>
+      <single>red.tłum.</single>
+      <multiple>red.tłum.</multiple>
     </term>
 
     <!-- VERB ROLE FORMS -->
     <term name="director" form="verb">directed by</term>
     <term name="editor" form="verb">zredagowane przez</term>
     <term name="editorial-director" form="verb">zredagowane przez</term>
-    <term name="illustrator" form="verb">illustrated by</term>
+    <term name="illustrator" form="verb">ilustrowane przez by</term>
     <term name="interviewer" form="verb">przeprowadzony przez</term>
     <term name="recipient" form="verb">dla</term>
-    <term name="reviewed-author" form="verb">by</term>
+    <term name="reviewed-author" form="verb">przez</term>
     <term name="translator" form="verb">przetłumaczone przez</term>
-    <term name="editortranslator" form="verb">zredagowane &amp; przetłumaczone przez</term>
+    <term name="editortranslator" form="verb">zredagowane i przetłumaczone przez</term>
 
     <!-- SHORT VERB ROLE FORMS -->
     <term name="container-author" form="verb-short">przez</term>
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">red.</term>
     <term name="editorial-director" form="verb-short">red.</term>
-    <term name="illustrator" form="verb-short">illus.</term>
+    <term name="illustrator" form="verb-short">il.</term>
     <term name="translator" form="verb-short">tłum.</term>
-    <term name="editortranslator" form="verb-short">red. &amp; tłum.</term>
+    <term name="editortranslator" form="verb-short">red.tłum.</term>
 
     <!-- LONG MONTH FORMS -->
     <term name="month-01">styczeń</term>

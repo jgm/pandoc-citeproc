@@ -124,6 +124,10 @@
       <single>หน้า</single>
       <multiple>หน้า</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>หน้า</single>
+      <multiple>หน้า</multiple>
+    </term>
     <term name="paragraph">
       <single>ย่อหน้า</single>
       <multiple>ย่อหน้า</multiple>
@@ -160,6 +164,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">บทประพันธ์</term>
     <term name="page" form="short">
+      <single>น.</single>
+      <multiple>น.</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>น.</single>
       <multiple>น.</multiple>
     </term>

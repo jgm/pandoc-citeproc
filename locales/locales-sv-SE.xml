@@ -128,6 +128,10 @@
       <single>sida</single>
       <multiple>sidor</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>sida</single>
+      <multiple>sidor</multiple>
+    </term>
     <term name="paragraph">
       <single>stycke</single>
       <multiple>stycken</multiple>
@@ -164,6 +168,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">op</term>
     <term name="page" form="short">
+      <single>s</single>
+      <multiple>ss</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>s</single>
       <multiple>ss</multiple>
     </term>

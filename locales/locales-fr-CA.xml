@@ -25,7 +25,7 @@
     <term name="anonymous">anonyme</term>
     <term name="anonymous" form="short">anon.</term>
     <term name="at">sur</term>
-    <term name="available at">disponible sur</term>
+    <term name="available at">disponible à</term>
     <term name="by">par</term>
     <term name="circa">vers</term>
     <term name="circa" form="short">v.</term>
@@ -129,6 +129,10 @@
       <single>page</single>
       <multiple>pages</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>page</single>
+      <multiple>pages</multiple>
+    </term>
     <term name="paragraph">
       <single>paragraphe</single>
       <multiple>paragraphes</multiple>
@@ -171,6 +175,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">op.</term>
     <term name="page" form="short">
+      <single>p.</single>
+      <multiple>p.</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>p.</single>
       <multiple>p.</multiple>
     </term>

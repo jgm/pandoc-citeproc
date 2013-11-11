@@ -130,6 +130,10 @@
       <single>stranica</single>
       <multiple>stranice</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>stranica</single>
+      <multiple>stranice</multiple>
+    </term>
     <term name="paragraph">
       <single>paragraf</single>
       <multiple>paragrafi</multiple>
@@ -166,6 +170,10 @@
     <term name="note" form="short">n</term>
     <term name="opus" form="short">op</term>
     <term name="page" form="short">
+      <single>str.</single>
+      <multiple>str.</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>str.</single>
       <multiple>str.</multiple>
     </term>

@@ -124,6 +124,10 @@
       <single>blaðsíða</single>
       <multiple>blaðsíður</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>blaðsíða</single>
+      <multiple>blaðsíður</multiple>
+    </term>
     <term name="paragraph">
       <single>málsgrein</single>
       <multiple>málsgreinar</multiple>
@@ -160,6 +164,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">tónv.</term>
     <term name="page" form="short">
+      <single>bls.</single>
+      <multiple>bls.</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>bls.</single>
       <multiple>bls.</multiple>
     </term>

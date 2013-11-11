@@ -130,6 +130,10 @@
       <single>صفحه</single>
       <multiple>صفحات</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>صفحه</single>
+      <multiple>صفحات</multiple>
+    </term>
     <term name="paragraph">
       <single>پاراگراف</single>
       <multiple>پاراگراف‌های</multiple>
@@ -166,6 +170,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">قطعه</term>
     <term name="page" form="short">
+      <single>ص</single>
+      <multiple>صص</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>ص</single>
       <multiple>صص</multiple>
     </term>

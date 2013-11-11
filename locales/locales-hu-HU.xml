@@ -130,6 +130,10 @@
       <single>oldal</single>
       <multiple>oldal</multiple>
     </term>
+    <term name="number-of-pages">
+      <single>oldal</single>
+      <multiple>oldal</multiple>
+    </term>
     <term name="paragraph">
       <single>bekezdés</single>
       <multiple>bekezdés</multiple>
@@ -166,6 +170,10 @@
     <term name="note" form="short">n.</term>
     <term name="opus" form="short">op</term>
     <term name="page" form="short">
+      <single>o</single>
+      <multiple>o</multiple>
+    </term>
+    <term name="number-of-pages" form="short">
       <single>o</single>
       <multiple>o</multiple>
     </term>
