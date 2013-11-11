@@ -400,7 +400,7 @@ instance FromJSON Reference where
        v .:? "original-date" .!= [] <*>
        v .:? "submitted" .!= [] <*>
        v .:? "title" .!= mempty <*>
-       v .:? "title-short" .!= mempty <*>
+       (v .: "shortTitle" <|> (v .:? "title-short" .!= mempty)) <*>
        v .:? "reviewed-title" .!= mempty <*>
        v .:? "container-title" .!= mempty <*>
        v .:? "volume-title" .!= mempty <*>
