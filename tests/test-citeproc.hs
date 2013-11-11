@@ -174,7 +174,6 @@ adjustSpans (Strong xs) =
   RawInline (Format "html") "<b>" : xs ++ [RawInline (Format "html") "</b>"]
 adjustSpans (SmallCaps xs) =
   RawInline (Format "html") "<span style=\"font-variant:small-caps;\">" : xs ++ [RawInline (Format "html") "</span>"]
-adjustSpans (Str "&") = [RawInline (Format "html") "&#38;"]
 adjustSpans x = [x]
 
 showDiff :: String -> String -> IO ()
