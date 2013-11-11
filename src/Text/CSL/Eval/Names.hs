@@ -236,7 +236,8 @@ formatName m b f fm ops np n
     where
       institution = [OStr (literal n) $ form "family"]
       when_ c o = if c /= [] then o else []
-      addAffixes s sf ns = [Output ((oStr' s (form sf) { prefix = [], suffix = [] }) ++ ns) $
+      addAffixes [] sf [] = []
+      addAffixes s sf ns  = [Output ((oStr' s (form sf) { prefix = [], suffix = [] }) ++ ns) $
                                    emptyFormatting { prefix = prefix (form sf)
                                                    , suffix = suffix (form sf)}]
 
@@ -253,12 +254,10 @@ formatName m b f fm ops np n
                      getOptionVal "initialize" ops /= "false"
                   then if not . and . map isLower $ x
                        then addIn x $ getOptionVal "initialize-with" ops
-                       else " " ++ case x of
-                                     _:'\'':[] -> x
-                                     _         -> x ++ " "
-                  else " " ++ if isJust (lookup "initialize-with" ops) && isInit x
-                              then addIn x $ getOptionVal "initialize-with" ops
-                              else x
+                       else x
+                  else if isJust (lookup "initialize-with" ops) && isInit x
+                          then addIn x $ getOptionVal "initialize-with" ops
+                          else x
       addIn x i = if hasHyphen x
                   then head (       takeWhile (/= '-') x) : hyphen ++
                        head (tail $ dropWhile (/= '-') x) : i
@@ -275,8 +274,11 @@ formatName m b f fm ops np n
       suffCom   = when_ (nameSuffix n) $ separator ++ [        OStr (nameSuffix n) fm]
       suffNoCom = when_ (nameSuffix n) $              [OSpace, OStr (nameSuffix n) fm]
 
-      given     = when_ (givenName  n) . unwords . words . concatMap initial $ givenName n
-      givenLong = when_ (givenName  n) . unwords' $ givenName n
+      onlyGiven = not (null $ givenName n) && null family
+      given     = if onlyGiven
+                     then givenLong
+                     else when_ (givenName  n) . unwords . map initial $ givenName n
+      givenLong = when_ (givenName  n) . unwords $ givenName n
       family    = familyName n
 
       shortName = oStr' (nonDroppingPart n <+> family) (form "family")
@@ -296,7 +298,7 @@ formatName m b f fm ops np n
                                addAffixes (droppingPart n <+> nonDroppingPart n <+> family) "family" suff
 
       disWithGiven = getOptionVal "disambiguate-add-givenname" ops == "true"
-      initialize   = isJust . lookup "initialize-with" $ ops
+      initialize   = isJust (lookup "initialize-with" ops) && not onlyGiven
       isLong       = f /= Short && initialize
       givenRule    = let gr = getOptionVal "givenname-disambiguation-rule" ops
                      in if null gr then "by-cite" else gr
@@ -313,13 +315,6 @@ formatName m b f fm ops np n
                          , "by-cite"      <- givenRule -> [longName given, longName givenLong]
                          | disWithGiven, isLong        -> [longName givenLong]
                          | otherwise                   -> []
-
-unwords' :: [String] -> String
-unwords' = unwords . words . foldr concatWord []
-    where
-      concatWord w ws = if w /= [] && last w == '.'
-                        then w ++     ws
-                        else w ++ ' ':ws
 
 formatLabel :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
 formatLabel f fm p s
