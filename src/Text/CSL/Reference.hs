@@ -59,7 +59,8 @@ instance IsString Formatted where
 
 readCSLString :: String -> Formatted
 readCSLString s = Formatted $
-                  case readHtml def{ readerSmart = True } s of
+                  case readHtml def{ readerSmart = True
+                                   , readerParseRaw = True } s of
                         Pandoc _ [Plain ils]   -> ils
                         Pandoc _ [Para  ils]   -> ils
                         Pandoc _ x             -> Walk.query (:[]) x
