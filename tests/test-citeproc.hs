@@ -199,7 +199,7 @@ main = do
   let matchesPattern x = if null args
                             then True
                             else let x' = map toLower x
-                                 in  any (`isInfixOf` x') args
+                                 in  any (`isInfixOf` x') (map takeBaseName args)
   exists <- doesDirectoryExist testDir
   unless exists $ do
     putStrLn "Downloading test suite"
