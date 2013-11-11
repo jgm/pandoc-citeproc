@@ -35,6 +35,7 @@ import Text.Pandoc (readHtml, def, Pandoc(..), Block(..), Inline(..),
                     ReaderOptions(..), Format(..), bottomUp)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.Builder as B
+import Data.List.Split (wordsBy)
 import Data.String
 
 -- We use a newtype wrapper so we can have custom ToJSON, FromJSON
@@ -134,7 +135,7 @@ data Agent
 
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
-              (v .: "given" <|> ((:[]) <$> v .: "given") <|> pure []) <*>
+              (v .: "given" <|> (wordsBy (==' ') <$> v .: "given") <|> pure []) <*>
               v .:?  "dropping-particle" .!= "" <*>
               v .:? "non-dropping-particle" .!= "" <*>
               v .:? "family" .!= "" <*>
