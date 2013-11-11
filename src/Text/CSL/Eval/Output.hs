@@ -24,6 +24,8 @@ import Text.Pandoc.Definition
 import Text.Pandoc.Walk (walk)
 import qualified Text.Pandoc.Builder as B
 import Text.Pandoc.XML (fromEntities)
+import Data.List.Split (splitWhen)
+import Data.List (intercalate)
 
 output :: Formatting -> String -> [Output]
 output fm s
@@ -99,9 +101,10 @@ formatOutput o =
       OPan     i          -> i
       ODel     []         -> []
       ODel     " "        -> [Space]
-      ODel     s          -> [Str s]
+      ODel     s          -> intercalate [Str "\n"]
+                             $ map (B.toList . B.text) $ splitWhen (=='\n') s
       OStr     []      _  -> []
-      OStr     s       f  -> addFormatting f [Str s]
+      OStr     s       f  -> addFormatting f $ B.toList $ B.text s
                              -- case formattingToAttr f of
                              --        ("",[],[]) -> [Str s]
                              --        attr       -> [Span attr [Str s]]
