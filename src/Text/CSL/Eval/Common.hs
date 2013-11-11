@@ -23,8 +23,11 @@ import Data.List ( elemIndex )
 import qualified Data.Map as M
 import Data.Maybe
 
+import Text.Pandoc.Shared ( stringify )
 import Text.CSL.Reference
 import Text.CSL.Style
+
+import Debug.Trace
 
 data EvalState
     = EvalState
@@ -120,9 +123,15 @@ getAgents' s
         _      -> return []
 
 getStringValue :: Value -> String
-getStringValue val
-    | Just v <- fromValue val = v
-    | otherwise               = []
+getStringValue val =
+  -- The second clause handles the case where we have a Formatted
+  -- but need a String.  This is currently needed for "page".  It's a bit
+  -- hackish; we should probably change the type in Reference for
+  -- page to String.
+  case fromValue val `mplus` ((stringify . unFormatted) `fmap` fromValue val) of
+       Just v   -> v
+       Nothing  -> Debug.Trace.trace ("Expecting string value, got " ++
+                       show val) []
 
 getOptionVal :: String -> [Option] -> String
 getOptionVal s = fromMaybe [] . lookup s
