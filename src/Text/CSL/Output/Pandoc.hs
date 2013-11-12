@@ -164,19 +164,6 @@ renderFo fo
       rmZeros = dropWhile (== '0')
       escape s x = Link x (s,s) -- we use a link to store some data
 
-toStr :: String -> [Inline]
-toStr = B.toList . B.text . tweak . fromEntities
-    where
-      tweak s
-          |'«':' ':xs <- s = "«\8239" ++ tweak xs
-          |' ':'»':xs <- s = "\8239»" ++ tweak xs
-          |' ':';':xs <- s = "\8239;" ++ tweak xs
-          |' ':':':xs <- s = "\8239:" ++ tweak xs
-          |' ':'!':xs <- s = "\8239!" ++ tweak xs
-          |' ':'?':xs <- s = "\8239?" ++ tweak xs
-          | x :xs     <- s = x : tweak xs
-          | []        <- s = []
-
 cleanStrict :: [Inline] -> [Inline]
 cleanStrict []  = []
 cleanStrict (i:is)

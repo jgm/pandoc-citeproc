@@ -22,10 +22,7 @@ import Data.Char (toLower, toUpper)
 import Text.CSL.Util (capitalize, titlecase, unTitlecase)
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk (walk)
-import qualified Text.Pandoc.Builder as B
-import Text.Pandoc.XML (fromEntities)
-import Data.List.Split (splitWhen)
-import Data.List (intercalate)
+import Text.CSL.Util (toStr)
 
 output :: Formatting -> String -> [Output]
 output fm s
@@ -184,16 +181,3 @@ addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
                               [Span ("",[],[("csl-baseline","true")]) ils]
           | otherwise                     = ils
 
-toStr :: String -> [Inline]
-toStr = intercalate [Str "\n"] .
-        map (B.toList . B.text . tweak . fromEntities) .
-        splitWhen (=='\n')
-    where
-      tweak ('«':' ':xs) = "«\8239" ++ tweak xs
-      tweak (' ':'»':xs) = "\8239»" ++ tweak xs
-      tweak (' ':';':xs) = "\8239;" ++ tweak xs
-      tweak (' ':':':xs) = "\8239:" ++ tweak xs
-      tweak (' ':'!':xs) = "\8239!" ++ tweak xs
-      tweak (' ':'?':xs) = "\8239?" ++ tweak xs
-      tweak ( x :xs    ) = x : tweak xs
-      tweak []           = []
