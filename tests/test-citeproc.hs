@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
     ScopedTypeVariables #-}
 import JSON
+import Text.Printf
 import System.Exit
 import qualified Control.Exception as E
 import Text.Pandoc
@@ -219,6 +220,14 @@ main = do
   putStrLn $ show numpasses ++ " passed; " ++ show numfailures ++
               " failed; " ++ show numskipped ++ " skipped; " ++
               show numerrors ++ " errored."
+  let summary = unlines $ zipWith (\fp res -> printf "%-10s %s" (show res) fp) testFiles results
+  when (null args) $ do -- write log if complete test suite run
+    ex <- doesFileExist "test-citeproc.log"
+    when ex $ do
+      putStrLn "Copying existing test-citeproc.log to test-citeproc.log.old"
+      copyFile "test-citeproc.log" "test-citeproc.log.old"
+    putStrLn "Writing test-citeproc.log."
+    writeFile "test-citeproc.log" summary
   exitWith $ if numfailures == 0
                 then ExitSuccess
                 else ExitFailure $ numfailures + numerrors
