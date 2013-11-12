@@ -16,9 +16,10 @@ import Text.Pandoc.Definition
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString.Char8 as B
 import qualified Text.Pandoc.UTF8 as UTF8
+import Text.Pandoc.Shared (normalize)
 import Text.Pandoc.Process (pipeProcess)
 import qualified Data.Yaml as Yaml (decode)
-import Text.Pandoc (writeNative, readNative, writeHtmlString, def)
+import Text.Pandoc (writeNative, writeHtmlString, readNative, def)
 import Text.CSL.Pandoc (processCites')
 
 main = do
@@ -60,8 +61,8 @@ testCase csl = do
      then err "PASSED" >> return Passed
      else do
         err $ "FAILED"
-        showDiff (UTF8.fromStringLazy $ writeHtmlString def expectedDoc)
-                 (UTF8.fromStringLazy $ writeHtmlString def outDoc)
+        showDiff (UTF8.fromStringLazy $ writeNative def $ normalize expectedDoc)
+                 (UTF8.fromStringLazy $ writeNative def $ normalize outDoc)
         return Failed
 
 showDiff :: BL.ByteString -> BL.ByteString -> IO ()
@@ -73,7 +74,7 @@ showDiff expected' result' =
     BL.writeFile actualf result'
     oldDir <- getCurrentDirectory
     setCurrentDirectory fp
-    rawSystem "diff" ["-u","expected","actual"]
+    rawSystem "diff" ["-U1","expected","actual"]
     setCurrentDirectory oldDir
 
 biblio2yamlTest :: String -> IO TestResult
