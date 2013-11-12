@@ -101,13 +101,9 @@ formatOutput o =
       OPan     i          -> i
       ODel     []         -> []
       ODel     " "        -> [Space]
-      ODel     s          -> intercalate [Str "\n"]
-                             $ map (B.toList . B.text) $ splitWhen (=='\n') s
+      ODel     s          -> toStr s
       OStr     []      _  -> []
-      OStr     s       f  -> addFormatting f $ B.toList $ B.text s
-                             -- case formattingToAttr f of
-                             --        ("",[],[]) -> [Str s]
-                             --        attr       -> [Span attr [Str s]]
+      OStr     s       f  -> addFormatting f $ toStr s
       OErr NoOutput       -> [Span ("",["citeproc-no-output"],[])
                                      [Strong [Str "???"]]]
       OErr (ReferenceNotFound r)
@@ -127,9 +123,6 @@ formatOutput o =
       OLoc     os      f  -> formatOutput (Output os f)
       Output   []      _  -> []
       Output   os      f  -> addFormatting f $ format os
-                           -- case formattingToAttr f of
-                           --          ("",[],[]) -> format os
-                             --        attr       -> [Span attr $ format os]
       _                   -> []
     where
       format = concatMap formatOutput
@@ -137,7 +130,7 @@ formatOutput o =
 
 addFormatting :: Formatting -> FormattedOutput -> FormattedOutput
 addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
-  where pref = case prefix f of { "" -> id; x -> (Str x :) }
+  where pref = case prefix f of { "" -> id; x -> ((toStr x) ++) }
         addSuffix i
           | case suffix f of {(c:_) | c `elem` ".?!" -> True; _ -> False}
           , case lastInline i of {(c:_) | c `elem` ".?!" -> True; _ -> False}
@@ -192,7 +185,9 @@ addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
           | otherwise                     = ils
 
 toStr :: String -> [Inline]
-toStr = B.toList . B.text . tweak . fromEntities
+toStr = intercalate [Str "\n"] .
+        map (B.toList . B.text . tweak . fromEntities) .
+        splitWhen (=='\n')
     where
       tweak ('«':' ':xs) = "«\8239" ++ tweak xs
       tweak (' ':'»':xs) = "\8239»" ++ tweak xs
