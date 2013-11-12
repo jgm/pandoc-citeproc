@@ -86,10 +86,7 @@ getStringVar
 getDateVar :: String -> State EvalState [RefDate]
 getDateVar
     = getVar [] getDateValue
-    where
-      getDateValue val
-          | Just v <- fromValue val = v
-          | otherwise               = []
+    where getDateValue = maybe [] id . fromValue
 
 getLocVar :: State EvalState (String,String)
 getLocVar = gets (env >>> cite >>> citeLabel &&& citeLocator)
@@ -140,9 +137,10 @@ isTitleVar         = flip elem ["title", "container-title", "collection-title"]
 isTitleShortVar    = flip elem ["title-short", "container-title-short"]
 
 getTitleShort :: String -> State EvalState String
-getTitleShort s = do v <- getStringVar (take (length s - 6) s)
-                     a <- gets (abbrevs . env)
-                     return $ getAbbreviation a (take (length s - 6) s) v
+getTitleShort s = do let s' = take (length s - 6) s  -- drop '-short'
+                     v <- getStringVar s'
+                     abbrs <- gets (abbrevs . env)
+                     return $ getAbbreviation abbrs s' v
 
 isVarSet :: String -> State EvalState Bool
 isVarSet s
