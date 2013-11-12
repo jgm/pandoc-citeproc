@@ -161,9 +161,10 @@ titlecase zs = evalState (caseTransform tc $ splitUpStr zs) True
   where tc (Str (x:xs))
           | isLower x && not (isShortWord (x:xs)) = Str (toUpper x : xs)
           where isShortWord  s = s `elem`
-                      ["a","an","and","as","at","but","by","down","for","from"
+                      ["a","an","and","as","at","but","by","d","de"
+                      ,"down","for","from"
                       ,"in","into","nor","of","on","onto","or","over","so"
-                      ,"the","till","to","up","via","with","yet"]
+                      ,"the","till","to","up","van","von","via","with","yet"]
         tc (Span ("",["nocase"],[]) xs) = Span ("",["nocase"],[]) xs
         tc x = x
 
