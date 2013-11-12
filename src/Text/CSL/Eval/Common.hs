@@ -69,13 +69,9 @@ isSorting m = case m of EvalSorting _ -> True; _ -> False
 -- abbreviation or return an empty string.
 getAbbreviation :: Abbreviations -> String -> String -> String
 getAbbreviation (Abbreviations as) s v
-    = case M.lookup "default" as of
-        Nothing -> []
-        Just x  -> case M.lookup (if s `elem` numericVars then "number" else s) x of
-                     Nothing -> []
-                     Just x' -> case M.lookup v x' of
-                                  Nothing  -> []
-                                  Just x'' -> x''
+    = maybe [] id $ M.lookup "default" as >>=
+                    M.lookup (if s `elem` numericVars then "number" else s) >>=
+                    M.lookup v
 
 -- | If the first parameter is 'True' the plural form will be retrieved.
 getTerm :: Bool -> Form -> String -> State EvalState String
