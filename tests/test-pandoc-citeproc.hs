@@ -55,14 +55,14 @@ testCase csl = do
   indataNative <- readFile $ "tests/" ++ csl ++ ".in.native"
   expectedNative <- readFile $ "tests/" ++ csl ++ ".expected.native"
   let inDoc = read indataNative
-  outDoc <- processCites' inDoc
-  let expectedDoc = read expectedNative
+  outDoc <- normalize `fmap` processCites' inDoc
+  let expectedDoc = normalize $ read expectedNative
   if outDoc == expectedDoc
      then err "PASSED" >> return Passed
      else do
         err $ "FAILED"
-        showDiff (UTF8.fromStringLazy $ writeNative def $ normalize expectedDoc)
-                 (UTF8.fromStringLazy $ writeNative def $ normalize outDoc)
+        showDiff (UTF8.fromStringLazy $ writeNative def expectedDoc)
+                 (UTF8.fromStringLazy $ writeNative def outDoc)
         return Failed
 
 showDiff :: BL.ByteString -> BL.ByteString -> IO ()
