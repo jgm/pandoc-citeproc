@@ -106,7 +106,7 @@ runTest path = E.handle (handleError path) $ do
   let refs     = testReferences testCase
   let cites    = map unCiteObject (testCitations testCase) ++ testCitationItems testCase
   let cites'   = if null cites
-                    then [map (\ref -> emptyCite{ citeId = refId ref}) refs]
+                    then [map (\ref -> emptyCite{ citeId = unLiteral $ refId ref}) refs]
                     else cites
   let expected = adjustEntities $ fixBegins $ trimEnd $ testResult testCase
   let mode     = testMode testCase

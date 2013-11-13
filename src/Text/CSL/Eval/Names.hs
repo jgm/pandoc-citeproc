@@ -20,6 +20,7 @@ import Control.Monad.State
 import Data.Char  ( toUpper, isLower, isUpper, isSpace )
 import Data.List  ( nub )
 import Data.Maybe ( isJust )
+import Data.Monoid
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
@@ -230,13 +231,13 @@ formatName :: EvalMode -> Bool -> Form -> Formatting -> [Option] -> [NamePart] -
 formatName m b f fm ops np n
     -- TODO awkward to use serialized string version of an Agent here;
     -- why not make OName take an Agent instead of a String??
-    | literal n /= [] = return $ OName (show n)  institution     []         fm
+    | literal n /= mempty = return $ OName (show n)  institution []         fm
     | Short      <- f = return $ OName (show n)  shortName       disambdata fm
     | otherwise       = return $ OName (show n) (longName given) disambdata fm
     where
-      institution = [OStr (literal n) $ form "family"]
+      institution = [OStr (unLiteral $ literal n) $ form "family"]
       when_ c o = if c /= [] then o else []
-      addAffixes [] sf [] = []
+      addAffixes [] _ [] = []
       addAffixes s sf ns  = [Output ((oStr' s (form sf) { prefix = [], suffix = [] }) ++ ns) $
                                    emptyFormatting { prefix = prefix (form sf)
                                                    , suffix = suffix (form sf)}]
@@ -250,7 +251,8 @@ formatName m b f fm ops np n
                   then getOptionVal "initialize-with" ops
                   else filter (not . isSpace) $ getOptionVal "initialize-with" ops  ++ "-"
       isInit  x = length x == 1 && or (map isUpper x)
-      initial x = if isJust (lookup "initialize-with" ops) &&
+      initial (Literal x) =
+                  if isJust (lookup "initialize-with" ops) &&
                      getOptionVal "initialize" ops /= "false"
                   then if not . and . map isLower $ x
                        then addIn x $ getOptionVal "initialize-with" ops
@@ -268,34 +270,36 @@ formatName m b f fm ops np n
                     then oStr "," ++ [OSpace]
                     else oStr (getOptionVal "sort-separator" ops)
 
-      suff      = if commaSuffix n && nameSuffix n /= []
+      suff      = if commaSuffix n && nameSuffix n /= mempty
                   then suffCom
                   else suffNoCom
-      suffCom   = when_ (nameSuffix n) $ separator ++ [        OStr (nameSuffix n) fm]
-      suffNoCom = when_ (nameSuffix n) $              [OSpace, OStr (nameSuffix n) fm]
+      suffCom   = when_ (unLiteral $ nameSuffix n) $ separator ++ [        OStr (unLiteral $ nameSuffix n) fm]
+      suffNoCom = when_ (unLiteral $ nameSuffix n) $              [OSpace, OStr (unLiteral $ nameSuffix n) fm]
 
       onlyGiven = not (null $ givenName n) && null family
       given     = if onlyGiven
                      then givenLong
                      else when_ (givenName  n) . unwords . map initial $ givenName n
-      givenLong = when_ (givenName  n) . unwords $ givenName n
-      family    = familyName n
+      givenLong = when_ (givenName  n) . unwords $ map unLiteral $ givenName n
+      family    = unLiteral $ familyName n
+      dropping  = unLiteral $ droppingPart n
+      nondropping  = unLiteral $ nonDroppingPart n
 
-      shortName = oStr' (nonDroppingPart n <+> family) (form "family")
+      shortName = oStr' (nondropping <+> family) (form "family")
       longName g = if isSorting m
                    then let firstPart = case getOptionVal "demote-non-dropping-particle" ops of
-                                           "never" -> nonDroppingPart n <+> family  <+> droppingPart n
-                                           _       -> family  <+> droppingPart n <+> nonDroppingPart n
+                                           "never" -> nondropping <+> family  <+> dropping
+                                           _       -> family  <+> dropping <+> nondropping
                         in [OStr firstPart (form "family")] <++> oStr' g (form "given") ++ suffCom
                    else if (b && getOptionVal "name-as-sort-order" ops == "first") ||
                            getOptionVal "name-as-sort-order" ops == "all"
                         then let (fam,par) = case getOptionVal "demote-non-dropping-particle" ops of
-                                               "never"     -> (nonDroppingPart n <+> family, droppingPart n)
-                                               "sort-only" -> (nonDroppingPart n <+> family, droppingPart n)
-                                               _           -> (family, droppingPart n <+> nonDroppingPart n)
+                                               "never"     -> (nondropping <+> family, dropping)
+                                               "sort-only" -> (nondropping <+> family, dropping)
+                                               _           -> (family, dropping <+> nondropping)
                              in oStr' fam (form "family") ++ sortSep g par ++ suffCom
                           else oStr' g (form "given") <++>
-                               addAffixes (droppingPart n <+> nonDroppingPart n <+> family) "family" suff
+                               addAffixes (dropping <+> nondropping <+> family) "family" suff
 
       disWithGiven = getOptionVal "disambiguate-add-givenname" ops == "true"
       initialize   = isJust (lookup "initialize-with" ops) && not onlyGiven

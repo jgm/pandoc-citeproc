@@ -440,10 +440,10 @@ parseDate s = do
              [y,m]   -> (y, m, mempty)
              [y,m,d] -> (y, m, d)
              _       -> (mempty, mempty, mempty)
-  return RefDate { year   = dropWhile (=='0') year'
-                 , month  = dropWhile (=='0') month'
+  return RefDate { year   = Literal $ dropWhile (=='0') year'
+                 , month  = Literal $ dropWhile (=='0') month'
                  , season = mempty
-                 , day    = dropWhile (=='0') day'
+                 , day    = Literal $ dropWhile (=='0') day'
                  , other  = mempty
                  , circa  = mempty
                  }
@@ -467,20 +467,20 @@ getOldDates prefix = do
   endyear' <- fixLeadingDash <$> getRawField (prefix ++ "endyear") <|> return ""
   endmonth' <- getRawField (prefix ++ "endmonth") <|> return ""
   endday' <- getRawField (prefix ++ "endday") <|> return ""
-  let start' = RefDate { year   = if isNumber year' then year' else ""
-                       , month  = month'
-                       , season = ""
-                       , day    = day'
-                       , other  = if isNumber year' then "" else year'
-                       , circa  = ""
+  let start' = RefDate { year   = Literal $ if isNumber year' then year' else ""
+                       , month  = Literal $ month'
+                       , season = mempty
+                       , day    = Literal day'
+                       , other  = Literal $ if isNumber year' then "" else year'
+                       , circa  = mempty
                        }
   let end' = if null endyear'
                 then []
-                else [RefDate { year   = if isNumber endyear' then endyear' else ""
-                              , month  = endmonth'
-                              , day    = endday'
+                else [RefDate { year   = Literal $ if isNumber endyear' then endyear' else ""
+                              , month  = Literal $ endmonth'
+                              , day    = Literal $ endday'
                               , season = mempty
-                              , other  = if isNumber endyear' then "" else endyear'
+                              , other  = Literal $ if isNumber endyear' then "" else endyear'
                               , circa  = mempty
                               }]
   return (start':end')
@@ -533,7 +533,7 @@ toAuthor _ [Str "others"] = return $
           , nonDroppingPart = mempty
           , familyName      = mempty
           , nameSuffix      = mempty
-          , literal         = "others"
+          , literal         = Literal "others"
           , commaSuffix     = False
           }
 toAuthor _ [Span ("",[],[]) ils] = do
@@ -544,7 +544,7 @@ toAuthor _ [Span ("",[],[]) ils] = do
           , nonDroppingPart = mempty
           , familyName      = mempty
           , nameSuffix      = mempty
-          , literal         = literal'
+          , literal         = Literal literal'
           , commaSuffix     = False
           }
 -- First von Last
@@ -579,12 +579,12 @@ toAuthor opts ils = do
   suffix <- inlinesToString $ intercalate [Space] jr
   givens <- mapM inlinesToString first
   return $
-    Agent { givenName       = givens
-          , droppingPart    = if useprefix then "" else prefix
-          , nonDroppingPart = if useprefix then prefix else ""
-          , familyName      = family
-          , nameSuffix      = suffix
-          , literal         = ""
+    Agent { givenName       = map Literal givens
+          , droppingPart    = Literal $ if useprefix then "" else prefix
+          , nonDroppingPart = Literal $ if useprefix then prefix else ""
+          , familyName      = Literal family
+          , nameSuffix      = Literal suffix
+          , literal         = mempty
           , commaSuffix     = usecomma
           }
 
@@ -953,7 +953,7 @@ itemToReference lang bibtex = bib $ do
   pubstate' <- resolveKey lang `fmap`
                  (  getField "pubstate"
                 <|> case issued' of
-                         (x:_) | other x == "forthcoming" ->
+                         (x:_) | other x == Literal "forthcoming" ->
                                      return (Formatted [Str "forthcoming"])
                          _ -> return mempty
                  )
@@ -962,7 +962,7 @@ itemToReference lang bibtex = bib $ do
       convertEnDash x       = x
 
   return $ emptyReference
-         { refId               = id'
+         { refId               = Literal id'
          , refType             = reftype
          , author              = author'
          , editor              = editor'
@@ -1039,10 +1039,10 @@ itemToReference lang bibtex = bib $ do
          , abstract            = abstract'
          , keyword             = keywords'
          , number              = number'
-         , url                 = url'
-         , doi                 = doi'
-         , isbn                = isbn'
-         , issn                = issn'
-         , language            = hyphenation
-         , callNumber          = callNumber'
+         , url                 = Literal url'
+         , doi                 = Literal doi'
+         , isbn                = Literal isbn'
+         , issn                = Literal issn'
+         , language            = Literal hyphenation
+         , callNumber          = Literal callNumber'
          }

@@ -27,9 +27,10 @@ import Data.Aeson.Types (Parser, Pair)
 import Control.Applicative ((<$>), (<*>), (<|>), pure)
 import qualified Data.Text as T
 import qualified Data.Vector as V
-import Data.Char (toUpper, toLower, isUpper, isLower, isDigit)
+import Data.Char (toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
-import Text.CSL.Util (parseString, trimr, safeRead, readNum, (.#?))
+import Text.CSL.Util (parseString, trimr, safeRead, readNum,
+                      inlinesToString, capitalize, camelize)
 import Text.Pandoc (readHtml, def, Pandoc(..), Block(..), Inline(..),
                     nullMeta, writeMarkdown, WriterOptions(..),
                     ReaderOptions(..), Format(..), bottomUp)
@@ -44,13 +45,26 @@ newtype Formatted = Formatted { unFormatted :: [Inline] }
   deriving ( Show, Read, Eq, Data, Typeable, Monoid )
 
 instance FromJSON Formatted where
-  parseJSON = fmap readCSLString . parseString
+  parseJSON v@(Array _) = Formatted <$> parseJSON v
+  parseJSON v           = fmap readCSLString $ parseString v
 
 instance ToJSON Formatted where
   toJSON = toJSON . writeCSLString
 
 instance IsString Formatted where
   fromString = Formatted . B.toList . B.text
+
+newtype Literal = Literal { unLiteral :: String }
+  deriving ( Show, Read, Eq, Data, Typeable, Monoid )
+
+instance FromJSON Literal where
+  parseJSON v             = Literal `fmap` parseString v
+
+instance ToJSON Literal where
+  toJSON = toJSON . unLiteral
+
+instance IsString Literal where
+  fromString = Literal
 
 -- Note:  FromJSON reads HTML, ToJSON writes Markdown.
 -- This means that they aren't proper inverses of each other, which
@@ -111,7 +125,8 @@ fromValue (Value a) = cast a
 
 isValueSet :: Value -> Bool
 isValueSet val
-    | Just v <- fromValue val :: Maybe String    = v /= []
+    | Just v <- fromValue val :: Maybe Literal   = v /= mempty
+    | Just v <- fromValue val :: Maybe String    = v /= mempty
     | Just v <- fromValue val :: Maybe Formatted = v /= mempty
     | Just v <- fromValue val :: Maybe [Agent]   = v /= []
     | Just v <- fromValue val :: Maybe [RefDate] = v /= []
@@ -123,19 +138,19 @@ isValueSet val
 data Empty = Empty deriving ( Typeable, Data )
 
 data Agent
-    = Agent { givenName       :: [String]
-            , droppingPart    ::  String
-            , nonDroppingPart ::  String
-            , familyName      ::  String
-            , nameSuffix      ::  String
-            , literal         ::  String
+    = Agent { givenName       :: [Literal]
+            , droppingPart    ::  Literal
+            , nonDroppingPart ::  Literal
+            , familyName      ::  Literal
+            , nameSuffix      ::  Literal
+            , literal         ::  Literal
             , commaSuffix     ::  Bool
             }
       deriving ( Show, Read, Eq, Typeable, Data )
 
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
-              (v .: "given" <|> (wordsBy (==' ') <$> v .: "given") <|> pure []) <*>
+              (v .: "given" <|> ((map Literal . wordsBy (==' ') . unLiteral) <$> v .: "given") <|> pure []) <*>
               v .:?  "dropping-particle" .!= "" <*>
               v .:? "non-dropping-particle" .!= "" <*>
               v .:? "family" .!= "" <*>
@@ -164,23 +179,23 @@ instance ToJSON [Agent] where
   toJSON xs  = Array (V.fromList $ map toJSON xs)
 
 data RefDate =
-    RefDate { year   :: String
-            , month  :: String
-            , season :: String
-            , day    :: String
-            , other  :: String
-            , circa  :: String
+    RefDate { year   :: Literal
+            , month  :: Literal
+            , season :: Literal
+            , day    :: Literal
+            , other  :: Literal
+            , circa  :: Literal
             } deriving ( Show, Read, Eq, Typeable, Data )
 
 instance FromJSON RefDate where
   parseJSON (Array v) =
      case fromJSON (Array v) of
-          Success [y]     -> RefDate <$> parseString y <*>
+          Success [y]     -> RefDate <$> parseJSON y <*>
                     pure "" <*> pure "" <*> pure "" <*> pure "" <*> pure ""
-          Success [y,m]   -> RefDate <$> parseString y <*> parseString m <*>
+          Success [y,m]   -> RefDate <$> parseJSON y <*> parseJSON m <*>
                     pure "" <*> pure "" <*> pure "" <*> pure ""
-          Success [y,m,d] -> RefDate <$> parseString y <*> parseString m <*>
-                    pure "" <*> parseString d <*> pure "" <*> pure ""
+          Success [y,m,d] -> RefDate <$> parseJSON y <*> parseJSON m <*>
+                    pure "" <*> parseJSON d <*> pure "" <*> pure ""
           Error e         -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
   parseJSON (Object v) = RefDate <$>
@@ -215,10 +230,10 @@ instance ToJSON [RefDate] where
   toJSON [x] = toJSON x
   toJSON xs  = Array (V.fromList $ map toJSON xs)
 
-mkRefDate :: String -> Parser [RefDate]
-mkRefDate xs
-  | all isDigit xs = return [RefDate xs "" "" "" "" ""]
-  | otherwise      = return [RefDate "" "" "" "" xs ""]
+mkRefDate :: Literal -> Parser [RefDate]
+mkRefDate z@(Literal xs)
+  | all isDigit xs = return [RefDate z mempty mempty mempty mempty mempty]
+  | otherwise      = return [RefDate mempty mempty mempty mempty z mempty]
 
 data RefType
     = NoType
@@ -264,13 +279,8 @@ instance Show RefType where
 
 instance FromJSON RefType where
   parseJSON (String t) = safeRead (capitalize . camelize . T.unpack $ t)
-    where camelize x
-            | '-':y:ys <- x = toUpper y : camelize ys
-            | '_':y:ys <- x = toUpper y : camelize ys
-            |     y:ys <- x =        y : camelize ys
-            | otherwise     = []
-          capitalize (x:xs) = toUpper x : xs
-          capitalize     [] = []
+  parseJSON v@(Array _) = fmap (capitalize . camelize . inlinesToString)
+    (parseJSON v) >>= safeRead
   parseJSON _ = fail "Could not parse RefType"
 
 instance ToJSON RefType where
@@ -295,7 +305,7 @@ instance ToJSON CNum where
 -- | The 'Reference' record.
 data Reference =
     Reference
-    { refId               :: String
+    { refId               :: Literal
     , refType             :: RefType
 
     , author              :: [Agent]
@@ -359,26 +369,26 @@ data Reference =
     , keyword             :: Formatted
     , number              :: Formatted
     , references          :: Formatted
-    , url                 :: String
-    , doi                 :: String
-    , isbn                :: String
-    , issn                :: String
-    , pmcid               :: String
-    , pmid                :: String
-    , callNumber          :: String
-    , dimensions          :: String
-    , scale               :: String
-    , categories          :: [String]
-    , language            :: String
+    , url                 :: Literal
+    , doi                 :: Literal
+    , isbn                :: Literal
+    , issn                :: Literal
+    , pmcid               :: Literal
+    , pmid                :: Literal
+    , callNumber          :: Literal
+    , dimensions          :: Literal
+    , scale               :: Literal
+    , categories          :: [Literal]
+    , language            :: Literal
 
     , citationNumber           :: CNum
     , firstReferenceNoteNumber :: Int
-    , citationLabel            :: String
+    , citationLabel            :: Literal
     } deriving ( Eq, Show, Read, Typeable, Data )
 
 instance FromJSON Reference where
   parseJSON (Object v) = Reference <$>
-       v .#? "id" .!= "" <*>
+       v .:? "id" .!= "" <*>
        v .:? "type" .!= NoType <*>
        v .:? "author" .!= [] <*>
        v .:? "editor" .!= [] <*>
@@ -537,7 +547,7 @@ instance ToJSON Reference where
 emptyReference :: Reference
 emptyReference =
     Reference
-    { refId               = []
+    { refId               = mempty
     , refType             = NoType
 
     , author              = []
@@ -601,21 +611,21 @@ emptyReference =
     , keyword             = mempty
     , number              = mempty
     , references          = mempty
-    , url                 = []
-    , doi                 = []
-    , isbn                = []
-    , issn                = []
-    , pmcid               = []
-    , pmid                = []
-    , callNumber          = []
-    , dimensions          = []
-    , scale               = []
-    , categories          = []
-    , language            = []
+    , url                 = mempty
+    , doi                 = mempty
+    , isbn                = mempty
+    , issn                = mempty
+    , pmcid               = mempty
+    , pmid                = mempty
+    , callNumber          = mempty
+    , dimensions          = mempty
+    , scale               = mempty
+    , categories          = mempty
+    , language            = mempty
 
     , citationNumber           = CNum 0
     , firstReferenceNoteNumber = 0
-    , citationLabel            = []
+    , citationLabel            = mempty
     }
 
 numericVars :: [String]
@@ -646,7 +656,7 @@ parseLocator s
 
 getReference :: [Reference] -> Cite -> Maybe Reference
 getReference  r c
-    = case citeId c `elemIndex` map refId r of
+    = case citeId c `elemIndex` map (unLiteral . refId) r of
         Just i  -> Just $ setPageFirst $ r !! i
         Nothing -> Nothing
 
@@ -654,10 +664,10 @@ processCites :: [Reference] -> [[Cite]] -> [[(Cite, Reference)]]
 processCites rs cs
     = procGr [[]] cs
     where
-      procRef r = case filter ((==) (refId r) . citeId) $ concat cs of
+      procRef r = case filter ((==) (unLiteral $ refId r) . citeId) $ concat cs of
                     x:_ -> r { firstReferenceNoteNumber = readNum $ citeNoteNumber x}
                     []  -> r
-      getRef  c = case filter ((==) (citeId c) . refId) rs of
+      getRef  c = case filter ((==) (citeId c) . unLiteral . refId) rs of
                     x:_ -> procRef $ setPageFirst x
                     []  -> emptyReference { title =
                             fromString $ citeId c ++ " not found!" }

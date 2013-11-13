@@ -69,7 +69,7 @@ evalLayout (Layout _ _ es) em b l m o a r
       -- TODO: is this needed? shouldn't the style specify titlecase or not
       -- depending on the locale?
       suppTC = let getLang = take 2 . map toLower in
-               case (getLang $ localeLang locale, getLang $ language r) of
+               case (getLang $ localeLang locale, getLang $ unLiteral $ language r) of
                  (_,  "en") -> id
                  ("en", []) -> id
                  _          -> proc' rmTitleCase
@@ -214,7 +214,7 @@ evalIfThen i ei e
                              as  <- gets (abbrevs . env)
                              let val' = if getAbbreviation as v val == [] then val else getAbbreviation as v val
                              return (isNumericString val')
-      chkDate         v = getDateVar v >>= return . not . null . filter ((/=) [] . circa)
+      chkDate         v = getDateVar v >>= return . not . null . filter ((/=) [] . unLiteral . circa)
       chkPosition     s = if s == "near-note"
                           then gets (nearNote . cite . env)
                           else gets (citePosition . cite . env) >>= return . compPosition s

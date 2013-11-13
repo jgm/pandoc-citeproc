@@ -5,6 +5,7 @@ module Text.CSL.Util
   , (<+>)
   , (<^>)
   , capitalize
+  , camelize
   , head'
   , tail'
   , last'
@@ -30,6 +31,7 @@ module Text.CSL.Util
   , toShow
   , toRead
   , toStr
+  , inlinesToString
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -38,7 +40,7 @@ import qualified Data.Text as T
 import Control.Applicative ((<$>), (<*>), pure)
 import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation)
 import qualified Data.Traversable
-import Text.Pandoc.Shared (safeRead)
+import Text.Pandoc.Shared (safeRead, stringify)
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc
 import Text.Pandoc.XML (fromEntities)
@@ -74,6 +76,12 @@ sa <^> sb         = sa ++ sb
 capitalize :: String -> String
 capitalize [] = []
 capitalize (c:cs) = toUpper c : cs
+
+camelize :: String -> String
+camelize ('-':y:ys) = toUpper y : camelize ys
+camelize ('_':y:ys) = toUpper y : camelize ys
+camelize     (y:ys) =         y : camelize ys
+camelize      _     = []
 
 head' :: [a] -> [a]
 head' = take 1
@@ -116,6 +124,7 @@ parseString (Number n) = case fromJSON (Number n) of
                                             Success (x :: Double) -> return $ show x
                                             Error e -> fail $ "Could not read string: " ++ e
 parseString (Bool b)   = return $ map toLower $ show b
+parseString v@(Array _)= inlinesToString `fmap` parseJSON v
 parseString _          = fail "Could not read string"
 
 mb :: Monad m => (b -> m a) -> (Maybe b -> m (Maybe a))
@@ -252,3 +261,6 @@ toStr = intercalate [Str "\n"] .
       tweak (' ':'?':xs) = "\8239?" ++ tweak xs
       tweak ( x :xs    ) = x : tweak xs
       tweak []           = []
+
+inlinesToString :: [Inline] -> String
+inlinesToString = stringify

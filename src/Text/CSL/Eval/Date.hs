@@ -107,14 +107,15 @@ formatDate em k tm dp date
 
       addZero n = if length n == 1 then '0' : n else n
       addZeros  = reverse . take 5 . flip (++) (repeat '0') . reverse
-      formatDatePart False (RefDate y m e d _ _) (DatePart n f _ fm)
+      formatDatePart False (RefDate (Literal y) (Literal m)
+        (Literal e) (Literal d) _ _) (DatePart n f _ fm)
           | "year"  <- n, y /= mempty = return $ OYear (formatYear  f    y) k fm
           | "month" <- n, m /= mempty = output fm      (formatMonth f fm m)
           | "day"   <- n, d /= mempty = output fm      (formatDay   f m  d)
           | "month" <- n, m == mempty
                         , e /= mempty = output fm $ term f ("season-0" ++ e)
 
-      formatDatePart True (RefDate y m e d _ _) (DatePart n f rd fm)
+      formatDatePart True (RefDate (Literal y) (Literal m) (Literal e) (Literal d) _ _) (DatePart n f rd fm)
           | "year"  <- n, y /= mempty = OYear (formatYear  f y) k (fm {suffix = []}) : formatDelim
           | "month" <- n, m /= mempty = output (fm {suffix = []}) (formatMonth f fm m) ++ formatDelim
           | "day"   <- n, d /= mempty = output (fm {suffix = []}) (formatDay   f m  d) ++ formatDelim
@@ -123,7 +124,7 @@ formatDate em k tm dp date
           where
             formatDelim = if rd == "-" then [OPan [Str "\x2013"]] else [OPan [Str rd]]
 
-      formatDatePart _ (RefDate _ _ _ _ o _) (DatePart n _ _ fm)
+      formatDatePart _ (RefDate _ _ _ _ (Literal o) _) (DatePart n _ _ fm)
           | "year"  <- n, o /= mempty = output fm o
           | otherwise                 = []
 
@@ -209,27 +210,27 @@ getOrdinal v s ts
                else Neuter
 
 parseRefDate :: RefDate -> [RefDate]
-parseRefDate r@(RefDate _ _ _ _ o c)
+parseRefDate r@(RefDate _ _ _ _ (Literal o) (Literal c))
     = if null o then return r
       else let (a,b) = break (== '-') o
            in  if null b then return (parseRaw o) else [parseRaw a, parseRaw b]
     where
       parseRaw str =
           case words $ check str of
-            [y']       | and (map isDigit y') -> RefDate y' [] [] [] o c
+            [y']       | and (map isDigit y') -> RefDate (Literal y') mempty mempty mempty (Literal o) (Literal c)
             [s',y']    | and (map isDigit y')
-                       , and (map isDigit s') -> RefDate y' s' [] [] o c
-            [s',y']    | s' `elem'` seasons   -> RefDate y' [] (select s' seasons) [] o []
-            [s',y']    | s' `elem'` months    -> RefDate y' (select s'  months) [] [] o c
+                       , and (map isDigit s') -> RefDate (Literal y') (Literal s') mempty mempty (Literal o) (Literal c)
+            [s',y']    | s' `elem'` seasons   -> RefDate (Literal y') mempty (Literal $ select s' seasons) mempty (Literal o) mempty
+            [s',y']    | s' `elem'` months    -> RefDate (Literal y') (Literal $ select s'  months) mempty mempty (Literal o) (Literal c)
             [s',d',y'] | and (map isDigit s')
                        , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate y' s' [] d' o c
+                       , and (map isDigit d') -> RefDate (Literal y') (Literal s') mempty (Literal d') (Literal o) (Literal c)
             [s',d',y'] | s' `elem'` months
                        , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate y' (select s'  months) [] d' o c
+                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') (Literal o) (Literal c)
             [s',d',y'] | s' `elem'` months
                        , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate y' (select s'  months) [] d' o c
+                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') (Literal o) (Literal c)
             _                                 -> r
       check []     = []
       check (x:xs) = if x `elem` ",/-" then ' ' : check xs else x : check xs

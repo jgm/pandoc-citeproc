@@ -1,6 +1,6 @@
 {-# LANGUAGE PatternGuards, OverloadedStrings, FlexibleInstances,
     ScopedTypeVariables, CPP #-}
-module Text.CSL.Pandoc (processCites, processCites', convertRefs) where
+module Text.CSL.Pandoc (processCites, processCites') where
 
 import Text.Pandoc
 import Text.Pandoc.Walk
@@ -96,7 +96,7 @@ getBibRefs _ = return []
 -- unescape reference ids, which may contain XML entities, so
 -- that we can do lookups with regular string equality
 unescapeRefId :: Reference -> Reference
-unescapeRefId ref = ref{ refId = decodeEntities (refId ref) }
+unescapeRefId ref = ref{ refId = Literal $ decodeEntities (unLiteral $ refId ref) }
 
 decodeEntities :: String -> String
 decodeEntities [] = []

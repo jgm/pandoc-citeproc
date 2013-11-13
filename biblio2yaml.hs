@@ -1,6 +1,6 @@
 module Main where
 import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
-import Text.CSL.Reference (Reference(refId))
+import Text.CSL.Reference (Reference(refId), Literal(..))
 import Data.List (group, sort)
 import Data.Char (chr, toLower)
 import Data.Monoid
@@ -51,7 +51,7 @@ main = do
 warnDuplicateKeys :: [Reference] -> IO [Reference]
 warnDuplicateKeys refs = mapM_ warnDup dupKeys >> return refs
   where warnDup k = hPutStrLn stderr $ "biblio2yaml: duplicate key " ++ k
-        allKeys   = map refId refs
+        allKeys   = map (unLiteral . refId) refs
         dupKeys   = [x | (x:_:_) <- group (sort allKeys)]
 
 outputYamlBlock :: B.ByteString -> IO ()

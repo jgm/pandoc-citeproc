@@ -121,7 +121,8 @@ getStringValue val =
   -- but need a String.  This is currently needed for "page".  It's a bit
   -- hackish; we should probably change the type in Reference for
   -- page to String.
-  case fromValue val `mplus` ((stringify . unFormatted) `fmap` fromValue val) of
+  case fromValue val `mplus` ((stringify . unFormatted) `fmap` fromValue val)
+       `mplus` (unLiteral `fmap` fromValue val) of
        Just v   -> v
        Nothing  -> Debug.Trace.trace ("Expecting string value, got " ++
                        show val) []

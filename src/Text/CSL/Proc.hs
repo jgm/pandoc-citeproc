@@ -86,7 +86,7 @@ processCitations ops s rs
 -- 'FormattedOutput' for the bibliography.
 processBibliography :: ProcOpts -> Style -> [Reference] -> [FormattedOutput]
 processBibliography ops s rs
-    = bibliography $ citeproc ops s rs [map (\r -> emptyCite { citeId = refId r}) rs]
+    = bibliography $ citeproc ops s rs [map (\r -> emptyCite { citeId = unLiteral $ refId r}) rs]
 
 -- | With a 'Style', a list of 'Reference's and the list of
 -- 'Citations', produce the 'FormattedOutput' for each citation group

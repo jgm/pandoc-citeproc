@@ -19,14 +19,13 @@ module Text.CSL.Input.Bibutils
     ) where
 
 import Text.Pandoc.UTF8 ( fromStringLazy )
-import qualified Data.Traversable as Traversable
-import Control.Monad (liftM)
 import Text.Pandoc
 import Data.Char
 import System.FilePath ( takeExtension )
 import Text.CSL.Reference hiding ( Value )
 import Text.CSL.Input.Bibtex
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.Map as M
 import Data.Aeson
 
 #ifdef USE_BIBUTILS
@@ -151,26 +150,14 @@ readYamlBib s = convertRefs $ lookupMeta "references" meta
 convertRefs :: Maybe MetaValue -> Either String [Reference]
 convertRefs Nothing = Right []
 convertRefs (Just v) =
-  case metaValueToJSON blocksToMarkdown inlinesToMarkdown v >>= fromJSON of
+  case fromJSON (metaValueToJSON v) of
        Data.Aeson.Error s   -> Left s
        Success x            -> Right x
 
-blocksToMarkdown :: (Functor m, Monad m) => [Block] -> m String
-blocksToMarkdown bs = return $ writeMarkdown def $ Pandoc nullMeta bs
-
-inlinesToMarkdown :: (Functor m, Monad m) => [Inline] -> m String
-inlinesToMarkdown ils = blocksToMarkdown [Plain ils]
-
-metaValueToJSON :: Monad m
-                => ([Block] -> m String)
-                -> ([Inline] -> m String)
-                -> MetaValue
-                -> m Value
-metaValueToJSON blockWriter inlineWriter (MetaMap metamap) = liftM toJSON $
-  Traversable.mapM (metaValueToJSON blockWriter inlineWriter) metamap
-metaValueToJSON blockWriter inlineWriter (MetaList xs) = liftM toJSON $
-  Traversable.mapM (metaValueToJSON blockWriter inlineWriter) xs
-metaValueToJSON _ _ (MetaBool b) = return $ toJSON b
-metaValueToJSON _ _ (MetaString s) = return $ toJSON s
-metaValueToJSON blockWriter _ (MetaBlocks bs) = liftM toJSON $ blockWriter bs
-metaValueToJSON _ inlineWriter (MetaInlines bs) = liftM toJSON $ inlineWriter bs
+metaValueToJSON :: MetaValue -> Value
+metaValueToJSON (MetaMap m) = toJSON $ M.map metaValueToJSON m
+metaValueToJSON (MetaList xs) = toJSON $ map metaValueToJSON xs
+metaValueToJSON (MetaString t) = toJSON t
+metaValueToJSON (MetaBool b) = toJSON b
+metaValueToJSON (MetaInlines ils) = toJSON ils
+metaValueToJSON (MetaBlocks bs) = toJSON bs

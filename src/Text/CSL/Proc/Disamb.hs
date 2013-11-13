@@ -156,7 +156,7 @@ reEvaluate :: Style -> [CiteData] -> [(Cite, Reference)] -> CitationGroup -> Cit
 reEvaluate (Style {citation = ct, csMacros = ms , styleLocale = lo,
                    styleAbbrevs = as}) l cr (CG a f d os)
     = CG a f d . flip concatMap (zip cr os) $
-      \((c,r),out) -> if refId r `elem` map key l
+      \((c,r),out) -> if unLiteral (refId r) `elem` map key l
                       then return . second (flip Output emptyFormatting) $
                            (,) c $ evalLayout (citLayout ct) (EvalCite c) True lo ms (citOptions ct) as r
                       else [out]
@@ -267,7 +267,7 @@ generateYearSuffix refs
       sort'  :: (Ord a, Ord b) => [(a,b)] -> [(a,b)]
       sort'  = sortBy (comparing snd)
       getFst = map $ map fst
-      getP k = case findIndex ((==) k . refId) refs of
+      getP k = case findIndex ((==) k . unLiteral . refId) refs of
                    Just x -> (k, x + 1)
                    _      -> (k,     0)
       suffs = l ++ [x ++ y | x <- l, y <- l ]
