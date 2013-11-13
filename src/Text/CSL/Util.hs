@@ -82,7 +82,8 @@ camelize     (y:ys) =         y : camelize ys
 camelize      _     = []
 
 last' :: [a] -> [a]
-last' = foldl (\_ x -> [x]) []
+last' [] = []
+last' xs = [last xs]
 
 -- | Like words, but doesn't break on nonbreaking spaces etc.
 words' :: String -> [String]
