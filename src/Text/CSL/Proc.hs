@@ -291,9 +291,7 @@ formatCitLayout s (CG co f d cs)
                      addDelim d .
                      map (fst &&& localMod >>> uncurry addCiteAffixes)
       formatting   = unsetAffixes f
-      localMod     = if null cs
-                     then snd
-                     else uncurry $ localModifiers s (not $ null co)
+      localMod     = uncurry $ localModifiers s (not $ null co)
       setAsSupAu h = map $ \(c,o) -> if (citeId c, citeHash c) == h
                                      then flip (,) o c { authorInText   = False
                                                        , suppressAuthor = True }
