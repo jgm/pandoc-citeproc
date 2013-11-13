@@ -120,7 +120,7 @@ formatOutput o =
       OYear    s _     f  -> formatOutput (OStr s f)
       OYearSuf s _ _   f  -> formatOutput (OStr s f)
       ONum     i       f  -> formatOutput (OStr (show i) f)
-      OCitNum  i       f  -> formatOutput (OStr (add00 i) f)
+      OCitNum  i       f  -> if i == 0 then [] else formatOutput (OStr (add00 i) f)
       OUrl     s       f  -> [Link (formatOutput (OStr (fst s) f)) s]
       OName  _ os _    f  -> formatOutput (Output os f)
       OContrib _ _ os _ _ -> format os
