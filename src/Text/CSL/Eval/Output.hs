@@ -16,7 +16,7 @@
 module Text.CSL.Eval.Output where
 
 import Text.CSL.Output.Plain
-import Text.CSL.Output.Pandoc (lastInline)
+import Text.CSL.Output.Pandoc (lastInline, headInline, tailInline)
 import Text.CSL.Style
 import Data.Char (toLower, toUpper)
 import Text.CSL.Util (capitalize, titlecase, unTitlecase)
@@ -87,7 +87,14 @@ o  <++> [] = o
 o1 <++> o2 = o1 ++ [OSpace] ++ o2
 
 formatOutputList :: [Output] -> FormattedOutput
-formatOutputList = concatMap formatOutput
+formatOutputList = foldr appendWithPunct [] . map formatOutput
+
+appendWithPunct :: FormattedOutput -> FormattedOutput -> FormattedOutput
+appendWithPunct left right = left ++
+  if isPunct (lastInline left) && isPunct (headInline right)
+     then tailInline right
+     else right
+  where isPunct = and . map (`elem` ".!?")
 
 -- | Convert evaluated 'Output' into 'FormattedOutput', ready for the
 -- output filters.
