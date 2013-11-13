@@ -854,7 +854,12 @@ itemToReference lang bibtex = bib $ do
                         <|> getPeriodicalTitle "journaltitleshort"
                         <|> getPeriodicalTitle "shortjournal"
                         <|> return mempty
-  seriesTitle' <- resolveKey lang <$> getTitle "series" <|> return mempty
+  -- change numerical series title to e.g. 'series 3'
+  let fixSeriesTitle x@(Formatted [Str xs]) | all isDigit xs =
+         Formatted [Str (resolveKey' lang "series"), Space] <> x
+      fixSeriesTitle x = x
+  seriesTitle' <- (fixSeriesTitle . resolveKey lang) <$>
+                      getTitle "series" <|> return mempty
   shortTitle' <- getTitle "shorttitle"
                <|> if subtitle' /= mempty
                       then getShortTitle False "title"
