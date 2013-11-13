@@ -30,6 +30,7 @@ import Data.Maybe ( fromMaybe )
 import Text.CSL.Style
 import Text.Pandoc.Definition
 import Text.Pandoc.XML (fromEntities)
+import Text.Pandoc.Shared (stringify)
 
 -- TODO - this is a placeholder
 renderPandoc :: Style -> FormattedOutput -> [Inline]
@@ -281,21 +282,12 @@ convertQuoted s = convertQuoted'
           | otherwise                      = []
 
 headInline :: [Inline] -> String
-headInline [] = []
-headInline (i:_)
-    | Str s <- i = take 1 s
-    | Space <- i = " "
-    | otherwise  = headInline $ getInline i
+headInline = take 1 . stringify
 
 lastInline :: [Inline] -> String
-lastInline [] = []
-lastInline (i:[])
-    | Str s <- i = last' s
-    | Space <- i = " "
-    | otherwise  = lastInline $ getInline i
-    where
-      last' s = if s /= [] then [last s] else []
-lastInline (_:xs) = lastInline xs
+lastInline xs = case stringify xs of
+                      [] -> []
+                      ys -> [last ys]
 
 initInline :: [Inline] -> [Inline]
 initInline [] = []
@@ -316,10 +308,8 @@ initInline (i:[])
 initInline (i:xs) = i : initInline xs
 
 tailInline :: [Inline] -> [Inline]
-tailInline inls
-    | (i:t) <- inls
-    , Space <- i = t
-    | otherwise  = tailFirstInlineStr inls
+tailInline (Space:xs) = xs
+tailInline xs         = tailFirstInlineStr xs
 
 tailFirstInlineStr :: [Inline] -> [Inline]
 tailFirstInlineStr = mapHeadInline (drop 1)
