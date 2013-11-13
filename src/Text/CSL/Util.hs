@@ -6,8 +6,6 @@ module Text.CSL.Util
   , (<^>)
   , capitalize
   , camelize
-  , head'
-  , tail'
   , last'
   , words'
   , trim
@@ -82,12 +80,6 @@ camelize ('-':y:ys) = toUpper y : camelize ys
 camelize ('_':y:ys) = toUpper y : camelize ys
 camelize     (y:ys) =         y : camelize ys
 camelize      _     = []
-
-head' :: [a] -> [a]
-head' = take 1
-
-tail' :: Eq a => [a] -> [a]
-tail' = drop 1
 
 last' :: [a] -> [a]
 last' = foldl (\_ x -> [x]) []

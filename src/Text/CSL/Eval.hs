@@ -37,8 +37,7 @@ import Text.CSL.Eval.Names
 import Text.CSL.Output.Plain
 import Text.CSL.Reference
 import Text.CSL.Style
-import Text.CSL.Util ( toStr, readNum, head', last', proc, proc',
-                       query, betterThan )
+import Text.CSL.Util ( toStr, readNum, last', proc, proc', query, betterThan )
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the
@@ -333,7 +332,7 @@ breakNumericString [] = []
 breakNumericString (x:xs)
     | isTransNumber x = x : breakNumericString xs
     | otherwise       = let (a,b) = break (flip elem "&-,") x
-                            (c,d) = if null b then ("","") else (head' b, tail b)
+                            (c,d) = if null b then ("","") else (take 1 b, tail b)
                         in filter (/= []) $  a : c : breakNumericString (d : xs)
 
 formatRange :: Formatting -> String -> State EvalState [Output]

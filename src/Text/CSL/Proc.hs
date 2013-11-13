@@ -22,7 +22,7 @@ import Data.List
 import Data.Ord  ( comparing )
 import Data.Maybe ( mapMaybe )
 import Text.CSL.Eval
-import Text.CSL.Util ( head', tail', capitalize, proc, proc', query, toShow )
+import Text.CSL.Util ( capitalize, proc, proc', query, toShow )
 import Text.CSL.Output.Plain
 import Text.CSL.Proc.Collapse
 import Text.CSL.Proc.Disamb
@@ -131,9 +131,9 @@ sortItems l
               else concatMap (map fst) result
     where
       result = process l
-      process = sortBy (comparing $ head' . snd)                 >>>
-                groupBy (\a b -> head' (snd a) == head' (snd b)) >>>
-                map (map $ second tail')
+      process = sortBy (comparing $ take 1 . snd)                 >>>
+                groupBy (\a b -> take 1 (snd a) == take 1 (snd b)) >>>
+                map (map $ second (drop 1))
 
 -- | With a 'Style' and a sorted list of 'Reference's produce the
 -- evaluated output for the bibliography.
@@ -157,11 +157,11 @@ subsequentAuthorSubstitute b = if null subAuthStr then id else chkCreator
       getContrib = if null subAuthStr
                    then const []
                    else case subAuthRule of
-                          "partial-first" -> head'  . query namesQ  . queryContrib
+                          "partial-first" -> take 1  . query namesQ  . queryContrib
                           "partial-each"  ->          query namesQ  . queryContrib
                           _               ->                          queryContrib
 
-      getPartialEach x xs = concat . head' . map fst . reverse .
+      getPartialEach x xs = concat . take 1 . map fst . reverse .
                             sortBy (comparing $ length . snd) . filter ((<) 0 . length . snd) .
                             zip xs . map (takeWhile id . map (uncurry (==)) . zip x) $ xs
 

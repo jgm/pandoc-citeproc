@@ -25,7 +25,7 @@ module Text.CSL.Output.Pandoc
     ) where
 
 -- import Data.Char ( toUpper, toLower, isPunctuation )
-import Text.CSL.Util ( head', tail', capitalize, proc, proc', query )
+import Text.CSL.Util ( capitalize, proc, proc', query )
 import Data.Maybe ( fromMaybe )
 import Text.CSL.Style
 import Text.Pandoc.Definition
@@ -75,10 +75,10 @@ render (x:y:os) =   let a = renderFo x
 tailFO :: [FormattedOutput] -> [FormattedOutput]
 tailFO [] = []
 tailFO (f:fs)
-    | FDel  s  <- f = FDel  (tail' s)       : fs
+    | FDel  s  <- f = FDel  (drop 1 s)       : fs
     | FPan is  <- f = FPan  (tailInline is) : fs
-    | FN s  fm <- f = if prefix fm /= [] then FN s (tailFm fm)    : fs else FN    (tail' s) fm : fs
-    | FS s  fm <- f = if prefix fm /= [] then FS s (tailFm fm)    : fs else FS    (tail' s) fm : fs
+    | FN s  fm <- f = if prefix fm /= [] then FN s (tailFm fm)    : fs else FN    (drop 1 s) fm : fs
+    | FS s  fm <- f = if prefix fm /= [] then FS s (tailFm fm)    : fs else FS    (drop 1 s) fm : fs
     | FO fm fo <- f = if prefix fm /= [] then FO   (tailFm fm) fo : fs else FO fm (tailFO fo)  : fs
     | otherwise     = f : tailFO fs
     where
@@ -196,7 +196,7 @@ clean b (i:is)
           | otherwise          = False
       split _ _ [] = []
       split f g xs = let (y, r) = break f xs
-                     in concatMap (unwrap g) [y, head' r] ++ split f g (tail' r)
+                     in concatMap (unwrap g) [y, take 1 r] ++ split f g (drop 1 r)
 -}
 
 
@@ -283,7 +283,7 @@ convertQuoted s = convertQuoted'
 headInline :: [Inline] -> String
 headInline [] = []
 headInline (i:_)
-    | Str s <- i = head' s
+    | Str s <- i = take 1 s
     | Space <- i = " "
     | otherwise  = headInline $ getInline i
 
@@ -322,7 +322,7 @@ tailInline inls
     | otherwise  = tailFirstInlineStr inls
 
 tailFirstInlineStr :: [Inline] -> [Inline]
-tailFirstInlineStr = mapHeadInline tail'
+tailFirstInlineStr = mapHeadInline (drop 1)
 
 toCapital :: [Inline] -> [Inline]
 toCapital = mapHeadInline capitalize

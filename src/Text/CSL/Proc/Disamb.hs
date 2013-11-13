@@ -28,7 +28,7 @@ import Data.Ord ( comparing )
 import Text.CSL.Eval
 import Text.CSL.Reference
 import Text.CSL.Style
-import Text.CSL.Util (head', query, proc)
+import Text.CSL.Util (query, proc)
 
 -- | Given the 'Style', the list of references and the citation
 -- groups, disambiguate citations according to the style options.
@@ -318,8 +318,8 @@ disambiguate l
       then disambiguate (rest l)
       else heads
     where
-      heads = map head' l
-      rest  = map (\(b,x) -> if b then tail_ x else head' x) . zip (same heads)
+      heads = map (take 1) l
+      rest  = map (\(b,x) -> if b then tail_ x else take 1 x) . zip (same heads)
 
       hasMult []     = False
       hasMult (x:xs) = length x > 1 || hasMult xs

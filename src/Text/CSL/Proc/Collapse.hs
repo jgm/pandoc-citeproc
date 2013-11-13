@@ -44,10 +44,9 @@ getCollapseOptions
 
 collapseNumber :: CitationGroup -> CitationGroup
 collapseNumber cg
-    | CG [a] f d os <- cg = mapCitationGroup process . CG [a] f d $ tail' os
+    | CG [a] f d os <- cg = mapCitationGroup process . CG [a] f d $ drop 1 os
     | otherwise           = mapCitationGroup process cg
     where
-      tail' x = if length x > 1 then tail x else x
       hasLocator = or . query hasLocator'
       hasLocator' o
           | OLoc _ _ <- o = [True]
