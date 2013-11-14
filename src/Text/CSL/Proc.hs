@@ -30,8 +30,7 @@ import Text.CSL.Reference
 import Text.CSL.Style
 import Data.Aeson
 import Control.Applicative ((<|>))
-import Text.Pandoc.Definition (Inline(Space, Note), Block(Para))
-import Text.Pandoc.Shared (stringify)
+import Text.Pandoc.Definition (Inline(Space, Str, Note), Block(Para))
 
 import Debug.Trace
 tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
@@ -283,13 +282,11 @@ formatCitLayout s (CG co f d cs)
     where
       isNote    = styleClass s == "note"
       toNote xs = [Note [Para xs]]
-      combine x y
-        | isNote     = x ++ y
-        | otherwise  = case stringify y of
-                           (c:_) | c `elem` ", ;:" -> x ++ y
-                           ""                      -> x
-                           _ | null x              -> y
-                             | otherwise           -> x ++ (Space:y)
+      combine xs [] = xs
+      combine [] ys = ys
+      combine xs ys@(Note _ : _) = xs ++ ys
+      combine xs ys@(Str [c]:_) | c `elem` ", ;:" = xs ++ ys
+      combine xs ys = xs ++ (Space : ys)
       formatAuth   = formatOutput . localMod
       formatCits   = (if isNote then toNote else id) .
                      formatOutputList . appendOutput formatting . addAffixes f .
