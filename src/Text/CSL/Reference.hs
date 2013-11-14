@@ -396,7 +396,7 @@ instance FromJSON Reference where
        v .:? "keyword" .!= mempty <*>
        v .:? "number" .!= mempty <*>
        v .:? "references" .!= mempty <*>
-       v .:? "url" .!= "" <*>
+       (v .: "URL" <|> v .:? "url" .!= "") <*>
        v .:? "doi" .!= "" <*>
        v .:? "isbn" .!= "" <*>
        v .:? "issn" .!= "" <*>
