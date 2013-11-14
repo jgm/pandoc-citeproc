@@ -24,7 +24,6 @@ module Text.CSL.Output.Pandoc
     , toCapital
     ) where
 
--- import Data.Char ( toUpper, toLower, isPunctuation )
 import Text.CSL.Util ( capitalize, proc, proc', query )
 import Data.Maybe ( fromMaybe )
 import Text.CSL.Style
@@ -42,27 +41,6 @@ renderPandoc' :: Style -> FormattedOutput -> Block
 renderPandoc' sty = Para . renderPandoc sty
 
 {-
--- | With a 'Style' and the formatted output generate a 'String' in
--- the native 'Pandoc' formats (i.e. immediately readable by pandoc).
-renderPandoc :: Style -> [FormattedOutput] -> [Inline]
-renderPandoc s
-    = proc (convertQuoted s) . proc' (clean $ isPunctuationInQuote s) .
-      flipFlop . render
-
--- | Same as 'renderPandoc', but the output is wrapped in a pandoc
--- paragraph block.
-renderPandoc' :: Style -> [FormattedOutput] -> Block
-renderPandoc' s
-    = Para . proc (convertQuoted s) . proc' (clean $ isPunctuationInQuote s) .
-      flipFlop . render
-
--- | For the testsuite: we use 'Link' and 'Strikeout' to store
--- "nocase" and "nodecor" rich text formatting classes.
-renderPandoc_ :: Style -> [FormattedOutput] -> [Inline]
-renderPandoc_ s
-    = proc (convertQuoted s) . proc (clean' $ isPunctuationInQuote s) .
-      flipFlop . render
-
 render :: [FormattedOutput] -> [Inline]
 render [] = []
 render (x:[])   =   renderFo x
@@ -164,40 +142,6 @@ renderFo fo
 
       rmZeros = dropWhile (== '0')
       escape s x = Link x (s,s) -- we use a link to store some data
-
-cleanStrict :: [Inline] -> [Inline]
-cleanStrict []  = []
-cleanStrict (i:is)
-    | Str []    <- i  =                  cleanStrict is
-    | Str " "   <- i  = Space          : cleanStrict is
-    | Str sa    <- i
-    , Str sb:xs <- is = Str (sa ++ sb) : cleanStrict xs
-    | otherwise       =              i : cleanStrict is
-
-clean :: Bool -> [Inline] -> [Inline]
-clean _ []  = []
-clean b (i:is)
-    | Superscript x <- i = split (isLink  "baseline") (return . Superscript) x ++ clean b is
-    | Subscript   x <- i = split (isLink  "baseline") (return . Subscript  ) x ++ clean b is
-    | SmallCaps   x <- i = split (isLink  "nodecor" ) (return . SmallCaps  ) x ++ clean b is
-    | Emph        x <- i = split (isLink' "emph"    ) (return . Emph       ) x ++ clean b is
-    | Strong      x <- i = split (isLink' "strong"  ) (return . Strong     ) x ++ clean b is
-    | Link      x t <- i = clean' b (Link x t : clean b is)
-    | otherwise          = clean' b (i        : clean b is)
-    where
-      unwrap f ls
-          | Link x _ : _ <- ls = clean' b x
-          |        _ : _ <- ls = f ls
-          | otherwise          = []
-      isLink l il
-          | Link _ (x,y) <- il = x == l && x == y
-          | otherwise          = False
-      isLink' l il
-          | Link _ (x,y) <- il = (x == l || x == "nodecor") && x == y
-          | otherwise          = False
-      split _ _ [] = []
-      split f g xs = let (y, r) = break f xs
-                     in concatMap (unwrap g) [y, take 1 r] ++ split f g (drop 1 r)
 -}
 
 

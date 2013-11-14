@@ -122,7 +122,7 @@ formatOutput o =
       ONum     i       f  -> formatOutput (OStr (show i) f)
       OCitNum  i       f  -> if i == 0
                                 then [Strong [Str "???"]]
-                                else formatOutput (OStr (add00 i) f)
+                                else formatOutput (OStr (show i) f)
       OUrl     s       f  -> [Link (formatOutput (OStr (fst s) f)) s]
       OName  _ os _    f  -> formatOutput (Output os f)
       OContrib _ _ os _ _ -> format os
@@ -132,7 +132,6 @@ formatOutput o =
       _                   -> []
     where
       format = concatMap formatOutput
-      add00  = show -- TODO why was this here??  reverse . take 5 . flip (++) (repeat '0') . reverse . show
 
 addFormatting :: Formatting -> FormattedOutput -> FormattedOutput
 addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
