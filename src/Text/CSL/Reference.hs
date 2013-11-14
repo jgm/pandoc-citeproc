@@ -378,7 +378,7 @@ instance FromJSON Reference where
        v .:? "container-title" .!= mempty <*>
        v .:? "volume-title" .!= mempty <*>
        v .:? "collection-title" .!= mempty <*>
-       v .:? "container-title-short" .!= mempty <*>
+       (v .: "journalAbbreviation" <|> v .:? "container-title-short" .!= mempty) <*>
        v .:? "collection-number" .!= mempty <*>
        v .:? "original-title" .!= mempty <*>
        v .:? "publisher" .!= mempty <*>
