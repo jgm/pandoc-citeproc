@@ -334,16 +334,3 @@ mapHeadInline f (i:xs)
     | Link      is t <- i = Link        (mapHeadInline f is) t : xs
     | Span     at is <- i = Span at     (mapHeadInline f is)   : xs
     | otherwise           = i : xs
-
-getInline :: Inline -> [Inline]
-getInline i
-    | Emph        is <- i = is
-    | Strong      is <- i = is
-    | Strikeout   is <- i = is
-    | Superscript is <- i = is
-    | Subscript   is <- i = is
-    | Quoted _    is <- i = is
-    | SmallCaps   is <- i = is
-    | Link      is _ <- i = is
-    | Span _      is <- i = is
-    | otherwise           = []
