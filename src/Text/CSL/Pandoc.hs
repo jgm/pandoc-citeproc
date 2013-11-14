@@ -119,13 +119,8 @@ processCite s cs (Cite t _) =
    case M.lookup t cs of
         Just (x:xs)
           | isTextualCitation t && not (null xs) ->
-             let xs' = renderPandoc s xs
-             in  if styleClass s == "note"
-                    then Cite t (renderPandoc s [x] ++ [Note [Para xs']])
-                    else Cite t (renderPandoc s [x] ++ [Space | not (startWithPunct xs')] ++ xs')
-          | otherwise -> if styleClass s == "note"
-                            then Cite t [Note [Para $ renderPandoc s (x:xs)]]
-                            else Cite t (renderPandoc s (x:xs))
+                         Cite t (renderPandoc s [x] ++ renderPandoc s xs)
+          | otherwise -> Cite t (renderPandoc s (x:xs))
         _             -> Strong [Str "???"]  -- TODO raise error instead?
 processCite _ _ x = x
 
