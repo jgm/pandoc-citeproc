@@ -29,12 +29,9 @@ import qualified Data.Text as T
 import qualified Data.Vector as V
 import Data.Char (toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
-import Text.CSL.Util (parseString, trimr, safeRead, readNum,
+import Text.CSL.Util (parseString, safeRead, readNum,
                       inlinesToString, capitalize, camelize)
-import Text.Pandoc (readHtml, def, Pandoc(..), Block(..), Inline(..),
-                    nullMeta, writeMarkdown, WriterOptions(..),
-                    ReaderOptions(..), Format(..), bottomUp)
-import qualified Text.Pandoc.Walk as Walk
+import Text.Pandoc (Inline(Str))
 import qualified Text.Pandoc.Builder as B
 import Data.List.Split (wordsBy)
 import Data.String
@@ -46,10 +43,10 @@ newtype Formatted = Formatted { unFormatted :: [Inline] }
 
 instance FromJSON Formatted where
   parseJSON v@(Array _) = Formatted <$> parseJSON v
-  parseJSON v           = fmap readCSLString $ parseString v
+  parseJSON v           = fmap (Formatted . readCSLString) $ parseString v
 
 instance ToJSON Formatted where
-  toJSON = toJSON . writeCSLString
+  toJSON = toJSON . writeCSLString . unFormatted
 
 instance IsString Formatted where
   fromString = Formatted . B.toList . B.text
@@ -65,40 +62,6 @@ instance ToJSON Literal where
 
 instance IsString Literal where
   fromString = Literal
-
--- Note:  FromJSON reads HTML, ToJSON writes Markdown.
--- This means that they aren't proper inverses of each other, which
--- is odd, but it makes sense given the uses here.  FromJSON is used
--- for reading JSON citeproc bibliographies.  ToJSON is used to create
--- pandoc metadata bibliographies.
-
-readCSLString :: String -> Formatted
-readCSLString s = Formatted $
-                  case readHtml def{ readerSmart = True
-                                   , readerParseRaw = True } s of
-                        Pandoc _ [Plain ils]   -> ils
-                        Pandoc _ [Para  ils]   -> ils
-                        Pandoc _ x             -> Walk.query (:[]) x
-
-writeCSLString :: Formatted -> String
-writeCSLString (Formatted ils) =
-  trimr $ writeMarkdown def{writerWrapText = False}
-        $ Pandoc nullMeta [Plain $ bottomUp (concatMap adjustCSL) ils]
-
-adjustCSL :: Inline -> [Inline]
-adjustCSL (Span ("",[],[]) xs) = xs
-adjustCSL (Span ("",["citeproc-no-output"],[]) _) =
-  [Str "[CSL STYLE ERROR: reference with no printed form.]"]
-adjustCSL (SmallCaps xs) =
-  RawInline (Format "html") "<span style=\"font-variant:small-caps;\">" : xs
-    ++ [RawInline (Format "html") "</span>"]
-adjustCSL (Subscript xs) =
-  RawInline (Format "html") "<span style=\"vertical-align:sub;\">" : xs
-    ++ [RawInline (Format "html") "</span>"]
-adjustCSL (Superscript xs) =
-  RawInline (Format "html") "<span style=\"vertical-align:sup;\">" : xs
-    ++ [RawInline (Format "html") "</span>"]
-adjustCSL x = [x]
 
 -- | An existential type to wrap the different types a 'Reference' is
 -- made of. This way we can create a map to make queries easier.

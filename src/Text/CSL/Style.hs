@@ -23,10 +23,13 @@ import Data.List ( nubBy, isPrefixOf, isInfixOf, intercalate )
 import Data.Generics ( Data, Typeable )
 import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
-import Text.Pandoc.Definition hiding (Citation, Cite)
 import Data.Char (isPunctuation)
 import Text.CSL.Util (mb, parseBool, (.#?), (.#:), proc', query,
-                      betterThan)
+                      betterThan, trimr )
+import Text.Pandoc.Definition hiding (Citation, Cite)
+import Text.Pandoc (readHtml, writeMarkdown, WriterOptions(..),
+                    ReaderOptions(..), bottomUp, def)
+import qualified Text.Pandoc.Walk as Walk
 import qualified Data.Text as T
 
 #ifdef UNICODE_COLLATION
@@ -38,6 +41,50 @@ import Data.RFC5051 (compareUnicode)
 import qualified Data.Vector as V
 #ifdef USE_NETWORK
 #endif
+
+-- Note:  FromJSON reads HTML, ToJSON writes Markdown.
+-- This means that they aren't proper inverses of each other, which
+-- is odd, but it makes sense given the uses here.  FromJSON is used
+-- for reading JSON citeproc bibliographies.  ToJSON is used to create
+-- pandoc metadata bibliographies.
+
+readCSLString :: String -> [Inline]
+readCSLString s = case readHtml def{ readerSmart = True
+                                   , readerParseRaw = True }
+                                (adjustScTags s) of
+                        Pandoc _ [Plain ils]   -> ils
+                        Pandoc _ [Para  ils]   -> ils
+                        Pandoc _ x             -> Walk.query (:[]) x
+
+adjustScTags :: String -> String
+adjustScTags zs =
+  case zs of
+       ('<':'s':'c':'>':xs)     -> "<span style=\"font-variant:small-caps;\">" ++
+                                    adjustScTags xs
+       ('<':'/':'s':'c':'>':xs) -> "</span>" ++ adjustScTags xs
+       (x:xs)                   -> x : adjustScTags xs
+       []                       -> []
+
+
+writeCSLString :: [Inline] -> String
+writeCSLString ils =
+  trimr $ writeMarkdown def{writerWrapText = False}
+        $ Pandoc nullMeta [Plain $ bottomUp (concatMap adjustCSL) ils]
+
+adjustCSL :: Inline -> [Inline]
+adjustCSL (Span ("",[],[]) xs) = xs
+adjustCSL (Span ("",["citeproc-no-output"],[]) _) =
+  [Str "[CSL STYLE ERROR: reference with no printed form.]"]
+adjustCSL (SmallCaps xs) =
+  RawInline (Format "html") "<span style=\"font-variant:small-caps;\">" : xs
+    ++ [RawInline (Format "html") "</span>"]
+adjustCSL (Subscript xs) =
+  RawInline (Format "html") "<span style=\"vertical-align:sub;\">" : xs
+    ++ [RawInline (Format "html") "</span>"]
+adjustCSL (Superscript xs) =
+  RawInline (Format "html") "<span style=\"vertical-align:sup;\">" : xs
+    ++ [RawInline (Format "html") "</span>"]
+adjustCSL x = [x]
 
 -- | The representation of a parsed CSL style.
 data Style
@@ -446,7 +493,7 @@ data Affix
       deriving ( Show, Read, Eq, Ord, Typeable, Data )
 
 instance FromJSON Affix where
-  parseJSON (String s) = pure $ PlainText (T.unpack s)
+  parseJSON (String s) = pure $ PandocText (readCSLString $ T.unpack s)
   parseJSON _          = fail "Could not parse affix"
 
 type Citations = [[Cite]]
