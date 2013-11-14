@@ -203,21 +203,23 @@ clean b (i:is)
 
 clean' :: Bool -> [Inline] -> [Inline]
 clean' _   []  = []
-clean' b (i:is) =
+clean' punctuationInQuote (i:is) =
   case (i:is) of
       (Span ("",[],kvs) inls : _)
          | lookup "csl-inquote" kvs == Just "true" ->
              case headInline is of
-                    [x] -> if x `elem` ".," && b
+                    [x] -> if x `elem` ".," && punctuationInQuote
                            then if lastInline inls `elem` [".",",",";",":","!","?"]
-                                then quote DoubleQuote inls                : clean' b (tailInline is)
-                                else quote DoubleQuote (inls ++ [Str [x]]) : clean' b (tailInline is)
-                           else quote DoubleQuote inls : clean' b is
-                    _   ->      quote DoubleQuote inls : clean' b is
-      (Quoted t inls : _) -> quote t inls : clean' b is
+                                then quote DoubleQuote inls                :
+                                     clean' punctuationInQuote (tailInline is)
+                                else quote DoubleQuote (inls ++ [Str [x]]) :
+                                     clean' punctuationInQuote (tailInline is)
+                           else quote DoubleQuote inls : clean' punctuationInQuote is
+                    _   ->      quote DoubleQuote inls : clean' punctuationInQuote is
+      (Quoted t inls : _) -> quote t inls : clean' punctuationInQuote is
       _      -> if lastInline [i] == headInline is && isPunct
-                   then i : clean' b (tailInline is)
-                   else i : clean' b is
+                   then i : clean' punctuationInQuote (tailInline is)
+                   else i : clean' punctuationInQuote is
     where
       quote t x = Quoted t (reverseQuoted t x)
       isPunct = and . map (flip elem ".,;:!? ") $ headInline is
