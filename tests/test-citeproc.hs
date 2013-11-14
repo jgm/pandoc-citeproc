@@ -165,6 +165,7 @@ fixBegins = unlines . map fixLine . lines
 
 -- adjust the spans so we fit what the test suite expects.
 adjustSpans :: Inline -> [Inline]
+adjustSpans (Note [Para xs]) = xs
 adjustSpans (Span ("",[],[]) xs) = xs
 adjustSpans (Span ("",["nocase"],[]) xs) = xs
 adjustSpans (Span ("",["citeproc-no-output"],[]) _) =
