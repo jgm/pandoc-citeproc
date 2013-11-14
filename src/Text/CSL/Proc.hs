@@ -22,7 +22,7 @@ import Data.List
 import Data.Ord  ( comparing )
 import Data.Maybe ( mapMaybe )
 import Text.CSL.Eval
-import Text.CSL.Util ( capitalize, proc, proc', query, toShow )
+import Text.CSL.Util ( capitalize, proc, proc', query, toShow, last' )
 import Text.CSL.Output.Plain
 import Text.CSL.Proc.Collapse
 import Text.CSL.Proc.Disamb
@@ -317,9 +317,7 @@ addAffixes f os
                     , [c] == lastOutput -> [OStr cs emptyFormatting]
                   [] -> []
                   cs  -> [OStr cs emptyFormatting]
-      lastOutput = case renderPlain (formatOutputList os) of
-                     [] -> ""
-                     x  -> [last x]
+      lastOutput = last' $ renderPlain (formatOutputList os)
 
 -- | The 'Bool' is 'True' if we are formatting a textual citation (in
 -- pandoc terminology).
