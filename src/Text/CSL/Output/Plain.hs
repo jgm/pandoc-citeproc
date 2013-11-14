@@ -24,6 +24,3 @@ import Text.Pandoc
 renderPlain :: FormattedOutput -> String
 renderPlain ils = writePlain def $ Pandoc nullMeta [Plain ils]
 
--- TODO:  handle capitalize-first, capitalize-all, lowercase, uppercase
--- Really this should probably be done on first conversion from
--- Output -> FormattedOutput
