@@ -46,7 +46,6 @@ module Text.CSL
     , Citation (..)
     , Bibliography (..)
     , Cite (..)
-    , Affix (..)
     , Abbreviations (..)
     , emptyCite
 

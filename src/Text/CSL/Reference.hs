@@ -32,24 +32,8 @@ import Text.CSL.Style hiding (Number)
 import Text.CSL.Util (parseString, safeRead, readNum,
                       inlinesToString, capitalize, camelize)
 import Text.Pandoc (Inline(Str))
-import qualified Text.Pandoc.Builder as B
 import Data.List.Split (wordsBy)
 import Data.String
-
--- We use a newtype wrapper so we can have custom ToJSON, FromJSON
--- instances.
-newtype Formatted = Formatted { unFormatted :: [Inline] }
-  deriving ( Show, Read, Eq, Data, Typeable, Monoid )
-
-instance FromJSON Formatted where
-  parseJSON v@(Array _) = Formatted <$> parseJSON v
-  parseJSON v           = fmap (Formatted . readCSLString) $ parseString v
-
-instance ToJSON Formatted where
-  toJSON = toJSON . writeCSLString . unFormatted
-
-instance IsString Formatted where
-  fromString = Formatted . B.toList . B.text
 
 newtype Literal = Literal { unLiteral :: String }
   deriving ( Show, Read, Eq, Data, Typeable, Monoid )

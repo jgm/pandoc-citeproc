@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings, PatternGuards, DeriveDataTypeable,
-    ScopedTypeVariables, FlexibleInstances #-}
+    ScopedTypeVariables, FlexibleInstances, GeneralizedNewtypeDeriving #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Style
@@ -17,6 +17,8 @@
 module Text.CSL.Style where
 
 import Data.Aeson hiding (Number)
+import Data.String
+import Data.Monoid (mempty, Monoid)
 import Control.Arrow
 import Control.Applicative hiding (Const)
 import Data.List ( nubBy, isPrefixOf, isInfixOf, intercalate )
@@ -24,13 +26,13 @@ import Data.Generics ( Data, Typeable )
 import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
 import Data.Char (isPunctuation)
-import Text.CSL.Util (mb, parseBool, (.#?), (.#:), proc', query,
+import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), proc', query,
                       betterThan, trimr )
 import Text.Pandoc.Definition hiding (Citation, Cite)
 import Text.Pandoc (readHtml, writeMarkdown, WriterOptions(..),
                     ReaderOptions(..), bottomUp, def)
 import qualified Text.Pandoc.Walk as Walk
-import qualified Data.Text as T
+import qualified Text.Pandoc.Builder as B
 
 #ifdef UNICODE_COLLATION
 import qualified Data.Text     as T
@@ -85,6 +87,21 @@ adjustCSL (Superscript xs) =
   RawInline (Format "html") "<span style=\"vertical-align:sup;\">" : xs
     ++ [RawInline (Format "html") "</span>"]
 adjustCSL x = [x]
+
+-- We use a newtype wrapper so we can have custom ToJSON, FromJSON
+-- instances.
+newtype Formatted = Formatted { unFormatted :: [Inline] }
+  deriving ( Show, Read, Eq, Data, Typeable, Monoid )
+
+instance FromJSON Formatted where
+  parseJSON v@(Array _) = Formatted <$> parseJSON v
+  parseJSON v           = fmap (Formatted . readCSLString) $ parseString v
+
+instance ToJSON Formatted where
+  toJSON = toJSON . writeCSLString . unFormatted
+
+instance IsString Formatted where
+  fromString = Formatted . B.toList . B.text
 
 -- | The representation of a parsed CSL style.
 data Style
@@ -487,21 +504,12 @@ data Output
     | Output  [Output]            Formatting            -- ^ Some nested 'Output'
       deriving ( Eq, Ord, Show, Typeable, Data )
 
-data Affix
-    = PlainText String
-    | PandocText [Inline]
-      deriving ( Show, Read, Eq, Ord, Typeable, Data )
-
-instance FromJSON Affix where
-  parseJSON (String s) = pure $ PandocText (readCSLString $ T.unpack s)
-  parseJSON _          = fail "Could not parse affix"
-
 type Citations = [[Cite]]
 data Cite
     = Cite
       { citeId         :: String
-      , citePrefix     :: Affix
-      , citeSuffix     :: Affix
+      , citePrefix     :: Formatted
+      , citeSuffix     :: Formatted
       , citeLabel      :: String
       , citeLocator    :: String
       , citeNoteNumber :: String
@@ -515,8 +523,8 @@ data Cite
 instance FromJSON Cite where
   parseJSON (Object v) = Cite <$>
               v .#: "id" <*>
-              v .:? "prefix" .!= PlainText "" <*>
-              v .:? "suffix" .!= PlainText "" <*>
+              v .:? "prefix" .!= mempty <*>
+              v .:? "suffix" .!= mempty <*>
               v .#? "label" .!= "" <*>
               v .#? "locator"  .!= "" <*>
               v .#? "note-number" .!= "" <*>
@@ -531,11 +539,8 @@ instance FromJSON [[Cite]] where
   parseJSON (Array v) = mapM parseJSON $ V.toList v
   parseJSON _ = return []
 
-emptyAffix :: Affix
-emptyAffix = PlainText []
-
 emptyCite :: Cite
-emptyCite  = Cite [] emptyAffix emptyAffix [] [] [] [] False False False 0
+emptyCite  = Cite [] mempty mempty [] [] [] [] False False False 0
 
 -- | A citation group: the first list has a single member when the
 -- citation group starts with an "author-in-text" cite, the

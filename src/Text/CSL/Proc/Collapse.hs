@@ -16,6 +16,7 @@
 
 module Text.CSL.Proc.Collapse where
 
+import Data.Monoid (mempty)
 import Control.Arrow ( (&&&), (>>>), second )
 import Data.Char
 import Data.List ( groupBy )
@@ -108,7 +109,7 @@ collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
       collapseRange = if null ranged then map (uncurry addCiteAffixes)
                       else collapseYearSuf isRanged yearSufDel
 
-      rmAffixes x = x {citePrefix = emptyAffix, citeSuffix = emptyAffix}
+      rmAffixes x = x {citePrefix = mempty, citeSuffix = mempty}
       delim = let d' = getOptionVal "cite-group-delimiter" . citOptions . citation $ s
               -- FIXME: see https://bitbucket.org/bdarcus/citeproc-test/issue/15
               -- in  if null d' then if null d then ", " else d else d'
@@ -145,8 +146,7 @@ collapseYearSuf ranged ysd = process
       processYS = if ranged then collapseYearSufRanged else id
       process = map (flip Output emptyFormatting . getYS) . groupBy comp
 
-      checkAffix (PlainText  []) = True
-      checkAffix (PandocText []) = True
+      checkAffix (Formatted  []) = True
       checkAffix _               = False
 
       comp a b = yearOf (snd a) == yearOf (snd b) &&
@@ -195,11 +195,8 @@ addCiteAffixes c x =
   where
       addCiteAff isprefix y =
           case y of
-            PlainText  []    -> []
-            PlainText  p     -> OStr p emptyFormatting
-                                : if isprefix then [OSpace] else []
-            PandocText []    -> []
-            PandocText p     -> OPan p : if isprefix then [OSpace] else []
+            Formatted  []    -> []
+            Formatted ils    -> OPan ils : if isprefix then [OSpace] else []
 
 isNumStyle :: [Output] -> Bool
 isNumStyle = null . query authorOrDate . proc rmLocator

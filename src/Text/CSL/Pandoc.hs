@@ -206,8 +206,8 @@ toCslCite c
                       SuppressAuthor -> (False,True )
                       NormalCitation -> (False,False)
       in   emptyCite { CSL.citeId         = citationId c
-                     , CSL.citePrefix     = PandocText $ citationPrefix c
-                     , CSL.citeSuffix     = PandocText s'
+                     , CSL.citePrefix     = Formatted $ citationPrefix c
+                     , CSL.citeSuffix     = Formatted s'
                      , CSL.citeLabel      = la
                      , CSL.citeLocator    = lo
                      , CSL.citeNoteNumber = show $ citationNoteNum c

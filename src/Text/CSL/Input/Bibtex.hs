@@ -28,6 +28,7 @@ import Control.Monad
 import Control.Monad.RWS
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
+import Text.CSL.Style (Formatted(..))
 import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen)
 import qualified Text.Pandoc.Walk as Walk
 
@@ -64,7 +65,7 @@ parseRawLaTeX _ _ = []
 
 inlinesToFormatted :: [Inline] -> Bib Formatted
 inlinesToFormatted ils = do
-  lang <- gets localeLang
+  lang <- gets localeLanguage
   return $ Formatted $ bottomUp (concatMap (adjustSpans lang)) ils
 
 inlinesToString :: [Inline] -> Bib String
@@ -374,8 +375,8 @@ parseMonth "dec" = "12"
 parseMonth x     = x
 
 data BibState = BibState{
-           untitlecase  :: Bool
-         , localeLang   :: Lang
+           untitlecase     :: Bool
+         , localeLanguage  :: Lang
          }
 
 type Bib = RWST Item () BibState Maybe
@@ -551,8 +552,8 @@ toAuthor _ [Span ("",[],[]) ils] = do
 -- von Last, First
 -- von Last, Jr ,First
 toAuthor opts ils = do
-  let useprefix = isSet "useprefix" opts
-  let usecomma  = isSet "juniorcomma" opts
+  let useprefix = optionSet "useprefix" opts
+  let usecomma  = optionSet "juniorcomma" opts
   let words' = wordsBy (\x -> x == Space || x == Str "\160")
   let commaParts = map words' $ splitWhen (== Str ",")
                               $ splitStrWhen (\c -> c == ',' || c == '\160') ils
@@ -596,8 +597,8 @@ isCapitalized (Str (c:cs) : rest)
 isCapitalized (_:rest) = isCapitalized rest
 isCapitalized [] = True
 
-isSet :: String -> Options -> Bool
-isSet key opts = case lookup key opts of
+optionSet :: String -> Options -> Bool
+optionSet key opts = case lookup key opts of
                       Just "true" -> True
                       Just s      -> s == mempty
                       _           -> False
@@ -705,7 +706,7 @@ parseOptions = map breakOpt . splitWhen (==',')
 
 itemToReference :: Lang -> Bool -> Item -> Maybe Reference
 itemToReference lang bibtex = bib $ do
-  modify $ \st -> st{ localeLang = lang,
+  modify $ \st -> st{ localeLanguage = lang,
                       untitlecase = case lang of
                                          Lang "en" _ -> True
                                          _           -> False }
