@@ -114,7 +114,7 @@ procRefs (Style {biblio = mb, csMacros = ms , styleLocale = l, styleAbbrevs = as
     where
       opts'   b = mergeOptions (bibOptions b) opts
       setCNum   = map (\(x,y) -> x { citationNumber = fromIntegral y }) . flip zip ([1..] :: [Int])
-      sort_   b = evalSorting (EvalSorting emptyCite {citePosition = "first"})l ms (opts' b) (bibSort b) as
+      sort_   b = evalSorting (EvalSorting emptyCite {citePosition = "first"}) l ms (opts' b) (bibSort b) as
       process b = setCNum . sortItems . map (id &&& sort_ b) $ rs
 
 sortItems :: Show a => [(a,[Sorting])] -> [a]
@@ -261,7 +261,7 @@ procGroup (Style {citation = ct, csMacros = ms , styleLocale = l,
                        _     -> (result, [])
       eqCites eq c = fst >>> citeId &&& citeHash >>> eq (citeId &&& citeHash $ fst c)
       opts'        = mergeOptions (citOptions ct) opts
-      format (c,r) = (,) c $ evalLayout (citLayout ct) (EvalCite c) False l ms opts' as r
+      format (c,r) = (c,  evalLayout (citLayout ct) (EvalCite c) False l ms opts' as r)
       sort_  (c,r) = evalSorting (EvalSorting c) l ms opts' (citSort ct) as r
       process      = map (second (flip Output emptyFormatting) . format &&& sort_)
       result       = sortItems $ process cr
