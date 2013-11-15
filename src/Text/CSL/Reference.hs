@@ -373,7 +373,7 @@ instance FromJSON Reference where
        v .:? "jurisdiction" .!= mempty <*>
        v .:? "archive" .!= mempty <*>
        v .:? "archive-place" .!= mempty <*>
-       v .:? "archive-location" .!= mempty <*>
+       (v .: "archive_location" <|> v .:? "archive-location" .!= mempty) <*>
        v .:? "event" .!= mempty <*>
        v .:? "event-place" .!= mempty <*>
        v .:? "page" .!= mempty <*>
