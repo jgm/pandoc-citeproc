@@ -220,7 +220,9 @@ evalIfThen i ei e
       chkDisambiguate s = gets disamb  >>= return . (==) (formatVariable s) . map toLower . show
       chkLocator      v = getLocVar    >>= return . (==) v . fst
       isIbid          s = not (s == "first" || s == "subsequent")
-      compPosition a b
+      -- DEBUG
+      compPosition a b = tr' ("compPosition " ++ show a ++ show b) (compPosition' a b)
+      compPosition' a b
           | "first"             <- a = b == "first"
           | "subsequent"        <- a = b /= "first"
           | "ibid-with-locator" <- a = b == "ibid-with-locator" ||

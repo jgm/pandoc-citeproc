@@ -251,7 +251,10 @@ filterRefs bos refs
 procGroup :: Style -> [(Cite, Reference)] -> CitationGroup
 procGroup (Style {citation = ct, csMacros = ms , styleLocale = l,
                   styleAbbrevs = as, csOptions = opts}) cr
-    = CG authIn (layFormat $ citLayout ct) (layDelim $ citLayout ct) (authIn ++ co)
+    = CG authIn (layFormat $ citLayout ct) (layDelim $ citLayout ct) (tr' "authIn" authIn ++ co)
+    -- NOTE TODO:  at this point, authIn lacks the book title in the bad case,
+    -- has it in the good case.  It has citeSuffix in both cases but the
+    -- citePosition is ibid-with-locator-c in the bad case, first in the good case.
     where
       (co, authIn) = case cr of
                        (c:_) -> if authorInText (fst c)
@@ -277,6 +280,7 @@ formatCitLayout s (CG co f d cs)
     | otherwise = formatCits cs
     where
       isNote    = styleClass s == "note"
+      toNote (Str [c]:xs) | c `elem` ".,;:!?" = [Note [Para $ dropWhile (==Space) xs]]
       toNote xs = [Note [Para xs]]
       combine xs [] = xs
       combine [] ys = ys
