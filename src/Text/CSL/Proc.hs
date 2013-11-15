@@ -255,11 +255,10 @@ procGroup (Style {citation = ct, csMacros = ms , styleLocale = l,
     where
       (co, authIn) = case cr of
                        (c:_) -> if authorInText (fst c)
-                                then (,) (filter (eqCites (/=) c) $ result
-                                         ) . foldr (\x _ -> [x]) [] .
-                                          filter (eqCites (==) c) $ result
-                                else (,) result []
-                       _     -> (,) result []
+                                then (filter (eqCites (/=) c) $ result,
+                                      take 1 .  filter (eqCites (==) c) $ result)
+                                else (result, [])
+                       _     -> (result, [])
       eqCites eq c = fst >>> citeId &&& citeHash >>> eq (citeId &&& citeHash $ fst c)
       opts'        = mergeOptions (citOptions ct) opts
       format (c,r) = (,) c $ evalLayout (citLayout ct) (EvalCite c) False l ms opts' as r
