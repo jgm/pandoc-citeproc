@@ -15,7 +15,6 @@
 
 module Text.CSL.Eval.Output where
 
-import Text.CSL.Output.Plain
 import Text.CSL.Output.Pandoc (lastInline, headInline, tailInline)
 import Text.CSL.Style
 import Data.Char (toLower, toUpper)
@@ -62,7 +61,8 @@ rmEmptyOutput o
     | otherwise        = o
 
 addDelim :: String -> [Output] -> [Output]
-addDelim d = intersperse (ODel d)
+addDelim "" = filter (/= ONull)
+addDelim d  = intersperse (ODel d) . filter (/= ONull)
 -- NOTE:  The old code, below, causes a huge number of
 -- invocations of formatOutputList, which I believe are
 -- unnecessary, given the way formatOutputList works now.
