@@ -219,12 +219,12 @@ evalIfThen i ei e
                           else gets (citePosition . cite . env) >>= return . compPosition s
       chkDisambiguate s = gets disamb  >>= return . (==) (formatVariable s) . map toLower . show
       chkLocator      v = getLocVar    >>= return . (==) v . fst
-      isIbid          s = if s == "first" || s == "subsequent" then False else True
+      isIbid          s = not (s == "first" || s == "subsequent")
       compPosition a b
-          | "first"             <- a = if b == "first"               then True  else False
-          | "subsequent"        <- a = if b == "first"               then False else True
-          | "ibid-with-locator" <- a = if b == "ibid-with-locator" ||
-                                          b == "ibid-with-locator-c" then True  else False
+          | "first"             <- a = b == "first"
+          | "subsequent"        <- a = b /= "first"
+          | "ibid-with-locator" <- a = b == "ibid-with-locator" ||
+                                       b == "ibid-with-locator-c"
           | otherwise                = isIbid b
 
 getFormattedValue :: [Option] -> Abbreviations -> Form -> Formatting -> String -> Value -> [Output]
