@@ -22,10 +22,9 @@ import Text.CSL.Util (capitalize, titlecase, unTitlecase)
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk (walk)
 import Text.CSL.Util (toStr)
-import Data.List (intersperse)
 
-import Debug.Trace
-tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
+-- import Debug.Trace
+-- tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
 
 output :: Formatting -> String -> [Output]
 output fm s
@@ -50,33 +49,27 @@ cleanOutput = flatten
       flatten (o:os)
           | ONull       <- o     = flatten os
           | Output xs f <- o
-          , f == emptyFormatting = flatten xs ++ flatten os
+          , f == emptyFormatting = flatten (map rmEmptyOutput xs) ++ flatten os
           | otherwise            = rmEmptyOutput o : flatten os
 
 rmEmptyOutput :: Output -> Output
 rmEmptyOutput o
     | Output [] _ <- o = ONull
     | OStr []   _ <- o = ONull
+    | OPan []     <- o = ONull
+    | ODel []     <- o = ONull
     | OUrl t    _ <- o = if null (fst t) then ONull else o
     | otherwise        = o
 
 addDelim :: String -> [Output] -> [Output]
-addDelim "" = filter (/= ONull)
-addDelim d  = intersperse (ODel d) . filter (/= ONull)
--- NOTE:  The old code, below, causes a huge number of
--- invocations of formatOutputList, which I believe are
--- unnecessary, given the way formatOutputList works now.
--- Taking it out speeds things out quite a bit and only causes
--- one test failure, which I think can be handled in another way.
--- addDelim d = foldr (\x xs -> if null xs then x : xs else check x xs) []
---     where
---       check ONull xs   = xs
---       check x     xs   = let text = renderPlain . formatOutputList
---                          in  if not (null d) && text [x] /= [] && text xs /= []
---                              then if head d == last (text [x]) && head d `elem` ".,;:!?"
---                                   then x : ODel (tail d) : xs
---                                   else x : ODel       d  : xs
---                              else      x                 : xs
+addDelim "" = id
+addDelim d  = foldr check []
+    where
+      check ONull xs   = xs
+      check x     []   = [x]
+      check x (z:zs)   = if null (formatOutput x) || null (formatOutput z)
+                            then x : z : zs
+                            else x : ODel d : z : zs
 
 noOutputError :: Output
 noOutputError = OErr NoOutput
@@ -97,7 +90,7 @@ o  <++> [] = o
 o1 <++> o2 = o1 ++ [OSpace] ++ o2
 
 formatOutputList :: [Output] -> FormattedOutput
-formatOutputList = foldr appendWithPunct [] . map formatOutput . tr' "output"
+formatOutputList = foldr appendWithPunct [] . map formatOutput
 
 appendWithPunct :: FormattedOutput -> FormattedOutput -> FormattedOutput
 appendWithPunct left right = left ++
