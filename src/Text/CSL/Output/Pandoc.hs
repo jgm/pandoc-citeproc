@@ -255,7 +255,8 @@ initInline (i:xs) = i : initInline xs
 
 tailInline :: [Inline] -> [Inline]
 tailInline (Space:xs) = xs
-tailInline xs         = tailFirstInlineStr xs
+tailInline xs         = removeEmpty $ tailFirstInlineStr xs
+  where removeEmpty   = dropWhile (== Str "")
 
 tailFirstInlineStr :: [Inline] -> [Inline]
 tailFirstInlineStr = mapHeadInline (drop 1)

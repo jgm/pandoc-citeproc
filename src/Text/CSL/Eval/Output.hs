@@ -101,10 +101,11 @@ formatOutputList = foldr appendWithPunct [] . map formatOutput
 
 appendWithPunct :: FormattedOutput -> FormattedOutput -> FormattedOutput
 appendWithPunct left right = left ++
-  if isPunct (lastInline left) && isPunct (headInline right)
+  if isPunct' (lastInline left) && isPunct' (headInline right)
      then tailInline right
      else right
-  where isPunct = and . map (`elem` ".!?")
+  where isPunct' [c] = isPunct c
+        isPunct' _   = False
 
 -- | Convert evaluated 'Output' into 'FormattedOutput', ready for the
 -- output filters.
@@ -143,12 +144,15 @@ formatOutput o =
     where
       format = concatMap formatOutput
 
+isPunct :: Char -> Bool
+isPunct c = c `elem` ".;?!"
+
 addFormatting :: Formatting -> FormattedOutput -> FormattedOutput
 addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
   where pref = case prefix f of { "" -> id; x -> ((toStr x) ++) }
         addSuffix i
-          | case suffix f of {(c:_) | c `elem` ".?!" -> True; _ -> False}
-          , case lastInline i of {(c:_) | c `elem` ".?!" -> True; _ -> False}
+          | case suffix f of {(c:_) | isPunct c -> True; _ -> False}
+          , case lastInline i of {(c:_) | isPunct c -> True; _ -> False}
                                   = i ++ toStr (tail $ suffix f)
           | not (null (suffix f)) = i ++ toStr (       suffix f)
           | otherwise             = i

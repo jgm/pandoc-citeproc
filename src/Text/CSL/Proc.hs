@@ -324,7 +324,8 @@ localModifiers s b c
     | suppressAuthor c = check . rmContrib . return
     | otherwise        = id
     where
-      isPunct = and . map (flip elem ".,;:!? ")
+      isPunct' [] = False
+      isPunct' xs = all (`elem` ".,;:!? ") xs
       check o = case cleanOutput o of
                   [] -> ONull
                   x  -> case trim' x of
@@ -339,13 +340,13 @@ localModifiers s b c
       trim' [] = []
       trim' (o:os)
           | Output ot f <- o, p <- prefix f,  p /= []
-          , isPunct p         = trim' $ Output ot f { prefix = []} : os
+          , isPunct' p        = trim' $ Output ot f { prefix = []} : os
           | Output ot f <- o  = if or (query hasOutput ot)
                                 then Output (trim' ot) f : os
                                 else Output       ot  f : trim' os
           | ODel _      <- o  = trim' os
           | OSpace      <- o  = trim' os
-          | OStr    x f <- o  = OStr x (if isPunct (prefix f)
+          | OStr    x f <- o  = OStr x (if isPunct' (prefix f)
                                         then f { prefix = []} else f) : os
           | otherwise         = o:os
       rmFormatting f
