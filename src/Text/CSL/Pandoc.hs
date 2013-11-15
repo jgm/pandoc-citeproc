@@ -151,7 +151,7 @@ startWithPunct = and . map (`elem` ".,;:!?") . headInline
 deNote :: Pandoc -> Pandoc
 deNote = topDown go
   where go (Cite (c:cs) [Note xs]) =
-            Cite (c:cs) [Note $ bottomUp go' $ sanitize c xs]
+            Cite (c:cs) [Note $ dropInitialPunct $ bottomUp go' $ sanitize c xs]
         go (Note xs) = Note $ bottomUp go' xs
         go x = x
         go' (Note [Para xs]:ys) =
@@ -159,6 +159,8 @@ deNote = topDown go
                 then initInline xs ++ ys
                 else xs ++ ys
         go' xs = xs
+        dropInitialPunct [Para (Str [c]:Space:xs)] | c `elem` ",;:" = [Para xs]
+        dropInitialPunct bs                                         = bs
         sanitize :: Citation -> [Block] -> [Block]
         sanitize Citation{citationPrefix = pref} [Para xs] =
            case (null pref, endWithPunct xs) of

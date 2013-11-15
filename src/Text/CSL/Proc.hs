@@ -280,7 +280,6 @@ formatCitLayout s (CG co f d cs)
     | otherwise = formatCits cs
     where
       isNote    = styleClass s == "note"
-      toNote (Str [c]:xs) | c `elem` ".,;:!?" = [Note [Para $ dropWhile (==Space) xs]]
       toNote xs = [Note [Para xs]]
       combine xs [] = xs
       combine [] ys = ys
