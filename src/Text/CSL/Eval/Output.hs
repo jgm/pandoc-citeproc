@@ -24,8 +24,8 @@ import Text.Pandoc.Walk (walk)
 import Text.CSL.Util (toStr)
 import Data.List (intersperse)
 
--- import Debug.Trace
--- tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
+import Debug.Trace
+tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
 
 output :: Formatting -> String -> [Output]
 output fm s
@@ -97,15 +97,20 @@ o  <++> [] = o
 o1 <++> o2 = o1 ++ [OSpace] ++ o2
 
 formatOutputList :: [Output] -> FormattedOutput
-formatOutputList = foldr appendWithPunct [] . map formatOutput
+formatOutputList = foldr appendWithPunct [] . map formatOutput . tr' "output"
 
 appendWithPunct :: FormattedOutput -> FormattedOutput -> FormattedOutput
 appendWithPunct left right = left ++
-  if isPunct' (lastInline left) && isPunct' (headInline right)
+  if isPunct' lastleft && isPunct' firstright ||
+     isSp lastleft && isSp firstright
      then tailInline right
      else right
   where isPunct' [c] = isPunct c
         isPunct' _   = False
+        isSp " "     = True
+        isSp _       = False
+        lastleft     = lastInline left
+        firstright   = headInline right
 
 -- | Convert evaluated 'Output' into 'FormattedOutput', ready for the
 -- output filters.
