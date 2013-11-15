@@ -189,9 +189,8 @@ addCiteAffixes :: Cite -> Output -> Output
 addCiteAffixes c x =
   if isNumStyle [x]
       then x
-      else flip Output emptyFormatting $
-            addCiteAff True (citePrefix c) ++ [x] ++
-            addCiteAff False (citeSuffix c)
+      else Output ( addCiteAff True (citePrefix c) ++ [x] ++
+                    addCiteAff False (citeSuffix c)) emptyFormatting
   where
       addCiteAff isprefix y =
           case y of
