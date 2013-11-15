@@ -17,14 +17,14 @@ module Text.CSL.Eval.Names where
 
 import Control.Applicative ( (<$>) )
 import Control.Monad.State
-import Data.Char  ( toUpper, isLower, isUpper, isSpace )
+import Data.Char  ( isLower, isUpper, isSpace )
 import Data.List  ( nub )
 import Data.Maybe ( isJust )
 import Data.Monoid
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
-import Text.CSL.Util ( readNum, (<^>), (<+>), query, toRead )
+import Text.CSL.Util ( readNum, (<^>), (<+>), query, toRead, capitalize )
 import Text.CSL.Reference
 import Text.CSL.Style
 import Text.Pandoc.Definition
@@ -342,9 +342,8 @@ formatLabel f fm p s
       format      = form output id
       format' t b = gets (citePosition . cite . env) >>= \po ->
                     if po == "ibid-with-locator-c" || po == "ibid-c"
-                    then form output capital t b
+                    then form output capitalize t b
                     else format t b
       form o g t b = return . o fm =<< g . period <$> getTerm (b && p) f t
       period      = if stripPeriods fm then filter (/= '.') else id
-      capital   x = toUpper (head x) : (tail x)
 
