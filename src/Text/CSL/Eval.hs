@@ -100,7 +100,7 @@ evalSorting m l ms opts ss as r
                                               , Macro str emptyFormatting))
 
 evalElements :: [Element] -> State EvalState [Output]
-evalElements x = concatMapM evalElement x
+evalElements = concatMapM evalElement
 
 evalElement :: Element -> State EvalState [Output]
 evalElement el
