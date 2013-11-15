@@ -373,7 +373,7 @@ instance FromJSON Reference where
        v .:? "jurisdiction" .!= mempty <*>
        v .:? "archive" .!= mempty <*>
        v .:? "archive-place" .!= mempty <*>
-       (v .: "archive_location" <|> v .:? "archive-location" .!= mempty) <*>
+       v .:? "archive_location" .!= mempty <*>
        v .:? "event" .!= mempty <*>
        v .:? "event-place" .!= mempty <*>
        v .:? "page" .!= mempty <*>
@@ -452,7 +452,7 @@ instance ToJSON Reference where
     , "jurisdiction" .= jurisdiction ref
     , "archive" .= archive ref
     , "archive-place" .= archivePlace ref
-    , "archive-location" .= archiveLocation ref
+    , "archive_location" .= archiveLocation ref
     , "event" .= event ref
     , "event-place" .= eventPlace ref
     , "page" .= page ref
