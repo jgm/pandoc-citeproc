@@ -46,6 +46,7 @@ import qualified Text.Pandoc.Builder as B
 import Data.List.Split (wordsBy, whenElt, dropBlanks, split, splitWhen)
 import Data.List (intercalate)
 import Control.Monad.State
+import Data.Monoid (Monoid, mappend, mempty)
 import Data.Generics ( Typeable, Data, everywhere
                      , everywhere', everything, mkT, mkQ )
 
@@ -215,8 +216,8 @@ proc' :: (Typeable a, Data b) => (a -> a) -> b -> b
 proc' f = everywhere' (mkT f)
 
 -- | A generic query function.
-query :: (Typeable a, Data b) => (a -> [c]) -> b -> [c]
-query f = everything (++) ([] `mkQ` f)
+query :: (Typeable a, Data b, Monoid m) => (a -> m) -> b -> m
+query f = everything mappend (mempty `mkQ` f)
 
 betterThan :: [a] -> [a] -> [a]
 betterThan [] b = b
