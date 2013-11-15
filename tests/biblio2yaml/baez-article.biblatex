@@ -68,6 +68,6 @@ references:
   version: 3
   container-title: Theory and Applications of Categories
   type: article-journal
-  url: http://arxiv.org/abs/math/0307200v3
+  URL: http://arxiv.org/abs/math/0307200v3
   language: en-US
 ...

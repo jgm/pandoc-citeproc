@@ -50,5 +50,5 @@ references:
     family: Author
   container-title: Journal
   type: webpage
-  url: http://foo.bar
+  URL: http://foo.bar
 ...

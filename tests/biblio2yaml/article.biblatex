@@ -92,7 +92,7 @@ references:
   container-title: The Journaltitle
   type: article-journal
   language: en-US
-- issn: issn
+- ISSN: issn
   status: in press
   issue: number, issue
   page: pages
@@ -127,9 +127,9 @@ references:
     given:
     - Ted
     family: Translator
-  url: http://foo.bar.baz/
+  URL: http://foo.bar.baz/
   type: article-journal
-  doi: 10.1086/520976
+  DOI: 10.1086/520976
   language: en-US
 ...
 

@@ -59,7 +59,7 @@ references:
     month: 10
     year: 2006
   version: 1.3
-  url: http://tug.ctan.org/tex-archive/info/bibtex/tamethebeast/ttb_en.pdf
+  URL: http://tug.ctan.org/tex-archive/info/bibtex/tamethebeast/ttb_en.pdf
   type: webpage
   language: en-US
 ...

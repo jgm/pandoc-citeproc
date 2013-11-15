@@ -36,7 +36,7 @@ NOTES:
 ---
 references:
 - annote: This is a periodical entry with an issn field.
-  issn: 0097-8493
+  ISSN: 0097-8493
   issue: 4
   title: Semantic 3D media and content
   volume: 35

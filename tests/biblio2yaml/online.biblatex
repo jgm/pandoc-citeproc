@@ -44,7 +44,7 @@ references:
     month: 10
     year: 2006
   version: 1.3
-  url: http://tug.ctan.org/tex-archive/info/bibtex/tamethebeast/ttb_en.pdf
+  URL: http://tug.ctan.org/tex-archive/info/bibtex/tamethebeast/ttb_en.pdf
   type: webpage
   language: en-US
 - annote: This is an online entry. The <span style="font-variant:small-caps;">url</span>, which is given in the url field,
@@ -61,7 +61,7 @@ references:
     day: 01
     month: 10
     year: 2006
-  url: http://www.ctan.org
+  URL: http://www.ctan.org
   type: webpage
   language: en-US
 ...

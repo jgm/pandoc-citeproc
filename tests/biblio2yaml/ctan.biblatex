@@ -63,7 +63,7 @@ references:
     day: 01
     month: 10
     year: 2006
-  url: http://www.ctan.org
+  URL: http://www.ctan.org
   type: webpage
   language: en-US
   title-short: CTAN

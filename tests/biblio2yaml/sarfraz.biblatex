@@ -40,7 +40,7 @@ for automatic capturing of the font outlines. *Computers and Graphics*,
 references:
 - title-short: Technical section
   annote: An article entry with an issn field
-  issn: 0097-8493
+  ISSN: 0097-8493
   issue: 5
   page: 795-804
   title: ! 'Technical section: An algorithm for automatic capturing of the font outlines'
