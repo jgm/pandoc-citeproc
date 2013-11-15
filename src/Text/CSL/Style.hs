@@ -44,6 +44,9 @@ import qualified Data.Vector as V
 #ifdef USE_NETWORK
 #endif
 
+import Debug.Trace
+tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
+
 -- Note:  FromJSON reads HTML, ToJSON writes Markdown.
 -- This means that they aren't proper inverses of each other, which
 -- is odd, but it makes sense given the uses here.  FromJSON is used

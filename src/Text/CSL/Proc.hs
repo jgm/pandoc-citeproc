@@ -32,9 +32,6 @@ import Data.Aeson
 import Control.Applicative ((<|>))
 import Text.Pandoc.Definition (Inline(Space, Str, Note), Block(Para))
 
-import Debug.Trace
-tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
-
 data ProcOpts
     = ProcOpts
       { bibOpts :: BibOpts
