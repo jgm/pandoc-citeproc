@@ -16,14 +16,14 @@
 
 module Text.CSL.Proc.Collapse where
 
-import Data.Monoid (mempty)
+import Data.Monoid (mempty, Any(..))
 import Control.Arrow ( (&&&), (>>>), second )
 import Data.Char
 import Data.List ( groupBy )
 import Text.CSL.Util ( query, proc, proc', betterThan )
 import Text.CSL.Eval
 import Text.CSL.Proc.Disamb
-import Text.CSL.Style
+import Text.CSL.Style hiding (Any)
 import Text.Pandoc.Definition ( Inline (Str) )
 
 -- | Collapse citations according to the style options.
@@ -199,17 +199,10 @@ addCiteAffixes c x =
             Formatted ils    -> OPan ils : if isprefix then [OSpace] else []
 
 isNumStyle :: [Output] -> Bool
-isNumStyle = null . query authorOrDate . proc rmLocator
+isNumStyle = getAny . query ocitnum
     where
-      rmLocator o
-          | OLoc     {} <- o = ONull
-          | otherwise        = o
-      authorOrDate o
-          | OContrib {} <- o = ['a']
-          | OYear    {} <- o = ['a']
-          | OYearSuf {} <- o = ['a']
-          | OStr     {} <- o = ['a']
-          | otherwise        = []
+      ocitnum (OCitNum {}) = Any True
+      ocitnum _            = Any False
 
 -- | Group consecutive integers:
 --
