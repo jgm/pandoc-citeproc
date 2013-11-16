@@ -24,7 +24,7 @@ import Data.Monoid
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
-import Text.CSL.Util ( readNum, (<^>), (<+>), query, toRead, capitalize, trim )
+import Text.CSL.Util ( readNum, (<^>), (<+>), query, toRead, capitalize, trimr )
 import Text.CSL.Reference
 import Text.CSL.Style
 import Text.Pandoc.Definition
@@ -246,20 +246,22 @@ formatName m b f fm ops np n
                     NamePart _ fm':_ -> fm'
                     _                -> emptyFormatting
 
-      hasHyphen = not . null . filter (== '-')
+      hasHyphen = elem '-'
       hyphen    = if getOptionVal "initialize-with-hyphen" ops == "false"
                   then getOptionVal "initialize-with" ops
                   else filter (not . isSpace) $ getOptionVal "initialize-with" ops  ++ "-"
-      isInit  x = length x == 1 && or (map isUpper x)
+      isInit [c] = isUpper c
+      isInit _   = False
       initial (Literal x) =
-                  if isJust (lookup "initialize-with" ops) &&
-                     getOptionVal "initialize" ops /= "false"
-                  then if not . and . map isLower $ x
-                       then addIn x $ getOptionVal "initialize-with" ops
-                       else x
-                  else if isJust (lookup "initialize-with" ops) && isInit x
-                          then addIn x $ getOptionVal "initialize-with" ops
-                          else x
+                  case lookup "initialize-with" ops of
+                       Just iw
+                         | getOptionVal "initialize" ops == "false"
+                         , isInit x  -> addIn x iw
+                         | getOptionVal "initialize" ops /= "false"
+                         , not (all isLower x) -> addIn x iw
+                       Nothing
+                         | isInit x  -> addIn x " " -- default
+                       _ -> x ++ " "
       addIn x i = if hasHyphen x
                   then head (       takeWhile (/= '-') x) : hyphen ++
                        head (tail $ dropWhile (/= '-') x) : i
@@ -279,7 +281,7 @@ formatName m b f fm ops np n
       onlyGiven = not (null $ givenName n) && null family
       given     = if onlyGiven
                      then givenLong
-                     else when_ (givenName  n) . unwords . map (trim . initial) $ givenName n
+                     else when_ (givenName  n) . trimr . concatMap initial $ givenName n
       givenLong = when_ (givenName  n) . unwords $ map unLiteral $ givenName n
       family    = unLiteral $ familyName n
       dropping  = unLiteral $ droppingPart n
