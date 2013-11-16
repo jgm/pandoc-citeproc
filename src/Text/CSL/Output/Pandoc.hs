@@ -33,8 +33,7 @@ import Text.Pandoc.Shared (stringify)
 
 renderPandoc :: Style -> FormattedOutput -> [Inline]
 renderPandoc sty
-    = proc (convertQuoted sty) . proc' (clean' $ isPunctuationInQuote sty)
-      -- . flipFlop
+    = proc (convertQuoted sty) . proc' (clean' $ isPunctuationInQuote sty) . flipFlop
 
 renderPandoc' :: Style -> FormattedOutput -> Block
 renderPandoc' sty = Para . renderPandoc sty
@@ -145,3 +144,41 @@ mapHeadInline f (i:xs)
     | Link      is t <- i = Link        (mapHeadInline f is) t : xs
     | Span     at is <- i = Span at     (mapHeadInline f is)   : xs
     | otherwise           = i : xs
+
+-- flip-flop
+
+data FlipFlopState = FlipFlopState
+     { inEmph      :: Bool
+     , inStrong    :: Bool
+     , inSmallCaps :: Bool
+     }
+
+flipFlop :: [Inline] -> [Inline]
+flipFlop = map (flipFlop' $ FlipFlopState False False False)
+
+flipFlop' :: FlipFlopState -> Inline -> Inline
+flipFlop' st (Emph ils) =
+  (if inEmph st then Span ("",[],[("style","font-style:normal;")]) else Emph)
+  $ map (flipFlop' st{ inEmph = not $ inEmph st }) ils
+flipFlop' st (Strong ils) =
+  (if inStrong st then Span ("",[],[("style","font-style:normal;")]) else Strong)
+  $ map (flipFlop' st{ inStrong = not $ inStrong st }) ils
+flipFlop' st (SmallCaps ils) =
+  (if inSmallCaps st then Span ("",[],[("style","font-style:normal;")]) else SmallCaps)
+  $ map (flipFlop' st{ inSmallCaps = not $ inSmallCaps st }) ils
+flipFlop' st (Strikeout ils) =
+  Strikeout $ map (flipFlop' st) ils
+flipFlop' st (Superscript ils) =
+  Superscript $ map (flipFlop' st) ils
+flipFlop' st (Subscript ils) =
+  Subscript $ map (flipFlop' st) ils
+-- TODO? Make Quoted flipflop in localized way.
+flipFlop' st (Quoted qt ils) =
+  Quoted qt $ map (flipFlop' st) ils
+flipFlop' st (Link ils t) =
+  Link (map (flipFlop' st) ils) t
+flipFlop' st (Span (id',classes,kvs) ils) =
+  Span (id',classes,kvs) $ map (flipFlop' st) ils
+flipFlop' st (Note [Para ils]) =
+  Note [Para $ map (flipFlop' st) ils]
+flipFlop' _ il = il
