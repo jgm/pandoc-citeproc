@@ -31,7 +31,6 @@ import Text.Pandoc.Definition
 import Text.Pandoc.XML (fromEntities)
 import Text.Pandoc.Shared (stringify)
 
--- TODO - this is a placeholder
 renderPandoc :: Style -> FormattedOutput -> [Inline]
 renderPandoc sty
     = proc (convertQuoted sty) . proc' (clean' $ isPunctuationInQuote sty)
@@ -39,111 +38,6 @@ renderPandoc sty
 
 renderPandoc' :: Style -> FormattedOutput -> Block
 renderPandoc' sty = Para . renderPandoc sty
-
-{-
-render :: [FormattedOutput] -> [Inline]
-render [] = []
-render (x:[])   =   renderFo x
-render (x:y:os) =   let a = renderFo x
-                        b = renderFo y
-                        isPunct = and . map (flip elem ".!?") in
-                    if isPunct (lastInline a) && isPunct (headInline b)
-                    then a ++ render (tailFO [y] ++ os)
-                    else a ++ render (y:os)
-
-tailFO :: [FormattedOutput] -> [FormattedOutput]
-tailFO [] = []
-tailFO (f:fs)
-    | FDel  s  <- f = FDel  (drop 1 s)       : fs
-    | FPan is  <- f = FPan  (tailInline is) : fs
-    | FN s  fm <- f = if prefix fm /= [] then FN s (tailFm fm)    : fs else FN    (drop 1 s) fm : fs
-    | FS s  fm <- f = if prefix fm /= [] then FS s (tailFm fm)    : fs else FS    (drop 1 s) fm : fs
-    | FO fm fo <- f = if prefix fm /= [] then FO   (tailFm fm) fo : fs else FO fm (tailFO fo)  : fs
-    | otherwise     = f : tailFO fs
-    where
-      tailFm fm = fm { prefix = tail $ prefix fm }
-
-renderFo ::  FormattedOutput -> [Inline]
-renderFo (FPan i) = i
-renderFo (FDel s) = toStr s
-renderFo fo
-    | FS str fm                  <- fo = toPandoc fm $ toStr str
-    | FN str fm                  <- fo = toPandoc fm $ toStr $ rmZeros str
-    | FO     fm xs               <- fo = toPandoc fm $ rest xs
-    | FUrl u fm                  <- fo = toPandoc fm [Link (toStr $ snd u) u]
-    | FErr NoOutput              <- fo = [Span ("",["citeproc-no-output"],[])
-                                              [Strong [Str "???"]]]
-    | FErr (ReferenceNotFound r) <- fo = [Span ("",["citeproc-not-found"],
-                                            [("data-reference-id",r)])
-                                            [Strong [Str "???"]]]
-    | otherwise = []
-    where
-      addSuffix f i
-          | not (null (suffix f))
-          , elem (head $ suffix f) ".?!"
-          , not (null (lastInline i))
-          , last (lastInline i)`elem` ".?!" = i ++ toStr (tail $ suffix f)
-          | null (suffix f)                 = i ++ toStr (       suffix f)
-          | otherwise                       = i
-
-      toPandoc f i = addSuffix f $ toStr (prefix f) ++
-                     (quote f . format f . proc cleanStrict $ i)
-      format     f = font_variant f . font f . text_case f
-      rest      xs = render xs
-      quote    f i = if i /= [] && quotes f /= NoQuote
-                     then if quotes f == NativeQuote
-                          then [escape "inquote"   . valign f $ i]
-                          else [Quoted DoubleQuote . valign f $ i]
-                     else valign f i
-      setCase f i
-          | Str     s <- i = Str $ f s
-          | otherwise      = i
-      setCase' f i
-          | Link s r <- i = Link (map (setCase f) s) r
-          | otherwise     = setCase f i
-
-      toCap       [] = []
-      toCap   (x:xs)
-          | isPunctuation x = x : toCap xs
-          | otherwise       = toUpper x : xs
-      toTitleCap   s = if isShortWord s then s else toCap s
-      isShortWord  s = s `elem` ["a","an","and","as","at","but","by","down","for","from"
-                                      ,"in","into","nor","of","on","onto","or","over","so"
-                                      ,"the","till","to","up","via","with","yet"]
-      text_case _ [] = []
-      text_case fm a@(i:is)
-          | noCase fm                         = [Span ("",["nocase"],[]) a]
-          | "lowercase"        <- textCase fm = map (setCase' $ map toLower) a
-          | "uppercase"        <- textCase fm = map (setCase' $ map toUpper) a
-          | "capitalize-all"   <- textCase fm = map (setCase  $ unwords . map toCap      . words') a
-          | "title"            <- textCase fm = map (setCase  $ unwords . map toTitleCap . words') a
-          | "capitalize-first" <- textCase fm = [setCase capitalize i] ++ is
-          | "sentence"         <- textCase fm = [setCase toCap      i] ++
-                                                map (setCase $ map toLower) is
-          | otherwise                         = a
-
-      font_variant fm i
-          | "small-caps" <- fontVariant fm = [SmallCaps i]
-          | otherwise                      = i
-
-      font fm
-          | noDecor fm                 = return . escape "nodecor"
-          | "italic"  <- fontStyle  fm = return . Emph
-          | "oblique" <- fontStyle  fm = return . Emph
-          | "bold"    <- fontWeight fm = return . Strong
-          | otherwise                  = id
-
-      valign _ [] = []
-      valign fm i
-          | "sup"      <- verticalAlign fm = [Superscript i]
-          | "sub"      <- verticalAlign fm = [Subscript   i]
-          | "baseline" <- verticalAlign fm = [escape "baseline" i]
-          | otherwise                      = i
-
-      rmZeros = dropWhile (== '0')
-      escape s x = Link x (s,s) -- we use a link to store some data
--}
-
 
 clean' :: Bool -> [Inline] -> [Inline]
 clean' _   []  = []
@@ -175,34 +69,6 @@ clean' punctuationInQuote (i:is) =
                 | Quoted _ qs <- q
                 , SingleQuote <- t = Quoted DoubleQuote (reverseQuoted DoubleQuote qs)
                 | otherwise        = q
-
-{-
-flipFlop :: [Inline] -> [Inline]
-flipFlop [] = []
-flipFlop (i:is)
-    | Emph     inls <- i = Emph   (reverseEmph   True inls) : flipFlop is
-    | Strong   inls <- i = Strong (reverseStrong True inls) : flipFlop is
-    | otherwise          = i                                : flipFlop is
-    where
-      reverseEmph bo = map reverseEmph'
-          where
-            reverseEmph' e
-                | bo, Emph inls <- e = Link (reverseEmph False inls) ("emph","emph")
-                | Emph     inls <- e = Emph (reverseEmph True  inls)
-                | Link ls (x,y) <- e = if x == "nodecor" && x == y
-                                       then Link ls ("emph","emph")
-                                       else e
-                | otherwise          = e
-      reverseStrong bo = map reverseStrong'
-          where
-            reverseStrong' e
-                | bo, Strong inls <- e = Link   (reverseStrong False inls) ("strong","strong")
-                | Strong     inls <- e = Strong (reverseStrong True  inls)
-                | Link   ls (x,y) <- e = if x == "nodecor" && x == y
-                                         then Link ls ("strong","strong")
-                                         else e
-                | otherwise            = e
--}
 
 isPunctuationInQuote :: Style -> Bool
 isPunctuationInQuote = or . query punctIn'
