@@ -24,7 +24,7 @@ import Data.Monoid
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
-import Text.CSL.Util ( readNum, (<^>), (<+>), query, toRead, capitalize )
+import Text.CSL.Util ( readNum, (<^>), (<+>), query, toRead, capitalize, trim )
 import Text.CSL.Reference
 import Text.CSL.Style
 import Text.Pandoc.Definition
@@ -279,7 +279,7 @@ formatName m b f fm ops np n
       onlyGiven = not (null $ givenName n) && null family
       given     = if onlyGiven
                      then givenLong
-                     else when_ (givenName  n) . unwords . map initial $ givenName n
+                     else when_ (givenName  n) . unwords . map (trim . initial) $ givenName n
       givenLong = when_ (givenName  n) . unwords $ map unLiteral $ givenName n
       family    = unLiteral $ familyName n
       dropping  = unLiteral $ droppingPart n
