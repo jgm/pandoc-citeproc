@@ -286,7 +286,11 @@ formatName m b f fm ops np n
       family    = unLiteral $ familyName n
       dropping  = unLiteral $ droppingPart n
       nondropping  = unLiteral $ nonDroppingPart n
-
+      isByzantine c = c <= '\x17f' || (c >= '\x590' && c <= '\x05ff') ||
+                      (c >= '\x400' && c <= '\x52f') || ( c >= '\x370' && c <= '\x3ff') ||
+                      (c >= '\x1f00' && c <= '\x1fff') || (c >= '\x0600' && c <= '\x200c') ||
+                      (c >= '\x200d' && c <= '\x200e') || (c >= '\x0218' && c <= '\x0219') ||
+                      (c >= '\x21a' && c <= '\x21b') || (c >= '\x202a' && c <= '\x202e')
       shortName = oStr' (nondropping <+> family) (form "family")
       longName g = if isSorting m
                    then let firstPart = case getOptionVal "demote-non-dropping-particle" ops of
@@ -300,8 +304,11 @@ formatName m b f fm ops np n
                                                "sort-only" -> (nondropping <+> family, dropping)
                                                _           -> (family, dropping <+> nondropping)
                              in oStr' fam (form "family") ++ sortSep g par ++ suffCom
-                          else oStr' g (form "given") <++>
-                               addAffixes (dropping <+> nondropping <+> family) "family" suff
+                          else let fam = addAffixes (dropping <+> nondropping <+> family) "family" suff
+                                   gvn = oStr' g (form "given")
+                               in  if all isByzantine family
+                                   then gvn <++> fam
+                                   else fam ++ gvn
 
       disWithGiven = getOptionVal "disambiguate-add-givenname" ops == "true"
       initialize   = isJust (lookup "initialize-with" ops) && not onlyGiven
