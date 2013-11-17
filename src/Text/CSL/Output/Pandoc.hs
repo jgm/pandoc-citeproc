@@ -42,32 +42,24 @@ clean' :: Bool -> [Inline] -> [Inline]
 clean' _   []  = []
 clean' punctuationInQuote (i:is) =
   case (i:is) of
-      (Span ("",[],kvs) inls : _)
-         | lookup "csl-inquote" kvs == Just "true" ->
-             case headInline is of
+      (Span ("",["csl-inquote"],kvs) inls : _) ->
+         let isOuter = lookup "position" kvs == Just "outer"
+             qt = if isOuter then DoubleQuote else SingleQuote
+         in  case headInline is of
                     [x] -> if x `elem` ".," && punctuationInQuote
                            then if lastInline inls `elem` [".",",",";",":","!","?"]
-                                then quote DoubleQuote inls                :
+                                then Quoted qt inls                :
                                      clean' punctuationInQuote (tailInline is)
-                                else quote DoubleQuote (inls ++ [Str [x]]) :
+                                else Quoted qt (inls ++ [Str [x]]) :
                                      clean' punctuationInQuote (tailInline is)
-                           else quote DoubleQuote inls : clean' punctuationInQuote is
-                    _   ->      quote DoubleQuote inls : clean' punctuationInQuote is
-      (Quoted t inls : _) -> quote t inls : clean' punctuationInQuote is
+                           else Quoted qt inls : clean' punctuationInQuote is
+                    _   ->      Quoted qt inls : clean' punctuationInQuote is
+      (Quoted t inls : _) -> Quoted t inls : clean' punctuationInQuote is
       _      -> if lastInline [i] == headInline is && isPunct
                    then i : clean' punctuationInQuote (tailInline is)
                    else i : clean' punctuationInQuote is
     where
-      quote t x = Quoted t (reverseQuoted t x)
       isPunct = and . map (flip elem ".,;:!? ") $ headInline is
-      reverseQuoted t = proc reverseQuoted'
-          where
-            reverseQuoted' q
-                | Quoted _ qs <- q
-                , DoubleQuote <- t = Quoted SingleQuote (reverseQuoted SingleQuote qs)
-                | Quoted _ qs <- q
-                , SingleQuote <- t = Quoted DoubleQuote (reverseQuoted DoubleQuote qs)
-                | otherwise        = q
 
 isPunctuationInQuote :: Style -> Bool
 isPunctuationInQuote = or . query punctIn'
@@ -173,14 +165,13 @@ flipFlop' st (Superscript ils) =
   Superscript $ map (flipFlop' st) ils
 flipFlop' st (Subscript ils) =
   Subscript $ map (flipFlop' st) ils
--- TODO? Make Quoted flipflop in localized way.
 flipFlop' st (Quoted _ ils) =
   Quoted (if inOuterQuotes st then SingleQuote else DoubleQuote)
   $ map (flipFlop' st{ inOuterQuotes = not $ inOuterQuotes st }) ils
-flipFlop' st (Link ils t) =
-  Link (map (flipFlop' st) ils) t
+-- TODO? Make Quoted flipflop in localized way.
 flipFlop' st (Span (_, ["csl-inquote"], _) ils) =
-  flipFlop' st (Quoted DoubleQuote ils)
+  Span ("", ["csl-inquote"], [("position", if inOuterQuotes st then "inner" else "outer")])
+  $ map (flipFlop' st{ inOuterQuotes = not $ inOuterQuotes st }) ils
 flipFlop' st (Span (id',classes,kvs) ils)
   | "nodecor" `elem` classes = Span (id',classes',kvs) $ map (flipFlop' st) ils
   | otherwise = Span (id',classes,kvs) $ map (flipFlop' st) ils
@@ -188,6 +179,8 @@ flipFlop' st (Span (id',classes,kvs) ils)
                        ["csl-no-emph"      | inEmph st] ++
                        ["csl-no-strong"    | inStrong st] ++
                        ["csl-no-smallcaps" | inSmallCaps st]
+flipFlop' st (Link ils t) =
+  Link (map (flipFlop' st) ils) t
 flipFlop' st (Note [Para ils]) =
   Note [Para $ map (flipFlop' st) ils]
 flipFlop' _ il = il
