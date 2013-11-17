@@ -106,7 +106,10 @@ evalElement :: Element -> State EvalState [Output]
 evalElement el
     | Choose i ei e         <- el = evalIfThen i ei e
     | Macro    s   fm       <- el = return . appendOutput fm =<< evalElements =<< getMacro s
-    | Const    s   fm       <- el = return $ oStr' s fm
+    | Const    s   fm       <- el = return $ addSpaces s
+                                           $ if fm == emptyFormatting
+                                                then [OPan (readCSLString s)]
+                                                else [Output [OPan (readCSLString s)] fm]
                                     -- NOTE: this conditional seems needed for
                                     -- locator_SimpleLocators.json:
     | Number   s f fm       <- el = if s == "locator"
@@ -127,6 +130,8 @@ evalElement el
                                             (getFirst els) id
     | otherwise                   = return []
     where
+      addSpaces strng = (if take 1 strng == " " then (OSpace:) else id) .
+                        (if last' strng == " " then (++[OSpace]) else id)
       substituteWith e = head <$> gets (names . env) >>= \(Names _ ns fm d _) -> do
                            case e of
                              Names rs [Name NotSet fm'' [] [] []] fm' d' []
@@ -229,13 +234,13 @@ evalIfThen i ei e
 
 getFormattedValue :: [Option] -> Abbreviations -> Form -> Formatting -> String -> Value -> [Output]
 getFormattedValue o as f fm s val
-    | Just v <- fromValue val :: Maybe String    = (:[]) . flip OStr fm . maybe v id . getAbbr $ value v
     | Just v <- fromValue val :: Maybe Formatted =
        if v == mempty
           then []
           else let ys = maybe (unFormatted v) toStr
                         $ getAbbr (stringify $ unFormatted v)
                in  [Output [OPan $ walk value' ys] fm]
+    | Just v <- fromValue val :: Maybe String    = (:[]) . flip OStr fm . maybe v id . getAbbr $ value v
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe CNum      = if v == 0 then [] else [OCitNum (unCNum v) fm]
     | Just v <- fromValue val :: Maybe [RefDate] = formatDate (EvalSorting emptyCite) [] [] sortDate v
