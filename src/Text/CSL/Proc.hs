@@ -138,7 +138,7 @@ procBiblio bos (Style {biblio = mb, csMacros = ms , styleLocale = l,
                        styleAbbrevs = as, csOptions = opts}) rs
     = maybe [] process mb
     where
-      process b   = flip map (render b) $ uncurry formatBiblioLayout (layFormat &&& layDelim $ bibLayout b)
+      process b   = map (formatBiblioLayout (layFormat $ bibLayout b) (layDelim $ bibLayout b)) $ render b
       render  b   = subsequentAuthorSubstitute b . map (evalBib b) . filterRefs bos $ rs
       evalBib b r = evalLayout (bibLayout b) (EvalBiblio emptyCite {citePosition = "first"}) False l ms
                                (mergeOptions (bibOptions b) opts) as r
