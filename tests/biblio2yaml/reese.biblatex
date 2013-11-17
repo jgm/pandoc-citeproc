@@ -59,7 +59,7 @@ references:
     - Trevor
     - R.
     family: Reese
-  container-title: William and Mary Quarterly, series 3
+  container-title: William and Mary Quarterly, <span class="nodecor">series 3</span>
   type: article-journal
   language: en-US
 ...

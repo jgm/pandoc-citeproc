@@ -6,5 +6,5 @@
 references:
 - id: item1
   type: book
-  title: 'The title <span style="font-style:normal;">of this book</span>'
+  title: 'The title <span class="nodecor">of this book</span>'
 ...
