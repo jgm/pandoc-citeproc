@@ -146,7 +146,7 @@ isPunct :: Char -> Bool
 isPunct c = c `elem` ".;?!"
 
 addFormatting :: Formatting -> FormattedOutput -> FormattedOutput
-addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
+addFormatting f = addSuffix . pref . quote . font . text_case
   where pref = case prefix f of { "" -> id; x -> ((toStr x) ++) }
         addSuffix i
           | case suffix f of {(c:_) | isPunct c -> True; _ -> False}
@@ -160,18 +160,23 @@ addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
                          NativeQuote ->
                                   [Span ("",["csl-inquote"],[]) ils]
                          _           -> [Quoted DoubleQuote $ valign ils]
+
+        font ils
+          | noDecor f    = [Span ("",["nodecor"],[]) ils]
+          | otherwise    = font_variant . font_style .  font_weight $ ils
         font_variant ils =
           case fontVariant f of
                "small-caps"  -> [SmallCaps ils]
                _             -> ils
-
-        font ils
-          | noDecor f                  = [Span ("",["nodecor"],[]) ils]
-          | otherwise = case fontStyle f of
-                             "italic"  -> [Emph ils]
-                             "oblique" -> [Emph ils]
-                             "bold"    -> [Strong ils]
-                             _         -> ils
+        font_style ils =
+          case fontStyle f of
+               "italic"      -> [Emph ils]
+               "oblique"     -> [Emph ils]
+               _             -> ils
+        font_weight ils =
+          case fontWeight f of
+               "bold"        -> [Strong ils]
+               _             -> ils
 
         text_case [] = []
         text_case ils@(i:is)
