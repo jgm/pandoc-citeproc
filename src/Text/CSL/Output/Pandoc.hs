@@ -148,13 +148,14 @@ mapHeadInline f (i:xs)
 -- flip-flop
 
 data FlipFlopState = FlipFlopState
-     { inEmph      :: Bool
-     , inStrong    :: Bool
-     , inSmallCaps :: Bool
+     { inEmph        :: Bool
+     , inStrong      :: Bool
+     , inSmallCaps   :: Bool
+     , inOuterQuotes :: Bool
      }
 
 flipFlop :: [Inline] -> [Inline]
-flipFlop = map (flipFlop' $ FlipFlopState False False False)
+flipFlop = map (flipFlop' $ FlipFlopState False False False False)
 
 flipFlop' :: FlipFlopState -> Inline -> Inline
 flipFlop' st (Emph ils) =
@@ -173,8 +174,9 @@ flipFlop' st (Superscript ils) =
 flipFlop' st (Subscript ils) =
   Subscript $ map (flipFlop' st) ils
 -- TODO? Make Quoted flipflop in localized way.
-flipFlop' st (Quoted qt ils) =
-  Quoted qt $ map (flipFlop' st) ils
+flipFlop' st (Quoted _ ils) =
+  Quoted (if inOuterQuotes st then SingleQuote else DoubleQuote)
+  $ map (flipFlop' st{ inOuterQuotes = not $ inOuterQuotes st }) ils
 flipFlop' st (Link ils t) =
   Link (map (flipFlop' st) ils) t
 flipFlop' st (Span (id',classes,kvs) ils)
