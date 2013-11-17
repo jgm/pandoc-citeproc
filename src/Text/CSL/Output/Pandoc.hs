@@ -158,13 +158,13 @@ flipFlop = map (flipFlop' $ FlipFlopState False False False)
 
 flipFlop' :: FlipFlopState -> Inline -> Inline
 flipFlop' st (Emph ils) =
-  (if inEmph st then Span ("",[],[("style","font-style:normal;")]) else Emph)
+  (if inEmph st then Span ("",["csl-no-emph"],[]) else Emph)
   $ map (flipFlop' st{ inEmph = not $ inEmph st }) ils
 flipFlop' st (Strong ils) =
-  (if inStrong st then Span ("",[],[("style","font-weight:normal;")]) else Strong)
+  (if inStrong st then Span ("",["csl-no-strong"],[]) else Strong)
   $ map (flipFlop' st{ inStrong = not $ inStrong st }) ils
 flipFlop' st (SmallCaps ils) =
-  (if inSmallCaps st then Span ("",[],[("style","font-variant:normal;")]) else SmallCaps)
+  (if inSmallCaps st then Span ("",["csl-no-smallcaps"],[]) else SmallCaps)
   $ map (flipFlop' st{ inSmallCaps = not $ inSmallCaps st }) ils
 flipFlop' st (Strikeout ils) =
   Strikeout $ map (flipFlop' st) ils
@@ -178,13 +178,12 @@ flipFlop' st (Quoted qt ils) =
 flipFlop' st (Link ils t) =
   Link (map (flipFlop' st) ils) t
 flipFlop' st (Span (id',classes,kvs) ils)
-  | "nodecor" `elem` classes = Span (id',classes',kvs') $ map (flipFlop' st) ils
+  | "nodecor" `elem` classes = Span (id',classes',kvs) $ map (flipFlop' st) ils
   | otherwise = Span (id',classes,kvs) $ map (flipFlop' st) ils
-     where classes' = filter (/= "nodecor") classes
-           kvs' = if null styles then kvs else ("style",concat styles) : kvs
-           styles = ["font-style:normal;"   | inEmph st]
-                 ++ ["font-weight:normal;"  | inStrong st]
-                 ++ ["font-variant:normal;" | inSmallCaps st]
+     where classes' = filter (/= "nodecor") classes ++
+                       ["csl-no-emph"      | inEmph st] ++
+                       ["csl-no-strong"    | inStrong st] ++
+                       ["csl-no-smallcaps" | inSmallCaps st]
 flipFlop' st (Note [Para ils]) =
   Note [Para $ map (flipFlop' st) ils]
 flipFlop' _ il = il

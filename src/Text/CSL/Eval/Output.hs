@@ -166,7 +166,7 @@ addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
                _             -> ils
 
         font ils
-          | noDecor f                  = [Span ("",[],[("style","font-style:normal;")]) ils]
+          | noDecor f                  = [Span ("",["nodecor"],[]) ils]
           | otherwise = case fontStyle f of
                              "italic"  -> [Emph ils]
                              "oblique" -> [Emph ils]
