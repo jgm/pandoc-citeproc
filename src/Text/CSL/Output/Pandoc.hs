@@ -44,22 +44,33 @@ clean' sty (i:is) =
   case (i:is) of
       (Span ("",["csl-inquote"],kvs) inls : _) ->
          let isOuter = lookup "position" kvs == Just "outer"
-             qt = if isOuter then DoubleQuote else SingleQuote
          in  case headInline is of
                     [x] -> if x `elem` ".," && isPunctuationInQuote sty
                            then if lastInline inls `elem` [".",",",";",":","!","?"]
-                                then Quoted qt inls                :
+                                then quoted isOuter inls ++
                                      clean' sty (tailInline is)
-                                else Quoted qt (inls ++ [Str [x]]) :
+                                else quoted isOuter (inls ++ [Str [x]]) ++
                                      clean' sty (tailInline is)
-                           else Quoted qt inls : clean' sty is
-                    _   ->      Quoted qt inls : clean' sty is
-      (Quoted t inls : _) -> Quoted t inls : clean' sty is
+                           else quoted isOuter inls ++ clean' sty is
+                    _   ->      quoted isOuter inls ++ clean' sty is
+      (Quoted t inls : _) -> quoted (t == DoubleQuote) inls ++ clean' sty is
       _      -> if lastInline [i] == headInline is && isPunct
                    then i : clean' sty (tailInline is)
                    else i : clean' sty is
     where
       isPunct = all (`elem` ".,;:!? ") $ headInline is
+      locale  = case styleLocale sty of
+                     (x:_) -> x
+                     []    -> Locale [] [] [] [] [] -- should not happen
+      getQuote s d     = case [term | term <- localeTerms locale, cslTerm term == s] of
+                               (x:_) -> Str (termSingular x)
+                               _     -> Str d
+      openQuoteOuter   = getQuote "open-quote" "“"
+      openQuoteInner   = getQuote "open-inner-quote" "‘"
+      closeQuoteOuter  = getQuote "close-quote" "”"
+      closeQuoteInner  = getQuote "close-inner-quote" "’"
+      quoted True ils  = openQuoteOuter : ils ++ [closeQuoteOuter]
+      quoted False ils = openQuoteInner : ils ++ [closeQuoteInner]
 
 isPunctuationInQuote :: Style -> Bool
 isPunctuationInQuote = or . query punctIn'
@@ -168,7 +179,6 @@ flipFlop' st (Subscript ils) =
 flipFlop' st (Quoted _ ils) =
   Quoted (if inOuterQuotes st then SingleQuote else DoubleQuote)
   $ map (flipFlop' st{ inOuterQuotes = not $ inOuterQuotes st }) ils
--- TODO? Make Quoted flipflop in localized way.
 flipFlop' st (Span (_, ["csl-inquote"], _) ils) =
   Span ("", ["csl-inquote"], [("position", if inOuterQuotes st then "inner" else "outer")])
   $ map (flipFlop' st{ inOuterQuotes = not $ inOuterQuotes st }) ils
