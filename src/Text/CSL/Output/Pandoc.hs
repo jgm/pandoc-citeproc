@@ -179,6 +179,8 @@ flipFlop' st (Quoted _ ils) =
   $ map (flipFlop' st{ inOuterQuotes = not $ inOuterQuotes st }) ils
 flipFlop' st (Link ils t) =
   Link (map (flipFlop' st) ils) t
+flipFlop' st (Span (_, ["csl-inquote"], _) ils) =
+  flipFlop' st (Quoted DoubleQuote ils)
 flipFlop' st (Span (id',classes,kvs) ils)
   | "nodecor" `elem` classes = Span (id',classes',kvs) $ map (flipFlop' st) ils
   | otherwise = Span (id',classes,kvs) $ map (flipFlop' st) ils

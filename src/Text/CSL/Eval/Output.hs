@@ -158,7 +158,7 @@ addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
         quote ils = case quotes f of
                          NoQuote     -> valign ils
                          NativeQuote ->
-                                  [Span ("",[],[("csl-inquote","true")]) ils]
+                                  [Span ("",["csl-inquote"],[]) ils]
                          _           -> [Quoted DoubleQuote $ valign ils]
         font_variant ils =
           case fontVariant f of
@@ -198,6 +198,6 @@ addFormatting f = addSuffix . pref . quote . font_variant . font . text_case
           | "sup"      <- verticalAlign f = [Superscript ils]
           | "sub"      <- verticalAlign f = [Subscript   ils]
           | "baseline" <- verticalAlign f =
-                              [Span ("",[],[("csl-baseline","true")]) ils]
+                              [Span ("",["csl-baseline"],[]) ils]
           | otherwise                     = ils
 
