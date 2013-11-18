@@ -183,6 +183,7 @@ caseTransform xform = mapM go
   where go Space            = put True >> return Space
         go LineBreak        = put True >> return Space
         go (Str [])         = return $ Str []
+        go (Str "’")        = return $ Str "’"
         go (Str [x])
           | isPunctuation x || x == '\160' = put True >> return (Str [x])
         go (Str (x:xs)) = do
