@@ -121,7 +121,7 @@ evalElement el
                                     return . outputList fm d =<< evalElements l
     | Date     _ _ _  _ _ _ <- el = evalDate el
     | Label    s f fm _     <- el = formatLabel f fm True s -- FIXME !!
-    | Term     s f fm p     <- el = formatLabel f fm p s
+    | Term     s f fm p     <- el = formatTerm  f fm p    s
     | Names    s n fm d sub <- el = modify (\st -> st { contNum = [] }) >>
                                     ifEmpty (evalNames False s n d)
                                             (withNames s el $ evalElements sub)

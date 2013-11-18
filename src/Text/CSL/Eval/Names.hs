@@ -329,6 +329,15 @@ formatName m b f fm ops np n
                          | disWithGiven, isLong        -> [longName givenLong]
                          | otherwise                   -> []
 
+formatTerm :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
+formatTerm f fm p s = do
+  t <- getTerm p f s
+  pos <- gets (citePosition . cite . env)
+  let t' = if pos == "ibid-with-locator-c" || pos == "ibid-c"
+              then capitalize t
+              else t
+  return $ oStr' t' fm
+
 formatLabel :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
 formatLabel f fm p s
     | "locator" <- s = when' (gets (citeLocator . cite . env) >>= return . (/=) []) $ do
