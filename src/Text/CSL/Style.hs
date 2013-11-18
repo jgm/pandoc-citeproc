@@ -132,9 +132,13 @@ appendWithPunct (Formatted left) (Formatted right) =
   Formatted $ left ++
   case concat [lastleft, firstright] of
        [c,d] | c `elem` " ,.:;", d == c -> tailInline right
-       ";." -> tailInline right
-       "?." -> tailInline right
-       ".;" -> right  -- e.g. et al.;
+       [c,'.'] | c `elem` ",.!:;?" -> tailInline right
+       [c,':'] | c `elem` ",!:;?" -> tailInline right  -- Mich.: 2005
+       [c,'!'] | c `elem` ",.!:;?" -> tailInline right
+       [c,'?'] | c `elem` ",.!:;?" -> tailInline right
+       [':',c] | c `elem` ",.!:;?" -> tailInline right
+       [';',c] | c `elem` ",.!:;?" -> tailInline right
+       -- ".;" -> right  -- e.g. et al.;
        _    -> right
   where lastleft     = lastInline left
         firstright   = headInline right
