@@ -17,13 +17,12 @@
 module Text.CSL.Proc where
 
 import Control.Arrow ( (&&&), (>>>), second )
-import Data.Char ( toLower )
+import Data.Char ( toLower, isLetter, isDigit )
 import Data.List
 import Data.Ord  ( comparing )
 import Data.Maybe ( mapMaybe )
 import Text.CSL.Eval
-import Text.CSL.Util ( capitalize, proc, proc', query, toShow, last' )
-import Text.CSL.Output.Plain
+import Text.CSL.Util ( capitalize, proc, proc', query, toShow, )
 import Text.CSL.Proc.Collapse
 import Text.CSL.Proc.Disamb
 import Text.CSL.Reference
@@ -308,12 +307,11 @@ addAffixes f os
              then [OStr (prefix f) emptyFormatting] ++ os
              else os
       suff = case suffix f of
+                  []     -> []
                   (c:cs)
-                    | c `elem` ",.:?!"
-                    , [c] == lastOutput -> [OStr cs emptyFormatting]
-                  [] -> []
-                  cs  -> [OStr cs emptyFormatting]
-      lastOutput = last' $ renderPlain (formatOutputList os)
+                    | isLetter c || isDigit c ->
+                         [OSpace, OStr (c:cs) emptyFormatting]
+                    | otherwise -> [OStr (c:cs) emptyFormatting]
 
 -- | The 'Bool' is 'True' if we are formatting a textual citation (in
 -- pandoc terminology).
