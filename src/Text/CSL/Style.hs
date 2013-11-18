@@ -136,6 +136,7 @@ appendWithPunct (Formatted left) (Formatted right) =
        [c,':'] | c `elem` ",!:;?" -> tailInline right  -- Mich.: 2005
        [c,'!'] | c `elem` ",.!:;?" -> tailInline right
        [c,'?'] | c `elem` ",.!:;?" -> tailInline right
+       [c,';'] | c `elem` ",:;" -> tailInline right
        [':',c] | c `elem` ",.!:;?" -> tailInline right
        [';',c] | c `elem` ",.!:;?" -> tailInline right
        -- ".;" -> right  -- e.g. et al.;
