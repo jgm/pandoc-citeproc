@@ -18,8 +18,8 @@ module Text.CSL.Style where
 
 import Data.Aeson hiding (Number)
 import Data.String
-import Data.Monoid (mempty, Monoid)
-import Control.Arrow
+import Data.Monoid (mempty, Monoid, mappend, mconcat)
+import Control.Arrow hiding (left, right)
 import Control.Applicative hiding (Const)
 import Data.List ( nubBy, isPrefixOf, isInfixOf, intercalate )
 import Data.List.Split ( splitWhen )
@@ -28,7 +28,7 @@ import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
 import Data.Char (isPunctuation)
 import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), proc', query,
-                      betterThan, trimr )
+                      betterThan, trimr, tailInline, headInline, lastInline)
 import Text.Pandoc.Definition hiding (Citation, Cite)
 import Text.Pandoc (readHtml, writeMarkdown, WriterOptions(..),
                     ReaderOptions(..), bottomUp, def)
@@ -96,7 +96,7 @@ adjustCSL x = [x]
 -- We use a newtype wrapper so we can have custom ToJSON, FromJSON
 -- instances.
 newtype Formatted = Formatted { unFormatted :: [Inline] }
-  deriving ( Show, Read, Eq, Data, Typeable, Monoid )
+  deriving ( Show, Read, Eq, Data, Typeable )
 
 instance FromJSON Formatted where
   parseJSON v@(Array _) = Formatted <$> parseJSON v
@@ -107,6 +107,11 @@ instance ToJSON Formatted where
 
 instance IsString Formatted where
   fromString = Formatted . toStr
+
+instance Monoid Formatted where
+  mempty = Formatted []
+  mappend = appendWithPunct
+  mconcat = foldr mappend mempty
 
 toStr :: String -> [Inline]
 toStr = intercalate [Str "\n"] .
@@ -121,6 +126,18 @@ toStr = intercalate [Str "\n"] .
       tweak (' ':'?':xs) = "\8239?" ++ tweak xs
       tweak ( x :xs    ) = x : tweak xs
       tweak []           = []
+
+appendWithPunct :: Formatted -> Formatted -> Formatted
+appendWithPunct (Formatted left) (Formatted right) =
+  Formatted $ left ++
+  case concat [lastleft, firstright] of
+       [c,d] | c `elem` " ,.:;", d == c -> tailInline right
+       ";." -> tailInline right
+       "?." -> tailInline right
+       ".;" -> right  -- e.g. et al.;
+       _    -> right
+  where lastleft     = lastInline left
+        firstright   = headInline right
 
 -- | The representation of a parsed CSL style.
 data Style

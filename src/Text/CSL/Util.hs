@@ -6,6 +6,7 @@ module Text.CSL.Util
   , (<^>)
   , capitalize
   , camelize
+  , isPunct
   , last'
   , words'
   , trim
@@ -29,6 +30,13 @@ module Text.CSL.Util
   , toShow
   , toRead
   , inlinesToString
+  , headInline
+  , lastInline
+  , tailInline
+  , initInline
+  , tailFirstInlineStr
+  , toCapital
+  , mapHeadInline
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -71,6 +79,9 @@ sa <^> sb         = sa ++ sb
 capitalize :: String -> String
 capitalize [] = []
 capitalize (c:cs) = toUpper c : cs
+
+isPunct :: Char -> Bool
+isPunct c = c `elem` ".;?!"
 
 camelize :: String -> String
 camelize ('-':y:ys) = toUpper y : camelize ys
@@ -240,3 +251,58 @@ toRead (s:ss) = toUpper s : camel ss
 
 inlinesToString :: [Inline] -> String
 inlinesToString = stringify
+
+headInline :: [Inline] -> String
+headInline = take 1 . stringify
+
+lastInline :: [Inline] -> String
+lastInline xs = case stringify xs of
+                      [] -> []
+                      ys -> [last ys]
+
+initInline :: [Inline] -> [Inline]
+initInline [] = []
+initInline (i:[])
+    | Str          s <- i = return $ Str         (init'       s)
+    | Emph        is <- i = return $ Emph        (initInline is)
+    | Strong      is <- i = return $ Strong      (initInline is)
+    | Superscript is <- i = return $ Superscript (initInline is)
+    | Subscript   is <- i = return $ Subscript   (initInline is)
+    | Quoted q    is <- i = return $ Quoted q    (initInline is)
+    | SmallCaps   is <- i = return $ SmallCaps   (initInline is)
+    | Strikeout   is <- i = return $ Strikeout   (initInline is)
+    | Link      is t <- i = return $ Link        (initInline is) t
+    | Span at     is <- i = return $ Span at     (initInline is)
+    | otherwise           = []
+    where
+      init' s = if s /= [] then init s else []
+initInline (i:xs) = i : initInline xs
+
+tailInline :: [Inline] -> [Inline]
+tailInline (Space:xs) = xs
+tailInline xs         = removeEmpty $ tailFirstInlineStr xs
+  where removeEmpty   = dropWhile (== Str "")
+
+tailFirstInlineStr :: [Inline] -> [Inline]
+tailFirstInlineStr = mapHeadInline (drop 1)
+
+toCapital :: [Inline] -> [Inline]
+toCapital = mapHeadInline capitalize
+
+mapHeadInline :: (String -> String) -> [Inline] -> [Inline]
+mapHeadInline _ [] = []
+mapHeadInline f (i:xs)
+    | Str         [] <- i =                      mapHeadInline f xs
+    | Str          s <- i = Str         (f                s)   : xs
+    | Emph        is <- i = Emph        (mapHeadInline f is)   : xs
+    | Strong      is <- i = Strong      (mapHeadInline f is)   : xs
+    | Superscript is <- i = Superscript (mapHeadInline f is)   : xs
+    | Subscript   is <- i = Subscript   (mapHeadInline f is)   : xs
+    | Quoted q    is <- i = Quoted q    (mapHeadInline f is)   : xs
+    | SmallCaps   is <- i = SmallCaps   (mapHeadInline f is)   : xs
+    | Strikeout   is <- i = Strikeout   (mapHeadInline f is)   : xs
+    | Link      is t <- i = Link        (mapHeadInline f is) t : xs
+    | Span     at is <- i = Span at     (mapHeadInline f is)   : xs
+    | otherwise           = i : xs
+
+

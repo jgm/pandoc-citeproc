@@ -15,13 +15,13 @@
 
 module Text.CSL.Eval.Output where
 
-import Text.CSL.Output.Pandoc (lastInline, headInline, tailInline)
+import Text.CSL.Output.Pandoc (lastInline)
 import Text.CSL.Style
 import Data.Char (toLower, toUpper)
-import Text.CSL.Util (capitalize, titlecase, unTitlecase)
+import Text.CSL.Util (capitalize, titlecase, unTitlecase, isPunct)
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk (walk)
-import Data.Monoid (mappend, mempty, mconcat, (<>))
+import Data.Monoid (mempty, mconcat, (<>))
 import Data.String (fromString)
 
 -- import Debug.Trace
@@ -91,20 +91,7 @@ o  <++> [] = o
 o1 <++> o2 = o1 ++ [OSpace] ++ o2
 
 formatOutputList :: [Output] -> Formatted
-formatOutputList = foldr appendWithPunct mempty . map formatOutput
-
-appendWithPunct :: Formatted -> Formatted -> Formatted
-appendWithPunct (Formatted left) (Formatted right) = Formatted $ left ++
-  if isPunct' lastleft && isPunct' firstright ||
-     isSp lastleft && isSp firstright
-     then tailInline right
-     else right
-  where isPunct' [c] = isPunct c
-        isPunct' _   = False
-        isSp " "     = True
-        isSp _       = False
-        lastleft     = lastInline left
-        firstright   = headInline right
+formatOutputList = mconcat . map formatOutput
 
 -- | Convert evaluated 'Output' into 'Formatted', ready for the
 -- output filters.
@@ -143,19 +130,18 @@ formatOutput o =
     where
       format = mconcat . map formatOutput
 
-isPunct :: Char -> Bool
-isPunct c = c `elem` ".;?!"
-
 addFormatting :: Formatting -> Formatted -> Formatted
 addFormatting f = addSuffix . pref . quote . font . text_case
-  where pref = case prefix f of { "" -> id; x -> ((fromString x) <>) }
+  where pref i = case prefix f of
+                      "" -> i
+                      x  -> fromString x <> i
         addSuffix i
+          | null (suffix f)       = i
           | case suffix f of {(c:_) | isPunct c -> True; _ -> False}
-          , case lastInline (unFormatted i) of
-                             {(c:_) | isPunct c -> True; _ -> False}
+          , case lastInline (unFormatted i) of {(c:_) | isPunct c -> True; _ -> False}
                                   = i <> fromString (tail $ suffix f)
-          | not (null (suffix f)) = i <> fromString (       suffix f)
-          | otherwise             = i
+          | otherwise             = i <> fromString (suffix f)
+
         quote (Formatted [])  = Formatted []
         quote (Formatted ils) =
                     case quotes f of
