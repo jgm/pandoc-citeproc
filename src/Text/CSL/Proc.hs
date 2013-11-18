@@ -287,7 +287,7 @@ formatCitLayout s (CG co f d cs)
              _ -> xs <> Formatted [Space] <> ys
       formatAuth   = formatOutput . localMod
       formatCits   = (if isNote then toNote else id) .
-                     formatOutputList . appendOutput formatting . tr' "X" . addAffixes f .
+                     formatOutputList . appendOutput formatting . addAffixes f .
                      addDelim d .
                      map (fst &&& localMod >>> uncurry addCiteAffixes)
       formatting   = unsetAffixes f
