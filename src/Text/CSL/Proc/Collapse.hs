@@ -195,7 +195,13 @@ addCiteAffixes c x =
       addCiteAff isprefix y =
           case y of
             Formatted  []    -> []
-            Formatted ils    -> OPan ils : if isprefix then [OSpace] else []
+            Formatted ils
+              | isprefix  -> [OPan ils, OSpace]
+              | otherwise -> case ils of
+                                  (Str (z:_):_)
+                                    | isAlphaNum z -> [OSpace, OPan ils]
+                                  _                -> [OPan ils]
+
 
 isNumStyle :: [Output] -> Bool
 isNumStyle = getAny . query ocitnum
