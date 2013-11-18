@@ -240,7 +240,9 @@ getFormattedValue o as f fm s val
           then []
           else let ys = maybe (unFormatted v) (unFormatted . fromString)
                         $ getAbbr (stringify $ unFormatted v)
-               in  [Output [OPan $ walk value' ys] fm]
+               in  if null ys
+                      then []
+                      else [Output [OPan $ walk value' ys] fm]
     | Just v <- fromValue val :: Maybe String    = (:[]) . flip OStr fm . maybe v id . getAbbr $ value v
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe CNum      = if v == 0 then [] else [OCitNum (unCNum v) fm]
