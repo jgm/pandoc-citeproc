@@ -31,11 +31,11 @@ import Text.Pandoc.Definition
 import Text.Pandoc.XML (fromEntities)
 import Text.Pandoc.Shared (stringify)
 
-renderPandoc :: Style -> FormattedOutput -> [Inline]
+renderPandoc :: Style -> Formatted -> [Inline]
 renderPandoc sty
-    = proc (convertQuoted sty) . proc' (clean' sty) . flipFlop
+    = proc (convertQuoted sty) . proc' (clean' sty) . flipFlop . unFormatted
 
-renderPandoc' :: Style -> FormattedOutput -> Block
+renderPandoc' :: Style -> Formatted -> Block
 renderPandoc' sty = Para . renderPandoc sty
 
 clean' :: Style -> [Inline] -> [Inline]

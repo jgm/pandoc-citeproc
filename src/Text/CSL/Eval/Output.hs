@@ -21,7 +21,8 @@ import Data.Char (toLower, toUpper)
 import Text.CSL.Util (capitalize, titlecase, unTitlecase)
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk (walk)
-import Text.CSL.Util (toStr)
+import Data.Monoid (mappend, mempty, mconcat, (<>))
+import Data.String (fromString)
 
 -- import Debug.Trace
 -- tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
@@ -67,7 +68,7 @@ addDelim d  = foldr check []
     where
       check ONull xs   = xs
       check x     []   = [x]
-      check x (z:zs)   = if null (formatOutput x) || null (formatOutput z)
+      check x (z:zs)   = if formatOutput x == mempty || formatOutput z == mempty
                             then x : z : zs
                             else x : ODel d : z : zs
 
@@ -89,11 +90,11 @@ oStr' s  f = [OStr s f]
 o  <++> [] = o
 o1 <++> o2 = o1 ++ [OSpace] ++ o2
 
-formatOutputList :: [Output] -> FormattedOutput
-formatOutputList = foldr appendWithPunct [] . map formatOutput
+formatOutputList :: [Output] -> Formatted
+formatOutputList = foldr appendWithPunct mempty . map formatOutput
 
-appendWithPunct :: FormattedOutput -> FormattedOutput -> FormattedOutput
-appendWithPunct left right = left ++
+appendWithPunct :: Formatted -> Formatted -> Formatted
+appendWithPunct (Formatted left) (Formatted right) = Formatted $ left ++
   if isPunct' lastleft && isPunct' firstright ||
      isSp lastleft && isSp firstright
      then tailInline right
@@ -105,65 +106,67 @@ appendWithPunct left right = left ++
         lastleft     = lastInline left
         firstright   = headInline right
 
--- | Convert evaluated 'Output' into 'FormattedOutput', ready for the
+-- | Convert evaluated 'Output' into 'Formatted', ready for the
 -- output filters.
-formatOutput :: Output -> FormattedOutput
+formatOutput :: Output -> Formatted
 formatOutput o =
   case o of
-      OSpace              -> [Space]
-      OPan     i          -> i
-      ODel     []         -> []
-      ODel     " "        -> [Space]
-      ODel     s          -> toStr s
-      OStr     []      _  -> []
-      OStr     s       f  -> addFormatting f $ toStr s
-      OErr NoOutput       -> [Span ("",["citeproc-no-output"],[])
+      OSpace              -> Formatted [Space]
+      OPan     i          -> Formatted i
+      ODel     []         -> Formatted []
+      ODel     " "        -> Formatted [Space]
+      ODel     s          -> fromString s
+      OStr     []      _  -> Formatted []
+      OStr     s       f  -> addFormatting f $ fromString s
+      OErr NoOutput       -> Formatted [Span ("",["citeproc-no-output"],[])
                                      [Strong [Str "???"]]]
       OErr (ReferenceNotFound r)
-                          -> [Span ("",["citeproc-not-found"],
+                          -> Formatted [Span ("",["citeproc-not-found"],
                                             [("data-reference-id",r)])
                                      [Strong [Str "???"]]]
-      OLabel   []      _  -> []
+      OLabel   []      _  -> Formatted []
       OLabel   s       f  -> formatOutput (OStr s f)
       ODate    os         -> format os
       OYear    s _     f  -> formatOutput (OStr s f)
       OYearSuf s _ _   f  -> formatOutput (OStr s f)
       ONum     i       f  -> formatOutput (OStr (show i) f)
       OCitNum  i       f  -> if i == 0
-                                then [Strong [Str "???"]]
+                                then Formatted [Strong [Str "???"]]
                                 else formatOutput (OStr (show i) f)
-      OUrl     s       f  -> [Link (formatOutput (OStr (fst s) f)) s]
+      OUrl     s       f  -> Formatted [Link (unFormatted $ formatOutput (OStr (fst s) f)) s]
       OName  _ os _    f  -> formatOutput (Output os f)
       OContrib _ _ os _ _ -> format os
       OLoc     os      f  -> formatOutput (Output os f)
-      Output   []      _  -> []
+      Output   []      _  -> Formatted []
       Output   os      f  -> addFormatting f $ format os
-      _                   -> []
+      _                   -> Formatted []
     where
-      format = concatMap formatOutput
+      format = mconcat . map formatOutput
 
 isPunct :: Char -> Bool
 isPunct c = c `elem` ".;?!"
 
-addFormatting :: Formatting -> FormattedOutput -> FormattedOutput
+addFormatting :: Formatting -> Formatted -> Formatted
 addFormatting f = addSuffix . pref . quote . font . text_case
-  where pref = case prefix f of { "" -> id; x -> ((toStr x) ++) }
+  where pref = case prefix f of { "" -> id; x -> ((fromString x) <>) }
         addSuffix i
           | case suffix f of {(c:_) | isPunct c -> True; _ -> False}
-          , case lastInline i of {(c:_) | isPunct c -> True; _ -> False}
-                                  = i ++ toStr (tail $ suffix f)
-          | not (null (suffix f)) = i ++ toStr (       suffix f)
+          , case lastInline (unFormatted i) of
+                             {(c:_) | isPunct c -> True; _ -> False}
+                                  = i <> fromString (tail $ suffix f)
+          | not (null (suffix f)) = i <> fromString (       suffix f)
           | otherwise             = i
-        quote []  = []
-        quote ils = case quotes f of
-                         NoQuote     -> valign ils
-                         NativeQuote ->
+        quote (Formatted [])  = Formatted []
+        quote (Formatted ils) =
+                    case quotes f of
+                         NoQuote     -> Formatted $ valign ils
+                         NativeQuote -> Formatted
                                   [Span ("",["csl-inquote"],[]) ils]
-                         _           -> [Quoted DoubleQuote $ valign ils]
+                         _           -> Formatted [Quoted DoubleQuote $ valign ils]
 
-        font ils
-          | noDecor f    = [Span ("",["nodecor"],[]) ils]
-          | otherwise    = font_variant . font_style .  font_weight $ ils
+        font (Formatted ils)
+          | noDecor f    = Formatted [Span ("",["nodecor"],[]) ils]
+          | otherwise    = Formatted $ font_variant . font_style .  font_weight $ ils
         font_variant ils =
           case fontVariant f of
                "small-caps"  -> [SmallCaps ils]
@@ -178,10 +181,10 @@ addFormatting f = addSuffix . pref . quote . font . text_case
                "bold"        -> [Strong ils]
                _             -> ils
 
-        text_case [] = []
-        text_case ils@(i:is)
-          | noCase f  = [Span ("",["nocase"],[]) ils]
-          | otherwise =
+        text_case (Formatted []) = Formatted []
+        text_case (Formatted ils@(i:is))
+          | noCase f  = Formatted [Span ("",["nocase"],[]) ils]
+          | otherwise = Formatted $
               case textCase f of
                    "lowercase"        -> walk lowercaseStr ils
                    "uppercase"        -> walk uppercaseStr ils

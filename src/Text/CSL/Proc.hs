@@ -29,6 +29,7 @@ import Text.CSL.Proc.Disamb
 import Text.CSL.Reference
 import Text.CSL.Style
 import Data.Aeson
+import Data.Monoid ((<>))
 import Control.Applicative ((<|>))
 import Text.Pandoc.Definition (Inline(Space, Str, Note), Block(Para))
 
@@ -73,19 +74,19 @@ procOpts = ProcOpts (Select [] [])
 
 -- | With a 'Style', a list of 'Reference's and the list of citation
 -- groups (the list of citations with their locator), produce the
--- 'FormattedOutput' for each citation group.
-processCitations :: ProcOpts -> Style -> [Reference] -> Citations -> [FormattedOutput]
+-- 'Formatted' for each citation group.
+processCitations :: ProcOpts -> Style -> [Reference] -> Citations -> [Formatted]
 processCitations ops s rs
     = citations . citeproc ops s rs
 
 -- | With a 'Style' and the list of 'Reference's produce the
--- 'FormattedOutput' for the bibliography.
-processBibliography :: ProcOpts -> Style -> [Reference] -> [FormattedOutput]
+-- 'Formatted' for the bibliography.
+processBibliography :: ProcOpts -> Style -> [Reference] -> [Formatted]
 processBibliography ops s rs
     = bibliography $ citeproc ops s rs [map (\r -> emptyCite { citeId = unLiteral $ refId r}) rs]
 
 -- | With a 'Style', a list of 'Reference's and the list of
--- 'Citations', produce the 'FormattedOutput' for each citation group
+-- 'Citations', produce the 'Formatted' for each citation group
 -- and the bibliography.
 citeproc :: ProcOpts -> Style -> [Reference] -> Citations -> BiblioData
 citeproc ops s rs cs
@@ -269,7 +270,7 @@ procGroup (Style {citation = ct, csMacros = ms , styleLocale = l,
 formatBiblioLayout :: Formatting -> Delimiter -> [Output] -> [Output]
 formatBiblioLayout  f d = appendOutput f . addDelim d
 
-formatCitLayout :: Style -> CitationGroup -> FormattedOutput
+formatCitLayout :: Style -> CitationGroup -> Formatted
 formatCitLayout s (CG co f d cs)
     | [a] <- co = combine (formatAuth a)
                   (formatCits $
@@ -277,12 +278,14 @@ formatCitLayout s (CG co f d cs)
     | otherwise = formatCits cs
     where
       isNote    = styleClass s == "note"
-      toNote xs = [Note [Para xs]]
-      combine xs [] = xs
-      combine [] ys = ys
-      combine xs ys@(Note _ : _) = xs ++ ys
-      combine xs ys@(Str [c]:_) | c `elem` ", ;:" = xs ++ ys
-      combine xs ys = xs ++ (Space : ys)
+      toNote (Formatted xs) = Formatted [Note [Para xs]]
+      combine (Formatted []) ys = ys
+      combine xs ys =
+        case ys of
+             Formatted [] -> xs
+             Formatted (Note _ : _) -> xs <> ys
+             Formatted (Str [c]:_) | c `elem` ", ;:" -> xs <> ys
+             _ -> xs <> Formatted [Space] <> ys
       formatAuth   = formatOutput . localMod
       formatCits   = (if isNote then toNote else id) .
                      formatOutputList . appendOutput formatting . addAffixes f .

@@ -59,7 +59,6 @@ module Text.CSL
     , BiblioData (..)
 
     -- * The output and the rendering functions
-    , FormattedOutput
     , renderPlain
     , renderPandoc
     , renderPandoc'
@@ -78,7 +77,7 @@ import Text.CSL.Output.Plain
 --
 -- /citeproc-hs/ provides functions for reading bibliographic
 -- databases, for reading and parsing CSL files and for generating
--- citations in an internal format, 'FormattedOutput', that can be
+-- citations in an internal format, 'Formatted', that can be
 -- easily rendered into different final formats. At the present time
 -- only 'Pandoc' and plain text rendering functions are provided by
 -- the library.

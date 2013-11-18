@@ -22,6 +22,7 @@ import Data.Monoid (mempty, Monoid)
 import Control.Arrow
 import Control.Applicative hiding (Const)
 import Data.List ( nubBy, isPrefixOf, isInfixOf, intercalate )
+import Data.List.Split ( splitWhen )
 import Data.Generics ( Data, Typeable )
 import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
@@ -33,6 +34,7 @@ import Text.Pandoc (readHtml, writeMarkdown, WriterOptions(..),
                     ReaderOptions(..), bottomUp, def)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.Builder as B
+import Text.Pandoc.XML (fromEntities)
 
 #ifdef UNICODE_COLLATION
 import qualified Data.Text     as T
@@ -104,7 +106,21 @@ instance ToJSON Formatted where
   toJSON = toJSON . writeCSLString . unFormatted
 
 instance IsString Formatted where
-  fromString = Formatted . B.toList . B.text
+  fromString = Formatted . toStr
+
+toStr :: String -> [Inline]
+toStr = intercalate [Str "\n"] .
+        map (B.toList . B.text . tweak . fromEntities) .
+        splitWhen (=='\n')
+    where
+      tweak ('«':' ':xs) = "«\8239" ++ tweak xs
+      tweak (' ':'»':xs) = "\8239»" ++ tweak xs
+      tweak (' ':';':xs) = "\8239;" ++ tweak xs
+      tweak (' ':':':xs) = "\8239:" ++ tweak xs
+      tweak (' ':'!':xs) = "\8239!" ++ tweak xs
+      tweak (' ':'?':xs) = "\8239?" ++ tweak xs
+      tweak ( x :xs    ) = x : tweak xs
+      tweak []           = []
 
 -- | The representation of a parsed CSL style.
 data Style
@@ -474,10 +490,6 @@ data CSInfo
 data CSAuthor   = CSAuthor   String String String deriving ( Show, Read, Eq, Typeable, Data )
 data CSCategory = CSCategory String String String deriving ( Show, Read, Eq, Typeable, Data )
 
--- | The formatted output, produced after post-processing the
--- evaluated citations.
-type FormattedOutput = [Inline]
-
 data CiteprocError
    = NoOutput
    | ReferenceNotFound String
@@ -553,11 +565,11 @@ data CitationGroup = CG [(Cite, Output)] Formatting Delimiter [(Cite, Output)] d
 
 data BiblioData
     = BD
-      { citations    :: [FormattedOutput]
-      , bibliography :: [FormattedOutput]
+      { citations    :: [Formatted]
+      , bibliography :: [Formatted]
       } deriving ( Show )
 
--- | A record with all the data to produce the 'FormattedOutput' of a
+-- | A record with all the data to produce the 'Formatted' of a
 -- citation: the citation key, the part of the formatted citation that
 -- may be colliding with other citations, the form of the citation
 -- when a year suffix is used for disambiguation , the data to

@@ -114,13 +114,14 @@ decodeEntities ('&':xs) =
 decodeEntities (x:xs) = x : decodeEntities xs
 
 -- | Substitute 'Cite' elements with formatted citations.
-processCite :: Style -> M.Map [Citation] FormattedOutput -> Inline -> Inline
+processCite :: Style -> M.Map [Citation] Formatted -> Inline -> Inline
 processCite s cs (Cite t _) =
    case M.lookup t cs of
-        Just (x:xs)
+        Just (Formatted (x:xs))
           | isTextualCitation t && not (null xs) ->
-                         Cite t (renderPandoc s [x] ++ renderPandoc s xs)
-          | otherwise -> Cite t (renderPandoc s (x:xs))
+                         Cite t (renderPandoc s (Formatted [x]) ++
+                                 renderPandoc s (Formatted xs))
+          | otherwise -> Cite t (renderPandoc s (Formatted (x:xs)))
         _             -> Strong [Str "???"]  -- TODO raise error instead?
 processCite _ _ x = x
 

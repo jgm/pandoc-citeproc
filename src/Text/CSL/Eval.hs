@@ -26,6 +26,7 @@ import Control.Monad.State
 import Data.Monoid (mempty)
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
+import Data.String ( fromString )
 import Text.Pandoc.Definition (Inline(Str, Space))
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc.Shared (stringify)
@@ -37,7 +38,7 @@ import Text.CSL.Eval.Names
 import Text.CSL.Output.Plain
 import Text.CSL.Reference
 import Text.CSL.Style
-import Text.CSL.Util ( toStr, readNum, last', proc, proc', query, betterThan )
+import Text.CSL.Util ( readNum, last', proc, proc', query, betterThan )
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the
@@ -237,7 +238,7 @@ getFormattedValue o as f fm s val
     | Just v <- fromValue val :: Maybe Formatted =
        if v == mempty
           then []
-          else let ys = maybe (unFormatted v) toStr
+          else let ys = maybe (unFormatted v) (unFormatted . fromString)
                         $ getAbbr (stringify $ unFormatted v)
                in  [Output [OPan $ walk value' ys] fm]
     | Just v <- fromValue val :: Maybe String    = (:[]) . flip OStr fm . maybe v id . getAbbr $ value v

@@ -20,7 +20,7 @@ module Text.CSL.Output.Plain
 import Text.CSL.Style
 import Text.Pandoc
 
--- | Render the 'FormattedOutput' into a plain text string.
-renderPlain :: FormattedOutput -> String
-renderPlain ils = writePlain def $ Pandoc nullMeta [Plain ils]
+-- | Render the 'Formatted' into a plain text string.
+renderPlain :: Formatted -> String
+renderPlain (Formatted ils) = writePlain def $ Pandoc nullMeta [Plain ils]
 

@@ -28,7 +28,6 @@ module Text.CSL.Util
   , readable
   , toShow
   , toRead
-  , toStr
   , inlinesToString
   ) where
 import Data.Aeson
@@ -41,10 +40,7 @@ import qualified Data.Traversable
 import Text.Pandoc.Shared (safeRead, stringify)
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc
-import Text.Pandoc.XML (fromEntities)
-import qualified Text.Pandoc.Builder as B
-import Data.List.Split (wordsBy, whenElt, dropBlanks, split, splitWhen)
-import Data.List (intercalate)
+import Data.List.Split (wordsBy, whenElt, dropBlanks, split )
 import Control.Monad.State
 import Data.Monoid (Monoid, mappend, mempty)
 import Data.Generics ( Typeable, Data, everywhere
@@ -241,20 +237,6 @@ toRead (s:ss) = toUpper s : camel ss
           | '_':y:ys <- x = toUpper y : camel ys
           |     y:ys <- x =         y : camel ys
           | otherwise     = []
-
-toStr :: String -> [Inline]
-toStr = intercalate [Str "\n"] .
-        map (B.toList . B.text . tweak . fromEntities) .
-        splitWhen (=='\n')
-    where
-      tweak ('«':' ':xs) = "«\8239" ++ tweak xs
-      tweak (' ':'»':xs) = "\8239»" ++ tweak xs
-      tweak (' ':';':xs) = "\8239;" ++ tweak xs
-      tweak (' ':':':xs) = "\8239:" ++ tweak xs
-      tweak (' ':'!':xs) = "\8239!" ++ tweak xs
-      tweak (' ':'?':xs) = "\8239?" ++ tweak xs
-      tweak ( x :xs    ) = x : tweak xs
-      tweak []           = []
 
 inlinesToString :: [Inline] -> String
 inlinesToString = stringify
