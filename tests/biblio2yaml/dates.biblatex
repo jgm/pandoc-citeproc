@@ -89,7 +89,7 @@ references:
     family: Author
   container-title: Journal
   type: article-journal
-- title: Year and month, biblatex style; note that biblatex does not have a "day"
+- title: Year and month, biblatex style; note that biblatex does not have a “day”
     field
   id: year-month-new
   issued:

@@ -20,8 +20,8 @@
 
 ---
 references:
-- title: ! 'Title of the "inbook" Entry: Subtitle. Titleaddon'
-  title-short: Title of the "inbook" Entry
+- title: ! 'Title of the “inbook” Entry: Subtitle. Titleaddon'
+  title-short: Title of the “inbook” Entry
   volume: 4
   id: item1
   issued:
