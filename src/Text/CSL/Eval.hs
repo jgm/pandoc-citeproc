@@ -118,8 +118,8 @@ evalElement el
                                        else formatNumber f fm s =<<
                                             getStringVar s
     | Variable s f fm d     <- el = return . addDelim d =<< concatMapM (getVariable f fm) s
-    | Group        fm d l   <- el = when' ((/=) [] <$> tryGroup l) $
-                                    return . outputList fm d =<< evalElements l
+    | Group        fm d l   <- el = when' (tryGroup l) $
+                                     outputList fm d <$> evalElements l
     | Date     _ _ _  _ _ _ <- el = evalDate el
     | Label    s f fm _     <- el = formatLabel f fm True s -- FIXME !!
     | Term     s f fm p     <- el = formatTerm  f fm p    s
@@ -141,8 +141,12 @@ evalElement el
                              _   -> evalElement e
 
       tryGroup l = if hasVar l
-                   then get >>= \s -> evalElements (rmTermConst l) >>= \r -> put s >> return r
-                   else return [ONull]
+                   then do
+                     oldState <- get
+                     res <- evalElements (rmTermConst l)
+                     put oldState
+                     return (not $ null res)
+                   else return True
       hasVar  = not . null . query hasVarQ
       hasVarQ e
           | Variable {} <- e = [e]
