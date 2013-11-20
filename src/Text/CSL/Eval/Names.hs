@@ -24,7 +24,7 @@ import Data.Monoid
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
-import Text.CSL.Util ( readNum, (<^>), (<+>), query, toRead, capitalize, trimr )
+import Text.CSL.Util ( readNum, (<^>), (<+>), query, toRead, capitalize, trim )
 import Text.CSL.Reference
 import Text.CSL.Style
 import Text.Pandoc.Definition
@@ -261,7 +261,7 @@ formatName m b f fm ops np n
                          , not (all isLower x) -> addIn x iw
                        Nothing
                          | isInit x  -> addIn x " " -- default
-                       _ -> x ++ " "
+                       _ -> " " ++ x ++ " "
       addIn x i = if hasHyphen x
                   then head (       takeWhile (/= '-') x) : hyphen ++
                        head (tail $ dropWhile (/= '-') x) : i
@@ -281,7 +281,10 @@ formatName m b f fm ops np n
       onlyGiven = not (null $ givenName n) && null family
       given     = if onlyGiven
                      then givenLong
-                     else when_ (givenName  n) . trimr . concatMap initial $ givenName n
+                     else when_ (givenName  n) . trim . fixsp . concatMap initial $ givenName n
+      fixsp     (' ':' ':xs) = fixsp (' ':xs)
+      fixsp     (x:xs)       = x : fixsp xs
+      fixsp     []           = []
       givenLong = when_ (givenName  n) . unwords $ map unLiteral $ givenName n
       family    = unLiteral $ familyName n
       dropping  = unLiteral $ droppingPart n
