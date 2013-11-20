@@ -22,7 +22,7 @@ import Data.List
 import Data.Ord  ( comparing )
 import Data.Maybe ( mapMaybe )
 import Text.CSL.Eval
-import Text.CSL.Util ( capitalize, proc, proc', query, toShow, )
+import Text.CSL.Util ( capitalize, proc, proc', query, toShow )
 import Text.CSL.Proc.Collapse
 import Text.CSL.Proc.Disamb
 import Text.CSL.Reference
@@ -309,7 +309,7 @@ addAffixes f os
       suff = case suffix f of
                   []     -> []
                   (c:cs)
-                    | isLetter c || isDigit c ->
+                    | isLetter c || isDigit c || c == '(' || c == '[' ->
                          [OSpace, OStr (c:cs) emptyFormatting]
                     | otherwise -> [OStr (c:cs) emptyFormatting]
 

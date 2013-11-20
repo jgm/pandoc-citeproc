@@ -199,8 +199,9 @@ addCiteAffixes c x =
               | isprefix  -> [OPan ils, OSpace]
               | otherwise -> case ils of
                                   (Str (z:_):_)
-                                    | isAlphaNum z -> [OSpace, OPan ils]
-                                  _                -> [OPan ils]
+                                    | isAlphaNum z ||
+                                      z == '(' -> [OSpace, OPan ils]
+                                  _            -> [OPan ils]
 
 
 isNumStyle :: [Output] -> Bool
