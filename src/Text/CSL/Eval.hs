@@ -144,9 +144,13 @@ evalElement el
                      oldState <- get
                      res <- evalElements (rmTermConst l)
                      put oldState
-                     nums <- mapM getStringVar [s | Number s _ _ <- l]
-                     let plur = any ('-' `elem`) nums
-                     let pluralizeTerm (Term s f fm _) = Term s f fm plur
+                     let numVars = [s | Number s _ _ <- l]
+                     nums <- mapM getStringVar numVars
+                     let pluralizeTerm (Term s f fm _) = Term s f fm $
+                            case numVars of
+                              ["number-of-volumes"] -> not $ any (== "1") nums
+                              ["number-of-pages"]   -> not $ any (== "1") nums
+                              _ -> any ('-' `elem`) nums
                          pluralizeTerm x = x
                      if null res
                         then return []
