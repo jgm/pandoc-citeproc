@@ -27,7 +27,7 @@ import Data.Monoid (mempty, Any(..))
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
 import Data.String ( fromString )
-import Text.Pandoc.Definition (Inline(Str, Space))
+import Text.Pandoc.Definition (Inline(Str, Space, Link))
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc.Shared (stringify)
 
@@ -194,7 +194,7 @@ evalElement el
                              "doi"         -> getStringVar "doi" >>= \d ->
                                               if null d
                                                  then return []
-                                                 else return [OUrl ("http://dx.doi.org/" ++ d, d) fm]
+                                                 else return [Output [OPan [Link [Str d] ("http://dx.doi.org/" ++ d, "")]] fm]
                              _             -> gets (env >>> options &&& abbrevs) >>= \(opts,as) ->
                                               getVar [] (getFormattedValue opts as f fm s) s >>= \r ->
                                               consumeVariable s >> return r
