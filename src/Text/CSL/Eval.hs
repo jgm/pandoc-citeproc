@@ -23,7 +23,7 @@ module Text.CSL.Eval
 import Control.Arrow
 import Control.Applicative ( (<$>) )
 import Control.Monad.State
-import Data.Monoid (mempty)
+import Data.Monoid (mempty, Any(..))
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
 import Data.String ( fromString )
@@ -37,7 +37,7 @@ import Text.CSL.Eval.Date
 import Text.CSL.Eval.Names
 import Text.CSL.Output.Plain
 import Text.CSL.Reference
-import Text.CSL.Style
+import Text.CSL.Style hiding (Any)
 import Text.CSL.Util ( readNum, last', proc, proc', query, betterThan )
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
@@ -139,7 +139,7 @@ evalElement el
                                     evalElement $ Names rs ns nfm (d' `betterThan` d) []
                              _   -> evalElement e
 
-      tryGroup l = if hasVar l
+      tryGroup l = if getAny $ query hasVar l
                    then do
                      oldState <- get
                      res <- evalElements (rmTermConst l)
@@ -152,18 +152,17 @@ evalElement el
                         then return []
                         else evalElements $ map pluralizeTerm l
                    else evalElements l
-      hasVar  = not . null . query hasVarQ
-      hasVarQ e
-          | Variable {} <- e = [e]
-          | Date     {} <- e = [e]
-          | Names    {} <- e = [e]
-          | Number   {} <- e = [e]
-          | otherwise        = []
-      rmTermConst [] = []
-      rmTermConst (e:es)
-          | Term  {} <- e = rmTermConst es
-          | Const {} <- e = rmTermConst es
-          | otherwise = e : rmTermConst es
+      hasVar e
+          | Variable {} <- e = Any True
+          | Date     {} <- e = Any True
+          | Names    {} <- e = Any True
+          | Number   {} <- e = Any True
+          | otherwise        = Any False
+      rmTermConst = filter (not . isTermConst)
+      isTermConst e
+          | Term  {} <- e = True
+          | Const {} <- e = True
+          | otherwise     = False
 
       ifEmpty p t e = p >>= \r -> if r == [] then t else return (e r)
 
