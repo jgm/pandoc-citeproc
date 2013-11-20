@@ -190,7 +190,7 @@ evalElement el
                              "page"        -> getStringVar "page" >>= formatRange fm
                              "locator"     -> getLocVar >>= formatRange fm . snd
                              "url"         -> getStringVar "url" >>= \k ->
-                                              if null k then return [] else return [OUrl (k,k) fm]
+                                              if null k then return [] else return [Output [OPan [Link [Str k] (k,"")]] fm]
                              "doi"         -> getStringVar "doi" >>= \d ->
                                               if null d
                                                  then return []

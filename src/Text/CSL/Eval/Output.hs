@@ -59,7 +59,6 @@ rmEmptyOutput o
     | OStr []   _ <- o = ONull
     | OPan []     <- o = ONull
     | ODel []     <- o = ONull
-    | OUrl t    _ <- o = if null (fst t) then ONull else o
     | otherwise        = o
 
 addDelim :: String -> [Output] -> [Output]
@@ -120,7 +119,6 @@ formatOutput o =
       OCitNum  i       f  -> if i == 0
                                 then Formatted [Strong [Str "???"]]
                                 else formatOutput (OStr (show i) f)
-      OUrl     s       f  -> Formatted [Link (unFormatted $ formatOutput (OStr (fst s) f)) s]
       OName  _ os _    f  -> formatOutput (Output os f)
       OContrib _ _ os _ _ -> format os
       OLoc     os      f  -> formatOutput (Output os f)

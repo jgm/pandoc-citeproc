@@ -536,7 +536,6 @@ data Output
     | OContrib String    String   [Output] [Output] [[Output]] -- ^ The citation key, the role (author, editor, etc.), the contributor(s),
                                                         -- the output needed for year suf. disambiguation, and everything used for
                                                         -- name disambiguation.
-    | OUrl    Target              Formatting            -- ^ An URL
     | OLoc    [Output]            Formatting            -- ^ The citation's locator
     | Output  [Output]            Formatting            -- ^ Some nested 'Output'
       deriving ( Eq, Ord, Show, Typeable, Data )
