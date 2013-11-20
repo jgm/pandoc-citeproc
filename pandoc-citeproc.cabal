@@ -83,6 +83,8 @@ data-files:         chicago-author-date.csl
                     tests/ieee.expected.native
                     tests/mhra.in.native
                     tests/mhra.expected.native
+                    tests/number-of-volumes.in.native
+                    tests/number-of-volumes.expected.native
                     tests/biblio.bib
                     tests/chicago-author-date.csl
                     tests/ieee.csl
