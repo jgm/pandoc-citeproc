@@ -214,9 +214,9 @@ getCiteData :: Output -> [CiteData]
 getCiteData out
     = (contribs &&& years >>> zipData) out
     where
-      contribs x = if query contribsQ x /= []
-                   then query contribsQ x
-                   else [CD [] [] [] [] [] [] []]
+      contribs x = case query contribsQ x of
+                        [] -> [CD [] [] [] [] [] [] []]
+                        xs -> xs
       yearsQ  = query getYears
       years o = if yearsQ o /= [] then yearsQ o else [([],[])]
       zipData = uncurry . zipWith $ \c y -> if key c /= []
