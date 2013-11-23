@@ -31,6 +31,7 @@ import Text.CSL.Reference
 import Text.CSL.Style (Formatted(..))
 import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen)
 import qualified Text.Pandoc.Walk as Walk
+import qualified Text.Pandoc.UTF8 as UTF8
 
 blocksToFormatted  :: [Block]  -> Bib Formatted
 blocksToFormatted bs =
@@ -77,7 +78,7 @@ data Item = Item{ identifier :: String
                 }
 
 readBibtexInput :: Bool -> FilePath -> IO [Reference]
-readBibtexInput isBibtex f = readFile f >>= readBibtexInputString isBibtex
+readBibtexInput isBibtex f = UTF8.readFile f >>= readBibtexInputString isBibtex
 
 readBibtexInputString :: Bool -> String -> IO [Reference]
 readBibtexInputString isBibtex bibstring = do

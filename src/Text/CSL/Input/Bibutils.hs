@@ -18,7 +18,7 @@ module Text.CSL.Input.Bibutils
     , convertRefs
     ) where
 
-import Text.Pandoc.UTF8 ( fromStringLazy )
+import qualified Text.Pandoc.UTF8 as UTF8
 import Text.Pandoc
 import Data.Char
 import System.FilePath ( takeExtension )
@@ -47,7 +47,7 @@ readBiblioFile :: FilePath -> IO [Reference]
 readBiblioFile f
     = case getExt f of
         ".json"     -> BL.readFile f >>= either error return . eitherDecode
-        ".yaml"     -> readFile f >>= either error return . readYamlBib
+        ".yaml"     -> UTF8.readFile f >>= either error return . readYamlBib
         ".bib"      -> readBibtexInput False f
         ".bibtex"   -> readBibtexInput True f
         ".biblatex" -> readBibtexInput False f
@@ -81,7 +81,7 @@ data BibFormat
 
 readBiblioString :: BibFormat -> String -> IO [Reference]
 readBiblioString b s
-    | Json      <- b = either error return $ eitherDecode $ fromStringLazy s
+    | Json      <- b = either error return $ eitherDecode $ UTF8.fromStringLazy s
     | Yaml      <- b = either error return $ readYamlBib s
     | Bibtex    <- b = readBibtexInputString True s
     | BibLatex  <- b = readBibtexInputString False s
@@ -98,7 +98,7 @@ readBiblioString b s
     where
       go f = withTempDir "citeproc" $ \tdir -> do
                let tfile = tdir </> "bibutils-tmp.biblio"
-               writeFile tfile s
+               UTF8.writeFile tfile s
                readBiblioFile' tfile f
 #endif
 
