@@ -45,8 +45,6 @@ adjustSpans _ (Span ("",[],[]) xs) = xs
 adjustSpans lang (RawInline (Format "latex") s)
   | s == "\\hyphen" = [Str "-"]
   | otherwise = bottomUp (concatMap (adjustSpans lang)) $ parseRawLaTeX lang s
-adjustSpans _ (SmallCaps xs) =
-  [Span ("",[],[("style","font-variant:small-caps;")]) xs]
 adjustSpans _ x = [x]
 
 parseRawLaTeX :: Lang -> String -> [Inline]
