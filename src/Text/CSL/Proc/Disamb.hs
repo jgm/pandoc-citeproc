@@ -196,9 +196,9 @@ getDuplCiteData b1 b2 g
                          else findDupl  collide
 rmExtras :: [Output] -> [Output]
 rmExtras os
-    | Output         x f : xs <- os = if null (rmExtras x)
-                                      then rmExtras xs
-                                      else Output (rmExtras x) f : rmExtras xs
+    | Output         x f : xs <- os = case rmExtras x of
+                                           [] -> rmExtras xs
+                                           ys -> Output ys f : rmExtras xs
     | OContrib _ _ x _ _ : xs <- os = OContrib [] [] x [] [] : rmExtras xs
     | OYear        y _ f : xs <- os = OYear y [] f : rmExtras xs
     | ODel             _ : xs <- os = rmExtras xs
