@@ -185,7 +185,8 @@ getCitDisambOptions
 -- year-suffix option is set).
 getDuplCiteData :: Bool -> Bool -> [CitationGroup] -> [[CiteData]]
 getDuplCiteData b1 b2 g
-    = groupBy (\x y -> collide x == collide y) . sortBy (comparing collide) $ duplicates
+    = groupBy (\x y -> collide x == collide y) . sortBy (comparing collide)
+      $ duplicates
     where
       whatToGet  = if b1 then collision else disambYS
       collide    = proc rmExtras . proc rmNameHash . proc rmGivenNames . whatToGet
@@ -194,6 +195,7 @@ getDuplCiteData b1 b2 g
       findDupl f = filter (flip (>) 1 . length . flip elemIndices (map f citeData) . f) citeData
       duplicates = if b2 then findDupl (collide &&& citYear)
                          else findDupl  collide
+
 rmExtras :: [Output] -> [Output]
 rmExtras os
     | Output         x f : xs <- os = case rmExtras x of
@@ -215,7 +217,8 @@ getCiteData out
     = (contribs &&& years >>> zipData) out
     where
       contribs x = case query contribsQ x of
-                        [] -> [CD [] [] [] [] [] [] []]
+                        [] -> [CD [] [out] [] [] [] [] []]
+                              -- allow title to disambiguate
                         xs -> xs
       yearsQ  = query getYears
       years o = if yearsQ o /= [] then yearsQ o else [([],[])]
