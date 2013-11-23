@@ -299,9 +299,10 @@ formatCitLayout s (CG co f d cs)
 
 addAffixes :: Formatting -> [Output] -> [Output]
 addAffixes f os
-    | []      <- os = []
-    | [ONull] <- os = []
-    | otherwise     = pref ++ suff
+    | []      <- os            = []
+    | [ONull] <- os            = []
+    | [Output [ONull] _] <- os = []
+    | otherwise                = pref ++ suff
     where
       pref = if not (null (prefix f))
              then [OStr (prefix f) emptyFormatting] ++ os
