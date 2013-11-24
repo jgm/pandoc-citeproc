@@ -139,6 +139,11 @@ evalElement el
                                     evalElement $ Names rs ns nfm (d' `betterThan` d) []
                              _   -> evalElement e
 
+      -- from citeproc documentation: "cs:group implicitly acts as a
+      -- conditional: cs:group and its child elements are suppressed if
+      -- a) at least one rendering element in cs:group calls a variable
+      -- (either directly or via a macro), and b) all variables that are
+      -- called are empty. This accommodates descriptive cs:text elements."
       tryGroup l = if getAny $ query hasVar l
                    then do
                      oldState <- get
