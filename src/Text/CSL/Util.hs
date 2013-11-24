@@ -24,6 +24,7 @@ module Text.CSL.Util
   , splitStrWhen
   , proc
   , proc'
+  , procM
   , query
   , betterThan
   , readable
@@ -51,8 +52,8 @@ import Text.Pandoc
 import Data.List.Split (wordsBy, whenElt, dropBlanks, split )
 import Control.Monad.State
 import Data.Monoid (Monoid, mappend, mempty)
-import Data.Generics ( Typeable, Data, everywhere
-                     , everywhere', everything, mkT, mkQ )
+import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
+                       everywhere', everything, mkT, mkQ )
 
 readNum :: String -> Int
 readNum s = case reads s of
@@ -222,6 +223,10 @@ proc f = everywhere (mkT f)
 -- top-down manner.
 proc' :: (Typeable a, Data b) => (a -> a) -> b -> b
 proc' f = everywhere' (mkT f)
+
+-- | A generic monadic processing function.
+procM :: (Monad m, Typeable a, Data b) => (a -> m a) -> b -> m b
+procM f = everywhereM (mkM f)
 
 -- | A generic query function.
 query :: (Typeable a, Data b, Monoid m) => (a -> m) -> b -> m
