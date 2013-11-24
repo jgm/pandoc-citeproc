@@ -167,7 +167,7 @@ evalElement el
           | Names    {} <- e = Any True
           | Number   {} <- e = Any True
           | otherwise        = Any False
-      rmTermConst = filter (not . isTermConst)
+      rmTermConst = proc $ filter (not . isTermConst)
       isTermConst e
           | Term  {} <- e = True
           | Const {} <- e = True
