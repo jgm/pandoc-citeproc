@@ -38,7 +38,7 @@ import Text.CSL.Eval.Names
 import Text.CSL.Output.Plain
 import Text.CSL.Reference
 import Text.CSL.Style hiding (Any)
-import Text.CSL.Util ( readNum, last', proc, proc', query, betterThan )
+import Text.CSL.Util ( readNum, last', proc, procM, proc', query, betterThan )
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the
@@ -59,7 +59,7 @@ evalLayout (Layout _ _ es) em b l m o a r
       locale = case l of
                  [x] -> x
                  _   -> Locale [] [] [] [] []
-      job    = concatMapM evalElement es
+      job    = expandMacros es >>= evalElements
       cit    = case em of
                  EvalCite    c -> c
                  EvalSorting c -> c
@@ -103,10 +103,28 @@ evalSorting m l ms opts ss as r
 evalElements :: [Element] -> State EvalState [Output]
 evalElements = concatMapM evalElement
 
+expandMacros :: [Element] -> State EvalState [Element]
+expandMacros = procM expandMacro
+
+expandMacro :: Element -> State EvalState Element
+expandMacro (Choose i ei e) =
+  Elements emptyFormatting `fmap` evalIfThen i ei e
+expandMacro (Macro s fm) = do
+  ms <- gets (macros . env)
+  case lookup s ms of
+       Nothing  -> error $ "Macro " ++ show s ++ " not found!"
+       Just els -> Elements fm `fmap` procM expandMacro els
+expandMacro x = return x
+
 evalElement :: Element -> State EvalState [Output]
 evalElement el
-    | Choose i ei e         <- el = evalIfThen i ei e
-    | Macro    s   fm       <- el = return . appendOutput fm =<< evalElements =<< getMacro s
+    | Elements fm es <- el        = evalElements es >>= \os ->
+                                    if fm == emptyFormatting
+                                       then return os
+                                       else return [Output os fm]
+    | Choose i ei e         <- el = error $ "Unexpanded Choose"
+    | Macro    s   _        <- el = error $ "Unexpanded macro " ++ s
+                                    -- All macros should have been expanded
     | Const    s   fm       <- el = return $ addSpaces s
                                            $ if fm == emptyFormatting
                                                 then [OPan (readCSLString s)]
@@ -144,6 +162,11 @@ evalElement el
       -- a) at least one rendering element in cs:group calls a variable
       -- (either directly or via a macro), and b) all variables that are
       -- called are empty. This accommodates descriptive cs:text elements."
+
+      -- TODO:  problem, this approach gives wrong results when the variable
+      -- is in a conditional and the other branch is followed.  the term
+      -- provided by the other branch (e.g. 'n.d.') is not printed.  we
+      -- should ideally expand conditionals when we expand macros.
       tryGroup l = if getAny $ query hasVar l
                    then do
                      oldState <- get
@@ -186,7 +209,6 @@ evalElement el
       getFirst    (x:xs) = whenElse ((/=) []  <$> substituteWith x)
                                     (consuming $  substituteWith x)
                                     (getFirst xs)
-      getMacro         s = maybe [] id . lookup s <$> gets (macros . env)
       getVariable f fm s = if isTitleVar s || isTitleShortVar s
                            then consumeVariable s >> formatTitle s f fm else
                            case map toLower s of
@@ -204,18 +226,14 @@ evalElement el
                                               getVar [] (getFormattedValue opts as f fm s) s >>= \r ->
                                               consumeVariable s >> return r
 
-evalIfThen :: IfThen -> [IfThen] -> [Element] -> State EvalState [Output]
+evalIfThen :: IfThen -> [IfThen] -> [Element] -> State EvalState [Element]
 evalIfThen i ei e
     | IfThen c m el <- i = ifElse c m el
-    | otherwise          = evalElements e
+    | otherwise          = return e
     where
       ifElse c m el = if ei == []
-                      then whenElse (evalCond m c)
-                                    (evalElements el)
-                                    (evalElements e )
-                      else whenElse (evalCond m c)
-                                    (evalElements el)
-                                    (evalIfThen (head ei) (tail ei) e)
+                      then whenElse (evalCond m c) (return el) (return e)
+                      else whenElse (evalCond m c) (return el) (evalIfThen (head ei) (tail ei) e)
       evalCond m c = do t <- checkCond chkType         isType          c m
                         v <- checkCond isVarSet        isSet           c m
                         n <- checkCond chkNumeric      isNumeric       c m
