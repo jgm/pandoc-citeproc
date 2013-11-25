@@ -250,7 +250,7 @@ evalIfThen (IfThen c' m' el') ei e = whenElse (evalCond m' c') (return el') rest
                              as  <- gets (abbrevs . env)
                              let val' = if getAbbreviation as v val == [] then val else getAbbreviation as v val
                              return (isNumericString val')
-      chkDate         v = getDateVar v >>= return . not . null . filter ((/=) [] . unLiteral . circa)
+      chkDate         v = getDateVar v >>= return . not . null . filter circa
       chkPosition     s = if s == "near-note"
                           then gets (nearNote . cite . env)
                           else gets (citePosition . cite . env) >>= return . compPosition s

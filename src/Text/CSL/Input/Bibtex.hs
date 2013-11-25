@@ -445,7 +445,7 @@ parseDate s = do
                  , season = mempty
                  , day    = Literal $ dropWhile (=='0') day'
                  , other  = mempty
-                 , circa  = mempty
+                 , circa  = False
                  }
 
 isNumber :: String -> Bool
@@ -472,7 +472,7 @@ getOldDates prefix = do
                        , season = mempty
                        , day    = Literal day'
                        , other  = Literal $ if isNumber year' then "" else year'
-                       , circa  = mempty
+                       , circa  = False
                        }
   let end' = if null endyear'
                 then []
@@ -481,7 +481,7 @@ getOldDates prefix = do
                               , day    = Literal $ endday'
                               , season = mempty
                               , other  = Literal $ if isNumber endyear' then "" else endyear'
-                              , circa  = mempty
+                              , circa  = False
                               }]
   return (start':end')
 

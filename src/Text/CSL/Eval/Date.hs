@@ -210,27 +210,27 @@ getOrdinal v s ts
                else Neuter
 
 parseRefDate :: RefDate -> [RefDate]
-parseRefDate r@(RefDate _ _ _ _ (Literal o) (Literal c))
+parseRefDate r@(RefDate _ _ _ _ (Literal o) c)
     = if null o then return r
       else let (a,b) = break (== '-') o
            in  if null b then return (parseRaw o) else [parseRaw a, parseRaw b]
     where
       parseRaw str =
           case words $ check str of
-            [y']       | and (map isDigit y') -> RefDate (Literal y') mempty mempty mempty (Literal o) (Literal c)
+            [y']       | and (map isDigit y') -> RefDate (Literal y') mempty mempty mempty (Literal o) c
             [s',y']    | and (map isDigit y')
-                       , and (map isDigit s') -> RefDate (Literal y') (Literal s') mempty mempty (Literal o) (Literal c)
-            [s',y']    | s' `elem'` seasons   -> RefDate (Literal y') mempty (Literal $ select s' seasons) mempty (Literal o) mempty
-            [s',y']    | s' `elem'` months    -> RefDate (Literal y') (Literal $ select s'  months) mempty mempty (Literal o) (Literal c)
+                       , and (map isDigit s') -> RefDate (Literal y') (Literal s') mempty mempty (Literal o) c
+            [s',y']    | s' `elem'` seasons   -> RefDate (Literal y') mempty (Literal $ select s' seasons) mempty (Literal o) False
+            [s',y']    | s' `elem'` months    -> RefDate (Literal y') (Literal $ select s'  months) mempty mempty (Literal o) c
             [s',d',y'] | and (map isDigit s')
                        , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate (Literal y') (Literal s') mempty (Literal d') (Literal o) (Literal c)
+                       , and (map isDigit d') -> RefDate (Literal y') (Literal s') mempty (Literal d') (Literal o) c
             [s',d',y'] | s' `elem'` months
                        , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') (Literal o) (Literal c)
+                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') (Literal o) c
             [s',d',y'] | s' `elem'` months
                        , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') (Literal o) (Literal c)
+                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') (Literal o) c
             _                                 -> r
       check []     = []
       check (x:xs) = if x `elem` ",/-" then ' ' : check xs else x : check xs

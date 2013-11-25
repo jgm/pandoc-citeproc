@@ -131,18 +131,18 @@ data RefDate =
             , season :: Literal
             , day    :: Literal
             , other  :: Literal
-            , circa  :: Literal
+            , circa  :: Bool
             } deriving ( Show, Read, Eq, Typeable, Data )
 
 instance FromJSON RefDate where
   parseJSON (Array v) =
      case fromJSON (Array v) of
           Success [y]     -> RefDate <$> parseJSON y <*>
-                    pure "" <*> pure "" <*> pure "" <*> pure "" <*> pure ""
+                    pure "" <*> pure "" <*> pure "" <*> pure "" <*> pure False
           Success [y,m]   -> RefDate <$> parseJSON y <*> parseJSON m <*>
-                    pure "" <*> pure "" <*> pure "" <*> pure ""
+                    pure "" <*> pure "" <*> pure "" <*> pure False
           Success [y,m,d] -> RefDate <$> parseJSON y <*> parseJSON m <*>
-                    pure "" <*> parseJSON d <*> pure "" <*> pure ""
+                    pure "" <*> parseJSON d <*> pure "" <*> pure False
           Error e         -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
   parseJSON (Object v) = RefDate <$>
@@ -151,18 +151,17 @@ instance FromJSON RefDate where
               v .:? "season" .!= "" <*>
               v .:? "day" .!= "" <*>
               v .:? "other" .!= "" <*>
-              v .:? "circa" .!= ""
+              v .:? "circa" .!= False
   parseJSON _ = fail "Could not parse RefDate"
 
 instance ToJSON RefDate where
-  toJSON refdate = object' [
+  toJSON refdate = object' $ [
       "year" .= year refdate
     , "month" .= month refdate
     , "season" .= season refdate
     , "day" .= day refdate
-    , "other" .= other refdate
-    , "circa" .= circa refdate
-    ]
+    , "other" .= other refdate ] ++
+    [ "circa" .= circa refdate | circa refdate ]
 
 instance FromJSON [RefDate] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
@@ -179,8 +178,8 @@ instance ToJSON [RefDate] where
 
 mkRefDate :: Literal -> Parser [RefDate]
 mkRefDate z@(Literal xs)
-  | all isDigit xs = return [RefDate z mempty mempty mempty mempty mempty]
-  | otherwise      = return [RefDate mempty mempty mempty mempty z mempty]
+  | all isDigit xs = return [RefDate z mempty mempty mempty mempty False]
+  | otherwise      = return [RefDate mempty mempty mempty mempty z False]
 
 data RefType
     = NoType
