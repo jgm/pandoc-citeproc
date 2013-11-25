@@ -562,7 +562,7 @@ instance FromJSON Cite where
               v .#: "id" <*>
               v .:? "prefix" .!= mempty <*>
               v .:? "suffix" .!= mempty <*>
-              v .#? "label" .!= "" <*>
+              v .#? "label" .!= "page" <*>
               v .#? "locator"  .!= "" <*>
               v .#? "note-number" .!= "" <*>
               v .#? "position" .!= "" <*>
