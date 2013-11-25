@@ -217,6 +217,7 @@ groupConsec :: [Int] -> [[Int]]
 groupConsec = foldr go [] . sort
   where go :: Int -> [[Int]] -> [[Int]]
         go x []     = [[x]]
-        go x (g:gs) = if x + 1 == minimum g
-                         then ((x:g):gs)
-                         else ([x]:g:gs)
+        go x ((y:ys):gs) = if x + 1 == y
+                         then ((x:y:ys):gs)
+                         else ([x]:(y:ys):gs)
+        go _ ([]:_) = error "groupConsec: head of list is empty"
