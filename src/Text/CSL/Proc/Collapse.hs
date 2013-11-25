@@ -19,7 +19,7 @@ module Text.CSL.Proc.Collapse where
 import Data.Monoid (mempty, Any(..))
 import Control.Arrow ( (&&&), (>>>), second )
 import Data.Char
-import Data.List ( groupBy )
+import Data.List ( groupBy, sort )
 import Text.CSL.Util ( query, proc, proc', betterThan )
 import Text.CSL.Eval
 import Text.CSL.Proc.Disamb
@@ -214,7 +214,7 @@ isNumStyle = getAny . query ocitnum
 --
 -- > groupConsec [1,2,3,5,6,8,9] == [[1,2,3],[5,6],[8,9]]
 groupConsec :: [Int] -> [[Int]]
-groupConsec = groupConsec' []
+groupConsec = groupConsec' [] . sort
     where
       groupConsec' x   []    = x
       groupConsec' [] (y:ys) = groupConsec' [[y]] ys
