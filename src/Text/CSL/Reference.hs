@@ -167,14 +167,19 @@ instance FromJSON [RefDate] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
   parseJSON (Object v) = do
     dateParts <- v .:? "date-parts"
+    circa <- (v .: "circa" >>= parseBool) <|> pure False
     case dateParts of
-         Just (Array xs) -> mapM parseJSON $ V.toList xs
+         Just (Array xs) -> mapM (fmap (setCirca circa) . parseJSON)
+                            $ V.toList xs
          _               -> (:[]) `fmap` parseJSON (Object v)
   parseJSON x          = parseJSON x >>= mkRefDate
 
 instance ToJSON [RefDate] where
   toJSON [x] = toJSON x
   toJSON xs  = Array (V.fromList $ map toJSON xs)
+
+setCirca :: Bool -> RefDate -> RefDate
+setCirca circa' rd = rd{ circa = circa' }
 
 mkRefDate :: Literal -> Parser [RefDate]
 mkRefDate z@(Literal xs)
