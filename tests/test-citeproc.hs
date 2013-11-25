@@ -205,11 +205,11 @@ withDirectory fp action = do
 
 main :: IO ()
 main = do
-  args <- fmap (map (map toLower)) getArgs
-  let matchesPattern x = if null args
-                            then True
-                            else let x' = map toLower x
-                                 in  any (`isInfixOf` x') (map takeBaseName args)
+  args <- getArgs
+  let matchesPattern x
+        | null args = True
+        | otherwise = any (`isInfixOf` (map toLower x))
+                        (map (map toLower . takeBaseName) args)
   exists <- doesDirectoryExist testDir
   unless exists $ do
     putStrLn "Downloading test suite"
@@ -217,10 +217,12 @@ main = do
     withDirectory "citeproc-test" $
       void $ rawSystem "python" ["processor.py", "--grind"]
 
-  testFiles <- (map (testDir </>) . sort .
-                filter matchesPattern .
-                filter (\f -> takeExtension f == ".json"))
-              <$> getDirectoryContents testDir
+  testFiles <- if any ('/' `elem`) args
+               then return args
+               else (map (testDir </>) . sort .
+                  filter matchesPattern .
+                  filter (\f -> takeExtension f == ".json"))
+                 <$> getDirectoryContents testDir
   results <- mapM runTest testFiles
   let numpasses  = length $ filter (== Passed) results
   let numskipped = length $ filter (== Skipped) results
