@@ -108,9 +108,11 @@ triml = dropWhile (`elem` " \r\n\t")
 trimr :: String -> String
 trimr = reverse . triml . reverse
 
--- | Parse JSON Boolean or Number as Bool.
+-- | Parse JSON Boolean or Number or String as Bool.
 parseBool :: Value -> Parser Bool
 parseBool (Bool b)   = return b
+parseBool (String s) = return $ T.unpack s `elem` ["Y","Yes","YES","yes",
+                                 "T","True","true", "On","on","ON","1"]
 parseBool (Number n) = case fromJSON (Number n) of
                             Success (0 :: Int) -> return False
                             Success _          -> return True

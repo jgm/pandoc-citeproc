@@ -29,7 +29,7 @@ import qualified Data.Text as T
 import qualified Data.Vector as V
 import Data.Char (toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
-import Text.CSL.Util (parseString, safeRead, readNum,
+import Text.CSL.Util (parseString, parseBool, safeRead, readNum,
                       inlinesToString, capitalize, camelize)
 import Text.Pandoc (Inline(Str))
 import Data.List.Split (wordsBy)
@@ -151,7 +151,7 @@ instance FromJSON RefDate where
               v .:? "season" .!= "" <*>
               v .:? "day" .!= "" <*>
               v .:? "other" .!= "" <*>
-              v .:? "circa" .!= False
+              ((v .: "circa" >>= parseBool) <|> pure False)
   parseJSON _ = fail "Could not parse RefDate"
 
 instance ToJSON RefDate where
