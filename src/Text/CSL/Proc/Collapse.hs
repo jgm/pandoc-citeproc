@@ -214,10 +214,9 @@ isNumStyle = getAny . query ocitnum
 --
 -- > groupConsec [1,2,3,5,6,8,9] == [[1,2,3],[5,6],[8,9]]
 groupConsec :: [Int] -> [[Int]]
-groupConsec = groupConsec' [] . sort
-    where
-      groupConsec' x   []    = x
-      groupConsec' [] (y:ys) = groupConsec' [[y]] ys
-      groupConsec' xs (y:ys) = if y - head (last xs) == length (last xs)
-                               then groupConsec' (init xs ++ [last xs ++ [y]]) ys
-                               else groupConsec' (     xs ++ [           [y]]) ys
+groupConsec = foldr go [] . sort
+  where go :: Int -> [[Int]] -> [[Int]]
+        go x []     = [[x]]
+        go x (g:gs) = if x + 1 == minimum g
+                         then ((x:g):gs)
+                         else ([x]:g:gs)
