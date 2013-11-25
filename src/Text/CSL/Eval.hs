@@ -227,11 +227,11 @@ evalElement el
 evalIfThen :: IfThen -> [IfThen] -> [Element] -> State EvalState [Element]
 evalIfThen i ei e
     | IfThen c m el <- i = ifElse c m el
-    | otherwise          = return e
     where
-      ifElse c m el = if ei == []
-                      then whenElse (evalCond m c) (return el) (return e)
-                      else whenElse (evalCond m c) (return el) (evalIfThen (head ei) (tail ei) e)
+      ifElse c m el = whenElse (evalCond m c) (return el) $
+                        case ei of
+                             []     -> return e
+                             (x:xs) -> evalIfThen x xs e
       evalCond m c = do t <- checkCond chkType         isType          c m
                         v <- checkCond isVarSet        isSet           c m
                         n <- checkCond chkNumeric      isNumeric       c m
