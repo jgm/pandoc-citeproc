@@ -23,6 +23,7 @@ import Text.Pandoc.Definition
 import Text.Pandoc.Walk (walk)
 import Data.Monoid (mempty, mconcat, (<>))
 import Data.String (fromString)
+import Data.Maybe (mapMaybe)
 
 -- import Debug.Trace
 -- tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
@@ -37,10 +38,12 @@ appendOutput :: Formatting -> [Output] -> [Output]
 appendOutput fm xs = if xs /= [] then [Output xs fm] else []
 
 outputList :: Formatting -> Delimiter -> [Output] -> [Output]
-outputList fm d = appendOutput fm . addDelim d . map cleanOutput'
+outputList fm d = appendOutput fm . addDelim d . mapMaybe cleanOutput'
     where
       cleanOutput' o
-          | Output xs f <- o = Output (cleanOutput xs) f
+          | Output xs f <- o = case cleanOutput xs of
+                                 []   -> Nothing
+                                 ys   -> Just (Output ys f)
           | otherwise        = rmEmptyOutput o
 
 cleanOutput :: [Output] -> [Output]
@@ -50,16 +53,17 @@ cleanOutput = flatten
       flatten (o:os)
           | ONull       <- o     = flatten os
           | Output xs f <- o
-          , f == emptyFormatting = flatten (map rmEmptyOutput xs) ++ flatten os
-          | otherwise            = rmEmptyOutput o : flatten os
+          , f == emptyFormatting = flatten (mapMaybe rmEmptyOutput xs) ++ flatten os
+          | Output xs f <- o     = Output (flatten $ mapMaybe rmEmptyOutput xs) f : flatten os
+          | otherwise            = maybe id (:) (rmEmptyOutput o) $ flatten os
 
-rmEmptyOutput :: Output -> Output
+rmEmptyOutput :: Output -> Maybe Output
 rmEmptyOutput o
-    | Output [] _ <- o = ONull
-    | OStr []   _ <- o = ONull
-    | OPan []     <- o = ONull
-    | ODel []     <- o = ONull
-    | otherwise        = o
+    | Output [] _ <- o = Nothing
+    | OStr []   _ <- o = Nothing
+    | OPan []     <- o = Nothing
+    | ODel []     <- o = Nothing
+    | otherwise        = Just o
 
 addDelim :: String -> [Output] -> [Output]
 addDelim "" = id

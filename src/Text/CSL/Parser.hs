@@ -81,6 +81,7 @@ instance XmlPickler Element where
           tag (Group        {}) = 10
           tag (Number       {}) = 11
           tag (Date         {}) = 12
+          tag (Elements     {}) = 13
           ps = [ xpChoose
                , xpMacro
                , xpConst

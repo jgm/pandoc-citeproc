@@ -107,8 +107,8 @@ expandMacros :: [Element] -> State EvalState [Element]
 expandMacros = procM expandMacro
 
 expandMacro :: Element -> State EvalState Element
-expandMacro (Choose i ei e) =
-  Elements emptyFormatting `fmap` evalIfThen i ei e
+expandMacro (Choose i ei xs) =
+  Elements emptyFormatting `fmap` evalIfThen i ei xs
 expandMacro (Macro s fm) = do
   ms <- gets (macros . env)
   case lookup s ms of
@@ -119,12 +119,7 @@ expandMacro x = return x
 evalElement :: Element -> State EvalState [Output]
 evalElement el
     | Elements fm es <- el        = evalElements es >>= \os ->
-                                    if fm == emptyFormatting
-                                       then return os
-                                       else return [Output os fm]
-    | Choose i ei e         <- el = error $ "Unexpanded Choose"
-    | Macro    s   _        <- el = error $ "Unexpanded macro " ++ s
-                                    -- All macros should have been expanded
+                                      return [Output os fm]
     | Const    s   fm       <- el = return $ addSpaces s
                                            $ if fm == emptyFormatting
                                                 then [OPan (readCSLString s)]
@@ -146,6 +141,9 @@ evalElement el
                                             (appendOutput fm)
     | Substitute (e:els)    <- el = ifEmpty (consuming $ substituteWith e)
                                             (getFirst els) id
+    -- All macros and conditionals should have been expanded
+    | Choose _ _  _         <- el = error $ "Unexpanded Choose"
+    | Macro    s   _        <- el = error $ "Unexpanded macro " ++ s
     | otherwise                   = return []
     where
       addSpaces strng = (if take 1 strng == " " then (OSpace:) else id) .
