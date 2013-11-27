@@ -28,7 +28,8 @@ import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
 import Data.Char (isPunctuation)
 import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), proc', query,
-                      betterThan, trimr, tailInline, headInline, lastInline)
+                      betterThan, trimr, tailInline, headInline, initInline,
+                      lastInline)
 import Text.Pandoc.Definition hiding (Citation, Cite)
 import Text.Pandoc (readHtml, writeMarkdown, WriterOptions(..),
                     ReaderOptions(..), bottomUp, def)
@@ -129,18 +130,19 @@ toStr = intercalate [Str "\n"] .
 
 appendWithPunct :: Formatted -> Formatted -> Formatted
 appendWithPunct (Formatted left) (Formatted right) =
-  Formatted $ left ++
+  Formatted $
   case concat [lastleft, firstright] of
-       [c,d] | c `elem` " ,.:;", d == c -> tailInline right
-       [c,'.'] | c `elem` ",.!:;?" -> tailInline right
-       [c,':'] | c `elem` ",!:;?" -> tailInline right  -- Mich.: 2005
-       [c,'!'] | c `elem` ",.!:;?" -> tailInline right
-       [c,'?'] | c `elem` ",.!:;?" -> tailInline right
-       [c,';'] | c `elem` ",:;" -> tailInline right
-       [':',c] | c `elem` ",.!:;?" -> tailInline right
-       [';',c] | c `elem` ",.!:;?" -> tailInline right
+       [' ',d] | d `elem` ",.:;" -> initInline left ++ tailInline right
+       [c,d] | c `elem` " ,.:;", d == c -> left ++ tailInline right
+       [c,'.'] | c `elem` ",.!:;?" -> left ++ tailInline right
+       [c,':'] | c `elem` ",!:;?" -> left ++ tailInline right  -- Mich.: 2005
+       [c,'!'] | c `elem` ",.!:;?" -> left ++ tailInline right
+       [c,'?'] | c `elem` ",.!:;?" -> left ++ tailInline right
+       [c,';'] | c `elem` ",:;" -> left ++ tailInline right
+       [':',c] | c `elem` ",.!:;?" -> left ++ tailInline right
+       [';',c] | c `elem` ",.!:;?" -> left ++ tailInline right
        -- ".;" -> right  -- e.g. et al.;
-       _    -> right
+       _    -> left ++ right
   where lastleft     = lastInline left
         firstright   = headInline right
 
