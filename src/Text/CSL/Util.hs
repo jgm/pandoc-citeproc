@@ -2,7 +2,6 @@
 module Text.CSL.Util
   ( safeRead
   , readNum
-  , (<+>)
   , (<^>)
   , capitalize
   , camelize
@@ -59,14 +58,6 @@ readNum :: String -> Int
 readNum s = case reads s of
               [(x,"")] -> x
               _        -> 0
-
-(<+>) :: String -> String -> String
-[] <+> ss = ss
-s  <+> [] = s
-s  <+> ss =
-  case reverse s of
-       ('\'':rs) -> reverse rs ++ ('’':ss)
-       _         -> s ++ (' ':ss)
 
 -- | Conjoin strings, avoiding repeated punctuation.
 (<^>) :: String -> String -> String

@@ -86,7 +86,7 @@ getYearAndSuf x
       getOYear o
           | OYear    {} : _ <- o = [head o]
           | OYearSuf {} : _ <- o = [head o]
-          | OPan     {} : _ <- o = [head o]
+          -- | OPan     {} : _ <- o = [head o]
           | OLoc     {} : _ <- o = [head o]
           | ODel _ : OLoc {} : _ <- o = [head o]
           | otherwise = []

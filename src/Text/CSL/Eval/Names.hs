@@ -17,17 +17,21 @@ module Text.CSL.Eval.Names where
 
 import Control.Applicative ( (<$>) )
 import Control.Monad.State
-import Data.Char  ( isLower, isUpper, isSpace )
-import Data.List  ( nub )
+import Data.Char  ( isLower, isUpper )
+import Data.List  ( nub, intercalate, intersperse )
+import Data.List.Split ( wordsBy )
 import Data.Maybe ( isJust )
 import Data.Monoid
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
-import Text.CSL.Util ( readNum, (<^>), (<+>), query, toRead, capitalize, trim )
+import Text.CSL.Util ( headInline, lastInline, readNum, (<^>), query, toRead,
+                       capitalize, splitStrWhen )
 import Text.CSL.Reference
 import Text.CSL.Style
 import Text.Pandoc.Definition
+import Text.Pandoc.Shared ( stringify )
+import qualified Text.Pandoc.Builder as B
 
 evalNames :: Bool -> [String] -> [Name] -> String -> State EvalState [Output]
 evalNames skipEdTrans ns nl d
@@ -235,10 +239,11 @@ formatName m b f fm ops np n
     | Short      <- f = return $ OName (show n)  shortName       disambdata fm
     | otherwise       = return $ OName (show n) (longName given) disambdata fm
     where
-      institution = [OStr (unLiteral $ literal n) $ form "family"]
-      when_ c o = if c /= [] then o else []
-      addAffixes [] _ [] = []
-      addAffixes s sf ns  = [Output ((oStr' s (form sf) { prefix = [], suffix = [] }) ++ ns) $
+      institution = oPan' (unFormatted $ literal n) (form "family")
+      when_ c o = if c /= mempty then o else mempty
+      addAffixes (Formatted []) _ [] = []
+      addAffixes s sf ns  = [Output (Output [OPan (unFormatted s)]
+                            (form sf){ prefix = mempty, suffix = mempty} : ns)
                                    emptyFormatting { prefix = prefix (form sf)
                                                    , suffix = suffix (form sf)}]
 
@@ -246,72 +251,75 @@ formatName m b f fm ops np n
                     NamePart _ fm':_ -> fm'
                     _                -> emptyFormatting
 
-      hasHyphen = elem '-'
-      hyphen    = if getOptionVal "initialize-with-hyphen" ops == "false"
-                  then getOptionVal "initialize-with" ops
-                  else filter (not . isSpace) $ getOptionVal "initialize-with" ops  ++ "-"
-      isInit [c] = isUpper c
-      isInit _   = False
-      initial (Literal x) =
+      hyphenate new []    = new
+      hyphenate new accum =
+                  if getOptionVal "initialize-with-hyphen" ops == "false"
+                  then new ++ accum
+                  else trimsp new ++ [Str "-"] ++ accum
+      isInit [Str [c]] = isUpper c
+      isInit _         = False
+      initial (Formatted x) =
                   case lookup "initialize-with" ops of
                        Just iw
                          | getOptionVal "initialize" ops == "false"
-                         , isInit x  -> addIn x iw
+                         , isInit x  -> addIn x $ B.toList $ B.text iw
                          | getOptionVal "initialize" ops /= "false"
-                         , not (all isLower x) -> addIn x iw
+                         , not (all isLower $ query (:[]) x) -> addIn x $ B.toList $ B.text iw
                        Nothing
-                         | isInit x  -> addIn x " " -- default
-                       _ -> " " ++ x ++ " "
-      addIn x i = if hasHyphen x
-                  then head (       takeWhile (/= '-') x) : hyphen ++
-                       head (tail $ dropWhile (/= '-') x) : i
-                  else head x : i
+                         | isInit x  -> addIn x [Space] -- default
+                       _ -> Space : x ++ [Space]
+      addIn x i = foldr hyphenate []
+                  $ map (\z -> Str (headInline z) : i)
+                  $ wordsBy (== Str "-")
+                  $ splitStrWhen (=='-') x
 
-      sortSep g s = when_ g $ separator ++ addAffixes (g <+> s) "given" []
-      separator   = if getOptionVal "sort-separator" ops == []
-                    then oStr "," ++ [OSpace]
-                    else oStr (getOptionVal "sort-separator" ops)
+      sortSep g s = when_ g $ separator ++ addAffixes (g <+> s) "given" mempty
+      separator   = if null (getOptionVal "sort-separator" ops)
+                    then [OPan [Str ",", Space]]
+                    else [OPan $ B.toList $ B.text $ getOptionVal "sort-separator" ops]
 
       suff      = if commaSuffix n && nameSuffix n /= mempty
                   then suffCom
                   else suffNoCom
-      suffCom   = when_ (unLiteral $ nameSuffix n) $ separator ++ [        OStr (unLiteral $ nameSuffix n) fm]
-      suffNoCom = when_ (unLiteral $ nameSuffix n) $              [OSpace, OStr (unLiteral $ nameSuffix n) fm]
+      suffCom   = when_ (nameSuffix n) $ separator ++
+                        oPan' (unFormatted $ nameSuffix n) fm
+      suffNoCom = when_ (nameSuffix n) $ OSpace : oPan' (unFormatted $ nameSuffix n) fm
 
-      onlyGiven = not (null $ givenName n) && null family
+      onlyGiven = not (givenName n == mempty) && family == mempty
       given     = if onlyGiven
                      then givenLong
-                     else when_ (givenName  n) . trim . fixsp . concatMap initial $ givenName n
-      fixsp     (' ':' ':xs) = fixsp (' ':xs)
+                     else when_ (givenName  n) . Formatted . trimsp . fixsp . concatMap initial $ givenName n
+      fixsp     (Space:Space:xs) = fixsp (Space:xs)
       fixsp     (x:xs)       = x : fixsp xs
       fixsp     []           = []
-      givenLong = when_ (givenName  n) . unwords $ map unLiteral $ givenName n
-      family    = unLiteral $ familyName n
-      dropping  = unLiteral $ droppingPart n
-      nondropping  = unLiteral $ nonDroppingPart n
+      trimsp = reverse . dropWhile (==Space) . reverse . dropWhile (==Space)
+      givenLong = when_ (givenName  n) . mconcat . intersperse (Formatted [Space]) $ givenName n
+      family    = familyName n
+      dropping  = droppingPart n
+      nondropping  = nonDroppingPart n
       isByzantine c = c <= '\x17f' || (c >= '\x590' && c <= '\x05ff') ||
                       (c >= '\x400' && c <= '\x52f') || ( c >= '\x370' && c <= '\x3ff') ||
                       (c >= '\x1f00' && c <= '\x1fff') || (c >= '\x0600' && c <= '\x200c') ||
                       (c >= '\x200d' && c <= '\x200e') || (c >= '\x0218' && c <= '\x0219') ||
                       (c >= '\x21a' && c <= '\x21b') || (c >= '\x202a' && c <= '\x202e')
-      shortName = oStr' (nondropping <+> family) (form "family")
+      shortName = oPan' (unFormatted $ nondropping <+> family) (form "family")
       longName g = if isSorting m
                    then let firstPart = case getOptionVal "demote-non-dropping-particle" ops of
                                            "never" -> nondropping <+> family  <+> dropping
                                            _       -> family  <+> dropping <+> nondropping
-                        in [OStr firstPart (form "family")] <++> oStr' g (form "given") ++ suffCom
+                        in oPan' (unFormatted firstPart) (form "family") <++> oPan' (unFormatted g) (form "given") <> suffCom
                    else if (b && getOptionVal "name-as-sort-order" ops == "first") ||
                            getOptionVal "name-as-sort-order" ops == "all"
                         then let (fam,par) = case getOptionVal "demote-non-dropping-particle" ops of
                                                "never"     -> (nondropping <+> family, dropping)
                                                "sort-only" -> (nondropping <+> family, dropping)
                                                _           -> (family, dropping <+> nondropping)
-                             in oStr' fam (form "family") ++ sortSep g par ++ suffCom
+                             in oPan' (unFormatted fam) (form "family") <> sortSep g par <> suffCom
                           else let fam = addAffixes (dropping <+> nondropping <+> family) "family" suff
-                                   gvn = oStr' g (form "given")
-                               in  if all isByzantine family
+                                   gvn = oPan' (unFormatted g) (form "given")
+                               in  if all isByzantine $ stringify $ unFormatted family
                                    then gvn <++> fam
-                                   else fam ++ gvn
+                                   else fam <> gvn
 
       disWithGiven = getOptionVal "disambiguate-add-givenname" ops == "true"
       initialize   = isJust (lookup "initialize-with" ops) && not onlyGiven
@@ -368,3 +376,15 @@ formatLabel f fm p s
       form o g t b = return . o fm =<< g . period <$> getTerm (b && p) f t
       period      = if stripPeriods fm then filter (/= '.') else id
 
+(<+>) :: Formatted -> Formatted -> Formatted
+Formatted [] <+> ss = ss
+s  <+> Formatted [] = s
+Formatted xs <+> Formatted ys =
+  case lastInline xs of
+       "’"  -> Formatted (xs ++ ys)
+       _    -> Formatted (xs ++ [Space] ++ ys)
+
+(<++>) :: [Output] -> [Output] -> [Output]
+[] <++> o  = o
+o  <++> [] = o
+o1 <++> o2 = o1 ++ [OSpace] ++ o2

@@ -19,7 +19,6 @@ module Text.CSL.Input.Bibtex
 import Text.Parsec hiding (optional, (<|>), many, State)
 import Control.Applicative
 import Text.Pandoc
-import Text.Pandoc.Shared (stringify)
 import Data.List.Split (splitOn, splitWhen, wordsBy)
 import Data.List (intercalate)
 import Data.Maybe
@@ -66,9 +65,6 @@ inlinesToFormatted :: [Inline] -> Bib Formatted
 inlinesToFormatted ils = do
   lang <- gets localeLanguage
   return $ Formatted $ bottomUp (concatMap (adjustSpans lang)) ils
-
-inlinesToString :: [Inline] -> Bib String
-inlinesToString ils = (stringify . unFormatted) <$> inlinesToFormatted ils
 
 data Item = Item{ identifier :: String
                 , entryType  :: String
@@ -533,18 +529,17 @@ toAuthor _ [Str "others"] = return $
           , nonDroppingPart = mempty
           , familyName      = mempty
           , nameSuffix      = mempty
-          , literal         = Literal "others"
+          , literal         = Formatted [Str "others"]
           , commaSuffix     = False
           }
-toAuthor _ [Span ("",[],[]) ils] = do
-  literal' <- inlinesToString ils
+toAuthor _ [Span ("",[],[]) ils] =
   return $ -- corporate author
     Agent { givenName       = []
           , droppingPart    = mempty
           , nonDroppingPart = mempty
           , familyName      = mempty
           , nameSuffix      = mempty
-          , literal         = Literal literal'
+          , literal         = Formatted ils
           , commaSuffix     = False
           }
 -- First von Last
@@ -574,16 +569,16 @@ toAuthor opts ils = do
   let (von, lastname) = case (reverse rvon, reverse rlast) of
                              (ws@(_:_),[]) -> (init ws, [last ws])
                              (ws, vs)      -> (ws, vs)
-  prefix <- inlinesToString $ intercalate [Space] von
-  family <- inlinesToString $ intercalate [Space] lastname
-  suffix <- inlinesToString $ intercalate [Space] jr
-  givens <- mapM inlinesToString first
+  let prefix = Formatted $ intercalate [Space] von
+  let family = Formatted $ intercalate [Space] lastname
+  let suffix = Formatted $ intercalate [Space] jr
+  let givens = map Formatted first
   return $
-    Agent { givenName       = map Literal givens
-          , droppingPart    = Literal $ if useprefix then "" else prefix
-          , nonDroppingPart = Literal $ if useprefix then prefix else ""
-          , familyName      = Literal family
-          , nameSuffix      = Literal suffix
+    Agent { givenName       = givens
+          , droppingPart    = if useprefix then mempty else prefix
+          , nonDroppingPart = if useprefix then prefix else mempty
+          , familyName      = family
+          , nameSuffix      = suffix
           , literal         = mempty
           , commaSuffix     = usecomma
           }

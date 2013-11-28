@@ -88,10 +88,13 @@ oStr' :: String -> Formatting -> [Output]
 oStr' [] _ = []
 oStr' s  f = [OStr s f]
 
-(<++>) :: [Output] -> [Output] -> [Output]
-[] <++> o  = o
-o  <++> [] = o
-o1 <++> o2 = o1 ++ [OSpace] ++ o2
+oPan :: [Inline] -> [Output]
+oPan []  = []
+oPan ils = [OPan ils]
+
+oPan' :: [Inline] -> Formatting -> [Output]
+oPan' [] _ = []
+oPan' ils f = [Output [OPan ils] f]
 
 formatOutputList :: [Output] -> Formatted
 formatOutputList = mconcat . map formatOutput

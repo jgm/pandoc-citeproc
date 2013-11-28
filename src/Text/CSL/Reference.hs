@@ -31,7 +31,7 @@ import Data.Char (toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Util (parseString, parseBool, safeRead, readNum,
                       inlinesToString, capitalize, camelize)
-import Text.Pandoc (Inline(Str))
+import Text.Pandoc (Inline(Str,Space))
 import Data.List.Split (wordsBy)
 import Data.String
 
@@ -85,24 +85,24 @@ isValueSet val
 data Empty = Empty deriving ( Typeable, Data )
 
 data Agent
-    = Agent { givenName       :: [Literal]
-            , droppingPart    ::  Literal
-            , nonDroppingPart ::  Literal
-            , familyName      ::  Literal
-            , nameSuffix      ::  Literal
-            , literal         ::  Literal
+    = Agent { givenName       :: [Formatted]
+            , droppingPart    ::  Formatted
+            , nonDroppingPart ::  Formatted
+            , familyName      ::  Formatted
+            , nameSuffix      ::  Formatted
+            , literal         ::  Formatted
             , commaSuffix     ::  Bool
             }
       deriving ( Show, Read, Eq, Typeable, Data )
 
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
-              (v .: "given" <|> ((map Literal . wordsBy (==' ') . unLiteral) <$> v .: "given") <|> pure []) <*>
-              v .:?  "dropping-particle" .!= "" <*>
-              v .:? "non-dropping-particle" .!= "" <*>
-              v .:? "family" .!= "" <*>
-              v .:? "suffix" .!= "" <*>
-              v .:? "literal" .!= "" <*>
+              (v .: "given" <|> ((map Formatted . wordsBy (== Space) . unFormatted) <$> v .: "given") <|> pure []) <*>
+              v .:?  "dropping-particle" .!= mempty <*>
+              v .:? "non-dropping-particle" .!= mempty <*>
+              v .:? "family" .!= mempty <*>
+              v .:? "suffix" .!= mempty <*>
+              v .:? "literal" .!= mempty <*>
               v .:? "comma-suffix" .!= False
   parseJSON _ = fail "Could not parse Agent"
 
@@ -167,9 +167,9 @@ instance FromJSON [RefDate] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
   parseJSON (Object v) = do
     dateParts <- v .:? "date-parts"
-    circa <- (v .: "circa" >>= parseBool) <|> pure False
+    circa' <- (v .: "circa" >>= parseBool) <|> pure False
     case dateParts of
-         Just (Array xs) -> mapM (fmap (setCirca circa) . parseJSON)
+         Just (Array xs) -> mapM (fmap (setCirca circa') . parseJSON)
                             $ V.toList xs
          _               -> (:[]) `fmap` parseJSON (Object v)
   parseJSON x          = parseJSON x >>= mkRefDate
