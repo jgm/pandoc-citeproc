@@ -18,7 +18,7 @@ module Text.CSL.Eval.Names where
 import Control.Applicative ( (<$>) )
 import Control.Monad.State
 import Data.Char  ( isLower, isUpper )
-import Data.List  ( nub, intercalate, intersperse )
+import Data.List  ( nub, intersperse )
 import Data.List.Split ( wordsBy )
 import Data.Maybe ( isJust )
 import Data.Monoid
