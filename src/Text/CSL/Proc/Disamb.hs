@@ -82,17 +82,17 @@ disambCitations s bibs cs groups
                     then map (uncurry $ reEvaluate s reEval) $ zip refs groups
                     else groups
 
-      withYearS = if hasYSuffOpt
+      withYearS = addNames $
+                  if hasYSuffOpt
                   then map (mapCitationGroup $ setYearSuffCollision hasNamesOpt needYSuff) $ reEvaluated
                   else rmYearSuff $ reEvaluated
 
-      yearSuffs = when_ hasYSuffOpt . generateYearSuffix bibs . query getYearSuffixes $ withYearS
+      yearSuffs = when_ hasYSuffOpt . generateYearSuffix bibs . concatMap getYearSuffixes $ withYearS
 
       addNames  = proc (updateContrib givenNames newNames newGName)
       processed = if hasYSuffOpt
-                  then proc (updateYearSuffixes yearSuffs) .
-                       addNames $ withYearS
-                  else addNames $ withYearS
+                  then proc (updateYearSuffixes yearSuffs) $ withYearS
+                  else withYearS
 
       citOutput = if disOpts /= [] then processed else reEvaluated
 
@@ -265,7 +265,7 @@ generateYearSuffix refs
       -- sort clashing cites using their position in the sorted bibliography
       getFst . map sort' . map (filter ((/=) 0 . snd)) . map (map getP) .
       -- group clashing cites
-      getFst . map nub . groupBy (\a b -> snd a == snd b) . sort' . filter ((/=) [] . snd)
+      getFst . map nub . filter (\grp -> length grp >= 2) . groupBy (\a b -> snd a == snd b) . sort' . filter ((/=) [] . snd)
     where
       sort'  :: (Ord a, Ord b) => [(a,b)] -> [(a,b)]
       sort'  = sortBy (comparing snd)
@@ -296,10 +296,13 @@ updateYearSuffixes yss o
                              _      -> ONull
  | otherwise             = o
 
-getYearSuffixes :: Output -> [(String,[Output])]
-getYearSuffixes o
-    | OYearSuf _ k c _ <- o = [(k,c)]
-    | otherwise             = []
+getYearSuffixes :: CitationGroup -> [(String,[Output])]
+getYearSuffixes (CG _ _ _ d) = map go d
+  where go (c,x) = (citeId c, query relevant x)
+        relevant :: Output -> [Output]
+        relevant (OYear n _ _) = [OStr n emptyFormatting]
+        relevant (OName _ m _ _) = m
+        relevant _ = []
 
 rmYearSuff :: [CitationGroup] -> [CitationGroup]
 rmYearSuff = proc rmYS
