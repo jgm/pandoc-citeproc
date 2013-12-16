@@ -90,7 +90,6 @@ data-files:         chicago-author-date.csl
                     tests/issue7.in.native
                     tests/issue7.expected.native
                     tests/biblio.bib
-                    tests/chicago-author-date.csl
                     tests/ieee.csl
                     tests/mhra.csl
                     tests/biblio2yaml/basic.bibtex
