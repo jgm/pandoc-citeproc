@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never">
   <info>
-    <title>Chicago Manual of Style (author-date)</title>
+    <title>Chicago Manual of Style 16th edition (author-date)</title>
     <id>http://www.zotero.org/styles/chicago-author-date</id>
     <link href="http://www.zotero.org/styles/chicago-author-date" rel="self"/>
     <link href="http://www.chicagomanualofstyle.org/tools_citationguide.html" rel="documentation"/>
@@ -20,7 +20,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>The author-date variant of the Chicago style</summary>
-    <updated>2013-03-28T05:37:10+00:00</updated>
+    <updated>2013-04-24T02:44:57+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -28,18 +28,20 @@
       <term name="editor" form="verb-short">ed.</term>
       <term name="container-author" form="verb">by</term>
       <term name="translator" form="verb-short">trans.</term>
+      <term name="editortranslator" form="verb">
+        <single>edited and translated by</single>
+        <multiple>edited and translated by</multiple>
+      </term>
       <term name="translator" form="short">trans.</term>
     </terms>
   </locale>
   <macro name="secondary-contributors">
     <choose>
       <if type="chapter paper-conference" match="none">
-        <group delimiter=". ">
-          <names variable="editor translator">
-            <label form="verb" text-case="capitalize-first" suffix=" " plural="never"/>
-            <name and="text" delimiter=", "/>
-          </names>
-        </group>
+        <names variable="editor translator" delimiter=". ">
+          <label form="verb" text-case="capitalize-first" suffix=" " plural="never"/>
+          <name and="text" delimiter=", "/>
+        </names>
       </if>
     </choose>
   </macro>
@@ -86,16 +88,18 @@
     </names>
   </macro>
   <macro name="contributors">
-    <names variable="author">
-      <name and="text" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="always"/>
-      <label form="short" plural="never" prefix=", "/>
-      <substitute>
-        <names variable="editor"/>
-        <names variable="translator"/>
-        <text macro="title"/>
-      </substitute>
-    </names>
-    <text macro="recipient"/>
+    <group delimiter=". ">
+      <names variable="author">
+        <name and="text" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="always"/>
+        <label form="short" plural="never" prefix=", "/>
+        <substitute>
+          <names variable="editor"/>
+          <names variable="translator"/>
+          <text macro="title"/>
+        </substitute>
+      </names>
+      <text macro="recipient"/>
+    </group>
   </macro>
   <macro name="contributors-short">
     <names variable="author">
@@ -372,7 +376,7 @@
     </choose>
     <choose>
       <if variable="title" match="none"/>
-      <else-if type="thesis"/>
+      <else-if type="thesis personal_communication" match="any"/>
       <else>
         <group delimiter=" " prefix=". ">
           <text variable="genre" text-case="capitalize-first"/>
@@ -405,7 +409,7 @@
           <text variable="event-place"/>
         </group>
       </else-if>
-      <else-if type="article-newspaper article-magazine" match="any">
+      <else-if type="article-newspaper article-magazine personal_communication" match="any">
         <text macro="day-month" prefix=", "/>
       </else-if>
       <else>
