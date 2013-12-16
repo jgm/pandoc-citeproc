@@ -27,8 +27,7 @@ license-file:       LICENSE
 author:             John MacFarlane, Andrea Rossato
 maintainer:         jgm@berkeley.edu
 build-type:         Custom
-data-files:         chicago-author-date.csl
-                    locales/locales-af-ZA.xml
+data-files:         locales/locales-af-ZA.xml
                     locales/locales-ar-AR.xml
                     locales/locales-bg-BG.xml
                     locales/locales-ca-AD.xml
