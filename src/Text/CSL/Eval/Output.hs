@@ -25,9 +25,6 @@ import Data.Monoid (mempty, mconcat, (<>))
 import Data.String (fromString)
 import Data.Maybe (mapMaybe)
 
--- import Debug.Trace
--- tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
-
 output :: Formatting -> String -> [Output]
 output fm s
     | ' ':xs <- s = OSpace : output fm xs

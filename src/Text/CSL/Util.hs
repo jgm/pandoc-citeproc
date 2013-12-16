@@ -7,6 +7,7 @@ module Text.CSL.Util
   , camelize
   , isPunct
   , last'
+  , init'
   , words'
   , trim
   , triml
@@ -37,6 +38,7 @@ module Text.CSL.Util
   , tailFirstInlineStr
   , toCapital
   , mapHeadInline
+  , tr'
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -53,6 +55,7 @@ import Control.Monad.State
 import Data.Monoid (Monoid, mappend, mempty)
 import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
                        everywhere', everything, mkT, mkQ )
+import qualified Debug.Trace
 
 readNum :: String -> Int
 readNum s = case reads s of
@@ -84,6 +87,10 @@ camelize      _     = []
 last' :: [a] -> [a]
 last' [] = []
 last' xs = [last xs]
+
+init' :: [a] -> [a]
+init' [] = []
+init' xs = init xs
 
 -- | Like words, but doesn't break on nonbreaking spaces etc.
 words' :: String -> [String]
@@ -271,8 +278,6 @@ initInline (i:[])
     | Link      is t <- i = return $ Link        (initInline is) t
     | Span at     is <- i = return $ Span at     (initInline is)
     | otherwise           = []
-    where
-      init' s = if s /= [] then init s else []
 initInline (i:xs) = i : initInline xs
 
 tailInline :: [Inline] -> [Inline]
@@ -302,4 +307,5 @@ mapHeadInline f (i:xs)
     | Span     at is <- i = Span at     (mapHeadInline f is)   : xs
     | otherwise           = i : xs
 
-
+tr' :: Show a => String -> a -> a
+tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
