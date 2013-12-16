@@ -27,7 +27,7 @@ import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
 import Text.CSL.Style
 import Text.CSL.Reference
-import Text.CSL.Util ( readNum, toRead )
+import Text.CSL.Util ( readNum, toRead, init', last' )
 import Text.Pandoc.Definition ( Inline (Str) )
 
 evalDate :: Element -> State EvalState [Output]
@@ -87,10 +87,13 @@ formatDate em k tm dp date
                         _       -> error "error in splitting date ranges"
       doRange   a b = let (x,y,z) = splitDate a b in
                       map (formatDatePart False  a) x ++
-                      map (formatDatePart False  a) (init y) ++
-                      map (formatDatePart True   a) [last y] ++
-                      map (formatDatePart False  b) y ++
+                      map (formatDatePart False  a) (init' y) ++
+                      map (formatDatePart True   a) (last' y) ++
+                      map (formatDatePart False  b) (map rmPrefix y) ++
                       map (formatDatePart False  b) z
+      -- the point of rmPrefix is to remove the blank space that otherwise
+      -- gets added after the delimiter in a range:  24- 26.
+      rmPrefix dp = dp{ dpFormatting = (dpFormatting dp) { prefix = "" } }
       diff  a b = filter (flip elem (diffDate a b) . dpName)
       diffDate (RefDate ya ma sa da _ _)
                (RefDate yb mb sb db _ _) = case () of
