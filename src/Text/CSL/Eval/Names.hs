@@ -36,11 +36,11 @@ import qualified Text.Pandoc.Builder as B
 evalNames :: Bool -> [String] -> [Name] -> String -> State EvalState [Output]
 evalNames skipEdTrans ns nl d
     | [sa,sb] <- ns, not skipEdTrans
-    , sa == "editor" && sb == "translator" ||
-      sb == "editor" && sa == "translator" = do
+    , (sa == "editor" && sb == "translator") ||
+      (sb == "editor" && sa == "translator") = do
         aa <- getAgents' sa
         ab <- getAgents' sb
-        if aa /= [] && aa == ab
+        if not (null aa) && aa == ab
            then modify (\s -> s { edtrans = True }) >>
                 evalNames True [sa] nl d
            else evalNames True  ns  nl d
@@ -111,7 +111,8 @@ formatNames ea del p s as n
 
     | NameLabel f fm pl <- n = when' (isVarSet s) $ do
         b <- gets edtrans
-        res <- formatLabel f fm (isPlural pl $ length as) $ if b then "editortranslator" else s
+        res <- formatLabel f fm (isPlural pl $ length as) $
+               if b then "editortranslator" else s
         modify $ \st -> st { edtrans = False }
         updateEtal [res]
         return res
@@ -357,8 +358,12 @@ formatLabel f fm p s
     | "page"    <- s = checkPlural
     | "volume"  <- s = checkPlural
     | "ibid"    <- s = format' s p
-    | isRole       s = do a <- getAgents' s
-                          if a /= [] then form (\fm' x -> [OLabel x fm']) id s p else return []
+    | isRole       s = do a <- getAgents' (if s == "editortranslator"
+                                              then "editor"
+                                              else s)
+                          if null a
+                             then return []
+                             else form (\fm' x -> [OLabel x fm']) id s p
     | otherwise      = format s p
     where
       isRole = flip elem ["author", "collection-editor", "composer", "container-author"
