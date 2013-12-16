@@ -265,7 +265,7 @@ generateYearSuffix refs
       -- sort clashing cites using their position in the sorted bibliography
       getFst . map sort' . map (filter ((/=) 0 . snd)) . map (map getP) .
       -- group clashing cites
-      getFst . map nub . filter (\grp -> length grp >= 2) . groupBy (\a b -> snd a == snd b) . sort' . filter ((/=) [] . snd)
+      getFst . filter (\grp -> length grp >= 2) . map nub . groupBy (\a b -> snd a == snd b) . sort' . filter ((/=) [] . snd)
     where
       sort'  :: (Ord a, Ord b) => [(a,b)] -> [(a,b)]
       sort'  = sortBy (comparing snd)
@@ -301,7 +301,9 @@ getYearSuffixes (CG _ _ _ d) = map go d
   where go (c,x) = (citeId c, query relevant x)
         relevant :: Output -> [Output]
         relevant (OYear n _ _) = [OStr n emptyFormatting]
-        relevant (OName _ m _ _) = m
+        relevant (OStr s _) = [OStr s emptyFormatting]
+        relevant OSpace     = [OSpace]
+        relevant (OPan ils) = [OPan ils]
         relevant _ = []
 
 rmYearSuff :: [CitationGroup] -> [CitationGroup]
