@@ -351,7 +351,8 @@ hasDuplicates :: Eq a => [a] -> Bool
 hasDuplicates = or . same
 
 allTheSame :: Eq a => [a] -> Bool
-allTheSame = and . same
+allTheSame []     = True
+allTheSame (x:xs) = all (== x) xs
 
 -- | Add the year suffix to the year. Needed for disambiguation.
 addYearSuffix :: Output -> Output
