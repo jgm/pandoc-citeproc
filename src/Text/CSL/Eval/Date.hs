@@ -89,11 +89,12 @@ formatDate em k tm dp date
                       map (formatDatePart False  a) x ++
                       map (formatDatePart False  a) (init' y) ++
                       map (formatDatePart True   a) (last' y) ++
-                      map (formatDatePart False  b) (map rmPrefix y) ++
+                      map (formatDatePart False  b) (rmPrefix y) ++
                       map (formatDatePart False  b) z
       -- the point of rmPrefix is to remove the blank space that otherwise
       -- gets added after the delimiter in a range:  24- 26.
-      rmPrefix dp' = dp'{ dpFormatting = (dpFormatting dp') { prefix = "" } }
+      rmPrefix (dp':rest) = dp'{ dpFormatting = (dpFormatting dp') { prefix = "" } } : rest
+      rmPrefix []         = []
       diff  a b = filter (flip elem (diffDate a b) . dpName)
       diffDate (RefDate ya ma sa da _ _)
                (RefDate yb mb sb db _ _) = case () of
