@@ -11,14 +11,13 @@ import System.IO.Temp (withSystemTempDirectory)
 import System.Process (rawSystem)
 import Text.Printf
 import qualified Data.Aeson as Aeson
-import Data.Aeson.Encode.Pretty
 import Text.Pandoc.Definition
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString.Char8 as B
 import qualified Text.Pandoc.UTF8 as UTF8
 import Text.Pandoc.Shared (normalize)
 import Text.Pandoc.Process (pipeProcess)
-import qualified Data.Yaml as Yaml (decode)
+import qualified Data.Yaml as Yaml
 import Text.Pandoc (writeNative, writeHtmlString, readNative, def)
 import Text.CSL.Pandoc (processCites')
 
@@ -97,14 +96,8 @@ biblio2yamlTest fp = do
            expectedDoc = Yaml.decode $ B.concat $ BL.toChunks expected
        let resultDoc   :: Maybe Aeson.Value
            resultDoc   = Yaml.decode $ B.concat $ BL.toChunks result
-       let result' = maybe BL.empty
-                     ( encodePretty' Config{ confIndent = 2
-                                           , confCompare = compare } )
-                     resultDoc
-       let expected' = maybe BL.empty
-                     ( encodePretty' Config{ confIndent = 2
-                                           , confCompare = compare } )
-                     expectedDoc
+       let result'   = BL.fromChunks [Yaml.encode resultDoc]
+       let expected' = BL.fromChunks [Yaml.encode expectedDoc]
        if expected' == result'
           then err "PASSED" >> return Passed
           else do

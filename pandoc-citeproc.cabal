@@ -352,7 +352,7 @@ test-suite test-pandoc-citeproc
   Main-Is:        test-pandoc-citeproc.hs
   Other-Modules:  JSON
   Hs-Source-Dirs: tests
-  build-depends:  base >= 4, aeson-pretty, aeson, directory, text,
+  build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8
