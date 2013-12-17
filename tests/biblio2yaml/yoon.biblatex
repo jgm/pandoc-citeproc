@@ -48,19 +48,13 @@ references:
   issued:
     year: 2006
   author:
-  - given:
-    - Myeong
-    - S.
+  - given: Myeong S.
     family: Yoon
-  - given:
-    - Dowook
+  - given: Dowook
     family: Ryu
-  - given:
-    - Jeongryul
+  - given: Jeongryul
     family: Kim
-  - given:
-    - Kyo
-    - Han
+  - given: Kyo Han
     family: Ahn
   container-title: Organometallics
   type: article-journal

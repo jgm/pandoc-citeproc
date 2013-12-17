@@ -48,17 +48,11 @@ references:
     month: 09
     year: 1997
   author:
-  - given:
-    - Ronald
-    - E.
+  - given: Ronald E.
     family: Sorace
-  - given:
-    - Victor
-    - S.
+  - given: Victor S.
     family: Reinhardt
-  - given:
-    - Steven
-    - A.
+  - given: Steven A.
     family: Vaughn
   number: 5668842
   type: patent

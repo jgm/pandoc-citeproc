@@ -29,8 +29,7 @@ references:
   issued:
     year: 1978
   author:
-    given:
-    - Martha
+    given: Martha
     family: Nussbaum
   publisher: Princeton University Press
   type: book

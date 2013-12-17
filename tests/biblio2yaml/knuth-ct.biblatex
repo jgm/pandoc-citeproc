@@ -51,9 +51,7 @@ references:
   - year: 1984
   - year: 1986
   author:
-    given:
-    - Donald
-    - E.
+    given: Donald E.
     family: Knuth
   number-of-volumes: 5
   publisher: Addison-Wesley

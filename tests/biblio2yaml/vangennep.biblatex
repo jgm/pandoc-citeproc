@@ -45,8 +45,7 @@ references:
   issued:
     year: 1909
   author:
-    given:
-    - Arnold
+    given: Arnold
     family: Gennep
     non-dropping-particle: van
   publisher: Nourry

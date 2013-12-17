@@ -48,9 +48,7 @@ references:
   issued:
     year: 2000
   author:
-    given:
-    - Michael
-    - J.
+    given: Michael J.
     family: Gerhardt
   publisher: Duke University Press
   type: book

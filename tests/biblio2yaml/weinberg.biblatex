@@ -39,8 +39,7 @@ references:
   issued:
     year: 1967
   author:
-    given:
-    - Steven
+    given: Steven
     family: Weinberg
   container-title: "Phys. Rev. Lett."
   type: article-journal

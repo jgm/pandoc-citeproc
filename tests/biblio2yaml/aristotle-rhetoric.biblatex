@@ -64,9 +64,7 @@ references:
     family: Aristotle
   number-of-volumes: 3
   editor:
-    given:
-    - Edward
-    - Meredith
+    given: Edward Meredith
     family: Cope
   publisher: Cambridge University Press
   type: book

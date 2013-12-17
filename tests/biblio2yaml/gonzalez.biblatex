@@ -45,8 +45,7 @@ references:
   issued:
     year: 2001
   author:
-    given:
-    - Ray
+    given: Ray
     family: Gonzalez
   publisher: The University of Arizona Press
   ISBN: 0-816-52066-6

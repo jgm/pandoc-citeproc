@@ -22,8 +22,7 @@ references:
   issued:
     year: 2013
   author:
-    given:
-    - Al
+    given: Al
     family: Author
   container-title: ! 'Maintitle: Mainsubtitle. Maintitleaddon'
   publisher: Publisher

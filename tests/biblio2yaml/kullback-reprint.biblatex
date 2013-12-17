@@ -55,8 +55,7 @@ references:
   issued:
     year: 1997
   author:
-    given:
-    - Solomon
+    given: Solomon
     family: Kullback
   original-publisher: John Wiley & Sons
   publisher: Dover Publications

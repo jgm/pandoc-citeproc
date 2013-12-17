@@ -49,21 +49,14 @@ references:
   issued:
     year: 1979
   author:
-    given:
-    - Paul
+    given: Paul
     family: Moraux
   container-title: Aristotle on Mind and the Senses. Proceedings of the Seventh Symposium
     Aristotelicum
   editor:
-  - given:
-    - G.
-    - E.
-    - R.
+  - given: G. E. R.
     family: Lloyd
-  - given:
-    - G.
-    - E.
-    - L.
+  - given: G. E. L.
     family: Owen
   publisher: Cambridge University Press
   type: paper-conference
@@ -82,14 +75,12 @@ references:
   issued:
     year: 1968
   author:
-    given:
-    - Abdus
+    given: Abdus
     family: Salam
   container-title: ! 'Elementary particle theory: Relativistic groups and analyticity.
     Proceedings of the eighth Nobel symposium'
   editor:
-    given:
-    - Nils
+    given: Nils
     family: Svartholm
   publisher: Almquist & Wiksell
   type: paper-conference

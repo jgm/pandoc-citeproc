@@ -46,19 +46,13 @@ references:
   issued:
     year: 1999
   author:
-  - given:
-    - Frank
-    - Albert
+  - given: Frank Albert
     family: Cotton
-  - given:
-    - Geoffrey
+  - given: Geoffrey
     family: Wilkinson
-  - given:
-    - Carlos
-    - A.
+  - given: Carlos A.
     family: Murillio
-  - given:
-    - Manfred
+  - given: Manfred
     family: Bochmann
   edition: 6
   publisher: Wiley

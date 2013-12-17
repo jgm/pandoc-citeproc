@@ -49,23 +49,15 @@ references:
   issued:
     year: 2006
   author:
-  - given:
-    - Wolfgang
-    - A.
+  - given: Wolfgang A.
     family: Herrmann
-  - given:
-    - Karl
+  - given: Karl
     family: Öfele
-  - given:
-    - Sabine
-    - K.
+  - given: Sabine K.
     family: Schneider
-  - given:
-    - Eberhardt
+  - given: Eberhardt
     family: Herdtweck
-  - given:
-    - Stephan
-    - D.
+  - given: Stephan D.
     family: Hoffmann
   container-title: "Angew. Chem. Int. Ed."
   type: article-journal

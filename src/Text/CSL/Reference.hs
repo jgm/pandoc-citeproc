@@ -17,7 +17,7 @@
 
 module Text.CSL.Reference where
 
-import Data.List  ( elemIndex, isPrefixOf )
+import Data.List  ( elemIndex, isPrefixOf, intercalate )
 import Data.Maybe ( fromMaybe             )
 import Data.Generics
 import Data.Monoid
@@ -108,7 +108,8 @@ instance FromJSON Agent where
 
 instance ToJSON Agent where
   toJSON agent = object' $ [
-      "given" .= givenName agent
+      "given" .= Formatted (intercalate [Space] $ map unFormatted
+                                                $ givenName agent)
     , "dropping-particle" .= droppingPart agent
     , "non-dropping-particle" .= nonDroppingPart agent
     , "family" .= familyName agent

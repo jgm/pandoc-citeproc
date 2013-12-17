@@ -52,13 +52,9 @@ references:
   issued:
     year: 1960
   translator:
-  - given:
-    - Monika
-    - B.
+  - given: Monika B.
     family: Vizedom
-  - given:
-    - Gabrielle
-    - L.
+  - given: Gabrielle L.
     family: Caffee
   publisher: University of Chicago Press
   type: book

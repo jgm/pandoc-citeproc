@@ -64,8 +64,7 @@ references:
     month: 03
     year: 1996
   author:
-    given:
-    - Nissan
+    given: Nissan
     family: Itzhaki
   version: 1
   type: webpage

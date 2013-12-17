@@ -45,8 +45,7 @@ references:
   issued:
     year: 2002
   author:
-    given:
-    - Nancy
+    given: Nancy
     family: Worman
   publisher: University of Texas Press
   type: book

@@ -42,9 +42,7 @@ references:
   issued:
     year: 1965
   author:
-    given:
-    - Gordon
-    - E.
+    given: Gordon E.
     family: Moore
   container-title: Electronics
   type: article-journal

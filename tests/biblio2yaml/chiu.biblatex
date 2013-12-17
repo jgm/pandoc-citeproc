@@ -59,13 +59,9 @@ references:
   issued:
     year: 1978
   author:
-  - given:
-    - Willy
-    - W.
+  - given: Willy W.
     family: Chiu
-  - given:
-    - We
-    - Min
+  - given: We Min
     family: Chow
   publisher: IBM
   number: RC-6947

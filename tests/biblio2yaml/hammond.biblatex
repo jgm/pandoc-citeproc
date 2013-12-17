@@ -47,8 +47,7 @@ references:
   issued:
     year: 1997
   author:
-    given:
-    - Christopher
+    given: Christopher
     family: Hammond
   publisher: International Union of Crystallography; Oxford University Press
   type: book

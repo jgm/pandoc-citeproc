@@ -87,13 +87,9 @@ references:
   issued:
     year: 2006
   author:
-  - given:
-    - M.
-    - A.
+  - given: M. A.
     family: Kastenholz
-  - given:
-    - Philippe
-    - H.
+  - given: Philippe H.
     family: Hünenberger
   container-title: "J. Chem. Phys."
   type: article-journal

@@ -61,18 +61,13 @@ references:
   issued:
     year: 1998
   author:
-  - given:
-    - José
-    - L.
+  - given: José L.
     family: Almendro
-  - given:
-    - Jacinto
+  - given: Jacinto
     family: Martín
-  - given:
-    - Alberto
+  - given: Alberto
     family: Sánchez
-  - given:
-    - Fernando
+  - given: Fernando
     family: Nozal
   number: EU-29702195U
   type: patent
@@ -90,11 +85,9 @@ references:
     month: 01
     year: 1995
   author:
-  - given:
-    - F.
+  - given: F.
     family: Kowalik
-  - given:
-    - M.
+  - given: M.
     family: Isard
   number: 9500261
   type: patent
@@ -109,41 +102,29 @@ references:
     month: 09
     year: 2006
   author:
-  - given:
-    - Xaver
+  - given: Xaver
     family: Laufenberg
-  - given:
-    - Dominique
+  - given: Dominique
     family: Eynius
-  - given:
-    - Helmut
+  - given: Helmut
     family: Suelzle
-  - given:
-    - Stephan
+  - given: Stephan
     family: Usbeck
-  - given:
-    - Matthias
+  - given: Matthias
     family: Spaeth
-  - given:
-    - Miriam
+  - given: Miriam
     family: Neuser-Hoffmann
-  - given:
-    - Christian
+  - given: Christian
     family: Myrzik
-  - given:
-    - Manfred
+  - given: Manfred
     family: Schmid
-  - given:
-    - Franz
+  - given: Franz
     family: Nietfeld
-  - given:
-    - Alexander
+  - given: Alexander
     family: Thiel
-  - given:
-    - Harald
+  - given: Harald
     family: Braun
-  - given:
-    - Norbert
+  - given: Norbert
     family: Ebner
   number: 1700367
   type: patent
@@ -163,17 +144,11 @@ references:
     month: 09
     year: 1997
   author:
-  - given:
-    - Ronald
-    - E.
+  - given: Ronald E.
     family: Sorace
-  - given:
-    - Victor
-    - S.
+  - given: Victor S.
     family: Reinhardt
-  - given:
-    - Steven
-    - A.
+  - given: Steven A.
     family: Vaughn
   number: 5668842
   type: patent

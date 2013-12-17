@@ -46,9 +46,7 @@ references:
   issued:
     year: 1986
   author:
-    given:
-    - Donald
-    - E.
+    given: Donald E.
     family: Knuth
   container-title: Computers & typesetting
   publisher: Addison-Wesley

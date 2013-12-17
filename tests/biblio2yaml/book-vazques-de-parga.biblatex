@@ -28,15 +28,11 @@ references:
   issued:
     year: 1993
   author:
-  - given:
-    - Luis
+  - given: Luis
     family: "V\xE1zques de Parga"
-  - given:
-    - ! "Jos\xE9"
-    - ! "Mar\xEDa"
+  - given: ! "Jos\xE9 Mar\xEDa"
     family: Lacarra
-  - given:
-    - Juan
+  - given: Juan
     family: "Ur\xEDa R\xEDu"
   number-of-volumes: 3
   publisher: Iberdrola

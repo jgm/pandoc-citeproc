@@ -63,14 +63,10 @@ references:
   author:
     family: Averroes
   editor:
-    given:
-    - Kalman
-    - P.
+    given: Kalman P.
     family: Bland
   translator:
-    given:
-    - Kalman
-    - P.
+    given: Kalman P.
     family: Bland
   publisher: Jewish Theological Seminary of America
   collection-title: ! 'Moreshet: Studies in Jewish History, Literature and Thought'
@@ -90,12 +86,10 @@ references:
   author:
     family: Averroes
   editor:
-    given:
-    - Ludwig
+    given: Ludwig
     family: Hannes
   translator:
-    given:
-    - Ludwig
+    given: Ludwig
     family: Hannes
   publisher: "C. A. Kaemmerer"
   type: book
@@ -114,12 +108,10 @@ references:
   author:
     family: Averroes
   editor:
-    given:
-    - J.
+    given: J.
     family: Hercz
   translator:
-    given:
-    - J.
+    given: J.
     family: Hercz
   publisher: "S. Hermann"
   type: book

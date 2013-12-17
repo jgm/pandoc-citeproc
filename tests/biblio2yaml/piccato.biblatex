@@ -44,8 +44,7 @@ references:
   issued:
     year: 2001
   author:
-    given:
-    - Pablo
+    given: Pablo
     family: Piccato
   publisher: Duke University Press
   type: book

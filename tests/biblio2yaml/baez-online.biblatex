@@ -53,13 +53,9 @@ references:
     month: 10
     year: 2004
   author:
-  - given:
-    - John
-    - C.
+  - given: John C.
     family: Baez
-  - given:
-    - Aaron
-    - D.
+  - given: Aaron D.
     family: Lauda
   version: 3
   type: webpage

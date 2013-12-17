@@ -53,11 +53,9 @@ references:
     month: 01
     year: 1995
   author:
-  - given:
-    - F.
+  - given: F.
     family: Kowalik
-  - given:
-    - M.
+  - given: M.
     family: Isard
   number: 9500261
   type: patent

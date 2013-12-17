@@ -61,11 +61,9 @@ references:
     month: 08
     year: 2010
   author:
-  - given:
-    - Jan
+  - given: Jan
     family: Wassenberg
-  - given:
-    - Peter
+  - given: Peter
     family: Sanders
   version: 1
   type: webpage

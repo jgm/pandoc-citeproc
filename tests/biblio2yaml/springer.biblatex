@@ -44,8 +44,7 @@ references:
   issued:
     year: 1950
   author:
-    given:
-    - Otto
+    given: Otto
     family: Springer
   container-title: Mediaeval Studies
   type: article-journal

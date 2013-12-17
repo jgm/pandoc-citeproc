@@ -48,9 +48,7 @@ references:
   author:
     family: Aristotle
   editor:
-    given:
-    - D.
-    - W.
+    given: D. W.
     family: Lucas
   publisher: Clarendon Press
   collection-title: Clarendon Aristotle

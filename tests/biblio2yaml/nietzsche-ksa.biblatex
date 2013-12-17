@@ -66,17 +66,14 @@ references:
   issued:
     year: 1988
   author:
-    given:
-    - Friedrich
+    given: Friedrich
     family: Nietzsche
   edition: 2
   number-of-volumes: 15
   editor:
-  - given:
-    - Giorgio
+  - given: Giorgio
     family: Colli
-  - given:
-    - Mazzino
+  - given: Mazzino
     family: Montinari
   publisher: Deutscher Taschenbuch-Verlag; Walter de Gruyter
   type: book

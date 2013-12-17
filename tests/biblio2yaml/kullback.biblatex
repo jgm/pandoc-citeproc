@@ -37,8 +37,7 @@ references:
   issued:
     year: 1959
   author:
-    given:
-    - Solomon
+    given: Solomon
     family: Kullback
   publisher: John Wiley & Sons
   type: book

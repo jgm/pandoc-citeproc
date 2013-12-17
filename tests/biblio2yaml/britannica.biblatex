@@ -69,9 +69,7 @@ references:
   edition: 15
   number-of-volumes: 32
   editor:
-    given:
-    - Warren
-    - E.
+    given: Warren E.
     family: Preece
   publisher: "Encyclopædia Britannica"
   type: book

@@ -53,8 +53,7 @@ references:
   issued:
     year: 1985
   author:
-    given:
-    - Ingrid
+    given: Ingrid
     dropping-particle: de
     family: Geer
   publisher: Uppsala Universitet

@@ -43,9 +43,7 @@ references:
   issued:
     year: 2001
   editor:
-    given:
-    - Dilip
-    - Parameshwar
+    given: Dilip Parameshwar
     family: Gaonkar
   publisher: Duke University Press
   ISBN: 0-822-32714-7

@@ -48,14 +48,11 @@ references:
   issued:
     year: 1994
   author:
-  - given:
-    - Michel
+  - given: Michel
     family: Goossens
-  - given:
-    - Frank
+  - given: Frank
     family: Mittelbach
-  - given:
-    - Alexander
+  - given: Alexander
     family: Samarin
   number-of-pages: 528
   edition: 1

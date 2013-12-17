@@ -84,8 +84,7 @@ references:
     month: 08
     year: 1999
   author:
-    given:
-    - Al
+    given: Al
     family: Author
   container-title: Journal
   type: article-journal
@@ -96,8 +95,7 @@ references:
     month: 08
     year: 1999
   author:
-    given:
-    - Al
+    given: Al
     family: Author
   container-title: Journal
   type: article-journal
@@ -116,8 +114,7 @@ references:
     month: 12
     year: 2012
   author:
-    given:
-    - Al
+    given: Al
     family: Author
   accessed:
     day: 23
@@ -147,8 +144,7 @@ references:
     month: 01
     year: 2010
   author:
-    given:
-    - Al
+    given: Al
     family: Author
   accessed:
   - day: 12
@@ -181,8 +177,7 @@ references:
     month: 10
     year: 1999
   author:
-    given:
-    - Al
+    given: Al
     family: Author
   accessed:
   - day: 31
@@ -210,8 +205,7 @@ references:
     year: 1999
   - {}
   author:
-    given:
-    - Al
+    given: Al
     family: Author
   accessed:
   - day: 31
@@ -235,8 +229,7 @@ references:
     month: 12
     year: 0712
   author:
-    given:
-    - Al
+    given: Al
     family: Author
   accessed:
     day: 14

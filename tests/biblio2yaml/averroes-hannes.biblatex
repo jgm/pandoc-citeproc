@@ -66,12 +66,10 @@ references:
   author:
     family: Averroes
   editor:
-    given:
-    - Ludwig
+    given: Ludwig
     family: Hannes
   translator:
-    given:
-    - Ludwig
+    given: Ludwig
     family: Hannes
   publisher: "C. A. Kaemmerer"
   type: book

@@ -70,21 +70,17 @@ references:
   issued:
     year: 1988
   author:
-    given:
-    - Friedrich
+    given: Friedrich
     family: Nietzsche
   container-title: "Sämtliche Werke: Kritische Studienausgabe"
   container-author:
-    given:
-    - Friedrich
+    given: Friedrich
     family: Nietzsche
   edition: 2
   editor:
-  - given:
-    - Giorgio
+  - given: Giorgio
     family: Colli
-  - given:
-    - Mazzino
+  - given: Mazzino
     family: Montinari
   publisher: Deutscher Taschenbuch-Verlag; Walter de Gruyter
   type: book

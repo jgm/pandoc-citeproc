@@ -35,8 +35,7 @@ references:
   issued:
     year: 2012
   author:
-    given:
-    - Andy
+    given: Andy
     family: Author
   container-title: Journal
   type: article-journal
@@ -45,8 +44,7 @@ references:
   issued:
     year: 2012
   author:
-    given:
-    - Andy
+    given: Andy
     family: Author
   container-title: Journal
   type: webpage

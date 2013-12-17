@@ -50,18 +50,13 @@ references:
   issued:
     year: 1998
   author:
-  - given:
-    - ! "José"
-    - L.
+  - given: José L.
     family: Almendro
-  - given:
-    - Jacinto
-    family: "Martín"
-  - given:
-    - Alberto
-    family: "Sánchez"
-  - given:
-    - Fernando
+  - given: Jacinto
+    family: Martín
+  - given: Alberto
+    family: Sánchez
+  - given: Fernando
     family: Nozal
   number: EU-29702195U
   type: patent

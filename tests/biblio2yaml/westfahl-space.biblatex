@@ -72,13 +72,11 @@ references:
   issued:
     year: 2000
   author:
-    given:
-    - Gary
+    given: Gary
     family: Westfahl
   container-title: ! 'Space and beyond: The frontier theme in science fiction'
   editor:
-    given:
-    - Gary
+    given: Gary
     family: Westfahl
   publisher: Greenwood
   type: chapter
@@ -92,8 +90,7 @@ references:
   issued:
     year: 2000
   editor:
-    given:
-    - Gary
+    given: Gary
     family: Westfahl
   publisher: Greenwood
   type: book

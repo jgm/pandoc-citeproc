@@ -57,8 +57,7 @@ references:
   issued:
     year: 2013
   author:
-    given:
-    - Ann
+    given: Ann
     family: Author
   container-title: Journal
   type: article-journal

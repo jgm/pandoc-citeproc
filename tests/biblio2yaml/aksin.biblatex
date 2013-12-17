@@ -52,26 +52,19 @@ references:
   issued:
     year: 2006
   author:
-  - given:
-    - Özge
+  - given: Özge
     family: Aksin
-  - given:
-    - Hayati
+  - given: Hayati
     family: Türkmen
-  - given:
-    - Levent
+  - given: Levent
     family: Artok
-  - given:
-    - Bekir
+  - given: Bekir
     family: Çetinkaya
-  - given:
-    - Chaoying
+  - given: Chaoying
     family: Ni
-  - given:
-    - Orhan
+  - given: Orhan
     family: Büyükgüngör
-  - given:
-    - Erhan
+  - given: Erhan
     family: Özkal
   container-title: "J. Organomet. Chem."
   type: article-journal

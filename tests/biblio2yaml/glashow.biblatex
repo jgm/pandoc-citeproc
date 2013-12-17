@@ -38,8 +38,7 @@ references:
   issued:
     year: 1961
   author:
-    given:
-    - Sheldon
+    given: Sheldon
     family: Glashow
   container-title: "Nucl. Phys."
   type: article-journal

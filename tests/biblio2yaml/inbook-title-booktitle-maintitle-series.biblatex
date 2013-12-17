@@ -26,8 +26,7 @@ references:
   issued:
     year: 2011
   author:
-    given:
-    - Al
+    given: Al
     family: Author
   volume: 4
   volume-title: ! 'Booktitle: Booksubtitle. Booktitleaddon'

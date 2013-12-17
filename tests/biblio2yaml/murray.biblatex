@@ -64,60 +64,33 @@ references:
   issued:
     year: 1998
   author:
-  - given:
-    - Michael
-    - J.
+  - given: Michael J.
     family: Hostetler
-  - given:
-    - Julia
-    - E.
+  - given: Julia E.
     family: Wingate
-  - given:
-    - Chuan-Jian
+  - given: Chuan-Jian
     family: Zhong
-  - given:
-    - Jay
-    - E.
+  - given: Jay E.
     family: Harris
-  - given:
-    - Richard
-    - W.
+  - given: Richard W.
     family: Vachet
-  - given:
-    - Michael
-    - R.
+  - given: Michael R.
     family: Clark
-  - given:
-    - J.
-    - David
+  - given: J. David
     family: Londono
-  - given:
-    - Stephen
-    - J.
+  - given: Stephen J.
     family: Green
-  - given:
-    - Jennifer
-    - J.
+  - given: Jennifer J.
     family: Stokes
-  - given:
-    - George
-    - D.
+  - given: George D.
     family: Wignall
-  - given:
-    - Gary
-    - L.
+  - given: Gary L.
     family: Glish
-  - given:
-    - Marc
-    - D.
+  - given: Marc D.
     family: Porter
-  - given:
-    - Neal
-    - D.
+  - given: Neal D.
     family: Evans
-  - given:
-    - Royce
-    - W.
+  - given: Royce W.
     family: Murray
   container-title: Langmuir
   type: article-journal

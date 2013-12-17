@@ -51,8 +51,7 @@ references:
     month: 10
     year: 2005
   author:
-    given:
-    - Nicolas
+    given: Nicolas
     family: Markey
   accessed:
     day: 01

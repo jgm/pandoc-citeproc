@@ -51,8 +51,7 @@ references:
   issued:
     year: 2002
   author:
-    given:
-    - Arnold
+    given: Arnold
     family: Angenendt
   container-title: "Revue d’Histoire Ecclésiastique"
   type: article-journal

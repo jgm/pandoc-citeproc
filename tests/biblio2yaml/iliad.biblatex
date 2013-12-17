@@ -53,8 +53,7 @@ references:
     family: Homer
   edition: 3
   translator:
-    given:
-    - Wolfgang
+    given: Wolfgang
     family: Schadewaldt
   publisher: Artemis & Winkler
   type: book

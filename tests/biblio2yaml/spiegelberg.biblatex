@@ -60,8 +60,7 @@ references:
   issued:
     year: 1969
   author:
-    given:
-    - Herbert
+    given: Herbert
     family: Spiegelberg
   container-title: Studia Philosophica
   type: article-journal

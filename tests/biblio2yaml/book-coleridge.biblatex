@@ -33,21 +33,15 @@ references:
   issued:
     year: 1983
   author:
-    given:
-    - Samuel
-    - Taylor
+    given: Samuel Taylor
     family: Coleridge
   container-title: The collected works of Samuel Taylor Coleridge
   editor:
-  - given:
-    - Kathleen
+  - given: Kathleen
     family: Coburn
-  - given:
-    - James
+  - given: James
     family: Engell
-  - given:
-    - W.
-    - Jackson
+  - given: W. Jackson
     family: Bate
   publisher: Routledge and Kegan Paul
   collection-title: Bollingen series

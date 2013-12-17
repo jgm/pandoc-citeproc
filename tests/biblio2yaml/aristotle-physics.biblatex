@@ -46,13 +46,9 @@ references:
   author:
     family: Aristotle
   translator:
-  - given:
-    - P.
-    - H.
+  - given: P. H.
     family: Wicksteed
-  - given:
-    - F.
-    - M.
+  - given: F. M.
     family: Cornford
   publisher: G. P. Putnam
   type: book

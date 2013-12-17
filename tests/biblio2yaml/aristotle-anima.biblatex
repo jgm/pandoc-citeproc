@@ -47,9 +47,7 @@ references:
   author:
     family: Aristotle
   editor:
-    given:
-    - Robert
-    - Drew
+    given: Robert Drew
     family: Hicks
   publisher: Cambridge University Press
   type: book

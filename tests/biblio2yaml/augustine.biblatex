@@ -41,9 +41,7 @@ references:
   issued:
     year: 1995
   author:
-    given:
-    - Robert
-    - L.
+    given: Robert L.
     family: Augustine
   publisher: Marcel Dekker
   type: book

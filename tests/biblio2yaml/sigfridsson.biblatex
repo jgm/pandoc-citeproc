@@ -76,11 +76,9 @@ references:
   issued:
     year: 1998
   author:
-  - given:
-    - Emma
+  - given: Emma
     family: Sigfridsson
-  - given:
-    - Ulf
+  - given: Ulf
     family: Ryde
   container-title: Journal of Computational Chemistry
   type: article-journal

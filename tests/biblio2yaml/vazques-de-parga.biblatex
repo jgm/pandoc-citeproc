@@ -54,15 +54,11 @@ references:
   issued:
     year: 1993
   author:
-  - given:
-    - Luis
+  - given: Luis
     family: Vázques de Parga
-  - given:
-    - José
-    - María
+  - given: José María
     family: Lacarra
-  - given:
-    - Juan
+  - given: Juan
     family: Uría Ríu
   number-of-volumes: 3
   publisher: Iberdrola

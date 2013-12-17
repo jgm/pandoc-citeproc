@@ -49,13 +49,9 @@ references:
   issued:
     year: 2002
   author:
-  - given:
-    - M.
+  - given: M.
     family: Sarfraz
-  - given:
-    - M.
-    - F.
-    - A.
+  - given: M. F. A.
     family: Razzak
   container-title: Computers and Graphics
   type: article-journal

@@ -67,41 +67,29 @@ references:
     month: 09
     year: 2006
   author:
-  - given:
-    - Xaver
+  - given: Xaver
     family: Laufenberg
-  - given:
-    - Dominique
+  - given: Dominique
     family: Eynius
-  - given:
-    - Helmut
+  - given: Helmut
     family: Suelzle
-  - given:
-    - Stephan
+  - given: Stephan
     family: Usbeck
-  - given:
-    - Matthias
+  - given: Matthias
     family: Spaeth
-  - given:
-    - Miriam
+  - given: Miriam
     family: Neuser-Hoffmann
-  - given:
-    - Christian
+  - given: Christian
     family: Myrzik
-  - given:
-    - Manfred
+  - given: Manfred
     family: Schmid
-  - given:
-    - Franz
+  - given: Franz
     family: Nietfeld
-  - given:
-    - Alexander
+  - given: Alexander
     family: Thiel
-  - given:
-    - Harald
+  - given: Harald
     family: Braun
-  - given:
-    - Norbert
+  - given: Norbert
     family: Ebner
   number: 1700367
   type: patent

@@ -69,8 +69,7 @@ references:
   edition: 2
   number-of-volumes: 2
   editor:
-    given:
-    - Philipp
+    given: Philipp
     family: Jaffé
   type: book
   publisher-place: Leipzig

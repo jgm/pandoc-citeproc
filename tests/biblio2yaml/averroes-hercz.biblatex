@@ -66,12 +66,10 @@ references:
   author:
     family: Averroes
   editor:
-    given:
-    - J.
+    given: J.
     family: Hercz
   translator:
-    given:
-    - J.
+    given: J.
     family: Hercz
   publisher: "S. Hermann"
   type: book

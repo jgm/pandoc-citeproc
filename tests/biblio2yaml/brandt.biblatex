@@ -62,17 +62,14 @@ references:
   issued:
     year: 1987
   author:
-  - given:
-    - Ahasver
+  - given: Ahasver
     dropping-particle: von
     family: Brandt
-  - given:
-    - Erich
+  - given: Erich
     family: Hoffmann
   container-title: "Europa im Hoch- und Spätmittelalter"
   editor:
-    given:
-    - Ferdinand
+    given: Ferdinand
     family: Seibt
   publisher: Klett-Cotta
   collection-title: "Handbuch der europäischen Geschichte"

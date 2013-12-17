@@ -50,11 +50,9 @@ references:
   issued:
     year: 1996
   author:
-  - given:
-    - Aaron
+  - given: Aaron
     family: Bertram
-  - given:
-    - Richard
+  - given: Richard
     family: Wentworth
   container-title: "J. Amer. Math. Soc."
   type: article-journal
