@@ -859,6 +859,7 @@ itemToReference lang bibtex = bib $ do
                <|> if subtitle' /= mempty
                       then getShortTitle False "title"
                       else getShortTitle True  "title"
+               <|> return mempty
 
   eventTitle' <- getTitle "eventtitle" <|> return mempty
   origTitle' <- getTitle "origtitle" <|> return mempty
