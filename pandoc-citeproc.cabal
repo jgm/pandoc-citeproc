@@ -328,7 +328,8 @@ executable biblio2yaml
     hs-source-dirs:   .
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
-    build-depends:    base >= 4, pandoc-citeproc, yaml, bytestring,
+    build-depends:    base >= 4, syb, pandoc-types >= 1.12.3,
+                      pandoc-citeproc, yaml, bytestring,
                       attoparsec, text, filepath, aeson-pretty
     default-language: Haskell98
 

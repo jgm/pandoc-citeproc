@@ -1,6 +1,9 @@
 module Main where
 import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
-import Text.CSL.Reference (Reference(refId), Literal(..))
+import Text.CSL.Style (Formatted(..))
+import Text.Pandoc.Definition (Inline(Space,Str))
+import Text.CSL.Reference (Reference(refId), Literal(..), Agent(..))
+import Data.Generics ( everywhere, mkT )
 import Data.List (group, sort)
 import Data.Char (chr, toLower)
 import Data.Monoid
@@ -46,7 +49,8 @@ main = do
   let output = if JsonOutput `elem` flags
                   then BL8.putStrLn .
                        encodePretty' Config{ confIndent = 2
-                                           , confCompare = compare }
+                                           , confCompare = compare } .
+                       everywhere (mkT compressName)
                   else outputYamlBlock . unescapeTags . encode
   case bibformat of
        Nothing  -> do
@@ -97,6 +101,30 @@ options =
   , Option ['f'] ["format"] (ReqArg Format "FORMAT") "bibliography format"
   , Option ['j'] ["json"] (NoArg JsonOutput) "output in json instead of yaml"
   ]
+
+-- Compress particles and suffixes into given and last name,
+-- as zotero JSON expects.  (We might also want to set parse-names = true.)
+compressName :: Agent -> Agent
+compressName ag = Agent{
+    givenName       = gn
+  , familyName      = fn
+  , droppingPart    = mempty
+  , nonDroppingPart = mempty
+  , literal         = literal ag
+  , nameSuffix      = mempty
+  , commaSuffix     = False
+  }
+  where
+  spcat (Formatted []) y = y
+  spcat y (Formatted []) = y
+  spcat x y = x <> Formatted [Space] <> y
+  gn = case (givenName ag, nameSuffix ag, commaSuffix ag) of
+            ([], _, _)            -> mempty
+            (xs, Formatted [], _) -> xs
+            (xs, ns, True)        -> init xs ++
+                [last xs <> Formatted [Str ",!", Space] <> ns]
+            (xs, ns, False)       -> xs ++ [ns]
+  fn = spcat (nonDroppingPart ag) (familyName ag)
 
 -- turn
 -- id: ! "\u043F\u0443\u043D\u043A\u04423"
