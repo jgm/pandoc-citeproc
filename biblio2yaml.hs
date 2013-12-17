@@ -7,10 +7,12 @@ import Data.Monoid
 import Data.Yaml
 import Control.Applicative
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy.Char8 as BL8
 import qualified Data.ByteString.Char8 as B8
 import Data.Attoparsec.ByteString.Char8 as Attoparsec
 import qualified Data.Text as T
 import Data.Text.Encoding (encodeUtf8)
+import Data.Aeson.Encode.Pretty (encodePretty', Config(..))
 import System.Console.GetOpt
 import Control.Monad
 import System.IO
@@ -41,12 +43,16 @@ main = do
                     (x:_) -> readFile x
                     []    -> getContents
   let bibformat = mbformat <|> msum (map formatFromExtension args)
+  let output = if JsonOutput `elem` flags
+                  then BL8.putStrLn .
+                       encodePretty' Config{ confIndent = 2
+                                           , confCompare = compare }
+                  else outputYamlBlock . unescapeTags . encode
   case bibformat of
        Nothing  -> do
          hPutStrLn stderr $ usageInfo ("Unknown format\n" ++ header) options
          exitWith $ ExitFailure 3
-       Just f   -> readBiblioString f bibstring >>= warnDuplicateKeys >>=
-                     outputYamlBlock . unescapeTags . encode
+       Just f   -> readBiblioString f bibstring >>= warnDuplicateKeys >>= output
 
 warnDuplicateKeys :: [Reference] -> IO [Reference]
 warnDuplicateKeys refs = mapM_ warnDup dupKeys >> return refs
@@ -64,7 +70,7 @@ formatFromExtension :: FilePath -> Maybe BibFormat
 formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
 
 data Option =
-    Help | Version | Format String
+    Help | Version | Format String | JsonOutput
   deriving (Ord, Eq, Show)
 
 readFormat :: String -> Maybe BibFormat
@@ -89,6 +95,7 @@ options =
   [ Option ['h'] ["help"] (NoArg Help) "show usage information"
   , Option ['V'] ["version"] (NoArg Version) "show program version"
   , Option ['f'] ["format"] (ReqArg Format "FORMAT") "bibliography format"
+  , Option ['j'] ["json"] (NoArg JsonOutput) "output in json instead of yaml"
   ]
 
 -- turn

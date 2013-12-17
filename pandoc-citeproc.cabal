@@ -329,7 +329,7 @@ executable biblio2yaml
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
     build-depends:    base >= 4, pandoc-citeproc, yaml, bytestring,
-                      attoparsec, text, filepath
+                      attoparsec, text, filepath, aeson-pretty
     default-language: Haskell98
 
 executable test-citeproc
@@ -340,7 +340,7 @@ executable test-citeproc
     Buildable:    True
   else
     Buildable:    False
-  build-depends:  base >= 4, aeson-pretty, aeson, directory, text,
+  build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8, containers >= 0.4 && < 0.6,
