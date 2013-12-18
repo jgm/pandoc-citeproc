@@ -118,12 +118,14 @@ compressName ag = Agent{
   spcat (Formatted []) y = y
   spcat y (Formatted []) = y
   spcat x y = x <> Formatted [Space] <> y
-  gn = case (givenName ag, nameSuffix ag, commaSuffix ag) of
-            ([], _, _)            -> mempty
-            (xs, Formatted [], _) -> xs
-            (xs, ns, True)        -> init xs ++
-                [last xs <> Formatted [Str ",!", Space] <> ns]
-            (xs, ns, False)       -> xs ++ [ns]
+  gnbase = givenName ag ++ [droppingPart ag | droppingPart ag /= mempty]
+  gn = case (gnbase, nameSuffix ag) of
+             ([], _)            -> []
+             (xs, Formatted []) -> xs
+             (xs, ns)           -> init xs ++
+                [last xs <> Formatted [if commaSuffix ag
+                                          then Str ",!"
+                                          else Str ",", Space], ns]
   fn = spcat (nonDroppingPart ag) (familyName ag)
 
 -- turn
