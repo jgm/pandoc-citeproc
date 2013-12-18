@@ -55,13 +55,13 @@ references:
   title: "Aristotle’s theory of the intellect and its interpretation by Averroes"
   id: hyman
   issued:
-    year: 1981
+  - year: 1981
   author:
-    given: Arthur
+  - given: Arthur
     family: Hyman
   container-title: Studies in Aristotle
   editor:
-    given: Dominic J.
+  - given: Dominic J.
     family: "O’Meara"
   publisher: The Catholic University of America Press
   collection-title: Studies in philosophy and the history of philosophy

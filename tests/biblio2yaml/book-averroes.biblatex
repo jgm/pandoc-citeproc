@@ -59,14 +59,14 @@ references:
     Ibn Rushd with the commentary of Moses Narboni
   id: averroes/bland
   issued:
-    year: 1982
+  - year: 1982
   author:
-    family: Averroes
+  - family: Averroes
   editor:
-    given: Kalman P.
+  - given: Kalman P.
     family: Bland
   translator:
-    given: Kalman P.
+  - given: Kalman P.
     family: Bland
   publisher: Jewish Theological Seminary of America
   collection-title: ! 'Moreshet: Studies in Jewish History, Literature and Thought'
@@ -82,14 +82,14 @@ references:
   title: "Des Averroës Abhandlung: “Über die Möglichkeit der Conjunktion” oder “Über den materiellen Intellekt”"
   id: averroes/hannes
   issued:
-    year: 1892
+  - year: 1892
   author:
-    family: Averroes
+  - family: Averroes
   editor:
-    given: Ludwig
+  - given: Ludwig
     family: Hannes
   translator:
-    given: Ludwig
+  - given: Ludwig
     family: Hannes
   publisher: "C. A. Kaemmerer"
   type: book
@@ -104,14 +104,14 @@ references:
     Samuel Ibn Tibbon"
   id: averroes/hercz
   issued:
-    year: 1869
+  - year: 1869
   author:
-    family: Averroes
+  - family: Averroes
   editor:
-    given: J.
+  - given: J.
     family: Hercz
   translator:
-    given: J.
+  - given: J.
     family: Hercz
   publisher: "S. Hermann"
   type: book

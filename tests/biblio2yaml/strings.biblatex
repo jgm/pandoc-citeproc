@@ -22,7 +22,7 @@ references:
   volume: 45
   id: herrmann
   issued:
-    year: 2006
+  - year: 2006
   author:
   - given: Wolfgang A.
     family: Herrmann

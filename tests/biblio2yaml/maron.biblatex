@@ -50,12 +50,12 @@ references:
   title: Animal triste
   id: maron
   issued:
-    year: 2000
+  - year: 2000
   author:
-    given: Monika
+  - given: Monika
     family: Maron
   translator:
-    given: Brigitte
+  - given: Brigitte
     family: Goldstein
   publisher: University of Nebraska Press
   type: book

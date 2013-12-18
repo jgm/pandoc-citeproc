@@ -59,12 +59,12 @@ references:
   title: The rhetoric of Aristotle with a commentary by the late Edward Meredith Cope
   id: aristotle:rhetoric
   issued:
-    year: 1877
+  - year: 1877
   author:
-    family: Aristotle
+  - family: Aristotle
   number-of-volumes: 3
   editor:
-    given: Edward Meredith
+  - given: Edward Meredith
     family: Cope
   publisher: Cambridge University Press
   type: book

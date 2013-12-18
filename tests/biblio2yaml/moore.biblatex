@@ -40,9 +40,9 @@ references:
   volume: 38
   id: moore
   issued:
-    year: 1965
+  - year: 1965
   author:
-    given: Gordon E.
+  - given: Gordon E.
     family: Moore
   container-title: Electronics
   type: article-journal

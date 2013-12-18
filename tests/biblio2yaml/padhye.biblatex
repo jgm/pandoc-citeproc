@@ -74,7 +74,7 @@ references:
   title: A stochastic model of TCP Reno congestion avoidance and control
   id: padhye
   issued:
-    year: 1999
+  - year: 1999
   author:
   - given: Jitendra
     family: Padhye

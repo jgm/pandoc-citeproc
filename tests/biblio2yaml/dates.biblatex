@@ -81,10 +81,10 @@ references:
 - title: Year and month, bibtex style, supported by biblatex for backwards compatibility
   id: year-month-old
   issued:
-    month: 08
+  - month: 08
     year: 1999
   author:
-    given: Al
+  - given: Al
     family: Author
   container-title: Journal
   type: article-journal
@@ -92,32 +92,32 @@ references:
     field
   id: year-month-new
   issued:
-    month: 08
+  - month: 08
     year: 1999
   author:
-    given: Al
+  - given: Al
     family: Author
   container-title: Journal
   type: article-journal
 - original-date:
-    day: 01
+  - day: 01
     month: 10
     year: 1888
   title: Dates, default biblatex style; year, month to be ignored if date exists
   event-date:
-    day: 03
+  - day: 03
     month: 10
     year: 2011
   id: dates
   issued:
-    day: 13
+  - day: 13
     month: 12
     year: 2012
   author:
-    given: Al
+  - given: Al
     family: Author
   accessed:
-    day: 23
+  - day: 23
     month: 05
     year: 1999
   container-title: Journal
@@ -144,7 +144,7 @@ references:
     month: 01
     year: 2010
   author:
-    given: Al
+  - given: Al
     family: Author
   accessed:
   - day: 12
@@ -177,7 +177,7 @@ references:
     month: 10
     year: 1999
   author:
-    given: Al
+  - given: Al
     family: Author
   accessed:
   - day: 31
@@ -205,7 +205,7 @@ references:
     year: 1999
   - {}
   author:
-    given: Al
+  - given: Al
     family: Author
   accessed:
   - day: 31
@@ -215,24 +215,24 @@ references:
   container-title: Journal
   type: article-journal
 - original-date:
-    day: 01
+  - day: 01
     month: 10
     year: 0088
   title: Dates, year less than 1000
   event-date:
-    day: 03
+  - day: 03
     month: 10
     year: 0311
   id: dates-very-old
   issued:
-    day: 13
+  - day: 13
     month: 12
     year: 0712
   author:
-    given: Al
+  - given: Al
     family: Author
   accessed:
-    day: 14
+  - day: 14
     month: 12
     year: 0999
   container-title: Journal

@@ -46,7 +46,7 @@ references:
   title: The LaTeX companion
   id: companion
   issued:
-    year: 1994
+  - year: 1994
   author:
   - given: Michel
     family: Goossens

@@ -56,13 +56,13 @@ references:
     Bajja</span>, and Maimonides
   id: pines
   issued:
-    year: 1979
+  - year: 1979
   author:
-    given: Shlomo
+  - given: Shlomo
     family: Pines
   container-title: Studies in medieval Jewish history and literature
   editor:
-    given: Isadore
+  - given: Isadore
     family: Twersky
   publisher: Harvard University Press
   type: chapter

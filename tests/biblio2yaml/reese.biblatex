@@ -53,9 +53,9 @@ references:
   volume: 15
   id: reese
   issued:
-    year: 1958
+  - year: 1958
   author:
-    given: Trevor R.
+  - given: Trevor R.
     family: Reese
   container-title: William and Mary Quarterly, <span class="nodecor">series 3</span>
   type: article-journal

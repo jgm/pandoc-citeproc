@@ -38,9 +38,9 @@ references:
   title: Crystal structure determination
   id: massa
   issued:
-    year: 2004
+  - year: 2004
   author:
-    given: Werner
+  - given: Werner
     family: Massa
   edition: 2
   publisher: Spinger

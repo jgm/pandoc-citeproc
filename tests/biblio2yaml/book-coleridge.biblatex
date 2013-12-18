@@ -31,9 +31,9 @@ references:
   volume: 7.2
   id: coleridge
   issued:
-    year: 1983
+  - year: 1983
   author:
-    given: Samuel Taylor
+  - given: Samuel Taylor
     family: Coleridge
   container-title: The collected works of Samuel Taylor Coleridge
   editor:

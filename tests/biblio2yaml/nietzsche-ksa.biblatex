@@ -64,9 +64,9 @@ references:
   title-short: Sämtliche Werke
   id: nietzsche:ksa
   issued:
-    year: 1988
+  - year: 1988
   author:
-    given: Friedrich
+  - given: Friedrich
     family: Nietzsche
   edition: 2
   number-of-volumes: 15

@@ -85,7 +85,7 @@ references:
   volume: 124
   id: kastenholz
   issued:
-    year: 2006
+  - year: 2006
   author:
   - given: M. A.
     family: Kastenholz

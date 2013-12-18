@@ -48,9 +48,9 @@ references:
   volume: B
   id: knuth:ct:b
   issued:
-    year: 1986
+  - year: 1986
   author:
-    given: Donald E.
+  - given: Donald E.
     family: Knuth
   container-title: Computers & typesetting
   publisher: Addison-Wesley

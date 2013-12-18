@@ -44,11 +44,11 @@ references:
   title: Poetics
   id: aristotle:poetics
   issued:
-    year: 1968
+  - year: 1968
   author:
-    family: Aristotle
+  - family: Aristotle
   editor:
-    given: D. W.
+  - given: D. W.
     family: Lucas
   publisher: Clarendon Press
   collection-title: Clarendon Aristotle

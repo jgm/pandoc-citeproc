@@ -44,12 +44,12 @@ references:
   title: "Le *De Anima* dans la tradition grècque: Quelques aspects de l’interpretation
     du traité, de Theophraste à Themistius"
   event-date:
-    year: 1975
+  - year: 1975
   id: moraux
   issued:
-    year: 1979
+  - year: 1979
   author:
-    given: Paul
+  - given: Paul
     family: Moraux
   container-title: Aristotle on Mind and the Senses. Proceedings of the Seventh Symposium
     Aristotelicum
@@ -73,14 +73,14 @@ references:
     year: 1968
   id: salam
   issued:
-    year: 1968
+  - year: 1968
   author:
-    given: Abdus
+  - given: Abdus
     family: Salam
   container-title: ! 'Elementary particle theory: Relativistic groups and analyticity.
     Proceedings of the eighth Nobel symposium'
   editor:
-    given: Nils
+  - given: Nils
     family: Svartholm
   publisher: Almquist & Wiksell
   type: paper-conference

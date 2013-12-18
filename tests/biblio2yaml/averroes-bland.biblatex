@@ -59,14 +59,14 @@ references:
     Ibn Rushd with the commentary of Moses Narboni
   id: averroes-bland
   issued:
-    year: 1982
+  - year: 1982
   author:
-    family: Averroes
+  - family: Averroes
   editor:
-    given: Kalman P.
+  - given: Kalman P.
     family: Bland
   translator:
-    given: Kalman P.
+  - given: Kalman P.
     family: Bland
   publisher: Jewish Theological Seminary of America
   collection-title: ! 'Moreshet: Studies in Jewish history, literature and thought'

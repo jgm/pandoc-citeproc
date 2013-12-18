@@ -41,13 +41,13 @@ references:
   title: On alternative modernities
   id: gaonkar:in
   issued:
-    year: 2001
+  - year: 2001
   author:
-    given: Dilip Parameshwar
+  - given: Dilip Parameshwar
     family: Gaonkar
   container-title: Alternative modernities
   editor:
-    given: Dilip Parameshwar
+  - given: Dilip Parameshwar
     family: Gaonkar
   publisher: Duke University Press
   ISBN: 0-822-32714-7

@@ -65,11 +65,11 @@ references:
   title: "The new encyclopædia Britannica"
   id: britannica
   issued:
-    year: 2003
+  - year: 2003
   edition: 15
   number-of-volumes: 32
   editor:
-    given: Warren E.
+  - given: Warren E.
     family: Preece
   publisher: "Encyclopædia Britannica"
   type: book

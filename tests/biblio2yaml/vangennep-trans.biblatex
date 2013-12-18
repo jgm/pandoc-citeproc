@@ -47,9 +47,9 @@ references:
   title: The rites of passage
   id: vangennep:trans
   issued:
-    year: 1960
+  - year: 1960
   author:
-    given: Arnold
+  - given: Arnold
     family: Gennep
     non-dropping-particle: van
   translator:

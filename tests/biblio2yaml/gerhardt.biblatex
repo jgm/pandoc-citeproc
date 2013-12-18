@@ -46,9 +46,9 @@ references:
   title: ! 'The federal appointments process: A constitutional and historical analysis'
   id: gerhardt
   issued:
-    year: 2000
+  - year: 2000
   author:
-    given: Michael J.
+  - given: Michael J.
     family: Gerhardt
   publisher: Duke University Press
   type: book

@@ -59,7 +59,7 @@ references:
   title: Elektromagnetisches Signalhorn
   id: almendro
   issued:
-    year: 1998
+  - year: 1998
   author:
   - given: José L.
     family: Almendro
@@ -81,7 +81,7 @@ references:
     en quadrature et étage de modulation l’utilisant"
   id: kowalik
   issued:
-    day: 11
+  - day: 11
     month: 01
     year: 1995
   author:
@@ -98,7 +98,7 @@ references:
   title: Elektrische Einrichtung und Betriebsverfahren
   id: laufenberg
   issued:
-    day: 13
+  - day: 13
     month: 09
     year: 2006
   author:
@@ -140,7 +140,7 @@ references:
   title: High-speed digital-to-RF converter
   id: sorace
   issued:
-    day: 16
+  - day: 16
     month: 09
     year: 1997
   author:

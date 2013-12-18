@@ -51,9 +51,9 @@ references:
   title-short: Earl, saint, bishop, skald – and music
   id: geer
   issued:
-    year: 1985
+  - year: 1985
   author:
-    given: Ingrid
+  - given: Ingrid
     dropping-particle: de
     family: Geer
   publisher: Uppsala Universitet

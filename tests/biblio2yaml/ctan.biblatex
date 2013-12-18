@@ -58,9 +58,9 @@ references:
   title-short: CTAN
   id: ctan
   issued:
-    year: 2006
+  - year: 2006
   accessed:
-    day: 01
+  - day: 01
     month: 10
     year: 2006
   URL: http://www.ctan.org

@@ -49,9 +49,9 @@ references:
   volume: 86
   id: moore:related
   issued:
-    year: 1998
+  - year: 1998
   author:
-    given: Gordon E.
+  - given: Gordon E.
     family: Moore
   container-title: Proceedings of the IEEE
   type: article-journal

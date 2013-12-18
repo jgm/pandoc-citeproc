@@ -68,13 +68,13 @@ references:
   volume: 1
   id: nietzsche:ksa1
   issued:
-    year: 1988
+  - year: 1988
   author:
-    given: Friedrich
+  - given: Friedrich
     family: Nietzsche
   container-title: "Sämtliche Werke: Kritische Studienausgabe"
   container-author:
-    given: Friedrich
+  - given: Friedrich
     family: Nietzsche
   edition: 2
   editor:

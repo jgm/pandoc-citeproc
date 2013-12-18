@@ -48,12 +48,12 @@ references:
   title: Die Ilias
   id: iliad
   issued:
-    year: 2004
+  - year: 2004
   author:
-    family: Homer
+  - family: Homer
   edition: 3
   translator:
-    given: Wolfgang
+  - given: Wolfgang
     family: Schadewaldt
   publisher: Artemis & Winkler
   type: book

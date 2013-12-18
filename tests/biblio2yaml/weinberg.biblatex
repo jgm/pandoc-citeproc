@@ -37,9 +37,9 @@ references:
   volume: 19
   id: weinberg
   issued:
-    year: 1967
+  - year: 1967
   author:
-    given: Steven
+  - given: Steven
     family: Weinberg
   container-title: "Phys. Rev. Lett."
   type: article-journal

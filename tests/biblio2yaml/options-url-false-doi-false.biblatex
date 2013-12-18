@@ -33,18 +33,18 @@ references:
 - title: Title, any entry type except online
   id: item1
   issued:
-    year: 2012
+  - year: 2012
   author:
-    given: Andy
+  - given: Andy
     family: Author
   container-title: Journal
   type: article-journal
 - title: Title, entry type online
   id: item2
   issued:
-    year: 2012
+  - year: 2012
   author:
-    given: Andy
+  - given: Andy
     family: Author
   container-title: Journal
   type: webpage

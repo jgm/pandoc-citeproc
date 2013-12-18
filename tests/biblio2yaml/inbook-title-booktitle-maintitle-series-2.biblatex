@@ -25,13 +25,13 @@ references:
   volume: 4
   id: item1
   issued:
-    year: 2011
+  - year: 2011
   author:
-    given: Al
+  - given: Al
     family: Author
   container-title: ! 'Maintitle: Mainsubtitle. Maintitleaddon'
   container-author:
-    given: Bob
+  - given: Bob
     family: Bookauthor
   publisher: Publisher
   collection-title: Series

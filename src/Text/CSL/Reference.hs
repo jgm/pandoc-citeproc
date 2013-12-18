@@ -123,7 +123,6 @@ instance FromJSON [Agent] where
   parseJSON _ = fail "Could not parse [Agent]"
 
 instance ToJSON [Agent] where
-  toJSON [x] = toJSON x
   toJSON xs  = Array (V.fromList $ map toJSON xs)
 
 data RefDate =
@@ -176,7 +175,6 @@ instance FromJSON [RefDate] where
   parseJSON x          = parseJSON x >>= mkRefDate
 
 instance ToJSON [RefDate] where
-  toJSON [x] = toJSON x
   toJSON xs  = Array (V.fromList $ map toJSON xs)
 
 setCirca :: Bool -> RefDate -> RefDate

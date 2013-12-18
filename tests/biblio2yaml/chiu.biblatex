@@ -57,7 +57,7 @@ references:
     system
   id: chiu
   issued:
-    year: 1978
+  - year: 1978
   author:
   - given: Willy W.
     family: Chiu

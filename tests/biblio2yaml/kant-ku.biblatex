@@ -59,13 +59,13 @@ references:
   volume: 5
   id: kant:ku
   issued:
-    year: 1968
+  - year: 1968
   author:
-    given: Immanuel
+  - given: Immanuel
     family: Kant
   container-title: Kants Werke. Akademie Textausgabe
   container-author:
-    given: Immanuel
+  - given: Immanuel
     family: Kant
   publisher: Walter de Gruyter
   type: chapter

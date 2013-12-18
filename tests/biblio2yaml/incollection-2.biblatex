@@ -47,13 +47,13 @@ references:
   title-short: The true frontier
   id: westfahl:space
   issued:
-    year: 2000
+  - year: 2000
   author:
-    given: Gary
+  - given: Gary
     family: Westfahl
   container-title: ! 'Space and beyond: The frontier theme in science fiction'
   editor:
-    given: Gary
+  - given: Gary
     family: Westfahl
   publisher: Greenwood
   type: chapter
@@ -63,13 +63,13 @@ references:
   title: On alternative modernities
   id: gaonkar:in
   issued:
-    year: 2001
+  - year: 2001
   author:
-    given: Dilip Parameshwar
+  - given: Dilip Parameshwar
     family: Gaonkar
   container-title: Alternative modernities
   editor:
-    given: Dilip Parameshwar
+  - given: Dilip Parameshwar
     family: Gaonkar
   publisher: Duke University Press
   ISBN: 0-822-32714-7
@@ -81,9 +81,9 @@ references:
   title-short: Space and beyond
   id: westfahl:frontier
   issued:
-    year: 2000
+  - year: 2000
   editor:
-    given: Gary
+  - given: Gary
     family: Westfahl
   publisher: Greenwood
   type: book

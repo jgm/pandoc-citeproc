@@ -48,7 +48,7 @@ references:
   title: Elektromagnetisches Signalhorn
   id: almendro
   issued:
-    year: 1998
+  - year: 1998
   author:
   - given: José L.
     family: Almendro

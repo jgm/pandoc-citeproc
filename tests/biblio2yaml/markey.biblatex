@@ -47,14 +47,14 @@ references:
   title-short: Tame the BeaST
   id: markey
   issued:
-    day: 16
+  - day: 16
     month: 10
     year: 2005
   author:
-    given: Nicolas
+  - given: Nicolas
     family: Markey
   accessed:
-    day: 01
+  - day: 01
     month: 10
     year: 2006
   version: 1.3

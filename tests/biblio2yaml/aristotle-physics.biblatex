@@ -42,9 +42,9 @@ references:
   title: Physics
   id: aristotle:physics
   issued:
-    year: 1929
+  - year: 1929
   author:
-    family: Aristotle
+  - family: Aristotle
   translator:
   - given: P. H.
     family: Wicksteed

@@ -48,9 +48,9 @@ references:
   title: High-resolution micromachined interferometric accelerometer
   id: loh
   issued:
-    year: 1992
+  - year: 1992
   author:
-    given: Nin C.
+  - given: Nin C.
     family: Loh
   publisher: Massachusetts Institute of Technology
   type: thesis

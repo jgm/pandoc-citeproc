@@ -42,9 +42,9 @@ references:
   title: "City of suspects: Crime in Mexico City, 1900–1931"
   id: piccato
   issued:
-    year: 2001
+  - year: 2001
   author:
-    given: Pablo
+  - given: Pablo
     family: Piccato
   publisher: Duke University Press
   type: book

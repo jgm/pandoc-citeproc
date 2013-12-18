@@ -74,7 +74,7 @@ references:
   volume: 19
   id: sigfridsson
   issued:
-    year: 1998
+  - year: 1998
   author:
   - given: Emma
     family: Sigfridsson

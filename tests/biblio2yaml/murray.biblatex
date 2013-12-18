@@ -62,7 +62,7 @@ references:
   volume: 14
   id: murray
   issued:
-    year: 1998
+  - year: 1998
   author:
   - given: Michael J.
     family: Hostetler

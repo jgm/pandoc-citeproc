@@ -49,10 +49,10 @@ references:
   volume: 93
   id: shore
   issued:
-    month: 03
+  - month: 03
     year: 1991
   author:
-    given: Bradd
+  - given: Bradd
     family: Shore
   container-title: American Anthropologist, new series
   type: article-journal

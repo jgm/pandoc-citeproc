@@ -63,7 +63,7 @@ references:
   title: Elektrische Einrichtung und Betriebsverfahren
   id: laufenberg
   issued:
-    day: 13
+  - day: 13
     month: 09
     year: 2006
   author:

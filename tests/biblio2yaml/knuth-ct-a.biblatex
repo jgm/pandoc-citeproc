@@ -56,9 +56,9 @@ references:
   volume: A
   id: knuth:ct:a
   issued:
-    year: 1984
+  - year: 1984
   author:
-    given: Donald E.
+  - given: Donald E.
     family: Knuth
   container-title: Computers & typesetting
   publisher: Addison-Wesley

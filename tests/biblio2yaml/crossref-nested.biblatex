@@ -45,11 +45,11 @@ references:
   volume: 3
   id: bookinbook-1
   issued:
-    year: 1975
+  - year: 1975
   author:
-    family: Shakespeare
+  - family: Shakespeare
   container-author:
-    family: Shakespeare
+  - family: Shakespeare
   number-of-volumes: 4
   publisher: Publisher
   type: book
@@ -59,15 +59,15 @@ references:
   volume-title: Tragedies [title field of book-1]
   container-title: Collected works [title field of mvbook-1]
   author:
-    family: Shakespeare
+  - family: Shakespeare
   container-author:
-    family: Shakespeare
+  - family: Shakespeare
   volume: 3
   chapter-number: 7
   page: 100-200
   id: inbook-1
   issued:
-    year: 1975
+  - year: 1975
   number-of-volumes: 4
   publisher: Publisher
   type: chapter
@@ -76,13 +76,13 @@ references:
 - title: Tragedies [title field of book-1]
   container-title: Collected works [title field of mvbook-1]
   author:
-    family: Shakespeare
+  - family: Shakespeare
   container-author:
-    family: Shakespeare
+  - family: Shakespeare
   volume: 3
   id: book-1
   issued:
-    year: 1975
+  - year: 1975
   number-of-volumes: 4
   publisher: Publisher
   type: book
@@ -90,7 +90,7 @@ references:
 
 - title: Collected works [title field of mvbook-1]
   author:
-    family: Shakespeare
+  - family: Shakespeare
   id: mvbook-1
   issued:
   - year: 1970

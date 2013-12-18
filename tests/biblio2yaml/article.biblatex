@@ -82,11 +82,11 @@ references:
 - title: An article entry with just the required fields
   id: article-req
   issued:
-    day: 29
+  - day: 29
     month: 07
     year: 2013
   author:
-    given: Ann
+  - given: Ann
     family: Author
   container-title: The Journaltitle
   type: article-journal
@@ -102,25 +102,25 @@ references:
   volume: volume
   id: article-opt
   issued:
-    day: 31
+  - day: 31
     month: 12
     year: 2008
   author:
-    suffix: Jr.
+  - suffix: Jr.
     given: Ann A.
     comma-suffix: false
     family: Author
   accessed:
-    day: 29
+  - day: 29
     month: 07
     year: 2013
   version: version
   container-title: ! 'The Journaltitle: The Journalsubtitle, new series'
   editor:
-    given: Edward
+  - given: Edward
     family: Editor
   translator:
-    given: Ted
+  - given: Ted
     family: Translator
   URL: http://foo.bar.baz/
   type: article-journal

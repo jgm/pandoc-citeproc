@@ -43,11 +43,11 @@ references:
   title: De anima
   id: aristotle:anima
   issued:
-    year: 1907
+  - year: 1907
   author:
-    family: Aristotle
+  - family: Aristotle
   editor:
-    given: Robert Drew
+  - given: Robert Drew
     family: Hicks
   publisher: Cambridge University Press
   type: book

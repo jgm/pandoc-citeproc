@@ -52,9 +52,9 @@ references:
   volume: 9
   id: gillies
   issued:
-    year: 1933
+  - year: 1933
   author:
-    given: Alexander
+  - given: Alexander
     family: Gillies
   container-title: Publications of the English Goethe Society, new series
   type: article-journal

@@ -50,7 +50,7 @@ references:
   volume: 691
   id: aksin
   issued:
-    year: 2006
+  - year: 2006
   author:
   - given: Özge
     family: Aksin

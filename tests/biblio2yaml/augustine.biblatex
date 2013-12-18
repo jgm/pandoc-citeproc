@@ -39,9 +39,9 @@ references:
   title: Heterogeneous catalysis for the synthetic chemist
   id: augustine
   issued:
-    year: 1995
+  - year: 1995
   author:
-    given: Robert L.
+  - given: Robert L.
     family: Augustine
   publisher: Marcel Dekker
   type: book

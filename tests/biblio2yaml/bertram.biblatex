@@ -48,7 +48,7 @@ references:
   volume: 9
   id: bertram
   issued:
-    year: 1996
+  - year: 1996
   author:
   - given: Aaron
     family: Bertram

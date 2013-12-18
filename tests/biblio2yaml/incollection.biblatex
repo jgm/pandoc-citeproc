@@ -62,7 +62,7 @@ references:
   title: "Die nordischen Länder von der Mitte des 11. Jahrhunderts bis 1448"
   id: brandt
   issued:
-    year: 1987
+  - year: 1987
   author:
   - given: Ahasver
     dropping-particle: von
@@ -71,7 +71,7 @@ references:
     family: Hoffmann
   container-title: "Europa im Hoch- und Spätmittelalter"
   editor:
-    given: Ferdinand
+  - given: Ferdinand
     family: Seibt
   publisher: Klett-Cotta
   collection-title: "Handbuch der europäischen Geschichte"
@@ -86,13 +86,13 @@ references:
   title: "Aristotle’s theory of the intellect and its interpretation by Averroes"
   id: hyman
   issued:
-    year: 1981
+  - year: 1981
   author:
-    given: Arthur
+  - given: Arthur
     family: Hyman
   container-title: Studies in Aristotle
   editor:
-    given: Dominic J.
+  - given: Dominic J.
     family: "O’Meara"
   publisher: The Catholic University of America Press
   collection-title: Studies in philosophy and the history of philosophy
@@ -107,13 +107,13 @@ references:
   title: 'The limitations of human knowledge according to Al-Farabi, <span class="nocase">ibn Bajja</span>, and Maimonides'
   id: pines
   issued:
-    year: 1979
+  - year: 1979
   author:
-    given: Shlomo
+  - given: Shlomo
     family: Pines
   container-title: Studies in medieval Jewish history and literature
   editor:
-    given: Isadore
+  - given: Isadore
     family: Twersky
   publisher: Harvard University Press
   type: chapter

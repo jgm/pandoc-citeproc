@@ -71,9 +71,9 @@ references:
   volume: 4
   id: doody
   issued:
-    year: 1974
+  - year: 1974
   author:
-    given: Terrence
+  - given: Terrence
     family: Doody
   container-title: The Journal of Narrative Technique
   type: article-journal
@@ -85,9 +85,9 @@ references:
   volume: 61
   id: matuz:doody
   issued:
-    year: 1990
+  - year: 1990
   editor:
-    given: Roger
+  - given: Roger
     family: Matuz
   publisher: Gale
   type: book

@@ -35,9 +35,9 @@ references:
 - title: Information theory and statistics
   id: kullback
   issued:
-    year: 1959
+  - year: 1959
   author:
-    given: Solomon
+  - given: Solomon
     family: Kullback
   publisher: John Wiley & Sons
   type: book

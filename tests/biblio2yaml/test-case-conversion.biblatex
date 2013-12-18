@@ -55,9 +55,9 @@ references:
 - title: A title, in English, with a Proper Name and an ACRONYM and a <span class="nocase">camelCase</span> word and some units, 400 <span class="nocase">nm</span>, 3 <span class="nocase">cm</span>, and a quote, *Alea <span class="nocase">iacta est</span>*
   id: item1
   issued:
-    year: 2013
+  - year: 2013
   author:
-    given: Ann
+  - given: Ann
     family: Author
   container-title: Journal
   type: article-journal

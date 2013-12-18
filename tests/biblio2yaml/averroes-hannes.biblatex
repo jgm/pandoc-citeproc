@@ -62,14 +62,14 @@ references:
     oder “Über den materiellen Intellekt”"
   id: averroes-hannes
   issued:
-    year: 1892
+  - year: 1892
   author:
-    family: Averroes
+  - family: Averroes
   editor:
-    given: Ludwig
+  - given: Ludwig
     family: Hannes
   translator:
-    given: Ludwig
+  - given: Ludwig
     family: Hannes
   publisher: "C. A. Kaemmerer"
   type: book

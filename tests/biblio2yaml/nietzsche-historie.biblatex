@@ -72,13 +72,13 @@ references:
   volume: 1
   id: nietzsche:historie
   issued:
-    year: 1988
+  - year: 1988
   author:
-    given: Friedrich
+  - given: Friedrich
     family: Nietzsche
   container-title: "Sämtliche Werke: Kritische Studienausgabe"
   container-author:
-    given: Friedrich
+  - given: Friedrich
     family: Nietzsche
   editor:
   - given: Giorgio

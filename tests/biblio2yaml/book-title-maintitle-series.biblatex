@@ -20,9 +20,9 @@ references:
   title-short: Title of the Book
   id: item1
   issued:
-    year: 2013
+  - year: 2013
   author:
-    given: Al
+  - given: Al
     family: Author
   container-title: ! 'Maintitle: Mainsubtitle. Maintitleaddon'
   publisher: Publisher
