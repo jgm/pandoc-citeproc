@@ -89,6 +89,8 @@ data-files:         chicago-author-date.csl
                     tests/no-author.expected.native
                     tests/issue7.in.native
                     tests/issue7.expected.native
+                    tests/issue13.in.native
+                    tests/issue13.expected.native
                     tests/biblio.bib
                     tests/ieee.csl
                     tests/mhra.csl

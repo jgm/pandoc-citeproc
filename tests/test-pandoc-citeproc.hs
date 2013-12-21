@@ -23,7 +23,8 @@ import Text.CSL.Pandoc (processCites')
 
 main = do
   citeprocTests <- mapM testCase ["chicago-author-date", "ieee", "mhra",
-                                  "number-of-volumes", "no-author", "issue7"]
+                                  "number-of-volumes", "no-author", "issue7",
+                                  "issue13"]
   fs <- filter (\f -> takeExtension f `elem` [".bibtex",".biblatex"])
            `fmap` getDirectoryContents "tests/biblio2yaml"
   biblio2yamlTests <- mapM biblio2yamlTest fs

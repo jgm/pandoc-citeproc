@@ -139,9 +139,11 @@ mvPunct xs = xs
 
 endWithPunct :: [Inline] -> Bool
 endWithPunct [] = True
-endWithPunct xs@(_:_) = case reverse (stringify [last xs]) of
+endWithPunct xs@(_:_) = case reverse (stringify xs) of
                               []                       -> True
-                              (')':c:_) | isEndPunct c -> True
+                              -- covers .), .", etc.:
+                              (d:c:_) | isPunctuation d
+                                       && isEndPunct c -> True
                               (c:_) | isEndPunct c     -> True
                                     | otherwise        -> False
   where isEndPunct c = c `elem` ".,;:!?"
