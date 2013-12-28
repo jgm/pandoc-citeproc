@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, PatternGuards, OverloadedStrings,
   DeriveDataTypeable, ExistentialQuantification, FlexibleInstances,
-  ScopedTypeVariables, GeneralizedNewtypeDeriving #-}
+  ScopedTypeVariables, GeneralizedNewtypeDeriving, IncoherentInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Reference
@@ -122,8 +122,8 @@ instance FromJSON [Agent] where
   parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
   parseJSON _ = fail "Could not parse [Agent]"
 
-instance ToJSON [Agent] where
-  toJSON xs  = Array (V.fromList $ map toJSON xs)
+-- instance ToJSON [Agent] where
+--  toJSON xs  = Array (V.fromList $ map toJSON xs)
 
 data RefDate =
     RefDate { year   :: Literal
@@ -154,6 +154,7 @@ instance FromJSON RefDate where
               ((v .: "circa" >>= parseBool) <|> pure False)
   parseJSON _ = fail "Could not parse RefDate"
 
+{-
 instance ToJSON RefDate where
   toJSON refdate = object' $ [
       "year" .= year refdate
@@ -162,6 +163,7 @@ instance ToJSON RefDate where
     , "day" .= day refdate
     , "other" .= other refdate ] ++
     [ "circa" .= circa refdate | circa refdate ]
+-}
 
 instance FromJSON [RefDate] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
@@ -174,8 +176,28 @@ instance FromJSON [RefDate] where
          _               -> (:[]) `fmap` parseJSON (Object v)
   parseJSON x          = parseJSON x >>= mkRefDate
 
+toDatePart :: RefDate -> [Int]
+toDatePart refdate =
+    case (safeRead (unLiteral $ year refdate),
+          safeRead (unLiteral $ month refdate),
+          safeRead (unLiteral $ day refdate)) of
+         (Just (y :: Int), Just (m :: Int), Just (d :: Int))
+                                     -> [y, m, d]
+         (Just y, Just m, Nothing)   -> [y, m]
+         (Just y, Nothing, Nothing)  -> [y]
+         _                           -> []
+
 instance ToJSON [RefDate] where
-  toJSON xs  = Array (V.fromList $ map toJSON xs)
+  toJSON [] = Array V.empty
+  toJSON xs = object' $
+    case filter (not . null) (map toDatePart xs) of
+         []  -> ["literal" .= intercalate "; " (map (unLiteral . other) xs)]
+         dps -> (["date-parts" .= dps ] ++
+                 ["circa" .= (1 :: Int) | or (map circa xs)] ++
+                 ["season" .= s | s <- map season xs, s /= mempty])
+
+-- instance ToJSON [RefDate]
+-- toJSON xs  = Array (V.fromList $ map toJSON xs)
 
 setCirca :: Bool -> RefDate -> RefDate
 setCirca circa' rd = rd{ circa = circa' }
