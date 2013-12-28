@@ -29,7 +29,7 @@ import qualified Data.Text as T
 import qualified Data.Vector as V
 import Data.Char (toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
-import Text.CSL.Util (parseString, parseBool, safeRead, readNum,
+import Text.CSL.Util (parseString, parseInt, parseBool, safeRead, readNum,
                       inlinesToString, capitalize, camelize)
 import Text.Pandoc (Inline(Str,Space))
 import Data.List.Split (wordsBy)
@@ -245,9 +245,7 @@ instance ToJSON RefType where
 newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data )
 
 instance FromJSON CNum where
-  parseJSON x = case fromJSON x of
-                     Success n -> return $ CNum n
-                     _         -> fail "Could not parse CNum"
+  parseJSON x = CNum `fmap` parseInt x
 
 instance ToJSON CNum where
   toJSON (CNum n) = toJSON n
@@ -411,7 +409,7 @@ instance FromJSON Reference where
        v .:? "categories" .!= [] <*>
        v .:? "language" .!= "" <*>
        v .:? "citation-number" .!= CNum 0 <*>
-       v .:? "first-reference-note-number" .!= 1 <*>
+       ((v .: "first-reference-note-number" >>= parseInt) <|> return 1) <*>
        v .:? "citation-label" .!= ""
   parseJSON _ = fail "Could not parse Reference"
 

@@ -14,6 +14,7 @@ module Text.CSL.Util
   , trimr
   , parseBool
   , parseString
+  , parseInt
   , mb
   , (.#?)
   , (.#:)
@@ -126,6 +127,16 @@ parseString (Number n) = case fromJSON (Number n) of
 parseString (Bool b)   = return $ map toLower $ show b
 parseString v@(Array _)= inlinesToString `fmap` parseJSON v
 parseString _          = fail "Could not read string"
+
+-- | Parse JSON value as Int.
+parseInt :: Value -> Parser Int
+parseInt (String s) = case safeRead (T.unpack s) of
+                            Just n  -> return n
+                            Nothing -> fail "Could not read Int"
+parseInt (Number n) = case fromJSON (Number n) of
+                            Success (x :: Int) -> return x
+                            Error e -> fail $ "Could not read string: " ++ e
+parseInt _          = fail "Could not read string"
 
 mb :: Monad m => (b -> m a) -> (Maybe b -> m (Maybe a))
 mb  = Data.Traversable.mapM
