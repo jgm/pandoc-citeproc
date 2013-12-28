@@ -43,7 +43,8 @@ references:
   title: The ghost of John Wayne and other stories
   id: gonzalez
   issued:
-  - year: 2001
+    date-parts:
+    - - 2001
   author:
   - given: Ray
     family: Gonzalez

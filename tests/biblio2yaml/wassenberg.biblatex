@@ -57,9 +57,10 @@ references:
   title: Faster radix sort via virtual memory and write-combining
   id: wassenberg
   issued:
-  - day: 17
-    month: 08
-    year: 2010
+    date-parts:
+    - - 2010
+      - 8
+      - 17
   author:
   - given: Jan
     family: Wassenberg

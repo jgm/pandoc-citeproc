@@ -33,7 +33,8 @@ references:
 - title: Title, any entry type except online
   id: item1
   issued:
-  - year: 2012
+    date-parts:
+    - - 2012
   author:
   - given: Andy
     family: Author
@@ -42,7 +43,8 @@ references:
 - title: Title, entry type online
   id: item2
   issued:
-  - year: 2012
+    date-parts:
+    - - 2012
   author:
   - given: Andy
     family: Author

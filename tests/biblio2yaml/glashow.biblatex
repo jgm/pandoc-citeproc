@@ -36,7 +36,8 @@ references:
   volume: 22
   id: glashow
   issued:
-  - year: 1961
+    date-parts:
+    - - 1961
   author:
   - given: Sheldon
     family: Glashow

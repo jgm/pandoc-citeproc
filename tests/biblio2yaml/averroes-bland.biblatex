@@ -59,7 +59,8 @@ references:
     Ibn Rushd with the commentary of Moses Narboni
   id: averroes-bland
   issued:
-  - year: 1982
+    date-parts:
+    - - 1982
   author:
   - family: Averroes
   editor:

@@ -59,7 +59,8 @@ references:
   title: The rhetoric of Aristotle with a commentary by the late Edward Meredith Cope
   id: aristotle:rhetoric
   issued:
-  - year: 1877
+    date-parts:
+    - - 1877
   author:
   - family: Aristotle
   number-of-volumes: 3

@@ -49,11 +49,13 @@ references:
 - annote: A reprint of the kullback entry. Note the format of origyear and origpublisher.
     These fields are not used by the standard bibliography styles
   original-date:
-  - year: 1959
+    date-parts:
+    - - 1959
   title: Information theory and statistics
   id: kullback:reprint
   issued:
-  - year: 1997
+    date-parts:
+    - - 1997
   author:
   - given: Solomon
     family: Kullback

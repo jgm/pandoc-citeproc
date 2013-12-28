@@ -64,8 +64,9 @@ references:
     <span style="font-variant:small-caps;">mcxcviii</span>
   id: jaffe
   issued:
-  - year: 1885
-  - year: 1888
+    date-parts:
+    - - 1885
+    - - 1888
   edition: 2
   number-of-volumes: 2
   editor:

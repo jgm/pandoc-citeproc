@@ -43,7 +43,8 @@ references:
   title: Les rites de passage
   id: vangennep
   issued:
-  - year: 1909
+    date-parts:
+    - - 1909
   author:
   - given: Arnold
     family: Gennep

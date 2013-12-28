@@ -20,7 +20,8 @@ references:
   title-short: Title of the Book
   id: item1
   issued:
-  - year: 2013
+    date-parts:
+    - - 2013
   author:
   - given: Al
     family: Author

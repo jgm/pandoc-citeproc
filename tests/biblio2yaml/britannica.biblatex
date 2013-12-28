@@ -65,7 +65,8 @@ references:
   title: "The new encyclopædia Britannica"
   id: britannica
   issued:
-  - year: 2003
+    date-parts:
+    - - 2003
   edition: 15
   number-of-volumes: 32
   editor:

@@ -59,7 +59,8 @@ references:
     system
   id: chiu
   issued:
-  - year: 1978
+    date-parts:
+    - - 1978
   author:
   - given: Willy W.
     family: Chiu
@@ -76,7 +77,8 @@ references:
   title: A stochastic model of TCP Reno congestion avoidance and control
   id: padhye
   issued:
-  - year: 1999
+    date-parts:
+    - - 1999
   author:
   - given: Jitendra
     family: Padhye

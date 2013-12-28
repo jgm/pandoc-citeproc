@@ -50,7 +50,8 @@ references:
   title: Animal triste
   id: maron
   issued:
-  - year: 2000
+    date-parts:
+    - - 2000
   author:
   - given: Monika
     family: Maron

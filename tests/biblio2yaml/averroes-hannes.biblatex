@@ -62,7 +62,8 @@ references:
     oder “Über den materiellen Intellekt”"
   id: averroes-hannes
   issued:
-  - year: 1892
+    date-parts:
+    - - 1892
   author:
   - family: Averroes
   editor:

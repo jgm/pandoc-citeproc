@@ -39,7 +39,8 @@ references:
   title: Heterogeneous catalysis for the synthetic chemist
   id: augustine
   issued:
-  - year: 1995
+    date-parts:
+    - - 1995
   author:
   - given: Robert L.
     family: Augustine

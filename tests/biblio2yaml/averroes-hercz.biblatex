@@ -62,7 +62,8 @@ references:
     Samuel Ibn Tibbon"
   id: averroes-hercz
   issued:
-  - year: 1869
+    date-parts:
+    - - 1869
   author:
   - family: Averroes
   editor:

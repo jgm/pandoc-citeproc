@@ -53,7 +53,8 @@ references:
   volume: 15
   id: reese
   issued:
-  - year: 1958
+    date-parts:
+    - - 1958
   author:
   - given: Trevor R.
     family: Reese

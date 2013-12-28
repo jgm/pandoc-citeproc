@@ -44,7 +44,8 @@ references:
   title: Advanced inorganic chemistry
   id: cotton
   issued:
-  - year: 1999
+    date-parts:
+    - - 1999
   author:
   - given: Frank Albert
     family: Cotton

@@ -31,7 +31,8 @@ references:
   volume: 7.2
   id: coleridge
   issued:
-  - year: 1983
+    date-parts:
+    - - 1983
   author:
   - given: Samuel Taylor
     family: Coleridge

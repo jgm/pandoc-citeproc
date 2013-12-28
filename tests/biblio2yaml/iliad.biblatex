@@ -48,7 +48,8 @@ references:
   title: Die Ilias
   id: iliad
   issued:
-  - year: 2004
+    date-parts:
+    - - 2004
   author:
   - family: Homer
   edition: 3

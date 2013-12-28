@@ -49,9 +49,10 @@ references:
   title: ! 'Higher-dimensional algebra V: 2-groups'
   id: baez-online
   issued:
-  - day: 27
-    month: 10
-    year: 2004
+    date-parts:
+    - - 2004
+      - 10
+      - 27
   author:
   - given: John C.
     family: Baez

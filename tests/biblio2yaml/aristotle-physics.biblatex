@@ -42,7 +42,8 @@ references:
   title: Physics
   id: aristotle:physics
   issued:
-  - year: 1929
+    date-parts:
+    - - 1929
   author:
   - family: Aristotle
   translator:

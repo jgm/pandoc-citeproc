@@ -37,7 +37,8 @@ references:
   volume: 19
   id: weinberg
   issued:
-  - year: 1967
+    date-parts:
+    - - 1967
   author:
   - given: Steven
     family: Weinberg

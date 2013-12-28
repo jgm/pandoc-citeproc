@@ -47,7 +47,8 @@ references:
   title: ! 'The importance of being earnest: A trivial comedy for serious people'
   id: wilde
   issued:
-  - year: 1899
+    date-parts:
+    - - 1899
   author:
   - given: Oscar
     family: Wilde

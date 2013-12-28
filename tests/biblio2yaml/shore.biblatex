@@ -49,8 +49,9 @@ references:
   volume: 93
   id: shore
   issued:
-  - month: 03
-    year: 1991
+    date-parts:
+    - - 1991
+      - 3
   author:
   - given: Bradd
     family: Shore

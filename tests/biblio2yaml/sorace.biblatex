@@ -44,9 +44,10 @@ references:
   title: High-speed digital-to-RF converter
   id: sorace
   issued:
-  - day: 16
-    month: 09
-    year: 1997
+    date-parts:
+    - - 1997
+      - 9
+      - 16
   author:
   - given: Ronald E.
     family: Sorace

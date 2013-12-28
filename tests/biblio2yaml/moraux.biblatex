@@ -66,10 +66,12 @@ references:
   page: 281-324
   title: "Le *De Anima* dans la tradition grècque: Quelques aspects de l’interpretation du traité, de Theophraste à Themistius"
   event-date:
-  - year: 1975
+    date-parts:
+    - - 1975
   id: moraux
   issued:
-  - year: 1979
+    date-parts:
+    - - 1979
   author:
   - given: Paul
     family: Moraux

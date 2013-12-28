@@ -55,7 +55,8 @@ references:
   volume: 12
   id: baez-article
   issued:
-  - year: 2004
+    date-parts:
+    - - 2004
   author:
   - given: John C.
     family: Baez

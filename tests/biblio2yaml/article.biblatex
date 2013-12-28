@@ -82,9 +82,10 @@ references:
 - title: An article entry with just the required fields
   id: article-req
   issued:
-  - day: 29
-    month: 07
-    year: 2013
+    date-parts:
+    - - 2013
+      - 07
+      - 29
   author:
   - given: Ann
     family: Author
@@ -102,18 +103,20 @@ references:
   volume: volume
   id: article-opt
   issued:
-  - day: 31
-    month: 12
-    year: 2008
+    date-parts:
+    - - 2008
+      - 12
+      - 31
   author:
   - suffix: Jr.
     given: Ann A.
     comma-suffix: false
     family: Author
   accessed:
-  - day: 29
-    month: 07
-    year: 2013
+    date-parts:
+    - - 2013
+      - 07
+      - 29
   version: version
   container-title: ! 'The Journaltitle: The Journalsubtitle, new series'
   editor:

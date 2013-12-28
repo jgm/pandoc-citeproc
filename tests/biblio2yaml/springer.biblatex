@@ -42,7 +42,8 @@ references:
   volume: 12
   id: springer
   issued:
-  - year: 1950
+    date-parts:
+    - - 1950
   author:
   - given: Otto
     family: Springer

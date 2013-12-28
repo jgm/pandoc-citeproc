@@ -59,7 +59,8 @@ references:
     Ibn Rushd with the commentary of Moses Narboni
   id: averroes/bland
   issued:
-  - year: 1982
+    date-parts:
+    - - 1982
   author:
   - family: Averroes
   editor:
@@ -82,7 +83,8 @@ references:
   title: "Des Averroës Abhandlung: “Über die Möglichkeit der Conjunktion” oder “Über den materiellen Intellekt”"
   id: averroes/hannes
   issued:
-  - year: 1892
+    date-parts:
+    - - 1892
   author:
   - family: Averroes
   editor:
@@ -104,7 +106,8 @@ references:
     Samuel Ibn Tibbon"
   id: averroes/hercz
   issued:
-  - year: 1869
+    date-parts:
+    - - 1869
   author:
   - family: Averroes
   editor:

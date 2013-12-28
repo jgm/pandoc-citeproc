@@ -46,7 +46,8 @@ references:
   volume: 25
   id: yoon
   issued:
-  - year: 2006
+    date-parts:
+    - - 2006
   author:
   - given: Myeong S.
     family: Yoon

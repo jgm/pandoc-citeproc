@@ -47,7 +47,8 @@ references:
   title-short: The true frontier
   id: westfahl:space
   issued:
-  - year: 2000
+    date-parts:
+    - - 2000
   author:
   - given: Gary
     family: Westfahl
@@ -63,7 +64,8 @@ references:
   title: On alternative modernities
   id: gaonkar:in
   issued:
-  - year: 2001
+    date-parts:
+    - - 2001
   author:
   - given: Dilip Parameshwar
     family: Gaonkar
@@ -81,7 +83,8 @@ references:
   title-short: Space and beyond
   id: westfahl:frontier
   issued:
-  - year: 2000
+    date-parts:
+    - - 2000
   editor:
   - given: Gary
     family: Westfahl

@@ -78,164 +78,181 @@
 
 ---
 references:
-- title: Year and month, bibtex style, supported by biblatex for backwards compatibility
+- author:
+  - family: Author
+    given: Al
+  title: Year and month, bibtex style, supported by biblatex for backwards compatibility
   id: year-month-old
   issued:
-  - month: 08
-    year: 1999
-  author:
-  - given: Al
-    family: Author
-  container-title: Journal
+    date-parts:
+    - - 1999
+      - 8
   type: article-journal
-- title: Year and month, biblatex style; note that biblatex does not have a “day”
-    field
+  container-title: Journal
+- author:
+  - family: Author
+    given: Al
+  title: "Year and month, biblatex style; note that biblatex does not have a “day”
+    field"
   id: year-month-new
   issued:
-  - month: 08
-    year: 1999
-  author:
-  - given: Al
-    family: Author
-  container-title: Journal
+    date-parts:
+    - - 1999
+      - 8
   type: article-journal
-- original-date:
-  - day: 01
-    month: 10
-    year: 1888
+  container-title: Journal
+- event-date:
+    date-parts:
+    - - 2011
+      - 10
+      - 3
+  accessed:
+    date-parts:
+    - - 1999
+      - 5
+      - 23
+  author:
+  - family: Author
+    given: Al
+  original-date:
+    date-parts:
+    - - 1888
+      - 10
+      - 1
   title: Dates, default biblatex style; year, month to be ignored if date exists
-  event-date:
-  - day: 03
-    month: 10
-    year: 2011
   id: dates
   issued:
-  - day: 13
-    month: 12
-    year: 2012
-  author:
-  - given: Al
-    family: Author
-  accessed:
-  - day: 23
-    month: 05
-    year: 1999
-  container-title: Journal
+    date-parts:
+    - - 2012
+      - 12
+      - 13
   type: article-journal
-- original-date:
-  - day: 02
-    month: 01
-    year: 1888
-  - day: 13
-    month: 12
-    year: 1913
+  container-title: Journal
+- event-date:
+    date-parts:
+    - - 1999
+      - 12
+    - - 2000
+      - 1
+  accessed:
+    date-parts:
+    - - 2012
+      - 10
+      - 12
+    - - 2013
+      - 1
+      - 31
+  author:
+  - family: Author
+    given: Al
+  original-date:
+    date-parts:
+    - - 1888
+      - 1
+      - 2
+    - - 1913
+      - 12
+      - 13
   title: Date ranges; different years
-  event-date:
-  - month: 12
-    year: 1999
-  - month: 01
-    year: 2000
   id: date-ranges-different-years
   issued:
-  - day: 14
-    month: 10
-    year: 1999
-  - day: 23
-    month: 01
-    year: 2010
-  author:
-  - given: Al
-    family: Author
-  accessed:
-  - day: 12
-    month: 10
-    year: 2012
-  - day: 31
-    month: 01
-    year: 2013
-  container-title: Journal
+    date-parts:
+    - - 1999
+      - 10
+      - 14
+    - - 2010
+      - 1
+      - 23
   type: article-journal
-- original-date:
-  - day: 02
-    month: 01
-    year: 1888
-  - day: 13
-    month: 12
-    year: 1888
+  container-title: Journal
+- event-date:
+    date-parts:
+    - - 1999
+      - 10
+    - - 1999
+      - 11
+  accessed:
+    date-parts:
+    - - 2012
+      - 10
+      - 31
+    - - 2012
+      - 11
+      - 1
+  author:
+  - family: Author
+    given: Al
+  original-date:
+    date-parts:
+    - - 1888
+      - 1
+      - 2
+    - - 1888
+      - 12
+      - 13
   title: Date ranges; same year
-  event-date:
-  - month: 10
-    year: 1999
-  - month: 11
-    year: 1999
   id: date-ranges-same-year
   issued:
-  - day: 14
-    month: 10
-    year: 1999
-  - day: 15
-    month: 10
-    year: 1999
-  author:
-  - given: Al
-    family: Author
-  accessed:
-  - day: 31
-    month: 10
-    year: 2012
-  - day: 01
-    month: 11
-    year: 2012
-  container-title: Journal
+    date-parts:
+    - - 1999
+      - 10
+      - 14
+    - - 1999
+      - 10
+      - 15
   type: article-journal
-- original-date:
-  - day: 02
-    month: 01
-    year: 1888
-  - {}
+  container-title: Journal
+- event-date:
+    date-parts:
+    - - 1999
+      - 10
+  accessed:
+    date-parts:
+    - - 2012
+      - 10
+      - 31
+  author:
+  - family: Author
+    given: Al
+  original-date:
+    date-parts:
+    - - 1888
+      - 1
+      - 2
   title: Date ranges, open-ended
-  event-date:
-  - month: 10
-    year: 1999
-  - {}
   id: date-ranges-open
   issued:
-  - day: 14
-    month: 10
-    year: 1999
-  - {}
-  author:
-  - given: Al
-    family: Author
-  accessed:
-  - day: 31
-    month: 10
-    year: 2012
-  - {}
-  container-title: Journal
+    date-parts:
+    - - 1999
+      - 10
+      - 14
   type: article-journal
-- original-date:
-  - day: 01
-    month: 10
-    year: 0088
+  container-title: Journal
+- event-date:
+    date-parts:
+    - - 311
+      - 10
+      - 3
+  accessed:
+    date-parts:
+    - - 999
+      - 12
+      - 14
+  author:
+  - family: Author
+    given: Al
+  original-date:
+    date-parts:
+    - - 88
+      - 10
+      - 1
   title: Dates, year less than 1000
-  event-date:
-  - day: 03
-    month: 10
-    year: 0311
   id: dates-very-old
   issued:
-  - day: 13
-    month: 12
-    year: 0712
-  author:
-  - given: Al
-    family: Author
-  accessed:
-  - day: 14
-    month: 12
-    year: 0999
-  container-title: Journal
+    date-parts:
+    - - 712
+      - 12
+      - 13
   type: article-journal
+  container-title: Journal
 ...
-

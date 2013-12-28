@@ -56,7 +56,8 @@ references:
     Bajja</span>, and Maimonides
   id: pines
   issued:
-  - year: 1979
+    date-parts:
+    - - 1979
   author:
   - given: Shlomo
     family: Pines

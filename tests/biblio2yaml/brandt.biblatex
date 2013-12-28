@@ -60,7 +60,8 @@ references:
   title: "Die nordischen Länder von der Mitte des 11. Jahrhunderts bis 1448"
   id: brandt
   issued:
-  - year: 1987
+    date-parts:
+    - - 1987
   author:
   - given: Ahasver
     dropping-particle: von

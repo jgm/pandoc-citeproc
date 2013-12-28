@@ -18,7 +18,8 @@ references:
   volume: 35
   id: jcg
   issued:
-  - year: 2011
+    date-parts:
+    - - 2011
   container-title: Computers and Graphics
   type: article-journal
 ...

@@ -43,7 +43,8 @@ references:
   title: ! 'The cast of character: Style in Greek literature'
   id: worman
   issued:
-  - year: 2002
+    date-parts:
+    - - 2002
   author:
   - given: Nancy
     family: Worman

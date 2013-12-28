@@ -25,7 +25,8 @@ references:
   volume: 4
   id: item1
   issued:
-  - year: 2011
+    date-parts:
+    - - 2011
   author:
   - given: Al
     family: Author

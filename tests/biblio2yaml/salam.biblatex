@@ -45,15 +45,17 @@ references:
 - page: 367-377
   title: Weak and electromagnetic interactions
   event-date:
-  - day: 19
-    month: 05
-    year: 1968
-  - day: 25
-    month: 05
-    year: 1968
+    date-parts:
+    - - 1968
+      - 5
+      - 19
+    - - 1968
+      - 5
+      - 25
   id: salam
   issued:
-  - year: 1968
+    date-parts:
+    - - 1968
   author:
   - given: Abdus
     family: Salam

@@ -58,7 +58,8 @@ references:
   volume: 29
   id: spiegelberg
   issued:
-  - year: 1969
+    date-parts:
+    - - 1969
   author:
   - given: Herbert
     family: Spiegelberg

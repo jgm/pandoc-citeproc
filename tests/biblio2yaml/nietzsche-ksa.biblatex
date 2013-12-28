@@ -64,7 +64,8 @@ references:
   title-short: Sämtliche Werke
   id: nietzsche:ksa
   issued:
-  - year: 1988
+    date-parts:
+    - - 1988
   author:
   - given: Friedrich
     family: Nietzsche

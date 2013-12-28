@@ -36,7 +36,8 @@ references:
   title-short: Earl, saint, bishop, skald – and music
   id: geer
   issued:
-  - year: 1985
+    date-parts:
+    - - 1985
   author:
   - given: Ingrid
     dropping-particle: de
@@ -51,7 +52,8 @@ references:
   title: High-resolution micromachined interferometric accelerometer
   id: loh
   issued:
-  - year: 1992
+    date-parts:
+    - - 1992
   author:
   - given: Nin C.
     family: Loh

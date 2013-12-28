@@ -51,7 +51,8 @@ references:
   title-short: Earl, saint, bishop, skald – and music
   id: geer
   issued:
-  - year: 1985
+    date-parts:
+    - - 1985
   author:
   - given: Ingrid
     dropping-particle: de

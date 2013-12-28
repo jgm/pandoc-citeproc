@@ -45,7 +45,8 @@ references:
   title: The basics of crystallography and diffraction
   id: hammond
   issued:
-  - year: 1997
+    date-parts:
+    - - 1997
   author:
   - given: Christopher
     family: Hammond

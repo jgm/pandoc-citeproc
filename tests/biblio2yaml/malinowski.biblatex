@@ -49,7 +49,8 @@ references:
     Guinea</span>'
   id: malinowski
   issued:
-  - year: 1972
+    date-parts:
+    - - 1972
   author:
   - given: Bronisław
     family: Malinowski

@@ -60,9 +60,10 @@ references:
     for black holes"
   id: itzhaki
   issued:
-  - day: 11
-    month: 03
-    year: 1996
+    date-parts:
+    - - 1996
+      - 3
+      - 11
   author:
   - given: Nissan
     family: Itzhaki

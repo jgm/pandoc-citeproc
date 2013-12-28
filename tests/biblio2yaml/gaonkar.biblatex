@@ -41,7 +41,8 @@ references:
   title: Alternative modernities
   id: gaonkar
   issued:
-  - year: 2001
+    date-parts:
+    - - 2001
   editor:
   - given: Dilip Parameshwar
     family: Gaonkar

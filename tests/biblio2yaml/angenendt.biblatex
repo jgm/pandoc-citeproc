@@ -49,7 +49,8 @@ references:
   volume: 97
   id: angenendt
   issued:
-  - year: 2002
+    date-parts:
+    - - 2002
   author:
   - given: Arnold
     family: Angenendt

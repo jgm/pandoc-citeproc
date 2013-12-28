@@ -49,7 +49,8 @@ references:
   volume: 86
   id: moore:related
   issued:
-  - year: 1998
+    date-parts:
+    - - 1998
   author:
   - given: Gordon E.
     family: Moore

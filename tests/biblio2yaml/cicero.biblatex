@@ -58,7 +58,8 @@ references:
   title: "De natura deorum. Über das Wesen der Götter"
   id: cicero
   issued:
-  - year: 1995
+    date-parts:
+    - - 1995
   author:
   - given: Marcus Tullius
     family: Cicero

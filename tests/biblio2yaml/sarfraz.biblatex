@@ -47,7 +47,8 @@ references:
   volume: 26
   id: sarfraz
   issued:
-  - year: 2002
+    date-parts:
+    - - 2002
   author:
   - given: M.
     family: Sarfraz

@@ -63,9 +63,10 @@ references:
   title: Elektrische Einrichtung und Betriebsverfahren
   id: laufenberg
   issued:
-  - day: 13
-    month: 09
-    year: 2006
+    date-parts:
+    - - 2006
+      - 9
+      - 13
   author:
   - given: Xaver
     family: Laufenberg

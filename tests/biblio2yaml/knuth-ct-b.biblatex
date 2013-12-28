@@ -48,7 +48,8 @@ references:
   volume: B
   id: knuth:ct:b
   issued:
-  - year: 1986
+    date-parts:
+    - - 1986
   author:
   - given: Donald E.
     family: Knuth

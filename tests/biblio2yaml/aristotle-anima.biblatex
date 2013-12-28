@@ -43,7 +43,8 @@ references:
   title: De anima
   id: aristotle:anima
   issued:
-  - year: 1907
+    date-parts:
+    - - 1907
   author:
   - family: Aristotle
   editor:

@@ -44,7 +44,8 @@ references:
   title: Poetics
   id: aristotle:poetics
   issued:
-  - year: 1968
+    date-parts:
+    - - 1968
   author:
   - family: Aristotle
   editor:

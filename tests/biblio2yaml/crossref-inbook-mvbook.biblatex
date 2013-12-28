@@ -34,7 +34,8 @@ references:
   container-author:
   - family: Shakespeare
   issued:
-  - year: 1975
+    date-parts:
+    - - 1975
   volume: 3
   chapter-number: 7
   page: 100-200
@@ -48,8 +49,9 @@ references:
   author:
   - family: Shakespeare
   issued:
-  - year: 1970
-  - year: 1980
+    date-parts:
+    - - 1970
+    - - 1980
   number-of-volumes: 4
   publisher: Publisher
   publisher-place: Location

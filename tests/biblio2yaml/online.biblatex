@@ -32,16 +32,18 @@ references:
   title-short: Tame the BeaST
   id: markey
   issued:
-  - day: 16
-    month: 10
-    year: 2005
+    date-parts:
+    - - 2005
+      - 10
+      - 16
   author:
   - given: Nicolas
     family: Markey
   accessed:
-  - day: 01
-    month: 10
-    year: 2006
+    date-parts:
+    - - 2006
+      - 10
+      - 1
   version: 1.3
   URL: http://tug.ctan.org/tex-archive/info/bibtex/tamethebeast/ttb_en.pdf
   type: webpage
@@ -55,11 +57,13 @@ references:
   title-short: CTAN
   id: CTAN
   issued:
-  - year: 2006
+    date-parts:
+    - - 2006
   accessed:
-  - day: 01
-    month: 10
-    year: 2006
+    date-parts:
+    - - 2006
+      - 10
+      - 1
   URL: http://www.ctan.org
   type: webpage
   language: en-US

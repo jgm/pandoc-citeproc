@@ -43,7 +43,8 @@ references:
   title-short: Space and beyond
   id: westfahl:frontier
   issued:
-  - year: 2000
+    date-parts:
+    - - 2000
   editor:
   - given: Gary
     family: Westfahl

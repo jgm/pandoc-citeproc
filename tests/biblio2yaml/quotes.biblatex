@@ -27,7 +27,8 @@ references:
   title: "Aristotle’s “De Motu Animalium”"
   id: nussbaum
   issued:
-  - year: 1978
+    date-parts:
+    - - 1978
   author:
   - given: Martha
     family: Nussbaum

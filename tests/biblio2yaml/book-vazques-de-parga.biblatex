@@ -26,7 +26,8 @@ references:
   title: Las Peregrinaciones a Santiago de Compostela
   id: vazques-de-parga
   issued:
-  - year: 1993
+    date-parts:
+    - - 1993
   author:
   - given: Luis
     family: "V\xE1zques de Parga"

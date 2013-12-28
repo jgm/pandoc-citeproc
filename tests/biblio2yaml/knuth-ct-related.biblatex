@@ -54,8 +54,9 @@ references:
   title: Computers & typesetting
   id: knuth:ct:related
   issued:
-  - year: 1984
-  - year: 1986
+    date-parts:
+    - - 1984
+    - - 1986
   author:
   - given: Donald E.
     family: Knuth

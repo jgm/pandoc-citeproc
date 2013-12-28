@@ -55,7 +55,8 @@ references:
   title: "Aristotle’s theory of the intellect and its interpretation by Averroes"
   id: hyman
   issued:
-  - year: 1981
+    date-parts:
+    - - 1981
   author:
   - given: Arthur
     family: Hyman

@@ -72,7 +72,8 @@ references:
   volume: 1
   id: nietzsche:historie
   issued:
-  - year: 1988
+    date-parts:
+    - - 1988
   author:
   - given: Friedrich
     family: Nietzsche

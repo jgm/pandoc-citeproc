@@ -71,7 +71,8 @@ references:
   volume: 4
   id: doody
   issued:
-  - year: 1974
+    date-parts:
+    - - 1974
   author:
   - given: Terrence
     family: Doody
@@ -85,7 +86,8 @@ references:
   volume: 61
   id: matuz:doody
   issued:
-  - year: 1990
+    date-parts:
+    - - 1990
   editor:
   - given: Roger
     family: Matuz

@@ -45,7 +45,8 @@ references:
   title: Information theory and statistics
   id: kullback:related
   issued:
-  - year: 1997
+    date-parts:
+    - - 1997
   author:
   - given: Solomon
     family: Kullback

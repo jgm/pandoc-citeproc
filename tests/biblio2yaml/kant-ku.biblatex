@@ -59,7 +59,8 @@ references:
   volume: 5
   id: kant:ku
   issued:
-  - year: 1968
+    date-parts:
+    - - 1968
   author:
   - given: Immanuel
     family: Kant

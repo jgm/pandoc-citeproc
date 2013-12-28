@@ -56,7 +56,8 @@ references:
   volume: A
   id: knuth:ct:a
   issued:
-  - year: 1984
+    date-parts:
+    - - 1984
   author:
   - given: Donald E.
     family: Knuth

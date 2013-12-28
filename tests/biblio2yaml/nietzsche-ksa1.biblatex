@@ -68,7 +68,8 @@ references:
   volume: 1
   id: nietzsche:ksa1
   issued:
-  - year: 1988
+    date-parts:
+    - - 1988
   author:
   - given: Friedrich
     family: Nietzsche

@@ -64,7 +64,8 @@ references:
     and publishers'
   id: cms
   issued:
-  - year: 2003
+    date-parts:
+    - - 2003
   edition: 15
   publisher: University of Chicago Press
   ISBN: 0-226-10403-6

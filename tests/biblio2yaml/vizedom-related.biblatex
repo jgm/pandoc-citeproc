@@ -50,7 +50,8 @@ references:
   title: The rites of passage
   id: vizedom:related
   issued:
-  - year: 1960
+    date-parts:
+    - - 1960
   translator:
   - given: Monika B.
     family: Vizedom
