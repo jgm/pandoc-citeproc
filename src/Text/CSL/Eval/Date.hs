@@ -27,7 +27,7 @@ import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
 import Text.CSL.Style
 import Text.CSL.Reference
-import Text.CSL.Util ( readNum, toRead, init', last' )
+import Text.CSL.Util ( readNum, toRead, init', last', trimr )
 import Text.Pandoc.Definition ( Inline (Str) )
 
 evalDate :: Element -> State EvalState [Output]
@@ -120,13 +120,23 @@ formatDate em k tm dp date
                         , e /= mempty = output fm $ term f ("season-0" ++ e)
 
       formatDatePart True (RefDate (Literal y) (Literal m) (Literal e) (Literal d) _ _) (DatePart n f rd fm)
-          | "year"  <- n, y /= mempty = OYear (formatYear  f y) k (fm {suffix = []}) : formatDelim
-          | "month" <- n, m /= mempty = output (fm {suffix = []}) (formatMonth f fm m) ++ formatDelim
-          | "day"   <- n, d /= mempty = output (fm {suffix = []}) (formatDay   f m  d) ++ formatDelim
-          | "month" <- n, m == mempty
-                        , e /= mempty = output (fm {suffix = []}) (term f $ "season-0" ++ e) ++ formatDelim
+          | "year"  <- n
+          , y /= mempty = OYear (formatYear  f y) k
+                          (fm {suffix = trimr $ suffix fm}) : formatDelim
+          | "month" <- n
+          , m /= mempty = output (fm {suffix = trimr $ suffix fm})
+                          (formatMonth f fm m) ++ formatDelim
+          | "day"   <- n
+          , d /= mempty = output (fm {suffix = trimr $ suffix fm})
+                          (formatDay   f m  d) ++ formatDelim
+          | "month" <- n
+          , m == mempty
+          , e /= mempty = output (fm {suffix = trimr $ suffix fm})
+                          (term f $ "season-0" ++ e) ++ formatDelim
           where
-            formatDelim = if rd == "-" then [OPan [Str "\x2013"]] else [OPan [Str rd]]
+            formatDelim = if rd == "-"
+                             then [OPan [Str "\x2013"]]
+                             else [OPan [Str rd]]
 
       formatDatePart _ (RefDate _ _ _ _ (Literal o) _) (DatePart n _ _ fm)
           | "year"  <- n, o /= mempty = output fm o
