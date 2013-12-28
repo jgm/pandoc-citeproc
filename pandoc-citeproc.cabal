@@ -94,6 +94,7 @@ data-files:         chicago-author-date.csl
                     tests/biblio.bib
                     tests/ieee.csl
                     tests/mhra.csl
+                    tests/chicago-note-bibliography.csl
                     tests/biblio2yaml/basic.bibtex
                     tests/biblio2yaml/dates.biblatex
                     tests/biblio2yaml/article.biblatex
