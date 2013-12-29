@@ -69,7 +69,8 @@ processCites' (Pandoc meta blocks) = do
                 >>= toPath
   rawCSL <- maybe getDefaultCSL (\f -> findFile [".", csldir] f >>= L.readFile)
                cslfile
-  csl <- localizeCSL $ parseCSL' rawCSL
+  let mbLocale = lookupMeta "locale" meta >>= toPath
+  csl <- localizeCSL mbLocale $ parseCSL' rawCSL
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
   let skipLeadingSpace = L.dropWhile (\s -> s == 32 || (s >= 9 && s <= 13))
   abbrevs <- maybe (return (Abbreviations M.empty))

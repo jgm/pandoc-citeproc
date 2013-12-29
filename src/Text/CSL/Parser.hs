@@ -24,7 +24,7 @@ import Text.CSL.Util ( readNum, toRead, toShow, readable )
 
 import Text.CSL.Pickle
 import Text.CSL.Data    ( getLocale )
-import Data.Maybe       ( catMaybes                 )
+import Data.Maybe       ( catMaybes, fromMaybe )
 import qualified Data.ByteString.Lazy as L
 #ifdef USE_NETWORK
 import Network.HTTP ( getResponseBody, mkRequest, RequestMethod(..) )
@@ -47,7 +47,7 @@ readCSLFile src = do
 #else
   f <- readFile' src
 #endif
-  localizeCSL $ parseCSL' f
+  localizeCSL Nothing $ parseCSL' f
 
 -- | Parse a 'String' into a 'Style' (with default locale).
 parseCSL :: String -> Style
@@ -57,10 +57,11 @@ parseCSL' :: L.ByteString -> Style
 parseCSL' f = readXmlString xpStyle f
 
 -- | Merge locale into a CSL style.
-localizeCSL :: Style -> IO Style
-localizeCSL s = do
-  l <- readXmlString xpLocale `fmap` getLocale (styleDefaultLocale s)
-  return s { styleLocale = mergeLocales (styleDefaultLocale s) l (styleLocale s)}
+localizeCSL :: Maybe String -> Style -> IO Style
+localizeCSL mbLocale s = do
+  let locale = fromMaybe (styleDefaultLocale s) mbLocale
+  l <- readXmlString xpLocale `fmap` getLocale locale
+  return s { styleLocale = mergeLocales locale l (styleLocale s) }
 
 instance XmlPickler Layout where
     xpickle = xpWrap (uncurry3 Layout, \(Layout f d e) -> (f,d,e)) $

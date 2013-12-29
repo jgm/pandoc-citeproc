@@ -101,8 +101,8 @@ runTest path = E.handle (handleError path) $ do
   raw <- BL.readFile path
   let testCase = either error id $ eitherDecode raw
   let procOpts = ProcOpts (testBibopts testCase)
-  style <- localizeCSL $ (testCsl testCase) {
-                             styleAbbrevs = testAbbreviations testCase }
+  style <- localizeCSL Nothing
+           $ (testCsl testCase) { styleAbbrevs = testAbbreviations testCase }
   let refs     = testReferences testCase
   let cites    = map unCiteObject (testCitations testCase) ++ testCitationItems testCase
   let cites'   = if null cites
