@@ -45,7 +45,7 @@ import Data.Aeson
 import Data.Aeson.Types (Parser)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Control.Applicative ((<$>), (<*>), pure)
+import Control.Applicative ((<$>), (<$), (<*>), pure)
 import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation)
 import qualified Data.Traversable
 import Text.Pandoc.Shared (safeRead, stringify)
@@ -163,7 +163,7 @@ splitUpStr :: [Inline] -> [Inline]
 splitUpStr = splitStrWhen (\c -> isPunctuation c || c == '\160')
 
 unTitlecase :: [Inline] -> [Inline]
-unTitlecase zs = evalState (caseTransform untc $ splitUpStr zs) False
+unTitlecase zs = evalState (caseTransform untc $ splitUpStr zs) SentenceBoundary
   where untc (Str (x:xs))
           | isUpper x = Str (toLower x : xs)
         untc (Span ("",[],[]) xs)
@@ -171,13 +171,13 @@ unTitlecase zs = evalState (caseTransform untc $ splitUpStr zs) False
         untc x = x
 
 protectCase :: [Inline] -> [Inline]
-protectCase zs = evalState (caseTransform protect $ splitUpStr zs) False
+protectCase zs = evalState (caseTransform protect $ splitUpStr zs) SentenceBoundary
   where protect (Span ("",[],[]) xs)
           | hasLowercaseWord xs = Span ("",["nocase"],[]) xs
         protect x = x
 
 titlecase :: [Inline] -> [Inline]
-titlecase zs = evalState (caseTransform tc $ splitUpStr zs) True
+titlecase zs = evalState (caseTransform tc $ splitUpStr zs) SentenceBoundary
   where tc (Str (x:xs))
           | isLower x && not (isShortWord (x:xs)) = Str (toUpper x : xs)
           where isShortWord  s = s `elem`
@@ -188,28 +188,33 @@ titlecase zs = evalState (caseTransform tc $ splitUpStr zs) True
         tc (Span ("",["nocase"],[]) xs) = Span ("",["nocase"],[]) xs
         tc x = x
 
-caseTransform :: (Inline -> Inline) -> [Inline] -> State Bool [Inline]
+data CaseTransformState = WordBoundary | SentenceBoundary | NoBoundary
+
+caseTransform :: (Inline -> Inline) -> [Inline]
+              -> State CaseTransformState [Inline]
 caseTransform xform = mapM go
-  where go Space            = put True >> return Space
-        go LineBreak        = put True >> return Space
-        go (Str [])         = return $ Str []
+  where go Space            = Space <$ modify (\st ->
+                                case st of
+                                     SentenceBoundary -> SentenceBoundary
+                                     _                -> WordBoundary)
+        go LineBreak        = Space <$ put WordBoundary
         go (Str "’")        = return $ Str "’"
         go (Str [x])
-          | isPunctuation x || x == '\160' = put True >> return (Str [x])
+          | x `elem` ".?!:" = (Str [x]) <$ put SentenceBoundary
+          | isPunctuation x || x == '\160' = (Str [x]) <$ put WordBoundary
+        go (Str [])         = return $ Str []
         go (Str (x:xs)) = do
-               atWordBoundary <- get
-               if atWordBoundary
-                  then do
-                    put False
-                    return $ xform $ Str (x:xs)
-                  else return $ Str (x:xs)
+               st <- get
+               put NoBoundary
+               return $ case st of
+                  WordBoundary -> xform $ Str (x:xs)
+                  _            -> Str (x:xs)
         go (Span ("",classes,[]) xs) | null classes || classes == ["nocase"] =
-            do atWordBoundary <- get
-               if atWordBoundary
-                  then do
-                    put False
-                    return $ xform (Span ("",classes,[]) xs)
-                  else return (Span ("",classes,[]) xs)
+            do st <- get
+               put NoBoundary
+               return $ case st of
+                  WordBoundary -> xform (Span ("",classes,[]) xs)
+                  _            -> (Span ("",classes,[]) xs)
         go (Quoted qt xs)   = Quoted qt <$> caseTransform xform xs
         go (Emph xs)        = Emph <$> caseTransform xform xs
         go (Strong xs)      = Strong <$> caseTransform xform xs
