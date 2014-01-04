@@ -298,13 +298,18 @@ updateYearSuffixes yss o
 
 getYearSuffixes :: CitationGroup -> [(String,[Output])]
 getYearSuffixes (CG _ _ _ d) = map go d
-  where go (c,x) = (citeId c, query relevant x)
-        relevant :: Output -> [Output]
-        relevant (OYear n _ _) = [OStr n emptyFormatting]
-        relevant (OStr s _) = [OStr s emptyFormatting]
-        relevant OSpace     = [OSpace]
-        relevant (OPan ils) = [OPan ils]
-        relevant _ = []
+  where go (c,x) = (citeId c, relevant False [x])
+        relevant :: Bool -> [Output] -> [Output] -- bool is true if has contrib
+        -- we're only interested in OContrib and OYear, unless there is no OContrib
+        relevant c (Output xs _ : rest) = relevant c xs ++ relevant c rest
+        relevant c (OYear n _ _ : rest) = OStr n emptyFormatting : relevant c rest
+        relevant False (OStr s _    : rest) = OStr s emptyFormatting : relevant False rest
+        relevant False (OSpace      : rest) = OSpace : relevant False rest
+        relevant False (OPan ils    : rest) = OPan ils : relevant False rest
+        relevant _ (OContrib _ u v w x : rest ) = OContrib "" u v w x : relevant True rest
+        relevant c (on@OName{} : rest ) = on : relevant c rest
+        relevant c (_           : rest) = relevant c rest
+        relevant _ []                   = []
 
 rmYearSuff :: [CitationGroup] -> [CitationGroup]
 rmYearSuff = proc rmYS
