@@ -306,8 +306,8 @@ getYearSuffixes (CG _ _ _ d) = map go d
         relevant False (OStr s _    : rest) = OStr s emptyFormatting : relevant False rest
         relevant False (OSpace      : rest) = OSpace : relevant False rest
         relevant False (OPan ils    : rest) = OPan ils : relevant False rest
-        relevant _ (OContrib _ u v w x : rest ) = OContrib "" u v w x : relevant True rest
-        relevant c (on@OName{} : rest ) = on : relevant c rest
+        relevant _ (OContrib _ _ v _ _ : rest ) = relevant False v ++ relevant True rest
+        relevant c (OName _ v _ _ : rest ) = relevant c v ++ relevant c rest
         relevant c (_           : rest) = relevant c rest
         relevant _ []                   = []
 
