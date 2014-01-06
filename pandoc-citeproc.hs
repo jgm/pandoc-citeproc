@@ -31,15 +31,7 @@ main :: IO ()
 main = do
   argv <- getArgs
   let (flags, args, errs) = getOpt Permute options argv
-  let header = "Usage: pandoc-citeproc [bib2yaml|bib2json] [options] [file..]"
-  (mode, bibfiles) <- case args of
-                         ("bib2yaml":xs) -> return (Bib2Yaml, xs)
-                         ("bib2json":xs) -> return (Bib2JSON, xs)
-                         []             -> return (Filter, [])
-                         _              -> do
-                           hPutStrLn stderr $ usageInfo (unlines $ errs ++
-                              [header]) options
-                           exitWith $ ExitFailure 1
+  let header = "Usage: pandoc-citeproc [options] [file..]"
   unless (null errs) $ do
     hPutStrLn stderr $ usageInfo (unlines $ errs ++ [header]) options
     exitWith $ ExitFailure 1
@@ -49,32 +41,30 @@ main = do
   when (Help `elem` flags) $ do
     putStrLn $ usageInfo header options
     exitWith ExitSuccess
-  case mode of
-       Filter -> toJSONFilter doCites
-       _      -> do
-            let mbformat = case [f | Format f <- flags] of
-                                [x] -> readFormat x
-                                _   -> Nothing
-            bibformat <- case mbformat <|>
-                              msum (map formatFromExtension bibfiles) of
-                              Just f   -> return f
-                              Nothing  -> do
-                                 hPutStrLn stderr $ usageInfo
-                                   ("Unknown format\n" ++ header) options
-                                 exitWith $ ExitFailure 3
-            bibstring <- case bibfiles of
-                              []    -> getContents
-                              xs    -> mconcat <$> mapM readFile xs
-            readBiblioString bibformat bibstring >>=
-              warnDuplicateKeys >>=
-              case mode of
-                 Bib2Yaml -> outputYamlBlock . unescapeTags . encode
-                 _        -> BL8.putStrLn .
-                   encodePretty' Config{ confIndent = 2
-                                       , confCompare = compare } .
-                   everywhere (mkT compressName)
-
-data Mode = Bib2Yaml | Bib2JSON | Filter deriving Show
+  if Bib2YAML `elem` flags || Bib2JSON `elem` flags
+     then do
+       let mbformat = case [f | Format f <- flags] of
+                           [x] -> readFormat x
+                           _   -> Nothing
+       bibformat <- case mbformat <|>
+                         msum (map formatFromExtension args) of
+                         Just f   -> return f
+                         Nothing  -> do
+                            hPutStrLn stderr $ usageInfo
+                              ("Unknown format\n" ++ header) options
+                            exitWith $ ExitFailure 3
+       bibstring <- case args of
+                         []    -> getContents
+                         xs    -> mconcat <$> mapM readFile xs
+       readBiblioString bibformat bibstring >>=
+         warnDuplicateKeys >>=
+         if Bib2YAML `elem` flags
+            then outputYamlBlock . unescapeTags . encode
+            else BL8.putStrLn .
+              encodePretty' Config{ confIndent = 2
+                                  , confCompare = compare } .
+              everywhere (mkT compressName)
+     else toJSONFilter doCites
 
 formatFromExtension :: FilePath -> Maybe BibFormat
 formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
@@ -112,13 +102,15 @@ findWarnings (Span (_,["citeproc-no-output"],_) _) =
 findWarnings _ = []
 
 data Option =
-    Help | Version | Convert | Format String
+    Help | Version | Convert | Format String | Bib2YAML | Bib2JSON
   deriving (Ord, Eq, Show)
 
 options :: [OptDescr Option]
 options =
   [ Option ['h'] ["help"] (NoArg Help) "show usage information"
   , Option ['V'] ["version"] (NoArg Version) "show program version"
+  , Option ['y'] ["bib2yaml"] (NoArg Bib2YAML) "convert bibliography to YAML"
+  , Option ['j'] ["bib2json"] (NoArg Bib2JSON) "convert bibliography to JSON"
   , Option ['f'] ["format"] (ReqArg Format "FORMAT") "bibliography format"
   ]
 

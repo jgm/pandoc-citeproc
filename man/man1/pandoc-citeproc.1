@@ -4,14 +4,14 @@
 pandoc\-citeproc \- filter to resolve citations in a pandoc document.
 .SH SYNOPSIS
 .PP
-pandoc\-citeproc [bib2yaml|bib2json] [options] [file..]
+pandoc\-citeproc [options] [file..]
 .SH DESCRIPTION
 .PP
 The \f[C]pandoc\-citeproc\f[] executable has two modes, filter mode and
 convert mode.
 .SS Filter mode
 .PP
-Run without arguments, it acts as a filter that takes a JSON\-encoded
+Run without options, it acts as a filter that takes a JSON\-encoded
 Pandoc document, formats citations and adds a bibliography, and returns
 a JSON\-encoded pandoc document.
 .PP
@@ -106,12 +106,12 @@ If \f[C]csl\f[] is not provided, \f[C]chicago\-author\-date.csl\f[] will
 be used by default.
 .SS Convert mode
 .PP
-If the argument \f[C]bib2yaml\f[] or \f[C]bib2json\f[] is used,
+If the option \f[C]\-\-bib2yaml\f[] or \f[C]\-\-bib2json\f[] is used,
 \f[C]pandoc\-citeproc\f[] will not process citations; instead, it will
 treat its input (from stdin or files) as a bibliography and convert it
 either to a pandoc YAML metadata section, suitable for inclusion in a
-pandoc document (\f[C]bib2yaml\f[]), or as a CSL JSON bibliography,
-suitable for import to zotero (\f[C]bib2json\f[]).
+pandoc document (\f[C]\-\-bib2yaml\f[]), or as a CSL JSON bibliography,
+suitable for import to zotero (\f[C]\-\-bib2json\f[]).
 .PP
 The \f[C]\-\-format\f[] option can be used to specify the bibliography
 format, though when files are used, \f[C]pandoc\-citeproc\f[] can
@@ -127,6 +127,16 @@ Print usage information.
 .TP
 .B \f[C]\-V,\ \-\-version\f[]
 Print version.
+.RS
+.RE
+.TP
+.B \f[C]\-y,\ \-\-bib2yaml\f[]
+Convert bibliography to YAML suitable for inclusion in pandoc metadata.
+.RS
+.RE
+.TP
+.B \f[C]\-j,\ \-\-bib2json\f[]
+Convert bibliography to CSL JSON suitable for import into Zotero.
 .RS
 .RE
 .TP
