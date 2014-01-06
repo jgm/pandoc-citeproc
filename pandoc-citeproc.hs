@@ -1,20 +1,45 @@
 module Main where
-import Text.CSL.Pandoc (processCites')
-import Text.Pandoc.JSON
-import Text.Pandoc.Walk
-import System.IO (stderr, hPutStrLn)
+import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
+import Text.CSL.Style (Formatted(..))
+import Text.CSL.Reference (Reference(refId), Literal(..), Agent(..))
+import Data.Generics ( everywhere, mkT )
+import Data.List (group, sort)
+import Data.Char (chr, toLower)
+import Data.Monoid
+import Data.Yaml
+import Control.Applicative
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy.Char8 as BL8
+import qualified Data.ByteString.Char8 as B8
+import Data.Attoparsec.ByteString.Char8 as Attoparsec
+import qualified Data.Text as T
+import Data.Text.Encoding (encodeUtf8)
+import Data.Aeson.Encode.Pretty (encodePretty', Config(..))
 import System.Console.GetOpt
-import System.Environment (getArgs)
 import Control.Monad
+import System.IO
+import System.FilePath (takeExtension)
+import System.Environment (getArgs)
 import System.Exit
 import Data.Version (showVersion)
 import Paths_pandoc_citeproc (version)
+import Text.CSL.Pandoc (processCites')
+import Text.Pandoc.JSON hiding (Format)
+import Text.Pandoc.Walk
 
 main :: IO ()
 main = do
   argv <- getArgs
-  let (flags, _, errs) = getOpt Permute options argv
-  let header = "Usage: pandoc-citeproc"
+  let (flags, args, errs) = getOpt Permute options argv
+  let header = "Usage: pandoc-citeproc [bib2yaml|bib2json] [options] [file..]"
+  (mode, bibfiles) <- case args of
+                         ("bib2yaml":xs) -> return (Bib2Yaml, xs)
+                         ("bib2json":xs) -> return (Bib2JSON, xs)
+                         []             -> return (Filter, [])
+                         _              -> do
+                           hPutStrLn stderr $ usageInfo (unlines $ errs ++
+                              [header]) options
+                           exitWith $ ExitFailure 1
   unless (null errs) $ do
     hPutStrLn stderr $ usageInfo (unlines $ errs ++ [header]) options
     exitWith $ ExitFailure 1
@@ -24,7 +49,53 @@ main = do
   when (Help `elem` flags) $ do
     putStrLn $ usageInfo header options
     exitWith ExitSuccess
-  toJSONFilter doCites
+  case mode of
+       Filter -> toJSONFilter doCites
+       _      -> do
+            let mbformat = case [f | Format f <- flags] of
+                                [x] -> readFormat x
+                                _   -> Nothing
+            bibformat <- case mbformat <|>
+                              msum (map formatFromExtension bibfiles) of
+                              Just f   -> return f
+                              Nothing  -> do
+                                 hPutStrLn stderr $ usageInfo
+                                   ("Unknown format\n" ++ header) options
+                                 exitWith $ ExitFailure 3
+            bibstring <- case bibfiles of
+                              []    -> getContents
+                              xs    -> mconcat <$> mapM readFile xs
+            readBiblioString bibformat bibstring >>=
+              warnDuplicateKeys >>=
+              case mode of
+                 Bib2Yaml -> outputYamlBlock . unescapeTags . encode
+                 _        -> BL8.putStrLn .
+                   encodePretty' Config{ confIndent = 2
+                                       , confCompare = compare } .
+                   everywhere (mkT compressName)
+
+data Mode = Bib2Yaml | Bib2JSON | Filter deriving Show
+
+formatFromExtension :: FilePath -> Maybe BibFormat
+formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
+
+readFormat :: String -> Maybe BibFormat
+readFormat = go . map toLower
+  where go "biblatex" = Just BibLatex
+        go "bib"      = Just BibLatex
+        go "bibtex"   = Just Bibtex
+        go "ris"      = Just Ris
+        go "endnote"  = Just Endnote
+        go "enl"      = Just Endnote
+        go "endnotexml" = Just EndnotXml
+        go "xml"      = Just EndnotXml
+        go "wos"      = Just Isi
+        go "isi"      = Just Isi
+        go "medline"  = Just Medline
+        go "copac"    = Just Copac
+        go "json"     = Just Json
+        go _          = Nothing
+
 
 doCites :: Pandoc -> IO Pandoc
 doCites doc = do
@@ -41,13 +112,84 @@ findWarnings (Span (_,["citeproc-no-output"],_) _) =
 findWarnings _ = []
 
 data Option =
-    Help | Version
+    Help | Version | Convert | Format String
   deriving (Ord, Eq, Show)
 
 options :: [OptDescr Option]
 options =
   [ Option ['h'] ["help"] (NoArg Help) "show usage information"
   , Option ['V'] ["version"] (NoArg Version) "show program version"
+  , Option ['f'] ["format"] (ReqArg Format "FORMAT") "bibliography format"
   ]
 
+warnDuplicateKeys :: [Reference] -> IO [Reference]
+warnDuplicateKeys refs = mapM_ warnDup dupKeys >> return refs
+  where warnDup k = hPutStrLn stderr $ "biblio2yaml: duplicate key " ++ k
+        allKeys   = map (unLiteral . refId) refs
+        dupKeys   = [x | (x:_:_) <- group (sort allKeys)]
 
+outputYamlBlock :: B.ByteString -> IO ()
+outputYamlBlock contents = do
+  putStrLn "---\nreferences:"
+  B.putStr contents
+  putStrLn "..."
+
+-- Compress particles and suffixes into given and last name,
+-- as zotero JSON expects.  (We might also want to set parse-names = true.)
+compressName :: Agent -> Agent
+compressName ag = Agent{
+    givenName       = gn
+  , familyName      = fn
+  , droppingPart    = mempty
+  , nonDroppingPart = mempty
+  , literal         = literal ag
+  , nameSuffix      = mempty
+  , commaSuffix     = False
+  }
+  where
+  spcat (Formatted []) y = y
+  spcat y (Formatted []) = y
+  spcat x y = x <> Formatted [Space] <> y
+  gnbase = givenName ag ++ [droppingPart ag | droppingPart ag /= mempty]
+  gn = case (gnbase, nameSuffix ag) of
+             ([], _)            -> []
+             (xs, Formatted []) -> xs
+             (xs, ns)           -> init xs ++
+                [last xs <> Formatted [if commaSuffix ag
+                                          then Str ",!"
+                                          else Str ",", Space], ns]
+  fn = spcat (nonDroppingPart ag) (familyName ag)
+
+-- turn
+-- id: ! "\u043F\u0443\u043D\u043A\u04423"
+-- into
+-- id: пункт3
+unescapeTags :: B.ByteString -> B.ByteString
+unescapeTags bs = case parseOnly (many $ tag <|> other) bs of
+                       Left e  -> error e
+                       Right r -> B.concat r
+
+tag :: Attoparsec.Parser B.ByteString
+tag = do
+  _ <- string $ B8.pack ": ! "
+  c <- char '\'' <|> char '"'
+  cs <- manyTill (escaped c <|> other) (char c)
+  return $ B8.pack ": " <> B8.singleton c <> B.concat cs <> B8.singleton c
+
+escaped :: Char -> Attoparsec.Parser B.ByteString
+escaped c = string $ B8.pack ['\\',c]
+
+other :: Attoparsec.Parser B.ByteString
+other = uchar <|> Attoparsec.takeWhile1 notspecial <|> regchar
+  where notspecial = not . inClass ":!\\\"'"
+
+uchar :: Attoparsec.Parser B.ByteString
+uchar = do
+  _ <- char '\\'
+  num <- (2 <$ char 'x') <|> (4 <$ char 'u') <|> (8 <$ char 'U')
+  cs <- count num $ satisfy $ inClass "0-9a-fA-F"
+  let n = read ('0':'x':cs)
+  return $ encodeUtf8 $ T.pack [chr n]
+
+regchar :: Attoparsec.Parser B.ByteString
+regchar = B8.singleton <$> anyChar

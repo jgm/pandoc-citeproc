@@ -102,8 +102,8 @@ biblio2yamlTest fp = do
   let expected = BL.unlines yamllines
   (ec, result, errout) <- pipeProcess
                      (Just [("LANG","en_US.UTF-8"),("HOME",".")])
-                     "dist/build/biblio2yaml/biblio2yaml"
-                     ["-f", drop 1 $ takeExtension fp] bib
+                     "dist/build/pandoc-citeproc/pandoc-citeproc"
+                     ["bib2yaml", "-f", drop 1 $ takeExtension fp] bib
   if ec == ExitSuccess
      then do
        let expectedDoc :: Maybe Aeson.Value

@@ -15,10 +15,10 @@ description:        The pandoc-citeproc library exports functions for
                     code. When citeproc-hs is updated to be compatible,
                     this package will simply depend on citeproc-hs.
                     .
-                    This package also contains two executables: pandoc-citeproc,
+                    This package also contains an executable: pandoc-citeproc,
                     which works as a pandoc filter (pandoc >= 1.12), and
-                    biblio2yaml, which converts bibliographic databases to
-                    a yaml format suitable for inclusion in pandoc YAML
+                    also has a mode for converting bibliographic databases
+                    a YAML format suitable for inclusion in pandoc YAML
                     metadata.
 
 category:           Text
@@ -217,8 +217,6 @@ data-files:         chicago-author-date.csl
                     tests/biblio2yaml/textnormal.biblatex
                     -- documentation
                     README.md
-                    LICENSE
-                    man/man1/biblio2yaml.1
                     man/man1/pandoc-citeproc.1
 
 source-repository head
@@ -325,17 +323,9 @@ executable pandoc-citeproc
     hs-source-dirs:   .
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -prof -auto-all
-    build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12.3, aeson
-    default-language: Haskell98
-
-executable biblio2yaml
-    main-is:          biblio2yaml.hs
-    hs-source-dirs:   .
-    ghc-options:      -funbox-strict-fields -Wall
-    ghc-prof-options: -prof -auto-all
-    build-depends:    base >= 4, syb, pandoc-types >= 1.12.3,
-                      pandoc-citeproc, yaml, bytestring,
-                      attoparsec, text, filepath, aeson-pretty
+    build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12.3, aeson,
+                      aeson-pretty, yaml, bytestring, syb, attoparsec, text,
+                      filepath
     default-language: Haskell98
 
 executable test-citeproc

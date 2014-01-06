@@ -46,8 +46,7 @@ bibutils.
     YAML citeproc     .yaml
 
     Note that the YAML bibliography should be a YAML object with a
-    field `references` containing a list of YAML references.  This is
-    the format created by the `biblio2yaml` tool.
+    field `references` containing a list of YAML references.
 
 `references`:  A YAML list of references.  Each reference is a YAML
 object.  The format is essentially CSL JSON format.  Here is an example:
@@ -93,24 +92,18 @@ both as a source of references.  `csl` and `citation-abbreviations`
 are optional.  If `csl` is not provided, `chicago-author-date.csl` will be
 used by default.
 
-`biblio2yaml`
--------------
+`pandoc-citeproc [bib2yaml|bib2json]`
+-------------------------------------
 
-`biblio2yaml` will convert an existing bibliography (in any of the formats
-listed above) into a YAML bibliography of the sort that can be included
-in the `references` field of pandoc's metadata.
+If `pandoc-citeproc` is given the argument `bib2yaml` or `bib2json`,
+it will not process citations. Instead, it will convert a bibliography
+(either from stdin or in one or more files specified on the command
+line) to a pandoc YAML metadata section or to CSL JSON suitable for
+import into Zotero.  If input comes from stdin, the `-f/--format` option
+must be used to specify the format of the bibliography; otherwise,
+pandoc will try to determine it from the first file's extension.
 
-Simplest usage is
-
-    biblio2yaml BIBFILE
-
-which will convert BIBFILE and print the result to stdout.
-The format will be derived from BIBFILE's extension, according to the
-table above.
-
-`biblio2yaml` can also be used as a pipe, taking inptu from stdin,
-in which case the format must be specified explicitly using the
-`-f/--format` flag.
+This mode of `pandoc-citeproc` supersedes the old `biblio2yaml` program.
 
 `Text.CSL.Pandoc`
 -----------------

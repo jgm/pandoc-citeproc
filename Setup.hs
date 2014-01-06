@@ -29,8 +29,7 @@ main = do
   exitWith ExitSuccess
 
 manpages :: [FilePath]
-manpages = ["man1" </> "pandoc-citeproc.1"
-           ,"man1" </> "biblio2yaml.1"]
+manpages = ["man1" </> "pandoc-citeproc.1"]
 
 manDir :: FilePath
 manDir = "man"

@@ -1,4 +1,4 @@
-ALL=man1/biblio2yaml.1 man1/pandoc-citeproc.1
+ALL=man1/pandoc-citeproc.1
 
 .PHONY: all
 

@@ -11,13 +11,17 @@ pandoc-citeproc - filter to resolve citations in a pandoc document.
 
 # SYNOPSIS
 
-pandoc-citeproc [*options*]
+pandoc-citeproc [bib2yaml|bib2json] [options] [file..]
 
 # DESCRIPTION
 
-The `pandoc-citeproc` executable is a filter that takes a JSON-encoded
-Pandoc document, formats citations and adds a bibliography, and
-returns a JSON-encoded pandoc document.
+The `pandoc-citeproc` executable has two modes, filter mode and convert mode.
+
+## Filter mode
+
+Run without arguments, it acts as a filter that takes a JSON-encoded Pandoc
+document, formats citations and adds a bibliography, and returns a JSON-encoded
+pandoc document.
 
 To process citations with pandoc, call pandoc-citeproc as a filter:
 
@@ -88,6 +92,20 @@ both as a source of references.  `csl` and `citation-abbreviations`
 are optional.  If `csl` is not provided, `chicago-author-date.csl` will be
 used by default.
 
+## Convert mode
+
+If the argument `bib2yaml` or `bib2json` is used, `pandoc-citeproc` will
+not process citations; instead, it will treat its input (from stdin or
+files) as a bibliography and convert it either to a pandoc YAML metadata
+section, suitable for inclusion in a pandoc document (`bib2yaml`), or
+as a CSL JSON bibliography, suitable for import to zotero (`bib2json`).
+
+The `--format` option can be used to specify the bibliography format,
+though when files are used, `pandoc-citeproc` can generally guess this
+from the extension.
+
+This mode supersedes the old `biblio2yaml` program.
+
 # OPTIONS
 
 `-h, --help`
@@ -96,13 +114,18 @@ used by default.
 `-V, --version`
 :   Print version.
 
+`-f` *FORMAT*, `--format=`*FORMAT*
+:   Specify format of bibliography to be converted.  Legal values are
+    `biblatex`, `bibtex`, `ris`, `endnote`, `endnotexml`, `isi`,
+    `medline`, `copac`, and `json`.
+
 # AUTHORS
 
 Andrea Rossato and John MacFarlane.
 
 # SEE ALSO
 
-`pandoc` (1), `biblio2yaml` (1).
+`pandoc` (1).
 
 The pandoc-citeproc source code and all documentation may be downloaded
 from <http://github.com/jgm/pandoc-citeproc/>.
