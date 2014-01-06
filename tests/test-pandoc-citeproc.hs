@@ -4,6 +4,7 @@ import System.Process
 import System.Exit
 import System.Directory
 import System.FilePath
+import Data.Maybe (fromMaybe)
 import Text.Printf
 import System.IO
 import Data.Monoid (mempty)
@@ -55,16 +56,28 @@ testCase csl = do
   hPutStr stderr $ "[" ++ csl ++ ".in.json] "
   indataNative <- readFile $ "tests/" ++ csl ++ ".in.native"
   expectedNative <- readFile $ "tests/" ++ csl ++ ".expected.native"
-  let inDoc = read indataNative
-  outDoc <- normalize `fmap` processCites' inDoc
+  let jsonIn = Aeson.encode $ (read indataNative :: Pandoc)
   let expectedDoc = normalize $ read expectedNative
-  if outDoc == expectedDoc
-     then err "PASSED" >> return Passed
+
+  (ec, jsonOut, errout) <- pipeProcess
+                     (Just [("LANG","en_US.UTF-8"),("HOME",".")])
+                     "dist/build/pandoc-citeproc/pandoc-citeproc"
+                     [] jsonIn
+  if ec == ExitSuccess
+     then do
+       let outDoc = normalize $ fromMaybe mempty $ Aeson.decode $ jsonOut
+       if outDoc == expectedDoc
+          then err "PASSED" >> return Passed
+          else do
+             err $ "FAILED"
+             showDiff (UTF8.fromStringLazy $ writeNative def expectedDoc)
+                      (UTF8.fromStringLazy $ writeNative def outDoc)
+             return Failed
      else do
-        err $ "FAILED"
-        showDiff (UTF8.fromStringLazy $ writeNative def expectedDoc)
-                 (UTF8.fromStringLazy $ writeNative def outDoc)
-        return Failed
+       err "ERROR"
+       err $ "Error status " ++ show ec
+       err $ UTF8.toStringLazy errout
+       return Errored
 
 showDiff :: BL.ByteString -> BL.ByteString -> IO ()
 showDiff expected' result' =
