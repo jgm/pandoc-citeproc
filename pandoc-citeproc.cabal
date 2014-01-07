@@ -218,6 +218,7 @@ data-files:         chicago-author-date.csl
                     -- documentation
                     README.md
                     man/man1/pandoc-citeproc.1
+                    changelog
 
 source-repository head
   type:          git

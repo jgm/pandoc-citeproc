@@ -1,0 +1,45 @@
+pandoc-citeproc (0.3)
+
+  * Removed biblio2yaml.  Instead, use pandoc-citeproc with the
+    --bib2yaml or --bib2json option.  (#20)
+  * pandoc-citeproc --bib2json will convert bibtex/biblatex to
+    CSL compatible JSON bibliographies.
+  * Updated locale files for correct textual date ranges
+    in e.g. the da-DK locale.  Use form="ordinal" instead of a period
+    as suffix.  (#16, #18)
+  * Support new langid and langidopts biblatex fields. (#11)
+  * Made test-pandoc-citeproc work in all locales. (#19)
+    It now tests the executable rather than the library function.
+  * Fixed disambiguation with multivolume works (#14).
+  * Improved titlecase/unTitlecase to be sensitive to colons,
+    question marks, and exclamation marks, after which the
+    next character sohuld be capitalized even in sentence case
+    (pandoc #1102).
+  * The "locale" filed in metadata will now override a style's
+    default locale.  This can also be set by the command line:
+    --metadata locale=fr-FR (#10).
+  * Use CSL-compatible date-parts for dates in YAML/JSON
+    bibliographies.
+  * Made FromJSON for Reference more forgiving.  Suitable strings
+    are coerced into integer values.  (pandoc #1094)
+  * Fixed extra punctuation at end of footnote (#13).
+  * Reference:  Always use array in JSON for dates, agents.
+  * Bibtex parser:  Don't fail on entry with no title.
+  * Bibliography output: 'given' is now a string, not an array.
+    The string will be split on spaces into a list of given names.
+    Note that an array can also be used.  But we write
+    a plain string, to match the  citeproc json schema.
+  * Fixed spacing bug in date ranges (#7).
+  * Names:  Fixed formatLabel so it works for editortranslator.
+    This fixes a bug for cases where editor = translator (#9).
+  * Text.CSL.Eval.Date:  Fixed bugs with date ranges.
+    Ranges within the same year were raising an error "Prelude.init: empty
+    list" (#7).
+  * Util: Export tr' and init'.
+  * Text.CSL.Proc.Disamb:  Correct definition of allTheSame.
+  * Improved disambiguation.  Now we correctly handle the case with no
+    author but title.
+  * Consider names too when determining date disambiguations.
+    Previously if you had two distinct names needing disambiguation for
+    the same date, the letters would not start over with 'a' for the second
+    name.
