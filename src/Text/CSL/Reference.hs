@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, PatternGuards, OverloadedStrings,
   DeriveDataTypeable, ExistentialQuantification, FlexibleInstances,
-  ScopedTypeVariables, GeneralizedNewtypeDeriving, IncoherentInstances #-}
+  ScopedTypeVariables, GeneralizedNewtypeDeriving, IncoherentInstances,
+  DeriveGeneric #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Reference
@@ -19,7 +20,8 @@ module Text.CSL.Reference where
 
 import Data.List  ( elemIndex, isPrefixOf, intercalate )
 import Data.Maybe ( fromMaybe             )
-import Data.Generics
+import Data.Generics hiding (Generic)
+import GHC.Generics (Generic)
 import Data.Monoid
 import Data.Aeson hiding (Value)
 import qualified Data.Aeson as Aeson
@@ -36,7 +38,7 @@ import Data.List.Split (wordsBy)
 import Data.String
 
 newtype Literal = Literal { unLiteral :: String }
-  deriving ( Show, Read, Eq, Data, Typeable, Monoid )
+  deriving ( Show, Read, Eq, Data, Typeable, Monoid, Generic )
 
 instance FromJSON Literal where
   parseJSON v             = Literal `fmap` parseString v
@@ -82,7 +84,7 @@ isValueSet val
     | Just _ <- fromValue val :: Maybe Empty     = True
     | otherwise = False
 
-data Empty = Empty deriving ( Typeable, Data )
+data Empty = Empty deriving ( Typeable, Data, Generic )
 
 data Agent
     = Agent { givenName       :: [Formatted]
@@ -93,7 +95,7 @@ data Agent
             , literal         ::  Formatted
             , commaSuffix     ::  Bool
             }
-      deriving ( Show, Read, Eq, Typeable, Data )
+      deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
@@ -132,7 +134,7 @@ data RefDate =
             , day    :: Literal
             , other  :: Literal
             , circa  :: Bool
-            } deriving ( Show, Read, Eq, Typeable, Data )
+            } deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 instance FromJSON RefDate where
   parseJSON (Array v) =
@@ -244,7 +246,7 @@ data RefType
     | Thesis
     | Treaty
     | Webpage
-      deriving ( Read, Eq, Typeable, Data )
+      deriving ( Read, Eq, Typeable, Data, Generic )
 
 instance Show RefType where
     show = map toLower . formatField . showConstr . toConstr
@@ -264,7 +266,7 @@ instance ToJSON RefType where
          uncapitalize (x:xs) = toLower x : xs
          uncapitalize []     = []
 
-newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data )
+newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data, Generic )
 
 instance FromJSON CNum where
   parseJSON x = CNum `fmap` parseInt x
@@ -354,7 +356,7 @@ data Reference =
     , citationNumber           :: CNum
     , firstReferenceNoteNumber :: Int
     , citationLabel            :: Literal
-    } deriving ( Eq, Show, Read, Typeable, Data )
+    } deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 instance FromJSON Reference where
   parseJSON (Object v) = Reference <$>

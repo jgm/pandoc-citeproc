@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings, PatternGuards, DeriveDataTypeable,
-    ScopedTypeVariables, FlexibleInstances, GeneralizedNewtypeDeriving #-}
+    ScopedTypeVariables, FlexibleInstances, DeriveGeneric,
+    GeneralizedNewtypeDeriving #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Style
@@ -17,6 +18,7 @@
 module Text.CSL.Style where
 
 import Data.Aeson hiding (Number)
+import GHC.Generics (Generic)
 import Data.String
 import Data.Monoid (mempty, Monoid, mappend, mconcat)
 import Control.Arrow hiding (left, right)
@@ -99,7 +101,7 @@ adjustCSL x = [x]
 -- We use a newtype wrapper so we can have custom ToJSON, FromJSON
 -- instances.
 newtype Formatted = Formatted { unFormatted :: [Inline] }
-  deriving ( Show, Read, Eq, Data, Typeable )
+  deriving ( Show, Read, Eq, Data, Typeable, Generic )
 
 instance FromJSON Formatted where
   parseJSON v@(Array _) = Formatted <$> parseJSON v
@@ -161,7 +163,7 @@ data Style
       , csMacros           :: [MacroMap]
       , citation           ::  Citation
       , biblio             ::  Maybe Bibliography
-      } deriving ( Show, Read, Typeable, Data )
+      } deriving ( Show, Read, Typeable, Data, Generic )
 
 data Locale
     = Locale
@@ -170,7 +172,7 @@ data Locale
       , localeOptions :: [Option]
       , localeTerms   :: [CslTerm]
       , localeDate    :: [Element]
-      } deriving ( Show, Read, Eq, Typeable, Data )
+      } deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 -- | With the 'defaultLocale', the locales-xx-XX.xml loaded file and
 -- the parsed 'Style' cs:locale elements, produce the final 'Locale'
@@ -202,7 +204,7 @@ data CslTerm
       , termSingular   :: String
       , termPlural     :: String
       , termMatch      :: String
-      } deriving ( Show, Read, Eq, Typeable, Data )
+      } deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 newTerm :: CslTerm
 newTerm = CT [] Long Neuter Neuter [] [] []
@@ -234,7 +236,7 @@ rmOrdinals = proc' doRemove
 
 newtype Abbreviations = Abbreviations {
            unAbbreviations :: M.Map String (M.Map String (M.Map String String))
-           } deriving ( Show, Read, Typeable, Data )
+           } deriving ( Show, Read, Typeable, Data, Generic )
 
 instance FromJSON Abbreviations where
   parseJSON (Object v)   = Abbreviations <$> parseJSON (Object v)
@@ -249,14 +251,14 @@ data Citation
       { citOptions :: [Option]
       , citSort    :: [Sort]
       , citLayout  ::  Layout
-      } deriving ( Show, Read, Typeable, Data )
+      } deriving ( Show, Read, Typeable, Data, Generic )
 
 data Bibliography
     = Bibliography
       { bibOptions :: [Option]
       , bibSort    :: [Sort]
       , bibLayout  ::  Layout
-      } deriving ( Show, Read, Typeable, Data )
+      } deriving ( Show, Read, Typeable, Data, Generic )
 
 type Option = (String,String)
 
@@ -268,7 +270,7 @@ data Layout
       { layFormat ::  Formatting
       , layDelim  ::  Delimiter
       , elements  :: [Element]
-      } deriving ( Show, Read, Typeable, Data )
+      } deriving ( Show, Read, Typeable, Data, Generic )
 
 data Element
     = Choose       IfThen    [IfThen]    [Element]
@@ -283,11 +285,11 @@ data Element
     | Group        Formatting Delimiter  [Element]
     | Elements     Formatting            [Element]
     | Date        [String]    DateForm    Formatting Delimiter [DatePart] String
-      deriving ( Show, Read, Eq, Typeable, Data )
+      deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 data IfThen
     = IfThen Condition Match [Element]
-      deriving ( Eq, Show, Read, Typeable, Data )
+      deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 data Condition
     = Condition
@@ -298,7 +300,7 @@ data Condition
       , isPosition      :: [String]
       , disambiguation  :: [String]
       , isLocator       :: [String]
-      } deriving ( Eq, Show, Read, Typeable, Data )
+      } deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 type Delimiter = String
 
@@ -306,7 +308,7 @@ data Match
     = Any
     | All
     | None
-      deriving ( Show, Read, Eq, Typeable, Data )
+      deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 match :: Match -> [Bool] -> Bool
 match All  = and
@@ -319,7 +321,7 @@ data DatePart
       , dpForm       :: String
       , dpRangeDelim :: String
       , dpFormatting :: Formatting
-      } deriving ( Show, Read, Eq, Typeable, Data )
+      } deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 defaultDate :: [DatePart]
 defaultDate
@@ -330,12 +332,12 @@ defaultDate
 data Sort
     = SortVariable String Sorting
     | SortMacro    String Sorting Int Int String
-      deriving ( Eq, Show, Read, Typeable, Data )
+      deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 data Sorting
     = Ascending  String
     | Descending String
-      deriving ( Read, Show, Eq, Typeable, Data )
+      deriving ( Read, Show, Eq, Typeable, Data, Generic )
 
 instance Ord Sorting where
     compare (Ascending  []) (Ascending  []) = EQ
@@ -371,44 +373,44 @@ data Form
     | VerbShort
     | Symbol
     | NotSet
-      deriving ( Eq, Show, Read, Typeable, Data )
+      deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 data Gender
     = Feminine
     | Masculine
     | Neuter
-      deriving ( Eq, Show, Read, Typeable, Data )
+      deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 data NumericForm
     = Numeric
     | Ordinal
     | Roman
     | LongOrdinal
-      deriving ( Eq, Show, Read, Typeable, Data )
+      deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 data DateForm
     = TextDate
     | NumericDate
     | NoFormDate
-      deriving ( Eq, Show, Read, Typeable, Data )
+      deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 data Plural
     = Contextual
     | Always
     | Never
-      deriving ( Eq, Show, Read, Typeable, Data )
+      deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 data Name
     = Name      Form Formatting NameAttrs Delimiter [NamePart]
     | NameLabel Form Formatting Plural
     | EtAl           Formatting String
-      deriving ( Eq, Show, Read, Typeable, Data )
+      deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 type NameAttrs = [(String, String)]
 
 data NamePart
     = NamePart String Formatting
-      deriving ( Show, Read, Eq, Typeable, Data )
+      deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 isPlural :: Plural -> Int -> Bool
 isPlural p l
@@ -445,7 +447,7 @@ data Formatting
       , stripPeriods   :: Bool
       , noCase         :: Bool
       , noDecor        :: Bool
-      } deriving ( Read, Eq, Ord, Typeable, Data )
+      } deriving ( Read, Eq, Ord, Typeable, Data, Generic )
 
 -- custom instance to make debugging output less busy
 instance Show Formatting where
@@ -478,7 +480,7 @@ data Quote
     = NativeQuote
     | ParsedQuote
     | NoQuote
-    deriving ( Show, Read, Eq, Ord, Typeable, Data )
+    deriving ( Show, Read, Eq, Ord, Typeable, Data, Generic )
 
 emptyFormatting :: Formatting
 emptyFormatting
@@ -512,15 +514,17 @@ data CSInfo
       , csiCategories :: [CSCategory]
       , csiId         :: String
       , csiUpdated    :: String
-      } deriving ( Show, Read, Typeable, Data )
+      } deriving ( Show, Read, Typeable, Data, Generic )
 
-data CSAuthor   = CSAuthor   String String String deriving ( Show, Read, Eq, Typeable, Data )
-data CSCategory = CSCategory String String String deriving ( Show, Read, Eq, Typeable, Data )
+data CSAuthor   = CSAuthor   String String String
+                deriving ( Show, Read, Eq, Typeable, Data, Generic )
+data CSCategory = CSCategory String String String
+                deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 data CiteprocError
    = NoOutput
    | ReferenceNotFound String
-   deriving ( Eq, Ord, Show, Typeable, Data )
+   deriving ( Eq, Ord, Show, Typeable, Data, Generic )
 
 -- | The 'Output' generated by the evaluation of a style. Must be
 -- further processed for disambiguation and collapsing.
@@ -543,7 +547,7 @@ data Output
                                                         -- name disambiguation.
     | OLoc    [Output]            Formatting            -- ^ The citation's locator
     | Output  [Output]            Formatting            -- ^ Some nested 'Output'
-      deriving ( Eq, Ord, Show, Typeable, Data )
+      deriving ( Eq, Ord, Show, Typeable, Data, Generic )
 
 type Citations = [[Cite]]
 data Cite
@@ -559,7 +563,7 @@ data Cite
       , authorInText   :: Bool
       , suppressAuthor :: Bool
       , citeHash       :: Int
-      } deriving ( Show, Eq, Typeable, Data )
+      } deriving ( Show, Eq, Typeable, Data, Generic )
 
 instance FromJSON Cite where
   parseJSON (Object v) = Cite <$>
@@ -587,13 +591,13 @@ emptyCite  = Cite [] mempty mempty [] [] [] [] False False False 0
 -- citation group starts with an "author-in-text" cite, the
 -- 'Formatting' to be applied, the 'Delimiter' between individual
 -- citations and the list of evaluated citations.
-data CitationGroup = CG [(Cite, Output)] Formatting Delimiter [(Cite, Output)] deriving ( Show, Eq, Typeable, Data )
+data CitationGroup = CG [(Cite, Output)] Formatting Delimiter [(Cite, Output)] deriving ( Show, Eq, Typeable, Data, Generic )
 
 data BiblioData
     = BD
       { citations    :: [Formatted]
       , bibliography :: [Formatted]
-      } deriving ( Show )
+      } deriving ( Show, Typeable, Data, Generic )
 
 -- | A record with all the data to produce the 'Formatted' of a
 -- citation: the citation key, the part of the formatted citation that
@@ -611,7 +615,7 @@ data CiteData
       , disambed   ::  [Output]
       , sameAs     ::  [String]
       , citYear    ::   String
-      } deriving ( Show, Typeable, Data )
+      } deriving ( Show, Typeable, Data, Generic )
 
 instance Eq CiteData where
     (==) (CD ka ca _ _ _ _ _)
@@ -623,7 +627,7 @@ data NameData
       , nameCollision  ::  [Output]
       , nameDisambData :: [[Output]]
       , nameDataSolved ::  [Output]
-      } deriving ( Show, Typeable, Data )
+      } deriving ( Show, Typeable, Data, Generic )
 
 instance Eq NameData where
     (==) (ND ka ca _ _)
