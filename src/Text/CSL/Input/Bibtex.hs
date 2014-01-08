@@ -782,16 +782,18 @@ itemToReference lang bibtex = bib $ do
   let defaultHyphenation = case lang of
                                 Lang x y -> x ++ "-" ++ y
   let getLangId = do
-           idopts <- getRawField "langidopts"
-           case map toLower idopts of
-                "variant=british"    -> return "british"
-                "variant=american"   -> return "american"
-                "variant=us"         -> return "american"
-                "variant=usmax"      -> return "american"
-                "variant=uk"         -> return "british"
-                "varant=australian"  -> return "australian"
-                "variant=newzealand" -> return "newzealand"
-                _                    -> getRawField "langid"
+           langid <- (trim . map toLower) <$> getRawField "langid"
+           idopts <- (trim . map toLower) <$>
+                         getRawField "langidopts" <|> return ""
+           case (langid, idopts) of
+                ("english","variant=british")    -> return "british"
+                ("english","variant=american")   -> return "american"
+                ("english","variant=us")         -> return "american"
+                ("english","variant=usmax")      -> return "american"
+                ("english","variant=uk")         -> return "british"
+                ("english","varant=australian")  -> return "australian"
+                ("english","variant=newzealand") -> return "newzealand"
+                (x,_)                            -> return x
   hyphenation <- ((toLocale . map toLower) <$>
                    (getLangId <|> getRawField "hyphenation"))
                 <|> return mempty
