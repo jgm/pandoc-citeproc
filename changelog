@@ -1,3 +1,7 @@
+pandoc-citeproc (0.3.0.1)
+
+  * Require ghc-prim if ghc < 7.6 (needed for generics).
+
 pandoc-citeproc (0.3)
 
   * Removed biblio2yaml.  Instead, use pandoc-citeproc with the
