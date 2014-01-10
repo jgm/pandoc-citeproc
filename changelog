@@ -43,3 +43,4 @@ pandoc-citeproc (0.3)
     Previously if you had two distinct names needing disambiguation for
     the same date, the letters would not start over with 'a' for the second
     name.
+  * Added Generic instances for the types in Style and Reference.
