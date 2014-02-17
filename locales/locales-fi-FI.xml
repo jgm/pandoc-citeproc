@@ -22,7 +22,7 @@
     <term name="anonymous">tuntematon</term>
     <term name="anonymous" form="short">tuntematon</term>
     <term name="at">osoitteessa</term>
-    <term name="available at">available at</term>
+    <term name="available at">saatavissa</term>
     <term name="by">tekijä</term>
     <term name="circa">noin</term>
     <term name="circa" form="short">n.</term>
@@ -34,7 +34,7 @@
     <term name="edition" form="short">p.</term>
     <term name="et-al">ym.</term>
     <term name="forthcoming">tulossa</term>
-    <term name="from">alkaen</term>
+    <term name="from">osoitteesta</term>
     <term name="ibid">mt.</term>
     <term name="in">teoksessa</term>
     <term name="in press">painossa</term>
@@ -42,7 +42,7 @@
     <term name="interview">haastattelu</term>
     <term name="letter">kirje</term>
     <term name="no date">ei päivämäärää</term>
-    <term name="no date" form="short">n.d.</term>
+    <term name="no date" form="short">ei pvm.</term>
     <term name="online">verkossa</term>
     <term name="presented at">esitetty tilaisuudessa</term>
     <term name="reference">
@@ -50,12 +50,12 @@
       <multiple>viittaukset</multiple>
     </term>
     <term name="reference" form="short">
-      <single>viit..</single>
+      <single>viit.</single>
       <multiple>viit.</multiple>
     </term>
     <term name="retrieved">noudettu</term>
-    <term name="scale">scale</term>
-    <term name="version">version</term>
+    <term name="scale">mittakaava</term>
+    <term name="version">versio</term>
 
     <!-- ANNO DOMINI; BEFORE CHRIST -->
     <term name="ad">eaa.</term>
@@ -113,8 +113,8 @@
       <multiple>rivit</multiple>
     </term>
     <term name="note">
-      <single>muistiinpano</single>
-      <multiple>muistiinpanot</multiple>
+      <single>huomautus</single>
+      <multiple>huomautukset</multiple>
     </term>
     <term name="opus">
       <single>opus</single>
@@ -160,8 +160,8 @@
     <term name="figure" form="short">kuv.</term>
     <term name="folio" form="short">fol.</term>
     <term name="issue" form="short">nro</term>
-    <term name="line" form="short">l.</term>
-    <term name="note" form="short">n.</term>
+    <term name="line" form="short">r.</term>
+    <term name="note" form="short">huom.</term>
     <term name="opus" form="short">op.</term>
     <term name="page" form="short">
       <single>s.</single>
@@ -183,8 +183,8 @@
       <multiple>säk.</multiple>
     </term>
     <term name="volume" form="short">
-      <single>vol.</single>
-      <multiple>vol.</multiple>
+      <single>vsk.</single>
+      <multiple>vsk.</multiple>
     </term>
 
     <!-- SYMBOL LOCATOR FORMS -->
@@ -199,8 +199,8 @@
 
     <!-- LONG ROLE FORMS -->
     <term name="director">
-      <single>director</single>
-      <multiple>directors</multiple>
+      <single>ohjaaja</single>
+      <multiple>ohjaajat</multiple>
     </term>
     <term name="editor">
       <single>toimittaja</single>
@@ -211,22 +211,22 @@
       <multiple>toimittajat</multiple>
     </term>
     <term name="illustrator">
-      <single>illustrator</single>
-      <multiple>illustrators</multiple>
+      <single>kuvittaja</single>
+      <multiple>kuvittajat</multiple>
     </term>
     <term name="translator">
-      <single>suomentaja</single>
-      <multiple>suomentajat</multiple>
+      <single>kääntäjä</single>
+      <multiple>kääntäjät</multiple>
     </term>
     <term name="editortranslator">
-      <single>toimittaja ja suomentaja</single>
-      <multiple>toimittajat ja suomentajat</multiple>
+      <single>toimittaja ja kääntäjä</single>
+      <multiple>toimittajat ja kääntäjät</multiple>
     </term>
 
     <!-- SHORT ROLE FORMS -->
     <term name="director" form="short">
-      <single>dir.</single>
-      <multiple>dirs.</multiple>
+      <single>ohj.</single>
+      <multiple>ohj.</multiple>
     </term>
     <term name="editor" form="short">
       <single>toim.</single>
@@ -237,51 +237,51 @@
       <multiple>toim.</multiple>
     </term>
     <term name="illustrator" form="short">
-      <single>ill.</single>
-      <multiple>ills.</multiple>
+      <single>kuv.</single>
+      <multiple>kuv.</multiple>
     </term>
     <term name="translator" form="short">
-      <single>suom.</single>
-      <multiple>suom.</multiple>
+      <single>käänt.</single>
+      <multiple>käänt.</multiple>
     </term>
     <term name="editortranslator" form="short">
-      <single>toim. ja suom.</single>
-      <multiple>toim. ja suom.</multiple>
+      <single>toim. ja käänt.</single>
+      <multiple>toim. ja käänt.</multiple>
     </term>
 
     <!-- VERB ROLE FORMS -->
-    <term name="director" form="verb">directed by</term>
+    <term name="director" form="verb">ohjannut</term>
     <term name="editor" form="verb">toimittanut</term>
     <term name="editorial-director" form="verb">toimittanut</term>
-    <term name="illustrator" form="verb">illustrated by</term>
+    <term name="illustrator" form="verb">kuvittanut</term>
     <term name="interviewer" form="verb">haastatellut</term>
     <term name="recipient" form="verb">vastaanottaja</term>
-    <term name="reviewed-author" form="verb">by</term>
-    <term name="translator" form="verb">suomentanut</term>
-    <term name="editortranslator" form="verb">toimittanut ja suomentanut</term>
+    <term name="reviewed-author" form="verb"/>
+    <term name="translator" form="verb">kääntänyt</term>
+    <term name="editortranslator" form="verb">toimittanut ja kääntänyt</term>
 
     <!-- SHORT VERB ROLE FORMS -->
     <term name="container-author" form="verb-short"/>
-    <term name="director" form="verb-short">dir.</term>
+    <term name="director" form="verb-short">ohj.</term>
     <term name="editor" form="verb-short">toim.</term>
     <term name="editorial-director" form="verb-short">toim.</term>
-    <term name="illustrator" form="verb-short">illus.</term>
-    <term name="translator" form="verb-short">suom.</term>
-    <term name="editortranslator" form="verb-short">toim. ja suom.</term>
+    <term name="illustrator" form="verb-short">kuv.</term>
+    <term name="translator" form="verb-short">käänt.</term>
+    <term name="editortranslator" form="verb-short">toim. ja käänt.</term>
 
     <!-- LONG MONTH FORMS -->
-    <term name="month-01">tammikuu</term>
-    <term name="month-02">helmikuu</term>
-    <term name="month-03">maaliskuu</term>
-    <term name="month-04">huhtikuu</term>
-    <term name="month-05">toukokuu</term>
-    <term name="month-06">kesäkuu</term>
-    <term name="month-07">heinäkuu</term>
-    <term name="month-08">elokuu</term>
-    <term name="month-09">syyskuu</term>
-    <term name="month-10">lokakuu</term>
-    <term name="month-11">marraskuu</term>
-    <term name="month-12">joulukuu</term>
+    <term name="month-01">tammikuuta</term>
+    <term name="month-02">helmikuuta</term>
+    <term name="month-03">maaliskuuta</term>
+    <term name="month-04">huhtikuuta</term>
+    <term name="month-05">toukokuuta</term>
+    <term name="month-06">kesäkuuta</term>
+    <term name="month-07">heinäkuuta</term>
+    <term name="month-08">elokuuta</term>
+    <term name="month-09">syyskuuta</term>
+    <term name="month-10">lokakuuta</term>
+    <term name="month-11">marraskuuta</term>
+    <term name="month-12">joulukuuta</term>
 
     <!-- SHORT MONTH FORMS -->
     <term name="month-01" form="short">tammi</term>

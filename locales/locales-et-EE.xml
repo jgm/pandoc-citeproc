@@ -69,7 +69,7 @@
     <term name="page-range-delimiter">–</term>
 
     <!-- ORDINALS -->
-    <term name="ordinal"/>
+    <term name="ordinal">.</term>
 
     <!-- LONG ORDINALS -->
     <term name="long-ordinal-01">esimene</term>
