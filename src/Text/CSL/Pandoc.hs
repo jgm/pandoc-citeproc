@@ -39,7 +39,8 @@ processCites style refs doc =
                       map (map toCslCite) grps)
       cits_map   = M.fromList $ zip grps (citations result)
       biblioList = map (renderPandoc' style) (bibliography result)
-      Pandoc m b = bottomUp mvPunct . deNote .
+      locale     = head $ styleLocale style
+      Pandoc m b = bottomUp (mvPunct locale) . deNote .
                      topDown (processCite style cits_map) $ doc'
       (bs, lastb) = case reverse b of
                          x@(Header _ _ _) : xs -> (reverse xs, [x])
@@ -131,12 +132,23 @@ isNote (Note _) = True
 isNote (Cite _ [Note _]) = True
 isNote _ = False
 
-mvPunct :: [Inline] -> [Inline]
-mvPunct (Space : Space : xs) = Space : xs
-mvPunct (Space : x : ys) | isNote x, startWithPunct ys =
+isPunctQuoteLocale :: Locale -> Bool
+isPunctQuoteLocale locale  = localeLang locale == "en-US"
+
+mvPunctInsideQuote :: Inline -> Inline -> [Inline]
+mvPunctInsideQuote (Quoted qt ils) (Str s) | s `elem` [".", ","] =
+  [Quoted qt (init ils ++ (mvPunctInsideQuote (last ils) (Str s)))]
+mvPunctInsideQuote il il' = [il, il']
+
+mvPunct :: Locale -> [Inline] -> [Inline]
+mvPunct _ (Space : Space : xs) = Space : xs
+mvPunct _ (Space : x : ys) | isNote x, startWithPunct ys =
    Str (headInline ys) : x : tailFirstInlineStr ys
-mvPunct (Space : x : ys) | isNote x = x : ys
-mvPunct xs = xs
+mvPunct locale (q@(Quoted _ _) : w@(Str _) : x : ys)
+  | isNote x, isPunctQuoteLocale locale  =
+    mvPunctInsideQuote q w ++ (x : ys)
+mvPunct _ (Space : x : ys) | isNote x = x : ys
+mvPunct _ xs = xs
 
 endWithPunct :: [Inline] -> Bool
 endWithPunct [] = True
