@@ -164,9 +164,14 @@ deNote :: Pandoc -> Pandoc
 deNote = topDown go
   where go (Cite (c:cs) [Note xs]) =
             Cite (c:cs) [Note $ dropInitialPunct $ bottomUp go' $ sanitize c xs]
-        go (Note xs) = Note $ bottomUp go' xs
+        go (Note xs) = Note $ topDown go' xs
         go x = x
-        go' (Note [Para xs]:ys) =
+        go' (x : Note [Para xs] : ys) | x /= Space =
+             x : Str "," : Space :
+             if startWithPunct ys && endWithPunct xs
+                then initInline xs ++ ys
+                else xs ++ ys
+        go' (Note [Para xs] : ys) =
              if startWithPunct ys && endWithPunct xs
                 then initInline xs ++ ys
                 else xs ++ ys
