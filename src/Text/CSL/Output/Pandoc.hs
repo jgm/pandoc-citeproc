@@ -24,7 +24,7 @@ module Text.CSL.Output.Pandoc
     , toCapital
     ) where
 
-import Text.CSL.Util ( proc, proc', query, tailInline, lastInline,
+import Text.CSL.Util ( proc, proc', tailInline, lastInline,
                        initInline, tailFirstInlineStr, headInline, toCapital )
 import Data.Maybe ( fromMaybe )
 import Text.CSL.Style
@@ -71,13 +71,6 @@ clean' sty (i:is) =
       closeQuoteInner  = getQuote "close-inner-quote" "’"
       quoted True ils  = openQuoteOuter : ils ++ [closeQuoteOuter]
       quoted False ils = openQuoteInner : ils ++ [closeQuoteInner]
-
-isPunctuationInQuote :: Style -> Bool
-isPunctuationInQuote = or . query punctIn'
-    where
-      punctIn' n
-          | ("punctuation-in-quote","true") <- n = [True]
-          | otherwise                            = [False]
 
 convertQuoted :: Style -> [Inline] -> [Inline]
 convertQuoted s = convertQuoted'

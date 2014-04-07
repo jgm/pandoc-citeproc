@@ -632,3 +632,9 @@ data NameData
 instance Eq NameData where
     (==) (ND ka ca _ _)
          (ND kb cb _ _) = ka == kb && ca == cb
+
+isPunctuationInQuote :: Style -> Bool
+isPunctuationInQuote sty =
+  case styleLocale sty of
+       (l:_) -> ("punctuation-in-quote","true") `elem` localeOptions l
+       _     -> False
