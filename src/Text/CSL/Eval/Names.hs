@@ -17,7 +17,7 @@ module Text.CSL.Eval.Names where
 
 import Control.Applicative ( (<$>) )
 import Control.Monad.State
-import Data.Char  ( isLower, isUpper )
+import Data.Char  ( isLower, isUpper, isLetter )
 import Data.List  ( nub, intersperse )
 import Data.List.Split ( wordsBy )
 import Data.Maybe ( isJust )
@@ -298,11 +298,10 @@ formatName m b f fm ops np n
       family    = familyName n
       dropping  = droppingPart n
       nondropping  = nonDroppingPart n
-      isByzantine c = c <= '\x17f' || (c >= '\x590' && c <= '\x05ff') ||
-                      (c >= '\x400' && c <= '\x52f') || ( c >= '\x370' && c <= '\x3ff') ||
-                      (c >= '\x1f00' && c <= '\x1fff') || (c >= '\x0600' && c <= '\x200c') ||
-                      (c >= '\x200d' && c <= '\x200e') || (c >= '\x0218' && c <= '\x0219') ||
-                      (c >= '\x21a' && c <= '\x21b') || (c >= '\x202a' && c <= '\x202e')
+      -- see src/load.js ROMANESQUE_REGEX in citeproc-js:
+      isByzantine c = not (isLetter c) ||
+                      c <= '\x5FF' ||
+                      (c >= '\x1f00' && c <= '\x1fff')
       shortName = oPan' (unFormatted $ nondropping <+> family) (form "family")
       longName g = if isSorting m
                    then let firstPart = case getOptionVal "demote-non-dropping-particle" ops of
