@@ -160,8 +160,8 @@
     <term name="figure" form="short">Abb.</term>
     <term name="folio" form="short">Fol.</term>
     <term name="issue" form="short">Nr.</term>
-    <term name="line" form="short">l.</term>
-    <term name="note" form="short">n.</term>
+    <term name="line" form="short">Z.</term>
+    <term name="note" form="short">N.</term>
     <term name="opus" form="short">op.</term>
     <term name="page" form="short">
       <single>S.</single>
@@ -212,7 +212,7 @@
     </term>
     <term name="illustrator">
       <single>Illustrator</single>
-      <multiple>illustratoren</multiple>
+      <multiple>Illustratoren</multiple>
     </term>
     <term name="translator">
       <single>Übersetzer</single>
