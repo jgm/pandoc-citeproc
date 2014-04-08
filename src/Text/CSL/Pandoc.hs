@@ -41,11 +41,32 @@ processCites style refs doc =
       biblioList = map (renderPandoc' style) (bibliography result)
       Pandoc m b = bottomUp (mvPunct style) . deNote .
                      topDown (processCite style cits_map) $ doc'
+      hdrInlines = refTitle m
       (bs, lastb) = case reverse b of
                          x@(Header _ _ _) : xs -> (reverse xs, [x])
                          _                     -> (b,  [])
+      refHeader = case isRefRemove m of
+        True  -> []
+        False -> case hdrInlines of
+          Just ils -> lastb ++ [Header 1 ("bibliography", ["unnumbered"], []) ils]
+          _  -> lastb
   in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
-               $ bs ++ [Div ("",["references"],[]) (lastb ++ biblioList)]
+               $ bs ++ [Div ("",["references"],[]) (refHeader ++ biblioList)]
+
+refTitle :: Meta -> Maybe [Inline]
+refTitle meta =
+  case lookupMeta "ref-section-title" meta of
+    Just (MetaString s)           -> Just [Str s]
+    Just (MetaInlines ils)        -> Just ils
+    Just (MetaBlocks [Plain ils]) -> Just ils
+    Just (MetaBlocks [Para ils])  -> Just ils
+    _                             -> Nothing
+
+isRefRemove :: Meta -> Bool
+isRefRemove meta =
+  case lookupMeta "remove-ref-section" meta of
+    Just (MetaBool True) -> True
+    _                    -> False
 
 removeNocaseSpans :: Inline -> [Inline]
 removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs
