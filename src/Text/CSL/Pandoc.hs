@@ -45,13 +45,14 @@ processCites style refs doc =
       (bs, lastb) = case reverse b of
                          x@(Header _ _ _) : xs -> (reverse xs, [x])
                          _                     -> (b,  [])
-      refHeader = case isRefRemove m of
+      refHeader = case hdrInlines of
+        Just ils -> lastb ++ [Header 1 ("bibliography", ["unnumbered"], []) ils]
+        _        -> lastb
+      refDiv    = case isRefRemove m of
         True  -> []
-        False -> case hdrInlines of
-          Just ils -> lastb ++ [Header 1 ("bibliography", ["unnumbered"], []) ils]
-          _  -> lastb
+        False -> [Div ("",["references"],[]) (refHeader ++ biblioList)]
   in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
-               $ bs ++ [Div ("",["references"],[]) (refHeader ++ biblioList)]
+               $ bs ++ refDiv
 
 refTitle :: Meta -> Maybe [Inline]
 refTitle meta =
