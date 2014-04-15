@@ -279,7 +279,7 @@ library
     build-depends:    containers, directory, mtl,
                       bytestring, filepath, pandoc-types >= 1.12.3, tagsoup,
                       aeson, text, vector, texmath >= 0.6.4, split,
-                      yaml >= 0.8, pandoc >= 1.12.1
+                      yaml >= 0.8.8.2, pandoc >= 1.12.1
     if impl(ghc < 7.6)
        build-depends: ghc-prim
 
@@ -342,7 +342,7 @@ executable test-citeproc
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
-                  yaml >= 0.8, containers >= 0.4 && < 0.6,
+                  yaml >= 0.8.8.2, containers >= 0.4 && < 0.6,
                   vector >= 0.10 && < 0.11
   default-language: Haskell98
 
@@ -354,5 +354,5 @@ test-suite test-pandoc-citeproc
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
-                  yaml >= 0.8
+                  yaml >= 0.8.8.2
   default-language: Haskell98
