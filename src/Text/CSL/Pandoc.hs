@@ -166,8 +166,7 @@ deNote = topDown go
             Cite (c:cs) [Note $ dropInitialPunct $ bottomUp go' $ sanitize c xs]
         go (Note xs) = Note $ topDown go' xs
         go x = x
-        go' (x : Note [Para xs] : ys) |
-          x /= Space && not (endsWithComma x) =
+        go' (x : Note [Para xs] : ys) | x /= Space =
              x : Str "," : Space :
              if startWithPunct ys && endWithPunct xs
                 then initInline xs ++ ys
@@ -177,9 +176,6 @@ deNote = topDown go
                 then initInline xs ++ ys
                 else xs ++ ys
         go' xs = xs
-        endsWithComma (Str zs) = case reverse zs of
-                                       (',':_) -> True
-                                       _       -> False
         dropInitialPunct [Para (Str [c]:Space:xs)] | c `elem` ",;:" = [Para xs]
         dropInitialPunct bs                                         = bs
         sanitize :: Citation -> [Block] -> [Block]
