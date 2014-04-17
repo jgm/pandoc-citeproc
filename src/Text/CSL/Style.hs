@@ -104,7 +104,9 @@ newtype Formatted = Formatted { unFormatted :: [Inline] }
   deriving ( Show, Read, Eq, Data, Typeable, Generic )
 
 instance FromJSON Formatted where
-  parseJSON v@(Array _) = Formatted <$> parseJSON v
+  parseJSON v@(Array _) =
+   Formatted <$> (parseJSON v
+             <|> ((query (:[]) :: [Block] -> [Inline]) <$> parseJSON v))
   parseJSON v           = fmap (Formatted . readCSLString) $ parseString v
 
 instance ToJSON Formatted where
