@@ -163,28 +163,28 @@ startWithPunct = and . map (`elem` ".,;:!?") . headInline
 deNote :: Pandoc -> Pandoc
 deNote = topDown go
   where go (Cite (c:cs) [Note xs]) =
-            Cite (c:cs) [Note $ dropInitialPunct $ bottomUp go' $ sanitize c xs]
+            Cite (c:cs) [Note $ sanitize c xs]
         go (Note xs) = Note $ topDown go' xs
         go x = x
+        go' (x : Cite cs [Note [Para xs]] : ys) | x /= Space =
+             x : Str "," : Space : comb (\zs -> [Cite cs zs]) xs ys
         go' (x : Note [Para xs] : ys) | x /= Space =
-             x : Str "," : Space :
-             if startWithPunct ys && endWithPunct xs
-                then initInline xs ++ ys
-                else xs ++ ys
-        go' (Note [Para xs] : ys) =
-             if startWithPunct ys && endWithPunct xs
-                then initInline xs ++ ys
-                else xs ++ ys
+             x : Str "," : Space : comb id xs ys
+        go' (Cite cs [Note [Para xs]] : ys) = comb (\zs -> [Cite cs zs]) xs ys
+        go' (Note [Para xs] : ys) = comb id xs ys
         go' xs = xs
-        dropInitialPunct [Para (Str [c]:Space:xs)] | c `elem` ",;:" = [Para xs]
-        dropInitialPunct bs                                         = bs
+        removeLeadingPunct (Str [c] : Space : xs)
+          | c == ',' || c == '.' || c == ':' = xs
+        removeLeadingPunct xs = xs
+        comb f xs ys =
+           let xs' = if startWithPunct ys && endWithPunct xs
+                        then initInline $ removeLeadingPunct xs
+                        else removeLeadingPunct xs
+           in f xs' ++ ys
         sanitize :: Citation -> [Block] -> [Block]
         sanitize Citation{citationPrefix = pref} [Para xs] =
-           case (null pref, endWithPunct xs) of
-                (True, False)  -> [Para $ xs ++ [Str "."]]
-                (True, True)   -> [Para xs]
-                (False, False) -> [Para $ toCapital $ xs ++ [Str "."]]
-                (False, True)  -> [Para $ toCapital xs]
+           [Para $ (if null pref then xs else toCapital xs) ++
+                   if endWithPunct xs then [Space] else []]
         sanitize _ bs = bs
 
 isTextualCitation :: [Citation] -> Bool
