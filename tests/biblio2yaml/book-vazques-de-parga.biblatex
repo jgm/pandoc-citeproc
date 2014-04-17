@@ -35,7 +35,7 @@ references:
     family: Lacarra
   - given: Juan
     family: "Ur\xEDa R\xEDu"
-  number-of-volumes: 3
+  number-of-volumes: '3'
   publisher: Iberdrola
   type: book
   publisher-place: Pamplona

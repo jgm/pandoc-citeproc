@@ -29,11 +29,11 @@ references:
   author:
   - given: Al
     family: Author
-  volume: 4
+  volume: '4'
   volume-title: ! 'Booktitle: Booksubtitle. Booktitleaddon'
   container-title: ! 'Maintitle: Mainsubtitle. Maintitleaddon'
   collection-title: Series
-  collection-number: 3
+  collection-number: '3'
   publisher: Publisher
   publisher-place: Location
   language: fr-FR

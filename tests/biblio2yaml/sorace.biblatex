@@ -55,7 +55,7 @@ references:
     family: Reinhardt
   - given: Steven A.
     family: Vaughn
-  number: 5668842
+  number: '5668842'
   type: patent
   language: en-US
 ...

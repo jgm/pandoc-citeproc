@@ -76,6 +76,6 @@ references:
   collection-title: "Handbuch der europäischen Geschichte"
   type: chapter
   publisher-place: Stuttgart
-  collection-number: 2
+  collection-number: '2'
   language: de-DE
 ...

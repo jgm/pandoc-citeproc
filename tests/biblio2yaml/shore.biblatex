@@ -42,11 +42,11 @@ cultural cognition. *American Anthropologist, new series*, *93*(1),
 references:
 - annote: An article entry with series, volume, and number fields. Note the format
     of the series which is a localization key
-  issue: 1
+  issue: '1'
   page: 9-27
   title: ! 'Twice-born, once conceived: Meaning construction and cultural cognition'
   title-short: Twice-born, once conceived
-  volume: 93
+  volume: '93'
   id: shore
   issued:
     date-parts:

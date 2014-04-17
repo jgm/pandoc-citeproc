@@ -52,7 +52,7 @@ references:
     - - 2004
   author:
   - family: Homer
-  edition: 3
+  edition: '3'
   translator:
   - given: Wolfgang
     family: Schadewaldt

@@ -55,7 +55,7 @@ references:
     family: Murillio
   - given: Manfred
     family: Bochmann
-  edition: 6
+  edition: '6'
   publisher: Wiley
   type: book
   publisher-place: Chichester

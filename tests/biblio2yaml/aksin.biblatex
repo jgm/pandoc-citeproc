@@ -44,10 +44,10 @@ reactions. *J. Organomet. Chem.*, *691*(13), 3027–3036.
 
 ---
 references:
-- issue: 13
+- issue: '13'
   page: 3027-3036
   title: Effect of immobilization on catalytic characteristics of saturated Pd-N-heterocyclic carbenes in Mizoroki-Heck reactions
-  volume: 691
+  volume: '691'
   id: aksin
   issued:
     date-parts:

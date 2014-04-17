@@ -42,10 +42,10 @@ maps on Riemann surfaces. *J. Amer. Math. Soc.*, *9*(2), 529–571.
 references:
 - title-short: Gromov invariants
   annote: An article entry with a volume and a number field
-  issue: 2
+  issue: '2'
   page: 529-571
   title: Gromov invariants for holomorphic maps on Riemann surfaces
-  volume: 9
+  volume: '9'
   id: bertram
   issued:
     date-parts:

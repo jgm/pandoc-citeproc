@@ -33,7 +33,7 @@ Glashow, S. (1961). Partial symmetries of weak interactions.
 references:
 - page: 579-588
   title: Partial symmetries of weak interactions
-  volume: 22
+  volume: '22'
   id: glashow
   issued:
     date-parts:

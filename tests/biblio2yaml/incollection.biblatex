@@ -78,7 +78,7 @@ references:
   collection-title: "Handbuch der europäischen Geschichte"
   type: chapter
   publisher-place: Stuttgart
-  collection-number: 2
+  collection-number: '2'
   language: de-DE
 - title-short: "Aristotle’s theory of the intellect"
   annote: An incollection entry with a series and number field
@@ -100,7 +100,7 @@ references:
   collection-title: Studies in philosophy and the history of philosophy
   type: chapter
   publisher-place: Washington, D.C.
-  collection-number: 9
+  collection-number: '9'
   language: en-US
 - title-short: Limitations of human knowledge
   annote: A typical incollection entry. Note the indextitle field

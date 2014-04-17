@@ -22,7 +22,7 @@
 references:
 - title: ! 'Title of the “inbook” Entry: Subtitle. Titleaddon'
   title-short: Title of the “inbook” Entry
-  volume: 4
+  volume: '4'
   id: item1
   issued:
     date-parts:
@@ -38,7 +38,7 @@ references:
   collection-title: Series
   type: chapter
   publisher-place: Location
-  collection-number: 3
+  collection-number: '3'
   volume-title: ! 'Booktitle: Booksubtitle. Booktitleaddon'
   language: fr-FR
 ...

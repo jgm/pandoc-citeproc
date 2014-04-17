@@ -65,10 +65,10 @@ NOTES
 references:
 - annote: An article entry cited as an excerpt from a collection entry. Note the format
     of the related and relatedstring fields
-  issue: 3
+  issue: '3'
   page: 212-225
   title: "Hemingway’s style and Jake’s narration"
-  volume: 4
+  volume: '4'
   id: doody
   issued:
     date-parts:
@@ -83,7 +83,7 @@ references:
     Note the format of the pages field
   page: 204-208
   title: Contemporary literary criticism
-  volume: 61
+  volume: '61'
   id: matuz:doody
   issued:
     date-parts:

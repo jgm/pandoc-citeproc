@@ -41,10 +41,10 @@ references:
 - title-short: Technical section
   annote: An article entry with an issn field
   ISSN: 0097-8493
-  issue: 5
+  issue: '5'
   page: 795-804
   title: ! 'Technical section: An algorithm for automatic capturing of the font outlines'
-  volume: 26
+  volume: '26'
   id: sarfraz
   issued:
     date-parts:

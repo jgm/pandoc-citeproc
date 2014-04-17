@@ -54,7 +54,7 @@ references:
   author:
   - given: Donald E.
     family: Knuth
-  number-of-volumes: 5
+  number-of-volumes: '5'
   publisher: Addison-Wesley
   type: book
   publisher-place: Reading, Mass.

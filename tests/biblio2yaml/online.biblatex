@@ -44,7 +44,7 @@ references:
     - - 2006
       - 10
       - 1
-  version: 1.3
+  version: '1.3'
   URL: http://tug.ctan.org/tex-archive/info/bibtex/tamethebeast/ttb_en.pdf
   type: webpage
   language: en-US

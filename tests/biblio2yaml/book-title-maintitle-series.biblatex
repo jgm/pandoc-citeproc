@@ -30,6 +30,6 @@ references:
   collection-title: Series
   type: book
   publisher-place: Location
-  collection-number: 3
+  collection-number: '3'
   language: fr-FR
 ...
