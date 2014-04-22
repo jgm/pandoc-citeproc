@@ -201,6 +201,7 @@ caseTransform xform = mapM go
         go (Str "’")        = return $ Str "’"
         go (Str [x])
           | x `elem` "?!:"  = (Str [x]) <$ put SentenceBoundary
+          | x == '\''       = return $ Str [x]
           | isPunctuation x || x == '\160' = (Str [x]) <$ put WordBoundary
         go (Str [])         = return $ Str []
         go (Str (x:xs)) = do
