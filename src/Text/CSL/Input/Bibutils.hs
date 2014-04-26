@@ -151,7 +151,14 @@ convertRefs :: Maybe MetaValue -> Either String [Reference]
 convertRefs Nothing = Right []
 convertRefs (Just v) =
   case fromJSON (metaValueToJSON v) of
-       Data.Aeson.Error s   -> Left s
+       Data.Aeson.Error s   ->
+         -- check for empty string and treat it as empty list:
+         -- ---
+         -- references:
+         -- ...
+         case fromJSON (metaValueToJSON v) of
+               Success ""   -> Right []
+               _            -> Left s
        Success x            -> Right x
 
 metaValueToJSON :: MetaValue -> Value
