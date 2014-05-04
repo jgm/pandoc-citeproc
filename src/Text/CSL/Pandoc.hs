@@ -42,8 +42,11 @@ processCites style refs doc =
       Pandoc m b = bottomUp (mvPunct style) . deNote .
                      topDown (processCite style cits_map) $ doc'
       (bs, lastb) = case reverse b of
-                         x@(Header _ _ _) : xs -> (reverse xs, [x])
-                         _                     -> (b,  [])
+                         (Header lev (id',classes,kvs) ys) : xs ->
+                           (reverse xs, [Header lev (id',classes',kvs) ys])
+                            where classes' = "unnumbered" :
+                                       [c | c <- classes, c /= "unnumbered"]
+                         _                                      -> (b,  [])
   in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
                $ bs ++ [Div ("",["references"],[]) (lastb ++ biblioList)]
 
