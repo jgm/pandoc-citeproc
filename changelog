@@ -1,3 +1,43 @@
+pandoc-citeproc (0.3.1)
+
+  * Mark final heading (if present) as "unnumbered".
+    Pandoc's algorithm will not number it correctly since it's in
+    a Div.  And it's not good practice to number a bibliography section
+    heading anyway.  See pandoc #1277.
+
+  * Treat empty `references` (empty string) in metadata as empty list.
+
+  * Fixed titlecase transformation of words containing `'`.
+
+  * Fixed punctuation in notes.
+
+  * Updated chicago-author-date.csl and locales.
+
+  * `FromJSON` for `Formatted`:  Handle block lists as well as inline lists.
+
+  * Require `yaml >= 0.8.8.2`.  This fixes a problem wherein dates with
+    integer components would be printed using decimal points in yaml output.
+
+  * Fixed spacing problem with citations in notes in footnote styles.
+    Closes pandoc #1036.
+
+  * Move punctuation inside quotes, depending on style.  This is activated by
+    the `punctuation-in-quote` locale option, which has a default
+    per locale but can be overridden in the style.  This gives more flexibility.
+    (Thanks to Jesse Rosenthal.)
+
+  * Moved `isPunctuationInQuote` to `Text.CSL.Style` and rewrote.
+    Previously it was in `Text.CSL.Output.Pandoc`.
+    It doesn't need to use generics and no longer does.
+
+  * Fixed recognition of "byzantine" names.  Names with curly apostrophes were
+    being counted as non-byzantine, and printed given-first with no space.
+    Closes #39.
+
+  * Fixed representation of reference types to conform to CSL:
+    `motion_picture`, `legal_case`, `musical_score`, `personal_communication`.
+    Closes #24.
+
 pandoc-citeproc (0.3.0.1)
 
   * Require ghc-prim if ghc < 7.6 (needed for generics).
