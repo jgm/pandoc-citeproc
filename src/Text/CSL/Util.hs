@@ -45,7 +45,7 @@ import Data.Aeson
 import Data.Aeson.Types (Parser)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Control.Applicative ((<$>), (<$), (<*>), pure)
+import Control.Applicative ((<$>), (<*>), pure)
 import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation)
 import qualified Data.Traversable
 import Text.Pandoc.Shared (safeRead, stringify)
@@ -192,37 +192,44 @@ data CaseTransformState = WordBoundary | SentenceBoundary | NoBoundary
 
 caseTransform :: (Inline -> Inline) -> [Inline]
               -> State CaseTransformState [Inline]
-caseTransform xform = mapM go
-  where go Space            = Space <$ modify (\st ->
-                                case st of
-                                     SentenceBoundary -> SentenceBoundary
-                                     _                -> WordBoundary)
-        go LineBreak        = Space <$ put WordBoundary
-        go (Str "’")        = return $ Str "’"
-        go (Str [x])
-          | x `elem` "?!:"  = (Str [x]) <$ put SentenceBoundary
-          | x == '\''       = return $ Str [x]
-          | isPunctuation x || x == '\160' = (Str [x]) <$ put WordBoundary
-        go (Str [])         = return $ Str []
-        go (Str (x:xs)) = do
+caseTransform xform = fmap reverse . foldM go []
+  where go acc Space        = do
+               modify (\st -> case st of
+                                   SentenceBoundary -> SentenceBoundary
+                                   _                -> WordBoundary)
+               return $ Space : acc
+        go acc LineBreak = do
+               put WordBoundary
+               return $ Space : acc
+        go acc (Str [x])
+          | x `elem` "?!:"  = do
+               put SentenceBoundary
+               return $ Str [x] : acc
+          | x == '\'' || x == '’'  = return $ Str [x] : acc
+          | isPunctuation x || x == '\160' = do
+               put WordBoundary
+               return $ Str [x] : acc
+        go acc (Str []) = return acc
+        go acc (Str (x:xs)) = do
                st <- get
                put NoBoundary
                return $ case st of
-                  WordBoundary -> xform $ Str (x:xs)
-                  _            -> Str (x:xs)
-        go (Span ("",classes,[]) xs) | null classes || classes == ["nocase"] =
-            do st <- get
+                  WordBoundary -> xform (Str (x:xs)) : acc
+                  _            -> Str (x:xs) : acc
+        go acc (Span ("",classes,[]) xs)
+          | null classes || classes == ["nocase"] = do
+               st <- get
                put NoBoundary
                return $ case st of
-                  WordBoundary -> xform (Span ("",classes,[]) xs)
-                  _            -> (Span ("",classes,[]) xs)
-        go (Quoted qt xs)   = Quoted qt <$> caseTransform xform xs
-        go (Emph xs)        = Emph <$> caseTransform xform xs
-        go (Strong xs)      = Strong <$> caseTransform xform xs
-        go (Link xs t)      = Link <$> caseTransform xform xs <*> pure t
-        go (Image xs t)     = Link <$> caseTransform xform xs <*> pure t
-        go (Span attr xs)   = Span attr <$> caseTransform xform xs
-        go x = return x
+                  WordBoundary -> xform (Span ("",classes,[]) xs) : acc
+                  _            -> (Span ("",classes,[]) xs) : acc
+        go acc (Quoted qt xs)    = (:acc) <$> (Quoted qt <$> caseTransform xform xs)
+        go acc (Emph xs)         = (:acc) <$> (Emph <$> caseTransform xform xs)
+        go acc (Strong xs)       = (:acc) <$> (Strong <$> caseTransform xform xs)
+        go acc (Link xs t)       = (:acc) <$> (Link <$> caseTransform xform xs <*> pure t)
+        go acc (Image xs t)      = (:acc) <$> (Link <$> caseTransform xform xs <*> pure t)
+        go acc (Span attr xs)    = (:acc) <$> (Span attr <$> caseTransform xform xs)
+        go acc x                 = return $ x : acc
 
 splitStrWhen :: (Char -> Bool) -> [Inline] -> [Inline]
 splitStrWhen _ [] = []
