@@ -206,7 +206,7 @@ caseTransform xform = fmap reverse . foldM go []
         go acc LineBreak = do
                put WordBoundary
                return $ Space : acc
-        go acc (Str [c]) | c `elem` "'’-\2013\2014\160" = do
+        go acc (Str [c]) | c `elem` "-\2013\2014\160" = do
                put WordBoundary
                return $ Str [c] : acc
         go acc (Str []) = return acc
