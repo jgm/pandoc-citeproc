@@ -194,21 +194,21 @@ caseTransform :: (Inline -> Inline) -> [Inline]
               -> State CaseTransformState [Inline]
 caseTransform xform = fmap reverse . foldM go []
   where go acc Space        = do
-               modify (\st -> case st of
-                                   SentenceBoundary -> SentenceBoundary
-                                   _                -> WordBoundary)
+               modify (\st ->
+                 case st of
+                      SentenceBoundary -> SentenceBoundary
+                      _                ->
+                          case acc of
+                                (Str [x]:_)
+                                  | x `elem` "?!:" -> SentenceBoundary
+                                _                  -> WordBoundary)
                return $ Space : acc
         go acc LineBreak = do
                put WordBoundary
                return $ Space : acc
-        go acc (Str [x])
-          | x `elem` "?!:"  = do
-               put SentenceBoundary
-               return $ Str [x] : acc
-          | x == '\'' || x == '’'  = return $ Str [x] : acc
-          | isPunctuation x || x == '\160' = do
+        go acc (Str [c]) | c `elem` "'’-\2013\2014\160" = do
                put WordBoundary
-               return $ Str [x] : acc
+               return $ Str [c] : acc
         go acc (Str []) = return acc
         go acc (Str (x:xs)) = do
                st <- get
