@@ -200,14 +200,18 @@ caseTransform xform = fmap reverse . foldM go []
                       _                ->
                           case acc of
                                 (Str [x]:_)
-                                  | x `elem` "?!:" -> SentenceBoundary
-                                _                  -> WordBoundary)
+                                  | x `elem` "?!:"   -> SentenceBoundary
+                                _                    -> WordBoundary)
                return $ Space : acc
         go acc LineBreak = do
                put WordBoundary
                return $ Space : acc
-        go acc (Str [c]) | c `elem` "-\2013\2014\160" = do
+        go acc (Str [c])
+          | c `elem` "-\2013\2014\160" = do
                put WordBoundary
+               return $ Str [c] : acc
+          | isPunctuation c = do
+               -- leave state unchanged
                return $ Str [c] : acc
         go acc (Str []) = return acc
         go acc (Str (x:xs)) = do
@@ -221,8 +225,8 @@ caseTransform xform = fmap reverse . foldM go []
                st <- get
                put NoBoundary
                return $ case st of
-                  WordBoundary -> xform (Span ("",classes,[]) xs) : acc
-                  _            -> (Span ("",classes,[]) xs) : acc
+                  NoBoundary -> (Span ("",classes,[]) xs) : acc
+                  _          -> xform (Span ("",classes,[]) xs) : acc
         go acc (Quoted qt xs)    = (:acc) <$> (Quoted qt <$> caseTransform xform xs)
         go acc (Emph xs)         = (:acc) <$> (Emph <$> caseTransform xform xs)
         go acc (Strong xs)       = (:acc) <$> (Strong <$> caseTransform xform xs)
