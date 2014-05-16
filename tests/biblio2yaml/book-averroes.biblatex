@@ -70,7 +70,7 @@ references:
   - given: Kalman P.
     family: Bland
   publisher: Jewish Theological Seminary of America
-  collection-title: ! 'Moreshet: Studies in Jewish History, Literature and Thought'
+  collection-title: ! '<span class="nocase">Moreshet: Studies in Jewish History, Literature and Thought</span>'
   type: book
   publisher-place: New York
   collection-number: '7'
