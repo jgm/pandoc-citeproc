@@ -12,7 +12,7 @@ env:
 before_install:
  - travis_retry sudo add-apt-repository -y ppa:hvr/ghc
  - travis_retry sudo apt-get update
- - travis_retry sudo apt-get install cabal-install-1.18 ghc-$GHCVER
+ - travis_retry sudo apt-get install cabal-install-1.18 ghc-$GHCVER alex happy
  - export PATH=/opt/ghc/$GHCVER/bin:$PATH
 
 install:
