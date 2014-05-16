@@ -1,11 +1,11 @@
 all:
-	cabal install --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization
+	cabal install --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization --ghc-options '-pgmPcpphs -optP--cpp'
 
 quick:
 	cabal install --disable-optim -ftest_citeproc
 
 prod:
-	cabal install --enable-tests -ftest_citeproc -fembed_data_files --enable-optimization
+	cabal install --enable-tests -ftest_citeproc -fembed_data_files --enable-optimization --ghc-options '-pgmPcpphs -optP--cpp'
 
 update:
 	curl 'https://raw2.github.com/citation-style-language/styles/master/chicago-author-date.csl' > chicago-author-date.csl ; \
