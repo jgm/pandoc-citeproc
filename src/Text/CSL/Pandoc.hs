@@ -27,6 +27,7 @@ import Control.Monad
 import Control.Monad.State
 import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)
+import Text.CSL.Util (findFile)
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -297,11 +298,4 @@ pWordWithDigits = try $ do
   guard $ any isDigit s
   return s
 
-findFile :: [FilePath] -> FilePath -> IO FilePath
-findFile [] f = fail $ "Not found: " ++ f
-findFile (p:ps) f = do
-  exists <- doesFileExist (p </> f)
-  if exists
-     then return (p </> f)
-     else findFile ps f
 

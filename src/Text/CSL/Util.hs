@@ -40,6 +40,7 @@ module Text.CSL.Util
   , toCapital
   , mapHeadInline
   , tr'
+  , findFile
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -56,6 +57,8 @@ import Control.Monad.State
 import Data.Monoid (Monoid, mappend, mempty)
 import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
                        everywhere', everything, mkT, mkQ )
+import System.FilePath
+import System.Directory (doesFileExist)
 import qualified Debug.Trace
 
 readNum :: String -> Int
@@ -337,3 +340,12 @@ mapHeadInline f (i:xs)
 
 tr' :: Show a => String -> a -> a
 tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
+
+findFile :: [FilePath] -> FilePath -> IO FilePath
+findFile [] f = fail $ "Not found: " ++ f
+findFile (p:ps) f = do
+  exists <- doesFileExist (p </> f)
+  if exists
+     then return (p </> f)
+     else findFile ps f
+
