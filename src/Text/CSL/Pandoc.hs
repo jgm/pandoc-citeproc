@@ -70,8 +70,16 @@ processCites' (Pandoc meta blocks) = do
   let refs = inlineRefs ++ bibRefs
   let cslfile = (lookupMeta "csl" meta <|> lookupMeta "citation-style" meta)
                 >>= toPath
-  rawCSL <- maybe getDefaultCSL (\f -> findFile [".", csldir] f >>= L.readFile)
-               cslfile
+  rawCSL <- case cslfile of
+                  Just f  -> findFile [".", csldir] f >>= L.readFile
+                  Nothing -> do
+                    -- get default CSL: look first in ~/.csl, and take
+                    -- from distribution if not found
+                    let f = csldir </> "chicago-author-date.csl"
+                    exists <- doesFileExist f
+                    if exists
+                       then L.readFile f
+                       else getDefaultCSL
   let mbLocale = lookupMeta "locale" meta >>= toPath
   csl <- localizeCSL mbLocale $ parseCSL' rawCSL
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
