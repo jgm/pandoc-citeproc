@@ -710,6 +710,9 @@ itemToReference lang bibtex = bib $ do
   opts <- (parseOptions <$> getRawField "options") <|> return []
   let getAuthorList' = getAuthorList opts
   st <- getRawField "entrysubtype" <|> return mempty
+  isEvent <- (True <$ (getRawField "eventdate"
+                     <|> getRawField "eventtitle"
+                     <|> getRawField "venue")) <|> return False
   let (reftype, refgenre) = case et of
        "article"
          | st == "magazine"  -> (ArticleMagazine,mempty)
@@ -749,7 +752,7 @@ itemToReference lang bibtex = bib $ do
          | otherwise         -> (ArticleJournal,mempty)
        "techreport"      -> (Report,mempty)
        "thesis"          -> (Thesis,mempty)
-       "unpublished"     -> (Manuscript,mempty)
+       "unpublished"     -> (if isEvent then Speech else Manuscript,mempty)
        "www"             -> (Webpage,mempty)
        -- biblatex, "unsupporEd"
        "artwork"         -> (Graphic,mempty)
