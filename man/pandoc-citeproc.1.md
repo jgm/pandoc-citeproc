@@ -63,10 +63,13 @@ appropriate:  so, for example, emphasis and strong emphasis can
 be used in title fileds. Simple tex math will also be
 parsed and rendered appropriately.
 
-`csl` or `citation-style`: Path to a CSL style file.  If the file is not found
-relative to the working directory, pandoc-citeproc will look in the
-`$HOME/.csl` directory (or `C:\Users\USERNAME\AppData\Roaming\csl` in Windows
-7).
+`csl` or `citation-style`: Path or URL of a CSL style file.
+If the file is not found relative to the working directory,
+pandoc-citeproc will look in the `$HOME/.csl` directory (or
+`C:\Users\USERNAME\AppData\Roaming\csl` in Windows 7).  If this is left
+off, pandoc-citeproc will look for `$HOME/.csl/chicago-author-date.csl`,
+and if this is not present, it will use its own version of
+`chicago-author-date.csl`.
 
 `citation-abbreviations`:  Path to a CSL abbreviations JSON file. The format
 is described [here](http://citationstylist.org/2011/10/19/abbreviations-for-zotero-test-release).  Here is a short example:

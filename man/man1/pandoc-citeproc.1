@@ -76,10 +76,15 @@ so, for example, emphasis and strong emphasis can be used in title
 fileds.
 Simple tex math will also be parsed and rendered appropriately.
 .PP
-\f[C]csl\f[] or \f[C]citation\-style\f[]: Path to a CSL style file.
+\f[C]csl\f[] or \f[C]citation\-style\f[]: Path or URL of a CSL style
+file.
 If the file is not found relative to the working directory,
 pandoc\-citeproc will look in the \f[C]$HOME/.csl\f[] directory (or
 \f[C]C:\\Users\\USERNAME\\AppData\\Roaming\\csl\f[] in Windows 7).
+If this is left off, pandoc\-citeproc will look for
+\f[C]$HOME/.csl/chicago\-author\-date.csl\f[], and if this is not
+present, it will use its own version of
+\f[C]chicago\-author\-date.csl\f[].
 .PP
 \f[C]citation\-abbreviations\f[]: Path to a CSL abbreviations JSON file.
 The format is described
