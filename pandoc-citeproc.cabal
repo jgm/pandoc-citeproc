@@ -231,10 +231,6 @@ flag bibutils
   description: Use Chris Putnam's Bibutils.
   default:     True
 
-flag network
-  description: Use network and HTTP to retrieve csl file from URIs.
-  default:     True
-
 flag hexpat
   description: Use hexpat to parse XML
   default:     True
@@ -287,11 +283,6 @@ library
        build-depends:   hs-bibutils >= 0.3
        default-extensions: CPP
        cpp-options:     -DUSE_BIBUTILS
-
-    if flag(network)
-       build-depends: network >= 2, HTTP >= 4000.0.9
-       default-extensions:    CPP
-       cpp-options:   -DUSE_NETWORK
 
     if flag(hexpat)
        build-depends: hexpat >= 0.20.2
