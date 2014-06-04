@@ -84,6 +84,7 @@ readFormat = go . map toLower
         go "medline"  = Just Medline
         go "copac"    = Just Copac
         go "json"     = Just Json
+        go "mods"     = Just Mods
         go _          = Nothing
 
 

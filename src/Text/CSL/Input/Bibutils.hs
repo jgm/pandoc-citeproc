@@ -77,6 +77,7 @@ data BibFormat
     | Isi
     | Medline
     | Copac
+    | Mods
 #endif
 
 readBiblioString :: BibFormat -> String -> IO [Reference]
@@ -92,6 +93,7 @@ readBiblioString b s
     | Isi       <- b = go isi_in
     | Medline   <- b = go medline_in
     | Copac     <- b = go copac_in
+    | Mods      <- b = go mods_in
 #endif
     | otherwise      = error "in readBiblioString"
 #ifdef USE_BIBUTILS

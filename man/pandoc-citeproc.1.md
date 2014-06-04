@@ -119,7 +119,7 @@ This mode supersedes the old `biblio2yaml` program.
 `-f` *FORMAT*, `--format=`*FORMAT*
 :   Specify format of bibliography to be converted.  Legal values are
     `biblatex`, `bibtex`, `ris`, `endnote`, `endnotexml`, `isi`,
-    `medline`, `copac`, and `json`.
+    `medline`, `copac`, `mods`, and `json`.
 
 # NOTES
 
