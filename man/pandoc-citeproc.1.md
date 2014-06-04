@@ -118,6 +118,80 @@ This mode supersedes the old `biblio2yaml` program.
     `biblatex`, `bibtex`, `ris`, `endnote`, `endnotexml`, `isi`,
     `medline`, `copac`, and `json`.
 
+# NOTES
+
+## General
+
+If you use a biblatex database, closely follow the specifications in the
+"Database Guide" section of the biblatex manual (currently 2.8a).
+
+If you use a CSL-YAML or CSL-JSON database, or a CSL-YAML metadata section in
+your markdown document, follow the "Citation Style Language 1.0.1 Language
+Specification" (<http://citationstyles.org/downloads/specification.html>).
+Particularly relevant are
+<http://citationstyles.org/downloads/specification.html#appendix-iii-types>
+(which neither comments on usage nor specifies required and optional fields) and
+<http://citationstyles.org/downloads/specification.html#appendix-iv-variables>
+(which does contain comments).
+
+## Titles: Title vs. Sentence Case
+
+If you are using a bibtex or biblatex bibliography, then observe
+the following rules:
+
+  - English titles should be in title case.  Non-English titles should
+    be in sentence case, and the `langid` field in biblatex should be
+    set to the relevant language.  (The following values are treated
+    as English:  `american`, `british`, `canadian`, `english`,
+    `australian`, `newzealand`, `USenglish`, or `UKenglish`.)
+
+  - As is standard with bibtex/biblatex, proper names should be
+    protected with curly braces so that they won't be lowercased
+    in styles that call for sentence case.  For example:
+
+        title = {My Dinner with {Andre}}
+
+  - In addition, words that should remain lowercase (or camelCase)
+    should be protected:
+
+        title = {Spin Wave Dispersion on the {nm} Scale}
+
+    Though this is not necessary in bibtex/biblatex, it is necessary
+    with citeproc, which stores titles internally in sentence case,
+    and converts to title case in styles that require it.  Here we
+    protect "nm" so that it doesn't get converted to "Nm" at this stage.
+
+If you are using a CSL bibliography (either JSON or YAML), then observe
+the following rules:
+
+  - All titles should be in sentence case.
+
+  - Use the `language` field for non-English titles to prevent their
+    conversion to title case in styles that call for this. (Conversion
+    happens only if `language` begins with `en` or is left empty.)
+
+  - Protect words that should not be converted to title case using
+    this syntax:
+
+        Spin wave dispersion on the <span class="nocase">nm</span> scale
+
+## Conference Papers, Published vs. Unpublished
+
+For a formally published conference paper, use the biblatex entry type
+`inproceedings` (which will be mapped to CSL `paper-conference`).
+
+For an unpublished manuscript, use the biblatex entry type `unpublished`
+without an `eventtitle` field (this entry type will be mapped to CSL
+`manuscript`).
+
+For a talk, an unpublished conference paper, or a poster presentation, use the
+biblatex entry type `unpublished` with an `eventtitle` field (this entry type
+will be mapped to CSL `speech`). Use the biblatex `type` field to indicate the
+type, e.g. "Paper", or "Poster". `venue` and `eventdate` may be useful too,
+though `eventdate` will not be rendered by most CSL styles. Note that `venue`
+is for the event's venue, unlike `location` which describes the publisher's
+location; do not use the latter for an unpublished conference paper.
+
 # AUTHORS
 
 Andrea Rossato and John MacFarlane.
