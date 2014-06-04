@@ -516,7 +516,6 @@ data CSInfo
       , csiCategories :: [CSCategory]
       , csiId         :: String
       , csiUpdated    :: String
-      , csiLinks      :: [(String, String)]
       } deriving ( Show, Read, Typeable, Data, Generic )
 
 data CSAuthor   = CSAuthor   String String String

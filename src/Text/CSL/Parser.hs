@@ -212,15 +212,14 @@ instance XmlPickler NamePart where
                       xpickle
 
 instance XmlPickler CSInfo where
-    xpickle = xpWrap ( \ ((t,i,u),(a,c,ls)) -> CSInfo t a c i u ls
+    xpickle = xpWrap ( \ ((t,i,u),(a,c)) -> CSInfo t a c i u
                      , \ s -> ((csiTitle s,  csiId s, csiUpdated s)
-                              ,(csiAuthor s, csiCategories s, csiLinks s))) $
+                              ,(csiAuthor s, csiCategories s))) $
               xpPair (xpTriple (get "title"  )
                                (get "id"     )
                                (get "updated"))
-                     (xpTriple (xpIElemWithDefault (CSAuthor   "" "" "") "author" xpickle)
-                               (xpDefault [] $ xpList $ xpIElem "category" xpickle)
-                               (xpList $ xpIElem "link" $ xpPair (xpAttr "rel" xpText) (xpAttr "href" xpText)))
+                     (xpPair   (xpIElemWithDefault (CSAuthor   "" "" "") "author" xpickle)
+                               (xpDefault [] $ xpList $ xpIElem "category" xpickle))
                   where
                     get = flip xpIElem xpText
 
