@@ -17,17 +17,18 @@
 module Text.CSL.Parser ( readCSLFile, parseCSL, parseCSL', localizeCSL )
 where
 
+import Control.Monad (when, mplus)
+import Control.Exception (throwIO)
 import Text.CSL.Style
+import Text.CSL.Util (toShow, toRead, readNum, readable, findFile)
 import Text.Pandoc.UTF8 (fromStringLazy)
 import qualified Data.Map as M
-import Text.CSL.Util ( readNum, toRead, toShow, readable )
-
+import Text.Pandoc.Shared (fetchItem)
 import Text.CSL.Pickle
 import Text.CSL.Data    ( getLocale )
 import Data.Maybe       ( catMaybes, fromMaybe )
 import qualified Data.ByteString.Lazy as L
 import System.Directory (getAppUserDataDirectory)
-import Text.CSL.Util (findFile)
 #ifdef USE_NETWORK
 import Network.HTTP ( getResponseBody, mkRequest, RequestMethod(..) )
 import Network.Browser ( browse, setAllowRedirects, setUserAgent, setOutHandler, request )
@@ -38,20 +39,26 @@ import Network.URI ( parseURI, URI(..) )
 readCSLFile :: Maybe String -> FilePath -> IO Style
 readCSLFile mbLocale src = do
   csldir <- getAppUserDataDirectory "csl"
-#ifdef USE_NETWORK
-  let readURI u = do rsp <- browse $ do
-                              setAllowRedirects True
-                              setOutHandler (const (return ()))
-                              setUserAgent "citeproc-hs"
-                              request $ mkRequest GET u
-                     getResponseBody (Right $ snd rsp)
-  f <- case parseURI src of
-         Just u | uriScheme u `elem` ["http:","https:"] -> readURI u
-         _      -> findFile [".", csldir] src >>= L.readFile
-#else
-  f <- findFile [".", csldir] src >>= L.readFile
-#endif
-  localizeCSL mbLocale $ parseCSL' f
+  mbSrc <- findFile [".", csldir] src
+  fetchRes <- fetchItem Nothing (fromMaybe src mbSrc)
+  f <- case fetchRes of
+            Left err         -> throwIO err
+            Right (rawbs, _) -> return $ L.fromChunks [rawbs]
+  -- see if it's a dependent style, and if so, try to fetch its parent:
+  let mbParent = lookup "independent-parent" $ readXmlString xpLinks f
+  when (mbParent == Just src) $ do
+    error $ "Dependent CSL style " ++ src ++ " specifies itself as parent."
+  case mbParent of
+       Just parent -> do
+           -- note, we insert locale from the dependent style:
+           let mbLocale' = mbLocale `mplus` readXmlString
+                   (xpOption $ xpAttr "default-locale" xpText) f
+           readCSLFile mbLocale' parent
+       Nothing     -> localizeCSL mbLocale $ parseCSL' f
+
+xpLinks :: PU [(String, String)]
+xpLinks = xpElem "style" $ xpElem "info" $ xpList $
+          xpIElem "link" $ xpPair (xpAttr "rel" xpText) (xpAttr "href" xpText)
 
 -- | Parse a 'String' into a 'Style' (with default locale).
 parseCSL :: String -> Style
