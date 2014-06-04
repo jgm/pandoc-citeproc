@@ -143,7 +143,7 @@ import Text.CSL.Output.Plain
 -- > main :: IO ()
 -- > main = do
 -- >   m <- readBiblioFile "mybibdb.bib"
--- >   s <- readCSLFile "apa-x.csl"
+-- >   s <- readCSLFile Nothing "apa-x.csl"
 -- >   let result = citeproc procOpts s m $ [cites]
 -- >   putStrLn . unlines . map renderPlain . citations $ result
 --

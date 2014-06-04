@@ -26,28 +26,32 @@ import Text.CSL.Pickle
 import Text.CSL.Data    ( getLocale )
 import Data.Maybe       ( catMaybes, fromMaybe )
 import qualified Data.ByteString.Lazy as L
+import System.Directory (getAppUserDataDirectory)
+import Text.CSL.Util (findFile)
 #ifdef USE_NETWORK
 import Network.HTTP ( getResponseBody, mkRequest, RequestMethod(..) )
-import Network.Browser ( browse, setAllowRedirects, setUserAgent, request )
+import Network.Browser ( browse, setAllowRedirects, setUserAgent, setOutHandler, request )
 import Network.URI ( parseURI, URI(..) )
 #endif
 
 -- | Read and parse a CSL style file into a localized sytle.
-readCSLFile :: FilePath -> IO Style
-readCSLFile src = do
+readCSLFile :: Maybe String -> FilePath -> IO Style
+readCSLFile mbLocale src = do
+  csldir <- getAppUserDataDirectory "csl"
 #ifdef USE_NETWORK
   let readURI u = do rsp <- browse $ do
                               setAllowRedirects True
+                              setOutHandler (const (return ()))
                               setUserAgent "citeproc-hs"
                               request $ mkRequest GET u
                      getResponseBody (Right $ snd rsp)
   f <- case parseURI src of
          Just u | uriScheme u `elem` ["http:","https:"] -> readURI u
-         _                                              -> readFile' src
+         _      -> findFile [".", csldir] src >>= L.readFile
 #else
-  f <- readFile' src
+  f <- findFile [".", csldir] src >>= L.readFile
 #endif
-  localizeCSL Nothing $ parseCSL' f
+  localizeCSL mbLocale $ parseCSL' f
 
 -- | Parse a 'String' into a 'Style' (with default locale).
 parseCSL :: String -> Style
