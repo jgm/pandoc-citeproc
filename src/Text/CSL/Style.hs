@@ -46,8 +46,6 @@ import qualified Data.Text.ICU as T
 import Data.RFC5051 (compareUnicode)
 #endif
 import qualified Data.Vector as V
-#ifdef USE_NETWORK
-#endif
 
 -- import Debug.Trace
 --
