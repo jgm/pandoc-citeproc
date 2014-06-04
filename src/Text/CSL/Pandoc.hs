@@ -87,6 +87,7 @@ processCites' (Pandoc meta blocks) = do
   let skipLeadingSpace = L.dropWhile (\s -> s == 32 || (s >= 9 && s <= 13))
   abbrevs <- maybe (return (Abbreviations M.empty))
              (\f -> findFile [".", csldir] f >>=
+                    maybe (error $ "Could not find " ++ f) return >>=
                L.readFile >>=
                either error return . eitherDecode . skipLeadingSpace)
              cslAbbrevFile
@@ -102,7 +103,7 @@ getBibRefs :: MetaValue -> IO [Reference]
 getBibRefs (MetaList xs) = concat `fmap` mapM getBibRefs xs
 getBibRefs (MetaInlines xs) = getBibRefs (MetaString $ stringify xs)
 getBibRefs (MetaString s) = do
-  path <- findFile ["."] s
+  path <- findFile ["."] s >>= maybe (error $ "Could not find " ++ s) return
   map unescapeRefId `fmap` readBiblioFile path
 getBibRefs _ = return []
 

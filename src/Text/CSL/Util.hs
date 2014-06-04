@@ -341,11 +341,11 @@ mapHeadInline f (i:xs)
 tr' :: Show a => String -> a -> a
 tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
 
-findFile :: [FilePath] -> FilePath -> IO FilePath
-findFile [] f = fail $ "Not found: " ++ f
+findFile :: [FilePath] -> FilePath -> IO (Maybe FilePath)
+findFile [] _ = return Nothing
 findFile (p:ps) f = do
   exists <- doesFileExist (p </> f)
   if exists
-     then return (p </> f)
+     then return $ Just (p </> f)
      else findFile ps f
 
