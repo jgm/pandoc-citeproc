@@ -363,7 +363,7 @@ data Reference =
     } deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 instance FromJSON Reference where
-  parseJSON (Object v) = Reference <$>
+  parseJSON (Object v) = addPageFirst <$> (Reference <$>
        v .:? "id" .!= "" <*>
        v .:? "type" .!= NoType <*>
        v .:? "author" .!= [] <*>
@@ -438,7 +438,16 @@ instance FromJSON Reference where
        v .:? "language" .!= "" <*>
        v .:? "citation-number" .!= CNum 0 <*>
        ((v .: "first-reference-note-number" >>= parseInt) <|> return 1) <*>
-       v .:? "citation-label" .!= ""
+       v .:? "citation-label" .!= "")
+    where takeFirstNum (Formatted (Str xs : _)) =
+            case takeWhile isDigit xs of
+                   []   -> mempty
+                   ds   -> Formatted [Str ds]
+          takeFirstNum x = x
+          addPageFirst ref = if pageFirst ref == mempty && page ref /= mempty
+                                then ref{ pageFirst =
+                                            takeFirstNum (page ref) }
+                                else ref
   parseJSON _ = fail "Could not parse Reference"
 
 instance ToJSON Reference where
@@ -485,7 +494,7 @@ instance ToJSON Reference where
     , "event" .= event ref
     , "event-place" .= eventPlace ref
     , "page" .= page ref
-    , "page-first" .= pageFirst ref
+    , "page-first" .= (if page ref == mempty then pageFirst ref else mempty)
     , "number-of-pages" .= numberOfPages ref
     , "version" .= version ref
     , "volume" .= volume ref
