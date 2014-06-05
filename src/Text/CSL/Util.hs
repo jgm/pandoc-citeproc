@@ -167,33 +167,45 @@ splitUpStr = splitStrWhen (\c -> isPunctuation c || c == '\160')
 
 unTitlecase :: [Inline] -> [Inline]
 unTitlecase zs = evalState (caseTransform untc $ splitUpStr zs) SentenceBoundary
-  where untc (Str (x:xs))
-          | isUpper x = Str (toLower x : xs)
-        untc (Span ("",[],[]) xs)
-          | hasLowercaseWord xs = Span ("",["nocase"],[]) xs
-        untc x = x
+  where untc w = do
+          st <- get
+          case (w, st) of
+               (y, NoBoundary) -> return y
+               (Str (x:xs), WordBoundary) | isUpper x ->
+                 return $ Str (toLower x : xs)
+               (Span ("",[],[]) xs, _) | hasLowercaseWord xs ->
+                 return $ Span ("",["nocase"],[]) xs
+               _ -> return w
 
 protectCase :: [Inline] -> [Inline]
 protectCase zs = evalState (caseTransform protect $ splitUpStr zs) SentenceBoundary
   where protect (Span ("",[],[]) xs)
-          | hasLowercaseWord xs = Span ("",["nocase"],[]) xs
-        protect x = x
+          | hasLowercaseWord xs = do
+            st <- get
+            case st of
+                 NoBoundary -> return $ Span ("",[],[]) xs
+                 _          -> return $ Span ("",["nocase"],[]) xs
+        protect x = return x
 
 titlecase :: [Inline] -> [Inline]
 titlecase zs = evalState (caseTransform tc $ splitUpStr zs) SentenceBoundary
-  where tc (Str (x:xs))
-          | isLower x && not (isShortWord (x:xs)) = Str (toUpper x : xs)
-          where isShortWord  s = s `elem`
+  where tc (Str (x:xs)) | isLower x && not (isShortWord (x:xs)) = do
+          st <- get
+          return $ case st of
+                        WordBoundary -> Str (toUpper x : xs)
+                        SentenceBoundary -> Str (toUpper x : xs)
+                        _ -> Str (x:xs)
+        tc (Span ("",["nocase"],[]) xs) = return $ Span ("",["nocase"],[]) xs
+        tc x = return x
+        isShortWord  s = s `elem`
                       ["a","an","and","as","at","but","by","d","de"
                       ,"down","for","from"
                       ,"in","into","nor","of","on","onto","or","over","so"
                       ,"the","till","to","up","van","von","via","with","yet"]
-        tc (Span ("",["nocase"],[]) xs) = Span ("",["nocase"],[]) xs
-        tc x = x
 
 data CaseTransformState = WordBoundary | SentenceBoundary | NoBoundary
 
-caseTransform :: (Inline -> Inline) -> [Inline]
+caseTransform :: (Inline -> State CaseTransformState Inline) -> [Inline]
               -> State CaseTransformState [Inline]
 caseTransform xform = fmap reverse . foldM go []
   where go acc Space        = do
@@ -217,19 +229,15 @@ caseTransform xform = fmap reverse . foldM go []
                -- leave state unchanged
                return $ Str [c] : acc
         go acc (Str []) = return acc
-        go acc (Str (x:xs)) = do
-               st <- get
+        go acc (Str xs) = do
+               res <- xform (Str xs)
                put NoBoundary
-               return $ case st of
-                  WordBoundary -> xform (Str (x:xs)) : acc
-                  _            -> Str (x:xs) : acc
+               return $ res : acc
         go acc (Span ("",classes,[]) xs)
           | null classes || classes == ["nocase"] = do
-               st <- get
+               res <- xform (Span ("",classes,[]) xs)
                put NoBoundary
-               return $ case st of
-                  NoBoundary -> (Span ("",classes,[]) xs) : acc
-                  _          -> xform (Span ("",classes,[]) xs) : acc
+               return $ res : acc
         go acc (Quoted qt xs)    = (:acc) <$> (Quoted qt <$> caseTransform xform xs)
         go acc (Emph xs)         = (:acc) <$> (Emph <$> caseTransform xform xs)
         go acc (Strong xs)       = (:acc) <$> (Strong <$> caseTransform xform xs)

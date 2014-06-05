@@ -1,0 +1,3 @@
+Pandoc (Meta {unMeta = fromList [("references",MetaList [MetaMap (fromList [("author",MetaList [MetaMap (fromList [("family",MetaInlines [Str "Author"]),("given",MetaInlines [Str "Al"])])]),("id",MetaInlines [Str "item1"]),("issued",MetaMap (fromList [("date-parts",MetaList [MetaList [MetaString "1998"]])])),("title",MetaInlines [Str "foo",Space,Str "bar",Space,Str "baz:",Space,Str "bazbaz",Space,Str "foo"]),("type",MetaInlines [Str "article-journal"])])])]})
+[Para [Str "Foo",Space,Cite [Citation {citationId = "item1", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 0}] [Str "[@item1]"],Str "."]
+,Header 1 ("references",["unnumbered"],[]) [Str "References"]]
