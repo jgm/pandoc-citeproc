@@ -979,6 +979,12 @@ itemToReference lang bibtex = bib $ do
   let convertEnDash (Str s) = Str (map (\c -> if c == '–' then '-' else c) s)
       convertEnDash x       = x
 
+  let takeDigits (Str xs : _) =
+         case takeWhile isDigit xs of
+              []               -> []
+              ds               -> [Str ds]
+      takeDigits x             = x
+
   return $ emptyReference
          { refId               = Literal id'
          , refType             = reftype
@@ -1035,7 +1041,7 @@ itemToReference lang bibtex = bib $ do
          , eventPlace          = venue'
          , page                = Formatted $
                                  Walk.walk convertEnDash $ unFormatted pages'
-         -- , pageFirst           = undefined -- :: String
+         , pageFirst           = Formatted $ takeDigits $ unFormatted pages'
          , numberOfPages       = pagetotal'
          , version             = version'
          , volume              = Formatted $ intercalate [Str "."]
