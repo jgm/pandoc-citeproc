@@ -79,9 +79,11 @@ getDate f = do
 formatDate :: EvalMode -> String -> [CslTerm] -> [DatePart] -> [RefDate] -> [Output]
 formatDate em k tm dp date
     | [d]     <- date = concatMap (formatDatePart False d) dp
-    | (a:b:_) <- date = return . ODate . concat $ doRange a b
+    | (a:b:_) <- date = addODate . concat $ doRange a b
     | otherwise       = []
     where
+      addODate []   = []
+      addODate xs   = [ODate xs]
       splitDate a b = case split (onSublist $ diff a b dp) dp of
                         [x,y,z] -> (x,y,z)
                         _       -> error "error in splitting date ranges"
