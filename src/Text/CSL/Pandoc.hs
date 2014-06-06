@@ -73,8 +73,8 @@ processCites' (Pandoc meta blocks) = do
                 >>= toPath
   let mbLocale = lookupMeta "locale" meta >>= toPath
   csl <- case cslfile of
-               Just f  -> readCSLFile mbLocale f
-               Nothing -> do
+               Just f | not (null f) -> readCSLFile mbLocale f
+               _ -> do
                  -- get default CSL: look first in ~/.csl, and take
                  -- from distribution if not found
                  let f = csldir </> "chicago-author-date.csl"
