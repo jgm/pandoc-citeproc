@@ -34,22 +34,25 @@ import Text.CSL.Util (findFile)
 -- for) at the end of the document.
 processCites :: Style -> [Reference] -> Pandoc -> Pandoc
 processCites style refs doc =
-  let doc'       = evalState (walkM setHashes doc) 1
-      grps       = query getCitation doc'
-      result     = citeproc procOpts style refs (setNearNote style $
+  let doc'        = evalState (walkM setHashes doc) 1
+      grps        = query getCitation doc'
+      result      = citeproc procOpts style refs (setNearNote style $
                       map (map toCslCite) grps)
-      cits_map   = M.fromList $ zip grps (citations result)
-      biblioList = map (renderPandoc' style) (bibliography result)
-      Pandoc m b = bottomUp (mvPunct style) . deNote .
+      cits_map    = M.fromList $ zip grps (citations result)
+      biblioList  = map (renderPandoc' style) (bibliography result)
+      Pandoc m b  = bottomUp (mvPunct style) . deNote .
                      topDown (processCite style cits_map) $ doc'
-      (bs, lastb) = case reverse b of
-                         (Header lev (id',classes,kvs) ys) : xs ->
+      (bs, lastb)  = case reverse b of
+                          (Header lev (id',classes,kvs) ys) : xs ->
                            (reverse xs, [Header lev (id',classes',kvs) ys])
                             where classes' = "unnumbered" :
                                        [c | c <- classes, c /= "unnumbered"]
-                         _                                      -> (b,  [])
+                          _                                      -> (b,  [])
   in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
-               $ bs ++ [Div ("",["references"],[]) (lastb ++ biblioList)]
+               $ bs ++
+                 if lookupMeta "suppress-bibliography" m == Just (MetaBool True)
+                    then []
+                    else [Div ("",["references"],[]) (lastb ++ biblioList)]
 
 removeNocaseSpans :: Inline -> [Inline]
 removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs
