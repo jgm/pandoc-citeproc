@@ -545,9 +545,16 @@ toAuthor _ [Span ("",[],[]) ils] =
 -- First von Last
 -- von Last, First
 -- von Last, Jr ,First
+-- NOTE: biblatex and bibtex differ on:
+-- Drummond de Andrade, Carlos
+-- bibtex takes "Drummond de" as the von;
+-- biblatex takes the whole as a last name.
+-- See https://github.com/plk/biblatex/issues/236
+-- Here we implement the more sensible biblatex behavior.
 toAuthor opts ils = do
   let useprefix = optionSet "useprefix" opts
   let usecomma  = optionSet "juniorcomma" opts
+  let bibtex    = optionSet "bibtex" opts
   let words' = wordsBy (\x -> x == Space || x == Str "\160")
   let commaParts = map words' $ splitWhen (== Str ",")
                               $ splitStrWhen (\c -> c == ',' || c == '\160') ils
@@ -565,10 +572,15 @@ toAuthor opts ils = do
                [vl,f]     -> (f, vl, [])
                (vl:j:f:_) -> (f, vl, j )
                []         -> ([], [], [])
-  let (rlast, rvon) = span isCapitalized $ reverse vonlast
-  let (von, lastname) = case (reverse rvon, reverse rlast) of
-                             (ws@(_:_),[]) -> (init ws, [last ws])
-                             (ws, vs)      -> (ws, vs)
+
+  let (von, lastname) =
+         if bibtex
+            then case span isCapitalized $ reverse vonlast of
+                        ([],(w:ws))    -> (reverse ws, [w])
+                        (vs, ws)       -> (reverse ws, reverse vs)
+            else case span (not . isCapitalized) vonlast of
+                        (vs@(_:_), []) -> (init vs, [last vs])
+                        (vs, ws)       -> (vs, ws)
   let prefix = Formatted $ intercalate [Space] von
   let family = Formatted $ intercalate [Space] lastname
   let suffix = Formatted $ intercalate [Space] jr
@@ -708,7 +720,8 @@ itemToReference lang bibtex = bib $ do
   et <- asks entryType
   guard $ et /= "xdata"
   opts <- (parseOptions <$> getRawField "options") <|> return []
-  let getAuthorList' = getAuthorList opts
+  let getAuthorList' = getAuthorList
+         (("bibtex", map toLower $ show bibtex):opts)
   st <- getRawField "entrysubtype" <|> return mempty
   isEvent <- (True <$ (getRawField "eventdate"
                      <|> getRawField "eventtitle"
