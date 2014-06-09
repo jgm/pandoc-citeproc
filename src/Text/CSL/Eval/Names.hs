@@ -138,9 +138,9 @@ formatNames ea del p s as n
       isBib  _             = False
       updateEtal x = modify $ \st ->
                      let x' = if length x == 1 then repeat $ head x else x
-                     in st { etal = if etal st /= []
-                                    then map (uncurry (++)) . zip (etal st) $ x'
-                                    else x
+                     in st { etal = case etal st of
+                                         []  -> x
+                                         ys  -> zipWith (++) ys x'
                            }
       isWithLastName os
           | "true" <-       getOptionVal "et-al-use-last"  os
