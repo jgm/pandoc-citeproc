@@ -52,8 +52,10 @@ import qualified Data.Traversable
 import Text.Pandoc.Shared (safeRead, stringify)
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc
-import Data.List.Split (wordsBy, whenElt, dropBlanks, split )
+import Data.List.Split (wordsBy, whenElt, dropBlanks, split)
+import Data.List (intercalate)
 import Control.Monad.State
+import qualified Data.Vector as V
 import Data.Monoid (Monoid, mappend, mempty)
 import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
                        everywhere', everything, mkT, mkQ )
@@ -128,7 +130,7 @@ parseString (Number n) = case fromJSON (Number n) of
                                             Success (x :: Double) -> return $ show x
                                             Error e -> fail $ "Could not read string: " ++ e
 parseString (Bool b)   = return $ map toLower $ show b
-parseString v@(Array _)= inlinesToString `fmap` parseJSON v
+parseString (Array v)  = intercalate ", " `fmap` (mapM parseString $ V.toList v)
 parseString _          = fail "Could not read string"
 
 -- | Parse JSON value as Int.
