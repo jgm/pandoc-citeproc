@@ -160,6 +160,7 @@ mvPunct sty (q@(Quoted _ _) : w@(Str _) : x : ys)
   | isNote x, isPunctuationInQuote sty  =
     mvPunctInsideQuote q w ++ (x : ys)
 mvPunct _ (Space : x : ys) | isNote x = x : ys
+mvPunct _ (Space : x@(Cite _ (Superscript _ : _)) : ys) = x : ys
 mvPunct _ xs = xs
 
 endWithPunct :: [Inline] -> Bool
