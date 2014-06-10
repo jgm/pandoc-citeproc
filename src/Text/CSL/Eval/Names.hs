@@ -101,10 +101,10 @@ formatNames ea del p s as n
                                   x  -> read $ toRead x
                       _      -> f
             genName x = do etal' <- formatEtAl o ea "et-al" fm del' x
-                           if etal' == []
+                           if null etal'
                               then do t <- getTerm False Long "and"
                                       return $ delim t o del' $ format m o form fm np x
-                              else do return $ (addDelim del' $ format m o form fm np x) ++ etal'
+                              else return $ (addDelim del' $ format m o form fm np x) ++ etal'
         setLastName o $ formatName m False f fm o np (last as)
         updateEtal =<< mapM genName [1 + i .. length as]
         genName i
@@ -114,7 +114,10 @@ formatNames ea del p s as n
         res <- formatLabel f fm (isPlural pl $ length as) $
                if b then "editortranslator" else s
         modify $ \st -> st { edtrans = False }
-        updateEtal [res]
+        -- Note: the following line was here previously.
+        -- It produces spurious 'et al's and seems to have no function,
+        -- so I have commented it out:
+        -- updateEtal [tr' "res" res]
         return res
 
     | EtAl fm t <- n = do
@@ -127,8 +130,8 @@ formatNames ea del p s as n
                  t' = if null t then "et-al" else t
              r <- mapM (et_al o False t' fm del) [i .. length as]
              let (r',r'') = case r of
-                              (x:xs) -> ( x,xs ++ [])
-                              _      -> ([],      [])
+                              (x:xs) -> (x, xs)
+                              []     -> ([],[])
              updateEtal r''
              return r'
 
@@ -181,7 +184,7 @@ formatNames ea del p s as n
            else et_al o b t fm d i
       et_al o b t fm d i
           = when' (gets mode >>= return . not . isSorting) $
-            if b || length as <= i
+            if (b || length as <= i)
             then return []
             else do x <- getTerm False Long t
                     when' (return $ x /= []) $
