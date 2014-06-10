@@ -131,7 +131,7 @@ parseString (Number n) = case fromJSON (Number n) of
                                             Error e -> fail $ "Could not read string: " ++ e
 parseString (Bool b)   = return $ map toLower $ show b
 parseString (Array v)  = intercalate ", " `fmap` (mapM parseString $ V.toList v)
-parseString _          = fail "Could not read string"
+parseString v          = fail $ "Could not read as string: " ++ show v
 
 -- | Parse JSON value as Int.
 parseInt :: Value -> Parser Int
