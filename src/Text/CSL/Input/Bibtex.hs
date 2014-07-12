@@ -733,7 +733,7 @@ itemToReference lang bibtex = bib $ do
          | otherwise         -> (ArticleJournal,mempty)
        "book"            -> (Book,mempty)
        "booklet"         -> (Pamphlet,mempty)
-       "bookinbook"      -> (Book,mempty)
+       "bookinbook"      -> (Chapter,mempty)
        "collection"      -> (Book,mempty)
        "electronic"      -> (Webpage,mempty)
        "inbook"          -> (Chapter,mempty)

@@ -53,7 +53,7 @@ references:
   - family: Shakespeare
   number-of-volumes: '4'
   publisher: Publisher
-  type: book
+  type: chapter
   publisher-place: Location
 
 - title: Macbeth [title field of inbook-1]
