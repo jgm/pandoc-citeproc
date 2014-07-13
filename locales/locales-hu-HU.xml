@@ -2,7 +2,7 @@
 <locale xmlns="http://purl.org/net/xbiblio/csl" version="1.0" xml:lang="hu-HU">
   <info>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
-    <updated>2014-05-31T22:15:07+02:00</updated>
+    <updated>2014-06-17T09:56:35+02:00</updated>
   </info>
   <style-options punctuation-in-quote="false"/>
   <date form="text">
@@ -35,7 +35,7 @@
     <term name="et-al">és mtsai.</term>
     <term name="forthcoming">megjelenés alatt</term>
     <term name="from">forrás</term>
-    <term name="ibid">ibid.</term>
+    <term name="ibid">uo.</term>
     <term name="in">in</term>
     <term name="in press">nyomtatás alatt</term>
     <term name="internet">internet</term>
