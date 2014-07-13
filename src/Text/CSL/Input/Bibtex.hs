@@ -1030,14 +1030,7 @@ itemToReference lang bibtex = bib $ do
                                       concatWith ':' [ containerTitle'
                                                      , containerSubtitle']
                                     , containerTitleAddon' ]
-                                   `mappend`
-                                   if isArticle && seriesTitle' /= mempty
-                                      then if containerTitle' == mempty
-                                              then seriesTitle'
-                                              else (Formatted [Str ",",Space])
-                                                    `mappend` seriesTitle'
-                                      else mempty
-         , collectionTitle     = if isArticle then mempty else seriesTitle'
+         , collectionTitle     = seriesTitle'
          , volumeTitle         = concatWith '.' [
                                       concatWith ':' [ volumeTitle'
                                                      , volumeSubtitle']

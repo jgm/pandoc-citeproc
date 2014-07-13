@@ -118,7 +118,7 @@ references:
       - 07
       - 29
   version: version
-  container-title: ! 'The Journaltitle: The Journalsubtitle, new series'
+  container-title: ! 'The Journaltitle: The Journalsubtitle'
   editor:
   - given: Edward
     family: Editor
@@ -127,6 +127,7 @@ references:
     family: Translator
   URL: http://foo.bar.baz/
   type: article-journal
+  collection-title: new series
   DOI: 10.1086/520976
   language: en-US
 ...

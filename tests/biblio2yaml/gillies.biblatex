@@ -57,7 +57,8 @@ references:
   author:
   - given: Alexander
     family: Gillies
-  container-title: Publications of the English Goethe Society, new series
+  container-title: Publications of the English Goethe Society
   type: article-journal
+  collection-title: new series
   language: en-GB
 ...
