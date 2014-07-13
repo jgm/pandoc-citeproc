@@ -7,10 +7,10 @@ import Text.Pandoc.Walk
 import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
+import Data.List (isPrefixOf)
 import Control.Applicative ((<|>))
 import Data.Aeson
-import Data.List
-import Data.Char ( isDigit, isPunctuation )
+import Data.Char ( isDigit, isPunctuation, toLower )
 import qualified Data.Map as M
 import Text.CSL.Reference hiding (processCites, Value)
 import Text.CSL.Input.Bibutils (readBiblioFile, convertRefs)
@@ -27,7 +27,7 @@ import Control.Monad
 import Control.Monad.State
 import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)
-import Text.CSL.Util (findFile)
+import Text.CSL.Util (findFile, splitStrWhen)
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -254,13 +254,9 @@ toCslCite c
 
 locatorWords :: [Inline] -> (String, [Inline])
 locatorWords inp =
-  case parse pLocatorWords "suffix" $ breakup inp of
+  case parse pLocatorWords "suffix" $ splitStrWhen (`elem` ";,\160") inp of
        Right r   -> r
        Left _    -> ("",inp)
-   where breakup [] = []
-         breakup (Str x : xs) = map Str (splitup x) ++ breakup xs
-         breakup (x : xs) = x : breakup xs
-         splitup = groupBy (\x y -> x /= '\160' && y /= '\160')
 
 pLocatorWords :: Parsec [Inline] st (String, [Inline])
 pLocatorWords = do
@@ -283,24 +279,37 @@ pLocator :: Parsec [Inline] st String
 pLocator = try $ do
   optional $ pMatch (== Str ",")
   optional pSpace
-  f  <- (guardFollowingDigit >> return [Str "p"]) -- "page" the default
-     <|> many1 (notFollowedBy pSpace >> anyToken)
-  gs <- many1 pWordWithDigits
-  return $ stringify f ++ (' ' : unwords gs)
+  rawLoc <- many1
+     (notFollowedBy pSpace >> notFollowedBy (pWordWithDigits True) >> anyToken)
+  let removePeriod xs = case reverse xs of
+                             ('.':xs') -> reverse xs'
+                             _ -> xs
+  let loc = if null rawLoc
+               then "p"
+               else removePeriod $ stringify rawLoc
+  guard $ any (\x -> x `isPrefixOf` map toLower loc)
+          [ "b", "ch", "co", "fi", "fo", "i", "l", "n"
+          , "o", "para", "part", "p", "sec", "sub", "ve", "v" ]
+  g <- pWordWithDigits True
+  gs <- many (pWordWithDigits False)
+  return $ concat (loc:" ":g:gs)
 
-guardFollowingDigit :: Parsec [Inline] st ()
-guardFollowingDigit = do
-  t <- lookAhead anyToken
-  case t of
-       Str (d:_) | isDigit d -> return ()
-       _                     -> mzero
-
-pWordWithDigits :: Parsec [Inline] st String
-pWordWithDigits = try $ do
-  optional pSpace
-  r <- many1 (notFollowedBy pSpace >> anyToken)
+-- we want to capture:  123, 123A, C22, XVII, 33-44, 22-33; 22-11
+pWordWithDigits :: Bool -> Parsec [Inline] st String
+pWordWithDigits isfirst = try $ do
+  punct <- if isfirst
+              then return ""
+              else stringify `fmap` pLocatorPunct
+  sp <- (pSpace >> return " ") <|> return ""
+  r <- many1 (notFollowedBy pSpace >> notFollowedBy pLocatorPunct >> anyToken)
   let s = stringify r
-  guard $ any isDigit s
-  return s
+  guard $ any isDigit s || all (`elem` "IVXLCM") s
+  return $ punct ++ sp ++ s
 
+pLocatorPunct :: Parsec [Inline] st Inline
+pLocatorPunct = pMatch isLocatorPunct
+
+isLocatorPunct :: Inline -> Bool
+isLocatorPunct (Str [c]) = c `elem` ",;:"
+isLocatorPunct _         = False
 
