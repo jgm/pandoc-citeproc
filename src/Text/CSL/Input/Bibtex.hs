@@ -715,6 +715,9 @@ parseOptions = map breakOpt . splitWhen (==',')
                           (w,v) -> (map toLower $ trim w,
                                     map toLower $ trim $ drop 1 v)
 
+ordinalize :: Locale -> Int -> String
+ordinalize locale n = undefined
+
 itemToReference :: Lang -> Locale -> Bool -> Item -> Maybe Reference
 itemToReference lang locale bibtex = bib $ do
   modify $ \st -> st{ localeLanguage = lang,
