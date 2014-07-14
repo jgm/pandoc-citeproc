@@ -27,7 +27,7 @@ import Control.Monad
 import Control.Monad.RWS
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
-import Text.CSL.Style (Formatted(..), Locale(..))
+import Text.CSL.Style (Formatted(..), Locale(..), CslTerm(..))
 import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen)
 import Text.CSL.Parser (parseLocale)
 import qualified Text.Pandoc.Walk as Walk
@@ -715,8 +715,15 @@ parseOptions = map breakOpt . splitWhen (==',')
                           (w,v) -> (map toLower $ trim w,
                                     map toLower $ trim $ drop 1 v)
 
-ordinalize :: Locale -> Int -> String
-ordinalize locale n = undefined
+ordinalize :: Locale -> String -> String
+ordinalize locale n =
+  case [termSingular c | c <- terms, cslTerm c == ("ordinal-" ++ pad0 n)] ++
+       [termSingular c | c <- terms, cslTerm c == "ordinal"] of
+       (suff:_) -> n ++ suff
+       []       -> n
+    where pad0 [c] = ['0',c]
+          pad0 s   = s
+          terms = localeTerms locale
 
 itemToReference :: Lang -> Locale -> Bool -> Item -> Maybe Reference
 itemToReference lang locale bibtex = bib $ do
@@ -889,7 +896,8 @@ itemToReference lang locale bibtex = bib $ do
                         <|> return mempty
   -- change numerical series title to e.g. 'series 3'
   let fixSeriesTitle (Formatted [Str xs]) | all isDigit xs =
-         Formatted [Span ("",["nodecor"],[]) [Str (resolveKey' lang "series"), Space, Str xs]]
+         Formatted [Span ("",["nodecor"],[]) [Str (ordinalize locale xs),
+                    Space, Str (resolveKey' lang "ser.")]]
       fixSeriesTitle x = x
   seriesTitle' <- (fixSeriesTitle . resolveKey lang) <$>
                       getTitle "series" <|> return mempty
