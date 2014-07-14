@@ -18,6 +18,7 @@ before_install:
 install:
  - cabal-1.18 update
  - cabal-1.18 install hsb2hs  # build dependency for embed_data_files
+ - export PATH=$HOME/.cabal/bin:$PATH
  - cabal-1.18 install --only-dependencies --enable-tests
 
 # Here starts the actual work to be performed for the package under test; any command which exits with a non-zero exit code causes the build to fail.
