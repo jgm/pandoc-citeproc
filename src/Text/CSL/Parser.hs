@@ -14,7 +14,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Text.CSL.Parser ( readCSLFile, parseCSL, parseCSL', localizeCSL )
+module Text.CSL.Parser ( readCSLFile, parseCSL, parseCSL', parseLocale, localizeCSL )
 where
 
 import Control.Monad (when, mplus)
@@ -67,11 +67,15 @@ parseCSL = parseCSL' . fromStringLazy
 parseCSL' :: L.ByteString -> Style
 parseCSL' f = readXmlString xpStyle f
 
+-- | Parse locale.
+parseLocale :: String -> IO Locale
+parseLocale locale = readXmlString xpLocale `fmap` getLocale locale
+
 -- | Merge locale into a CSL style.
 localizeCSL :: Maybe String -> Style -> IO Style
 localizeCSL mbLocale s = do
   let locale = fromMaybe (styleDefaultLocale s) mbLocale
-  l <- readXmlString xpLocale `fmap` getLocale locale
+  l <- parseLocale locale
   return s { styleLocale = mergeLocales locale l (styleLocale s) }
 
 instance XmlPickler Layout where
