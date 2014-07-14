@@ -27,8 +27,9 @@ import Control.Monad
 import Control.Monad.RWS
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
-import Text.CSL.Style (Formatted(..))
+import Text.CSL.Style (Formatted(..), Locale(..))
 import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen)
+import Text.CSL.Parser (parseLocale)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.UTF8 as UTF8
 
@@ -86,7 +87,8 @@ readBibtexInputString isBibtex bibstring = do
   let items = case runParser (bibEntries <* eof) [] "stdin" bibstring of
                    Left err -> error (show err)
                    Right xs -> resolveCrossRefs isBibtex xs
-  return $ mapMaybe (itemToReference lang isBibtex) items
+  locale <- parseLocale (langToLocale lang)
+  return $ mapMaybe (itemToReference lang locale isBibtex) items
 
 type BibParser = Parsec [Char] [(String, String)]
 
@@ -309,6 +311,9 @@ bookTrans z =
        _                -> [z]
 
 data Lang = Lang String String  -- e.g. "en" "US"
+
+langToLocale :: Lang -> String
+langToLocale (Lang x y) = x ++ ('-':y)
 
 resolveKey :: Lang -> Formatted -> Formatted
 resolveKey lang (Formatted ils) = Formatted (Walk.walk go ils)
@@ -710,8 +715,8 @@ parseOptions = map breakOpt . splitWhen (==',')
                           (w,v) -> (map toLower $ trim w,
                                     map toLower $ trim $ drop 1 v)
 
-itemToReference :: Lang -> Bool -> Item -> Maybe Reference
-itemToReference lang bibtex = bib $ do
+itemToReference :: Lang -> Locale -> Bool -> Item -> Maybe Reference
+itemToReference lang locale bibtex = bib $ do
   modify $ \st -> st{ localeLanguage = lang,
                       untitlecase = case lang of
                                          Lang "en" _ -> True
