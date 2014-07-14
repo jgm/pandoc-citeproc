@@ -156,6 +156,12 @@ mvPunct :: Style -> [Inline] -> [Inline]
 mvPunct _ (Space : Space : xs) = Space : xs
 mvPunct _ (Space : x : ys) | isNote x, startWithPunct ys =
    Str (headInline ys) : x : tailFirstInlineStr ys
+mvPunct _ (Cite cs ils : ys) |
+     length ils > 1
+   , isNote (last ils)
+   , startWithPunct ys
+   = Cite cs (init ils ++ [Str (headInline ys) | not (endWithPunct (init ils))]
+     ++ [last ils]) : tailFirstInlineStr ys
 mvPunct sty (q@(Quoted _ _) : w@(Str _) : x : ys)
   | isNote x, isPunctuationInQuote sty  =
     mvPunctInsideQuote q w ++ (x : ys)
