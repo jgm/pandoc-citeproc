@@ -5,7 +5,7 @@ env:
 # - GHCVER=6.12.3
  - GHCVER=7.4.2
  - GHCVER=7.6.3
- - GHCVER=7.8.2 # see note about Alex/Happy
+ - GHCVER=7.8.3 # see note about Alex/Happy
 # - GHCVER=head  # see section about GHC HEAD snapshots
 
 # Note: the distinction between `before_install` and `install` is not important.
@@ -17,6 +17,10 @@ before_install:
 
 install:
  - cabal-1.18 update
+ - if [ $GHCVER = "head" ] || [ $GHCVER = "7.8.2" ]; then
+ -   cabal-1.18 install happy alex
+ -   export PATH=$HOME/.cabal/bin:$PATH
+ - fi
  - cabal-1.18 install hsb2hs  # build dependency for embed_data_files
  - export PATH=$HOME/.cabal/bin:$PATH
  - cabal-1.18 install --only-dependencies --enable-tests
