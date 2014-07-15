@@ -896,8 +896,8 @@ itemToReference lang locale bibtex = bib $ do
                         <|> return mempty
   -- change numerical series title to e.g. 'series 3'
   let fixSeriesTitle (Formatted [Str xs]) | all isDigit xs =
-         Formatted [Span ("",["nodecor"],[]) [Str (ordinalize locale xs),
-                    Space, Str (resolveKey' lang "ser.")]]
+         Formatted [Str (ordinalize locale xs),
+                    Space, Str (resolveKey' lang "ser.")]
       fixSeriesTitle x = x
   seriesTitle' <- (fixSeriesTitle . resolveKey lang) <$>
                       getTitle "series" <|> return mempty
