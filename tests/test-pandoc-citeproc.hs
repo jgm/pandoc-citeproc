@@ -23,10 +23,10 @@ import Text.Pandoc (writeNative, writeHtmlString, readNative, def)
 import Text.CSL.Pandoc (processCites')
 
 main = do
-  citeprocTests <- mapM testCase ["chicago-author-date", "ieee", "mhra",
-                                  "number-of-volumes", "no-author", "issue7",
-                                  "issue13", "issue14", "issue25", "issue51",
-                                  "issue61", "issue64"]
+  testnames <- fmap (map (dropExtension . takeBaseName) .
+                     filter (\x -> takeExtension x == ".native")) $
+               getDirectoryContents "tests"
+  citeprocTests <- mapM testCase testnames
   fs <- filter (\f -> takeExtension f `elem` [".bibtex",".biblatex"])
            `fmap` getDirectoryContents "tests/biblio2yaml"
   biblio2yamlTests <- mapM biblio2yamlTest fs
