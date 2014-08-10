@@ -28,7 +28,6 @@ author:             John MacFarlane, Andrea Rossato
 maintainer:         jgm@berkeley.edu
 build-type:         Custom
 data-files:         chicago-author-date.csl
-                    chicago-author-date-with-original-date-and-status.csl
                     locales/locales-af-ZA.xml
                     locales/locales-ar-AR.xml
                     locales/locales-bg-BG.xml
@@ -84,6 +83,7 @@ data-files:         chicago-author-date.csl
                     tests/ieee.csl
                     tests/mhra.csl
                     tests/chicago-note-bibliography.csl
+                    tests/chicago-author-date-with-original-date-and-status.csl
                     tests/biblio2yaml/*.bibtex
                     -- documentation
                     README.md
