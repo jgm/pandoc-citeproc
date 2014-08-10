@@ -97,7 +97,7 @@ doCites doc = do
 
 findWarnings :: Inline -> [String]
 findWarnings (Span (_,["citeproc-not-found"],[("data-reference-id",ref)]) _) =
-  ["pandoc-citeproc: reference " ++ ref ++ " not found"]
+  ["pandoc-citeproc: reference " ++ ref ++ " not found" | ref /= "*"]
 findWarnings (Span (_,["citeproc-no-output"],_) _) =
   ["pandoc-citeproc: reference with no printed form"]
 findWarnings _ = []

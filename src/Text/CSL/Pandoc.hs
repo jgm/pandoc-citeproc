@@ -4,6 +4,7 @@ module Text.CSL.Pandoc (processCites, processCites') where
 
 import Text.Pandoc
 import Text.Pandoc.Walk
+import Text.Pandoc.Builder (setMeta, deleteMeta, Inlines, cite)
 import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
@@ -24,6 +25,7 @@ import Text.CSL.Output.Pandoc ( headInline, tailFirstInlineStr, initInline,
 import Text.CSL.Data (getDefaultCSL)
 import Text.Parsec hiding (State, (<|>))
 import Control.Monad
+import Data.Monoid (mempty)
 import Control.Monad.State
 import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)
@@ -33,26 +35,47 @@ import Text.CSL.Util (findFile, splitStrWhen)
 -- according to a CSL style.  Add a bibliography (if one is called
 -- for) at the end of the document.
 processCites :: Style -> [Reference] -> Pandoc -> Pandoc
-processCites style refs doc =
-  let doc'        = evalState (walkM setHashes doc) 1
-      grps        = query getCitation doc'
-      result      = citeproc procOpts style refs (setNearNote style $
-                      map (map toCslCite) grps)
-      cits_map    = M.fromList $ zip grps (citations result)
-      biblioList  = map (renderPandoc' style) (bibliography result)
-      Pandoc m b  = bottomUp (mvPunct style) . deNote .
-                     topDown (processCite style cits_map) $ doc'
-      (bs, lastb)  = case reverse b of
+processCites style refs (Pandoc m1 b1) =
+  let m2            = setMeta "nocites-wildcards" (mkNociteWildcards refs m1) m1
+      Pandoc m3 b2  = evalState (walkM setHashes $ Pandoc m2 b1) 1
+      grps          = query getCitation $ Pandoc m3 b2
+      m4            = deleteMeta "nocites-wildcards" m3
+      result        = citeproc procOpts style refs (setNearNote style $
+                        map (map toCslCite) grps)
+      cits_map      = M.fromList $ zip grps (citations result)
+      biblioList    = map (renderPandoc' style) (bibliography result)
+      Pandoc m b3   = bottomUp (mvPunct style) . deNote .
+                        topDown (processCite style cits_map) $ Pandoc m4 b2
+      (bs, lastb)    = case reverse b3 of
                           (Header lev (id',classes,kvs) ys) : xs ->
                            (reverse xs, [Header lev (id',classes',kvs) ys])
                             where classes' = "unnumbered" :
                                        [c | c <- classes, c /= "unnumbered"]
-                          _                                      -> (b,  [])
+                          _                                      -> (b3,  [])
   in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
                $ bs ++
                  if lookupMeta "suppress-bibliography" m == Just (MetaBool True)
                     then []
                     else [Div ("",["references"],[]) (lastb ++ biblioList)]
+
+-- if the 'nocite' Meta field contains a citation with id = '*',
+-- create a cite with to all the references.
+mkNociteWildcards :: [Reference] -> Meta -> Inlines
+mkNociteWildcards refs meta =
+  case lookupMeta "nocite" meta of
+       Nothing      -> mempty
+       Just nocites ->
+         case [c | c <- concat (query getCitation nocites)
+                 , citationId c == "*"] of
+              []    -> mempty
+              (_:_) -> cite allcites mempty
+         where allcites = map (\ref -> Citation{
+                                  citationId = unLiteral (refId ref),
+                                  citationPrefix = [],
+                                  citationSuffix = [],
+                                  citationMode = NormalCitation,
+                                  citationNoteNum = 0,
+                                  citationHash = 0 }) refs
 
 removeNocaseSpans :: Inline -> [Inline]
 removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs

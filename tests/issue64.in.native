@@ -1,0 +1,2 @@
+Pandoc (Meta {unMeta = fromList [("bibliography",MetaList [MetaInlines [Str "tests/biblio.bib"]]),("nocite",MetaInlines [Cite [Citation {citationId = "*", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 0}] [RawInline (Format "latex") "\\nocite{*}"]])]})
+[]

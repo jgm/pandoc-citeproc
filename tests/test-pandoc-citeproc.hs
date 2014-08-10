@@ -26,7 +26,7 @@ main = do
   citeprocTests <- mapM testCase ["chicago-author-date", "ieee", "mhra",
                                   "number-of-volumes", "no-author", "issue7",
                                   "issue13", "issue14", "issue25", "issue51",
-                                  "issue61"]
+                                  "issue61", "issue64"]
   fs <- filter (\f -> takeExtension f `elem` [".bibtex",".biblatex"])
            `fmap` getDirectoryContents "tests/biblio2yaml"
   biblio2yamlTests <- mapM biblio2yamlTest fs
@@ -54,7 +54,7 @@ data TestResult =
 
 testCase :: String -> IO TestResult
 testCase csl = do
-  hPutStr stderr $ "[" ++ csl ++ ".in.json] "
+  hPutStr stderr $ "[" ++ csl ++ ".in.native] "
   indataNative <- readFile $ "tests/" ++ csl ++ ".in.native"
   expectedNative <- readFile $ "tests/" ++ csl ++ ".expected.native"
   let jsonIn = Aeson.encode $ (read indataNative :: Pandoc)
