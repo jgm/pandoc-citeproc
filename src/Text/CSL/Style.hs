@@ -136,7 +136,7 @@ appendWithPunct :: Formatted -> Formatted -> Formatted
 appendWithPunct (Formatted left) (Formatted right) =
   Formatted $
   case concat [lastleft, firstright] of
-       [' ',d] | d `elem` ",.:;" -> initInline left ++ tailInline right
+       [' ',d] | d `elem` ",.:;" -> initInline left ++ right
        [c,d] | c `elem` " ,.:;", d == c -> left ++ tailInline right
        [c,'.'] | c `elem` ",.!:;?" -> left ++ tailInline right
        [c,':'] | c `elem` ",!:;?" -> left ++ tailInline right  -- Mich.: 2005
