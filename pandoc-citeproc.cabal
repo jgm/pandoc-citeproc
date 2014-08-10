@@ -82,6 +82,7 @@ data-files:         chicago-author-date.csl
                     tests/biblio.bib
                     tests/ieee.csl
                     tests/mhra.csl
+                    tests/science.csl
                     tests/chicago-note-bibliography.csl
                     tests/chicago-author-date-with-original-date-and-status.csl
                     tests/biblio2yaml/*.bibtex
