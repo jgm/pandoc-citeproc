@@ -692,4 +692,4 @@ instance FromJSON [Agent] where
   parseJSON _ = fail "Could not parse [Agent]"
 
 -- instance ToJSON [Agent] where
---  toJSON xs  = Array (V.fromList $ map toJSON xs)
+-- toJSON xs  = Array (V.fromList $ map toJSON xs)
