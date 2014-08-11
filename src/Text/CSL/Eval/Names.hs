@@ -27,7 +27,6 @@ import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
 import Text.CSL.Util ( headInline, lastInline, readNum, (<^>), query, toRead,
                        capitalize, splitStrWhen )
-import Text.CSL.Reference
 import Text.CSL.Style
 import Text.Pandoc.Definition
 import Text.Pandoc.Shared ( stringify )
@@ -237,11 +236,9 @@ isEtAl b os p as
 -- 'Bool' indicate whether we are formatting the first name or not.
 formatName :: EvalMode -> Bool -> Form -> Formatting -> [Option] -> [NamePart] -> Agent -> [Output]
 formatName m b f fm ops np n
-    -- TODO awkward to use serialized string version of an Agent here;
-    -- why not make OName take an Agent instead of a String??
-    | literal n /= mempty = return $ OName (show n)  institution []         fm
-    | Short      <- f = return $ OName (show n)  shortName       disambdata fm
-    | otherwise       = return $ OName (show n) (longName given) disambdata fm
+    | literal n /= mempty = return $ OName n  institution []         fm
+    | Short      <- f = return $ OName n  shortName       disambdata fm
+    | otherwise       = return $ OName n (longName given) disambdata fm
     where
       institution = oPan' (unFormatted $ literal n) (form "family")
       when_ c o = if c /= mempty then o else mempty

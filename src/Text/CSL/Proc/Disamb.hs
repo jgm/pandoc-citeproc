@@ -143,7 +143,7 @@ updateOName :: [NameData] -> Output -> Output
 updateOName n o
     | OName _ _ [] _ <- o = o
     | OName k x _  f <- o = case elemIndex (ND k (clean x) [] []) n of
-                              Just i -> OName [] (nameDataSolved $ n !! i) [] f
+                              Just i -> OName emptyAgent (nameDataSolved $ n !! i) [] f
                               _      -> o
     | otherwise           = o
     where
@@ -395,7 +395,7 @@ rmGivenNames o
 
 rmNameHash :: Output -> Output
 rmNameHash o
-    | OName _ s ss f <- o = OName [] s ss f
+    | OName _ s ss f <- o = OName emptyAgent s ss f
     | otherwise           = o
 
 -- | Add, with 'proc', a give name to the family name. Needed for

@@ -27,7 +27,7 @@ import Control.Monad
 import Control.Monad.RWS
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
-import Text.CSL.Style (Formatted(..), Locale(..), CslTerm(..))
+import Text.CSL.Style (Formatted(..), Locale(..), CslTerm(..), Agent(..))
 import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen)
 import Text.CSL.Parser (parseLocale)
 import qualified Text.Pandoc.Walk as Walk

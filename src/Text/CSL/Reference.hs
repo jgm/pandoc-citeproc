@@ -24,8 +24,7 @@ import Data.Generics hiding (Generic)
 import GHC.Generics (Generic)
 import Data.Monoid
 import Data.Aeson hiding (Value)
-import qualified Data.Aeson as Aeson
-import Data.Aeson.Types (Parser, Pair)
+import Data.Aeson.Types (Parser)
 import Control.Applicative ((<$>), (<*>), (<|>), pure)
 import qualified Data.Text as T
 import qualified Data.Vector as V
@@ -33,8 +32,7 @@ import Data.Char (toLower, isUpper, isLower, isDigit)
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Util (parseString, parseInt, parseBool, safeRead, readNum,
                       inlinesToString, capitalize, camelize)
-import Text.Pandoc (Inline(Str,Space))
-import Data.List.Split (wordsBy)
+import Text.Pandoc (Inline(Str))
 import Data.String
 
 newtype Literal = Literal { unLiteral :: String }
@@ -85,47 +83,6 @@ isValueSet val
     | otherwise = False
 
 data Empty = Empty deriving ( Typeable, Data, Generic )
-
-data Agent
-    = Agent { givenName       :: [Formatted]
-            , droppingPart    ::  Formatted
-            , nonDroppingPart ::  Formatted
-            , familyName      ::  Formatted
-            , nameSuffix      ::  Formatted
-            , literal         ::  Formatted
-            , commaSuffix     ::  Bool
-            }
-      deriving ( Show, Read, Eq, Typeable, Data, Generic )
-
-instance FromJSON Agent where
-  parseJSON (Object v) = Agent <$>
-              (v .: "given" <|> ((map Formatted . wordsBy (== Space) . unFormatted) <$> v .: "given") <|> pure []) <*>
-              v .:?  "dropping-particle" .!= mempty <*>
-              v .:? "non-dropping-particle" .!= mempty <*>
-              v .:? "family" .!= mempty <*>
-              v .:? "suffix" .!= mempty <*>
-              v .:? "literal" .!= mempty <*>
-              v .:? "comma-suffix" .!= False
-  parseJSON _ = fail "Could not parse Agent"
-
-instance ToJSON Agent where
-  toJSON agent = object' $ [
-      "given" .= Formatted (intercalate [Space] $ map unFormatted
-                                                $ givenName agent)
-    , "dropping-particle" .= droppingPart agent
-    , "non-dropping-particle" .= nonDroppingPart agent
-    , "family" .= familyName agent
-    , "suffix" .= nameSuffix agent
-    , "literal" .= literal agent
-    ] ++ ["comma-suffix" .= commaSuffix agent | nameSuffix agent /= mempty]
-
-instance FromJSON [Agent] where
-  parseJSON (Array xs) = mapM parseJSON $ V.toList xs
-  parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
-  parseJSON _ = fail "Could not parse [Agent]"
-
--- instance ToJSON [Agent] where
---  toJSON xs  = Array (V.fromList $ map toJSON xs)
 
 data RefDate =
     RefDate { year   :: Literal
@@ -709,11 +666,4 @@ setNearNote s cs
                                   readNum (citeNoteNumber c) - readNum (citeNoteNumber x) <= near_note
                            _   -> False
 
-object' :: [Pair] -> Aeson.Value
-object' = object . filter (not . isempty)
-  where isempty (_, Array v)  = V.null v
-        isempty (_, String t) = T.null t
-        isempty ("first-reference-note-number", Aeson.Number n) = n == 0
-        isempty ("citation-number", Aeson.Number n) = n == 0
-        isempty (_, _)        = False
 

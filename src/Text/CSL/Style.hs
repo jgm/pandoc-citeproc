@@ -23,8 +23,10 @@ import Data.String
 import Data.Monoid (mempty, Monoid, mappend, mconcat)
 import Control.Arrow hiding (left, right)
 import Control.Applicative hiding (Const)
+import qualified Data.Aeson as Aeson
+import Data.Aeson.Types (Pair)
 import Data.List ( nubBy, isPrefixOf, isInfixOf, intercalate )
-import Data.List.Split ( splitWhen )
+import Data.List.Split ( splitWhen, wordsBy )
 import Data.Generics ( Data, Typeable )
 import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
@@ -37,6 +39,7 @@ import Text.Pandoc (readHtml, writeMarkdown, WriterOptions(..),
                     ReaderOptions(..), bottomUp, def)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.Builder as B
+import qualified Data.Text as T
 import Text.Pandoc.XML (fromEntities)
 
 #ifdef UNICODE_COLLATION
@@ -99,7 +102,7 @@ adjustCSL x = [x]
 -- We use a newtype wrapper so we can have custom ToJSON, FromJSON
 -- instances.
 newtype Formatted = Formatted { unFormatted :: [Inline] }
-  deriving ( Show, Read, Eq, Data, Typeable, Generic )
+  deriving ( Show, Read, Eq, Ord, Data, Typeable, Generic )
 
 instance FromJSON Formatted where
   parseJSON v@(Array _) =
@@ -541,7 +544,7 @@ data Output
     | ODate   [Output]                                  -- ^ A (possibly) ranged date
     | OYear    String    String   Formatting            -- ^ The year and the citeId
     | OYearSuf String    String   [Output]   Formatting -- ^ The year suffix, the citeId and a holder for collision data
-    | OName    String   [Output] [[Output]]  Formatting -- ^ A (family) name with the list of given names.
+    | OName    Agent    [Output] [[Output]]  Formatting -- ^ A (family) name with the list of given names.
     | OContrib String    String   [Output] [Output] [[Output]] -- ^ The citation key, the role (author, editor, etc.), the contributor(s),
                                                         -- the output needed for year suf. disambiguation, and everything used for
                                                         -- name disambiguation.
@@ -623,7 +626,7 @@ instance Eq CiteData where
 
 data NameData
     = ND
-      { nameKey        ::   String
+      { nameKey        ::  Agent
       , nameCollision  ::  [Output]
       , nameDisambData :: [[Output]]
       , nameDataSolved ::  [Output]
@@ -638,3 +641,55 @@ isPunctuationInQuote sty =
   case styleLocale sty of
        (l:_) -> ("punctuation-in-quote","true") `elem` localeOptions l
        _     -> False
+
+object' :: [Pair] -> Aeson.Value
+object' = object . filter (not . isempty)
+  where isempty (_, Array v)  = V.null v
+        isempty (_, String t) = T.null t
+        isempty ("first-reference-note-number", Aeson.Number n) = n == 0
+        isempty ("citation-number", Aeson.Number n) = n == 0
+        isempty (_, _)        = False
+
+data Agent
+    = Agent { givenName       :: [Formatted]
+            , droppingPart    ::  Formatted
+            , nonDroppingPart ::  Formatted
+            , familyName      ::  Formatted
+            , nameSuffix      ::  Formatted
+            , literal         ::  Formatted
+            , commaSuffix     ::  Bool
+            }
+      deriving ( Show, Read, Eq, Ord, Typeable, Data, Generic )
+
+emptyAgent :: Agent
+emptyAgent = Agent [] mempty mempty mempty mempty mempty False
+
+instance FromJSON Agent where
+  parseJSON (Object v) = Agent <$>
+              (v .: "given" <|> ((map Formatted . wordsBy (== Space) . unFormatted) <$> v .: "given") <|> pure []) <*>
+              v .:?  "dropping-particle" .!= mempty <*>
+              v .:? "non-dropping-particle" .!= mempty <*>
+              v .:? "family" .!= mempty <*>
+              v .:? "suffix" .!= mempty <*>
+              v .:? "literal" .!= mempty <*>
+              v .:? "comma-suffix" .!= False
+  parseJSON _ = fail "Could not parse Agent"
+
+instance ToJSON Agent where
+  toJSON agent = object' $ [
+      "given" .= Formatted (intercalate [Space] $ map unFormatted
+                                                $ givenName agent)
+    , "dropping-particle" .= droppingPart agent
+    , "non-dropping-particle" .= nonDroppingPart agent
+    , "family" .= familyName agent
+    , "suffix" .= nameSuffix agent
+    , "literal" .= literal agent
+    ] ++ ["comma-suffix" .= commaSuffix agent | nameSuffix agent /= mempty]
+
+instance FromJSON [Agent] where
+  parseJSON (Array xs) = mapM parseJSON $ V.toList xs
+  parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
+  parseJSON _ = fail "Could not parse [Agent]"
+
+-- instance ToJSON [Agent] where
+--  toJSON xs  = Array (V.fromList $ map toJSON xs)
