@@ -1,42 +1,89 @@
-pandoc-citeproc (0.3.1)
+pandoc-citeproc (0.4)
 
+  * Fixed #58 - previously not all substitute alternatives were tried.
+  * Made first parameter of OName an Agent, not a String (API change).
+    Also moved Agent from Reference to Style.
+  * test-pandoc-citeproc: run tests on all matching files in the directory.
+    This removes the need to recompile when new tests are added.
+  * Style: Fixed appendWithPunct (mappend for Formatted).  One definition
+    was wrong, causing commas to be lost in certain places (#57).
+  * Support \nocite{*}.  If the `nocite` metadata filed contains a citation
+    with identifier `*`, all entries in the bibliography are included
+    in the references (#64).
+  * Bump upper bound for aeson.
+  * Removed span nodecor around 'ser.' (#60).
+  * Print series as "3rd ser." (using locale's ordinal) (#60).
+  * Added scaffolding for 'ordinalize' and infrastructure for
+    accessing locale information to Bibtex.
+  * Export new parseLocale from Text.CSL.Parser.
+  * Move punctuation before fn in in-text citation before punctuation (#59).
+  * Updated locales and chicago-author-date.csl.
+  * Use collection-title for series, even for articles (#60).
+  * Fixed locator parsing so capital roman numerals are legal numbers (#61).
+  * Map bookinbook -> chapter (#62).
+  * Better error message from parseString.
+  * Remove space before superscript citation (pandoc #1327).
+  * Fixed spurious "et al" problem (#27).
+  * Match biblatex's method for separating von from last name, for biblatex.
+    For bibtex, we match the documented bibtex algorithm as before (#50).
+    Test case:  Drummond de Andrade, Carlos.
+    bibtex makes "Drummond de" a dropping particle.
+    biblatex takes "Drummond de Andrade" to be the last name.
+  * Leave off bibliography if `suppress-bibliography` has a true value
+    in the document metadata (#40, with thanks to Jesse Rosenthal).
+  * Try empty (null) 'csl' as if no 'csl' was specified.
+    (The default chicago-author-date.csl is then used.)
+  * Fixed #51:  empty braces with date range.
+  * Set pageFirst automatically from page range (#31).
+  * Bibtex input: set page-first automatically.
+  * Fixed capitalization of first word in sentence (#25).
+    E.g. "foo bar baz: bazbaz foo" should turn into
+    "Foo Bar Baz: Bazbaz Foo" in titlecase, but was turning into
+    "foo Bar Baz: bazbaz Foo."
+  * pandoc-citeproc:  Allow conversion of mods bibliographies (#28).
+  * readCSLFile now supports dependent styles (#30).
+  * Removed network flag.  We now use pandoc's fetchItem.
+  * Changed type of findFile, so it returns a Maybe.
+  * Documented fact that you can specify a URL under 'csl:'.
+  * Added locale parameter to readCSLFile (API change).
+    readCSLFile also now looks in ~/.csl for the file, if it isn't
+    found locally.
+  * Moved findFile to Util.
+  * Bibtex/biblatex:  map "unpublished" to "speech" if
+    the record contains "eventtitle", "eventdate", or "venue".
+    Otherwise map it to "manuscript" as before (#44).
+  * Look for chicago-author-date.csl in ~/.csl if no csl specified.
+    If not found there, use the chicago-author-date.csl that comes with
+    the distribution (#48).
+  * Improved case transform behavior with puncutation.
+    Previously capitalization might change after a word-internal period
+    or apostrophe.  Now internal punctuation only signals a word
+    boundary if it is a dash or single quote character.
   * Mark final heading (if present) as "unnumbered".
     Pandoc's algorithm will not number it correctly since it's in
     a Div.  And it's not good practice to number a bibliography section
     heading anyway.  See pandoc #1277.
-
   * Treat empty `references` (empty string) in metadata as empty list.
-
   * Fixed titlecase transformation of words containing `'`.
-
   * Fixed punctuation in notes.
-
   * Updated chicago-author-date.csl and locales.
-
   * `FromJSON` for `Formatted`:  Handle block lists as well as inline lists.
-
   * Require `yaml >= 0.8.8.2`.  This fixes a problem wherein dates with
     integer components would be printed using decimal points in yaml output.
-
   * Fixed spacing problem with citations in notes in footnote styles.
     Closes pandoc #1036.
-
   * Move punctuation inside quotes, depending on style.  This is activated by
     the `punctuation-in-quote` locale option, which has a default
     per locale but can be overridden in the style.  This gives more flexibility.
     (Thanks to Jesse Rosenthal.)
-
   * Moved `isPunctuationInQuote` to `Text.CSL.Style` and rewrote.
     Previously it was in `Text.CSL.Output.Pandoc`.
     It doesn't need to use generics and no longer does.
-
   * Fixed recognition of "byzantine" names.  Names with curly apostrophes were
-    being counted as non-byzantine, and printed given-first with no space.
-    Closes #39.
-
-  * Fixed representation of reference types to conform to CSL:
+    being counted as non-byzantine, and printed given-first with no space
+    (#39).
+  * Fixed representation of reference types to conform to CSL (#24):
     `motion_picture`, `legal_case`, `musical_score`, `personal_communication`.
-    Closes #24.
 
 pandoc-citeproc (0.3.0.1)
 
