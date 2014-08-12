@@ -192,18 +192,15 @@ getDuplCiteData b1 b2 g
       collide    = proc rmExtras . proc rmNameHash . proc rmGivenNames . whatToGet
       citeData   = nubBy (\a b -> collide a == collide b && key a == key b) $
                    concatMap (mapGroupOutput $ getCiteData) g
-      findDupl f = [c | c <- citeData
-                      , d <- citeData
-                      , c /= d
-                      , f c == f d ]
-      duplicates = if b2 then findDupl (collide &&& citYear)
-                         else findDupl  collide
+      duplicates = [c | c <- citeData , d <- citeData , collides c d]
+      collides x y = x /= y && (collide x == collide y)
+                            && (not b2 || citYear x == citYear y)
 
 rmExtras :: [Output] -> [Output]
 rmExtras os
-    | Output         x f : xs <- os = case rmExtras x of
+    | Output         x _ : xs <- os = case rmExtras x of
                                            [] -> rmExtras xs
-                                           ys -> Output ys f : rmExtras xs
+                                           ys -> ys ++ rmExtras xs
     | OContrib _ _ x _ _ : xs <- os = OContrib [] [] x [] [] : rmExtras xs
     | OYear        y _ f : xs <- os = OYear y [] f : rmExtras xs
     | ODel             _ : xs <- os = rmExtras xs
