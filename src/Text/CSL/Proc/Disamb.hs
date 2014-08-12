@@ -20,7 +20,7 @@ module Text.CSL.Proc.Disamb where
 
 import Control.Arrow ( (&&&), (>>>), second )
 import Data.Char ( chr )
-import Data.List ( elemIndex, elemIndices, find, findIndex, sortBy, mapAccumL
+import Data.List ( elemIndex, find, findIndex, sortBy, mapAccumL
                  , nub, nubBy, groupBy, isPrefixOf )
 import Data.Maybe
 import Data.Ord ( comparing )
@@ -192,7 +192,10 @@ getDuplCiteData b1 b2 g
       collide    = proc rmExtras . proc rmNameHash . proc rmGivenNames . whatToGet
       citeData   = nubBy (\a b -> collide a == collide b && key a == key b) $
                    concatMap (mapGroupOutput $ getCiteData) g
-      findDupl f = filter (flip (>) 1 . length . flip elemIndices (map f citeData) . f) citeData
+      findDupl f = [c | c <- citeData
+                      , d <- citeData
+                      , c /= d
+                      , f c == f d ]
       duplicates = if b2 then findDupl (collide &&& citYear)
                          else findDupl  collide
 
