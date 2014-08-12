@@ -145,7 +145,7 @@ evalElement el
                         res <- consuming $ substituteWith e
                         if null res
                            then if null els
-                                   then return [Output [] emptyFormatting]
+                                   then return [ONull]
                                    else evalElement (Substitute els)
                            else return res
     -- All macros and conditionals should have been expanded
