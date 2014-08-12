@@ -55,23 +55,23 @@ pandoc-citeproc (0.4)
   * Look for chicago-author-date.csl in ~/.csl if no csl specified.
     If not found there, use the chicago-author-date.csl that comes with
     the distribution (#48).
-  * Improved case transform behavior with puncutation.
+  * Improved case transform behavior with punctuation.
     Previously capitalization might change after a word-internal period
     or apostrophe.  Now internal punctuation only signals a word
     boundary if it is a dash or single quote character.
-  * Mark final heading (if present) as "unnumbered".
-    Pandoc's algorithm will not number it correctly since it's in
-    a Div.  And it's not good practice to number a bibliography section
-    heading anyway.  See pandoc #1277.
-  * Treat empty `references` (empty string) in metadata as empty list.
-  * Fixed titlecase transformation of words containing `'`.
+
+pandoc-citeproc (0.3.1)
+
+  * Marked final heading (if present) as "unnumbered" (pandoc #1277).
+  * Treat empty 'references' (empty string) as empty list.
+  * Fixed titlecase transformation of words containing '.
   * Fixed punctuation in notes.
-  * Updated chicago-author-date.csl and locales.
-  * `FromJSON` for `Formatted`:  Handle block lists as well as inline lists.
-  * Require `yaml >= 0.8.8.2`.  This fixes a problem wherein dates with
-    integer components would be printed using decimal points in yaml output.
-  * Fixed spacing problem with citations in notes in footnote styles.
-    Closes pandoc #1036.
+  * Improved test suite.
+  * FromJSON for Formatted: handle block lists as well as inline.
+  * Require yaml >= 0.8.8.2.
+  * Fixed spacing problem with citations in notes in footnote styles
+    (pandoc #1036).
+  * Updated chicago-author-date.csl and locales (#34).
   * Move punctuation inside quotes, depending on style.  This is activated by
     the `punctuation-in-quote` locale option, which has a default
     per locale but can be overridden in the style.  This gives more flexibility.
