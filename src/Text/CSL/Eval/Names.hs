@@ -54,10 +54,10 @@ evalNames skipEdTrans ns nl d
                   st  <- get
                   fb  <- agents "subsequent" s ags
                   put st
-                  if res /= []
-                    then let role = if aus == ["author"] then concat aus ++ "sub" else s
+                  if null res
+                    then     return []
+                    else let role = if aus == ["author"] then "authorsub" else s
                          in  return . return . OContrib k role res fb =<< gets etal
-                    else     return []
         r'  <- evalNames skipEdTrans xs nl d
         num <- gets contNum
         return $ if r /= [] && r' /= []
