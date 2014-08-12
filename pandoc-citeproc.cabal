@@ -142,7 +142,7 @@ library
     ghc-prof-options: -prof -auto-all
     build-depends:    containers, directory, mtl,
                       bytestring, filepath, pandoc-types >= 1.12.3, tagsoup,
-                      aeson >= 0.7 && < 0.9, text, vector, texmath >= 0.6.4,
+                      aeson >= 0.7 && < 0.9, text, vector,
                       split, yaml >= 0.8.8.2, pandoc >= 1.12.1
     if impl(ghc < 7.6)
        build-depends: ghc-prim
