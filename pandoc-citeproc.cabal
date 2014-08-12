@@ -11,9 +11,10 @@ description:        The pandoc-citeproc library exports functions for
                     Style Language (CSL). More details on CSL can be
                     found here: <http://citationstyles.org/>.
                     .
-                    Currently this package includes a copy of the citeproc-hs
-                    code. When citeproc-hs is updated to be compatible,
-                    this package will simply depend on citeproc-hs.
+                    Currently this package includes a heavily revised
+                    copy of the citeproc-hs code. When citeproc-hs is
+                    updated to be compatible, this package will simply
+                    depend on citeproc-hs.
                     .
                     This package also contains an executable: pandoc-citeproc,
                     which works as a pandoc filter (pandoc >= 1.12), and
