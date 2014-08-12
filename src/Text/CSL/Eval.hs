@@ -119,7 +119,9 @@ expandMacro x = return x
 evalElement :: Element -> State EvalState [Output]
 evalElement el
     | Elements fm es <- el        = evalElements es >>= \os ->
-                                      return [Output os fm]
+                                      if null os
+                                         then return []
+                                         else return [Output os fm]
     | Const    s   fm       <- el = return $ addSpaces s
                                            $ if fm == emptyFormatting
                                                 then [OPan (readCSLString s)]
@@ -139,8 +141,13 @@ evalElement el
                                     ifEmpty (evalNames False s n d)
                                             (withNames s el $ evalElements sub)
                                             (appendOutput fm)
-    | Substitute (e:els)    <- el = ifEmpty (consuming $ substituteWith e)
-                                            (getFirst els) id
+    | Substitute (e:els)    <- el = do
+                        res <- consuming $ substituteWith e
+                        if null res
+                           then if null els
+                                   then return [Output [] emptyFormatting]
+                                   else evalElement (Substitute els)
+                           else return res
     -- All macros and conditionals should have been expanded
     | Choose _ _  _         <- el = error $ "Unexpanded Choose"
     | Macro    s   _        <- el = error $ "Unexpanded macro " ++ s
@@ -203,10 +210,6 @@ evalElement el
                                         , env = (env s)
                                           {names = tail $ names (env s)}}) >> return r
 
-      getFirst        [] = return []
-      getFirst    (x:xs) = whenElse ((/=) []  <$> substituteWith x)
-                                    (consuming $  substituteWith x)
-                                    (getFirst xs)
       getVariable f fm s = if isTitleVar s || isTitleShortVar s
                            then consumeVariable s >> formatTitle s f fm else
                            case map toLower s of
