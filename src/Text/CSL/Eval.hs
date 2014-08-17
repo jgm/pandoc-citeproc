@@ -342,7 +342,7 @@ formatNumber f fm v n
 
 checkRange :: [CslTerm] -> String -> String
 checkRange _ [] = []
-checkRange ts (x:xs) = if x == '-'
+checkRange ts (x:xs) = if x == '-' || x == '\x2013'
                        then pageRange ts ++ checkRange ts xs
                        else x             : checkRange ts xs
 
