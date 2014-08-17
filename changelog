@@ -1,3 +1,25 @@
+pandoc-citeproc (0.4.0.1)
+
+  * Interpret date literals with underscores (e.g. "2004_2006") as ranges.
+    This covers a common workaround for a deficiency in Zotero (#65).
+  * Correctly handle "literal" in CSL date (#65).
+  * Fixed erroneous capitalization of the first ibid. in a citation,
+    even in the middle of a sentence (#68).  Removed "ibid-c",
+    "ibid-locator-c" classifications.
+  * Pandoc:  Capitalize first word of citation note, unless span=nocase.
+    Previously we only capitalized citations.  This captures ibid
+    and the like.
+  * Text.CSL.Util.toCapital:  respect `<span class="nocase">`.
+  * Turn small caps into SmallCaps element in reading CSL JSON (#67).
+    Either the <span style="font-variant:small-caps"> or the <sc>
+    variant may be used.
+  * Added "ca", "c", "et" to list of short words in titlecase transforms
+    (#66).
+  * Fixed some errors in the no-author test case.
+  * test-pandoc-citeproc:  Avoid running tests twice!
+  * Check for en dash in checking for page ranges (#70).
+  * Removed unused texmath build-depend.
+
 pandoc-citeproc (0.4)
 
   * Fixed #58 - previously not all substitute alternatives were tried.
