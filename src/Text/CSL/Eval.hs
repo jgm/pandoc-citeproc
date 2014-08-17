@@ -183,7 +183,9 @@ evalElement el
                             case numVars of
                               ["number-of-volumes"] -> not $ any (== "1") nums
                               ["number-of-pages"]   -> not $ any (== "1") nums
-                              _ -> any ('-' `elem`) nums
+                              _ -> any
+                                   (\x -> '-' `elem` x || '\x2013' `elem` x)
+                                   nums
                          pluralizeTerm x = x
                      if null res
                         then return []
@@ -373,7 +375,7 @@ breakNumericString :: [String] -> [String]
 breakNumericString [] = []
 breakNumericString (x:xs)
     | isTransNumber x = x : breakNumericString xs
-    | otherwise       = let (a,b) = break (flip elem "&-,") x
+    | otherwise       = let (a,b) = break (flip elem "&-\x2013,") x
                             (c,d) = if null b then ("","") else (take 1 b, tail b)
                         in filter (/= []) $  a : c : breakNumericString (d : xs)
 
@@ -387,7 +389,9 @@ formatRange fm p = do
 
       tupleRange [] = []
       tupleRange (x:"-":[]  ) = return (x,[])
+      tupleRange (x:"\x2013":[]  ) = return (x,[])
       tupleRange (x:"-":y:xs) = (x, y) : tupleRange xs
+      tupleRange (x:"\x2013":y:xs) = (x, y) : tupleRange xs
       tupleRange (x:      xs) = (x,[]) : tupleRange xs
 
       joinRange (a, []) = a
