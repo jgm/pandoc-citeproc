@@ -21,10 +21,11 @@ import Text.Pandoc.Process (pipeProcess)
 import qualified Data.Yaml as Yaml
 import Text.Pandoc (writeNative, writeHtmlString, readNative, def)
 import Text.CSL.Pandoc (processCites')
+import Data.List (isSuffixOf)
 
 main = do
   testnames <- fmap (map (dropExtension . takeBaseName) .
-                     filter (\x -> takeExtension x == ".native")) $
+                     filter (".in.native" `isSuffixOf`)) $
                getDirectoryContents "tests"
   citeprocTests <- mapM testCase testnames
   fs <- filter (\f -> takeExtension f `elem` [".bibtex",".biblatex"])
