@@ -109,7 +109,7 @@ instance FromJSON RefDate where
               v .:? "month" .!= "" <*>
               v .:? "season" .!= "" <*>
               v .:? "day" .!= "" <*>
-              v .:? "other" .!= "" <*>
+              v .:? "literal" .!= "" <*>
               ((v .: "circa" >>= parseBool) <|> pure False)
   parseJSON _ = fail "Could not parse RefDate"
 
