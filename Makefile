@@ -2,7 +2,7 @@ all:
 	cabal install --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization --ghc-options '-pgmPcpphs -optP--cpp'
 
 quick:
-	cabal install --disable-optim -ftest_citeproc
+	cabal install --disable-optim --enable-tests -ftest_citeproc
 
 prod:
 	cabal install --enable-tests -ftest_citeproc -fembed_data_files --enable-optimization --ghc-options '-pgmPcpphs -optP--cpp'
