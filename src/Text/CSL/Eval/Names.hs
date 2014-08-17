@@ -344,10 +344,7 @@ formatTerm :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
 formatTerm f fm p s = do
   t <- getTerm p f s
   pos <- gets (citePosition . cite . env)
-  let t' = if pos == "ibid-with-locator-c" || pos == "ibid-c"
-              then capitalize t
-              else t
-  return $ oStr' t' fm
+  return $ oStr' t fm
 
 formatLabel :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
 formatLabel f fm p s
@@ -356,7 +353,7 @@ formatLabel f fm p s
                        form (\fm' -> return . flip OLoc emptyFormatting . output fm') id l ('-' `elem` v)
     | "page"    <- s = checkPlural
     | "volume"  <- s = checkPlural
-    | "ibid"    <- s = format' s p
+    | "ibid"    <- s = format s p
     | isRole       s = do a <- getAgents' (if s == "editortranslator"
                                               then "editor"
                                               else s)
@@ -373,10 +370,6 @@ formatLabel f fm p s
                       v <- getStringVar s
                       format  s ('-' `elem` v)
       format      = form output id
-      format' t b = gets (citePosition . cite . env) >>= \po ->
-                    if po == "ibid-with-locator-c" || po == "ibid-c"
-                    then form output capitalize t b
-                    else format t b
       form o g t b = return . o fm =<< g . period <$> getTerm (b && p) f t
       period      = if stripPeriods fm then filter (/= '.') else id
 

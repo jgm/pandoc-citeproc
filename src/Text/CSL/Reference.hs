@@ -620,22 +620,22 @@ processCites rs cs
 
       procCs a [] = (a,[])
       procCs a (c:xs)
-          | isIbidC, isLocSet = go "ibid-with-locator-c"
           | isIbid,  isLocSet = go "ibid-with-locator"
-          | isIbidC           = go "ibid-c"
           | isIbid            = go "ibid"
           | isElem            = go "subsequent"
           | otherwise         = go "first"
           where
-            go s = let addCite    = if last a /= [] then init a ++ [last a ++ [c]] else init a ++ [[c]]
+            go s = let addCite    = init a ++ [last a ++ [c]]
                        (a', rest) = procCs addCite xs
                    in  (a', (c { citePosition = s}, getRef c) : rest)
             isElem   = citeId c `elem` map citeId (concat a)
-            -- Ibid in same citation
-            isIbid   = last a /= [] && citeId c == citeId (last $ last a)
-            -- Ibid in different citations (must be capitalized)
-            isIbidC  = init a /= [] && length (last $ init a) == 1 &&
-                       last a == [] && citeId c == citeId (head . last $ init a)
+            isIbid   = case reverse (last a) of
+                            []    -> case reverse (init a) of
+                                          []     -> False
+                                          (xs:_) -> not (null xs) &&
+                                                    all (== citeId c)
+                                                        (map citeId xs)
+                            (x:_) -> citeId c == citeId x
             isLocSet = citeLocator c /= ""
 
 setPageFirst :: Reference -> Reference
