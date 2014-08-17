@@ -62,13 +62,22 @@ import qualified Data.Vector as V
 -- pandoc metadata bibliographies.
 
 readCSLString :: String -> [Inline]
-readCSLString s = case readHtml def{ readerSmart = True
+readCSLString s = Walk.walk handleSmallCapsSpans
+                $ case readHtml def{ readerSmart = True
                                    , readerParseRaw = True }
                                 (adjustScTags s) of
                         Pandoc _ [Plain ils]   -> ils
                         Pandoc _ [Para  ils]   -> ils
                         Pandoc _ x             -> Walk.query (:[]) x
+  -- this is needed for versions of pandoc that don't turn
+  -- a span with font-variant:small-caps into a SmallCaps element:
+  where handleSmallCapsSpans (Span ("",[],[("style",s)]) ils)
+            | filter (`notElem` " ;") s == "font-variant:small-caps" =
+              SmallCaps ils
+        handleSmallCapsSpans x = x
 
+-- <sc> is not a real HTML tag, but a CSL convention.  So we
+-- replace it with a real tag that the HTML reader will understand.
 adjustScTags :: String -> String
 adjustScTags zs =
   case zs of
