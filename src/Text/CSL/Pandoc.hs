@@ -229,8 +229,7 @@ deNote = topDown go
            in f xs' ++ ys
         sanitize :: Citation -> [Block] -> [Block]
         sanitize Citation{citationPrefix = pref} [Para xs] =
-           [Para $ (if null pref then xs else toCapital xs) ++
-                   if endWithPunct xs then [Space] else []]
+           [Para $ toCapital xs ++ if endWithPunct xs then [Space] else []]
         sanitize _ bs = bs
 
 isTextualCitation :: [Citation] -> Bool
