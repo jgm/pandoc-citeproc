@@ -646,9 +646,9 @@ processCites rs cs
             isIbid   = case reverse (last a) of
                             []    -> case reverse (init a) of
                                           []     -> False
-                                          (xs:_) -> not (null xs) &&
+                                          (zs:_) -> not (null zs) &&
                                                     all (== citeId c)
-                                                        (map citeId xs)
+                                                        (map citeId zs)
                             (x:_) -> citeId c == citeId x
             isLocSet = citeLocator c /= ""
 

@@ -26,7 +26,7 @@ import Data.Monoid
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
 import Text.CSL.Util ( headInline, lastInline, readNum, (<^>), query, toRead,
-                       capitalize, splitStrWhen )
+                       splitStrWhen )
 import Text.CSL.Style
 import Text.Pandoc.Definition
 import Text.Pandoc.Shared ( stringify )
@@ -343,7 +343,6 @@ formatName m b f fm ops np n
 formatTerm :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
 formatTerm f fm p s = do
   t <- getTerm p f s
-  pos <- gets (citePosition . cite . env)
   return $ oStr' t fm
 
 formatLabel :: Form -> Formatting -> Bool -> String -> State EvalState [Output]

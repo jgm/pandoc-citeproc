@@ -209,7 +209,7 @@ startWithPunct = and . map (`elem` ".,;:!?") . headInline
 deNote :: Pandoc -> Pandoc
 deNote = topDown go
   where go (Cite (c:cs) [Note xs]) =
-            Cite (c:cs) [Note $ sanitize c xs]
+            Cite (c:cs) [Note $ sanitize xs]
         go (Note xs) = Note $ topDown go' xs
         go x = x
         go' (x : Cite cs [Note [Para xs]] : ys) | x /= Space =
@@ -227,10 +227,10 @@ deNote = topDown go
                         then initInline $ removeLeadingPunct xs
                         else removeLeadingPunct xs
            in f xs' ++ ys
-        sanitize :: Citation -> [Block] -> [Block]
-        sanitize Citation{citationPrefix = pref} [Para xs] =
+        sanitize :: [Block] -> [Block]
+        sanitize [Para xs] =
            [Para $ toCapital xs ++ if endWithPunct xs then [Space] else []]
-        sanitize _ bs = bs
+        sanitize bs = bs
 
 isTextualCitation :: [Citation] -> Bool
 isTextualCitation (c:_) = citationMode c == AuthorInText

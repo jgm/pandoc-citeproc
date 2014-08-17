@@ -71,8 +71,8 @@ readCSLString s = Walk.walk handleSmallCapsSpans
                         Pandoc _ x             -> Walk.query (:[]) x
   -- this is needed for versions of pandoc that don't turn
   -- a span with font-variant:small-caps into a SmallCaps element:
-  where handleSmallCapsSpans (Span ("",[],[("style",s)]) ils)
-            | filter (`notElem` " \t;") s == "font-variant:small-caps" =
+  where handleSmallCapsSpans (Span ("",[],[("style",sty)]) ils)
+            | filter (`notElem` " \t;") sty == "font-variant:small-caps" =
               SmallCaps ils
         handleSmallCapsSpans x = x
 
