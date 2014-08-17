@@ -328,7 +328,8 @@ tailFirstInlineStr :: [Inline] -> [Inline]
 tailFirstInlineStr = mapHeadInline (drop 1)
 
 toCapital :: [Inline] -> [Inline]
-toCapital = mapHeadInline capitalize
+toCapital ils@(Span (_,["nocase"],_) _:_) = ils
+toCapital ils = mapHeadInline capitalize ils
 
 mapHeadInline :: (String -> String) -> [Inline] -> [Inline]
 mapHeadInline _ [] = []
