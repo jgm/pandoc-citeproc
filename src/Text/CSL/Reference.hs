@@ -19,6 +19,7 @@
 module Text.CSL.Reference where
 
 import Data.List  ( elemIndex, isPrefixOf, intercalate )
+import Data.List.Split ( splitWhen )
 import Data.Maybe ( fromMaybe             )
 import Data.Generics hiding (Generic)
 import GHC.Generics (Generic)
@@ -132,8 +133,21 @@ instance FromJSON [RefDate] where
     case dateParts of
          Just (Array xs) -> mapM (fmap (setCirca circa') . parseJSON)
                             $ V.toList xs
-         _               -> (:[]) `fmap` parseJSON (Object v)
+         _               -> handleLiteral <$> parseJSON (Object v)
   parseJSON x          = parseJSON x >>= mkRefDate
+
+-- Zotero doesn't properly support date ranges, so a common
+-- workaround is 2005_2007; support this as date range:
+handleLiteral :: RefDate -> [RefDate]
+handleLiteral d@(RefDate (Literal "") (Literal "") (Literal "")
+                         (Literal "") (Literal xs) b)
+  = case splitWhen (=='_') xs of
+         [x,y] | all isDigit x && all isDigit y &&
+                 not (null x) && not (null y) ->
+                 [RefDate (Literal x) mempty mempty mempty mempty b,
+                  RefDate (Literal y) mempty mempty mempty mempty b]
+         _ -> [d]
+handleLiteral d = [d]
 
 toDatePart :: RefDate -> [Int]
 toDatePart refdate =
@@ -665,5 +679,3 @@ setNearNote s cs
                                   citeNoteNumber x /= "0" &&
                                   readNum (citeNoteNumber c) - readNum (citeNoteNumber x) <= near_note
                            _   -> False
-
-
