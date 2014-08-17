@@ -198,8 +198,8 @@ titlecase zs = evalState (caseTransform tc $ splitUpStr zs) SentenceBoundary
         tc (Span ("",["nocase"],[]) xs) = return $ Span ("",["nocase"],[]) xs
         tc x = return x
         isShortWord  s = s `elem`
-                      ["a","an","and","as","at","but","by","d","de"
-                      ,"down","for","from"
+                      ["a","an","and","as","at","but","by","c","ca","d","de"
+                      ,"down","et","for","from"
                       ,"in","into","nor","of","on","onto","or","over","so"
                       ,"the","till","to","up","van","von","via","with","yet"]
 
