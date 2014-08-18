@@ -38,7 +38,7 @@ import Text.CSL.Eval.Names
 import Text.CSL.Output.Plain
 import Text.CSL.Reference
 import Text.CSL.Style hiding (Any)
-import Text.CSL.Util ( readNum, last', proc, procM, proc', query, betterThan )
+import Text.CSL.Util ( readNum, last', proc, proc', query, betterThan )
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the
@@ -59,7 +59,7 @@ evalLayout (Layout _ _ es) em b l m o a r
       locale = case l of
                  [x] -> x
                  _   -> Locale [] [] [] [] []
-      job    = expandMacros es >>= evalElements
+      job    = evalElements es
       cit    = case em of
                  EvalCite    c -> c
                  EvalSorting c -> c
@@ -103,19 +103,6 @@ evalSorting m l ms opts ss as r
 evalElements :: [Element] -> State EvalState [Output]
 evalElements = concatMapM evalElement
 
-expandMacros :: [Element] -> State EvalState [Element]
-expandMacros = procM expandMacro
-
-expandMacro :: Element -> State EvalState Element
-expandMacro (Choose i ei xs) =
-  Elements emptyFormatting `fmap` evalIfThen i ei xs
-expandMacro (Macro s fm) = do
-  ms <- gets (macros . env)
-  case lookup s ms of
-       Nothing  -> error $ "Macro " ++ show s ++ " not found!"
-       Just els -> Elements fm `fmap` procM expandMacro els
-expandMacro x = return x
-
 evalElement :: Element -> State EvalState [Output]
 evalElement el
     | Elements fm es <- el        = evalElements es >>= \os ->
@@ -149,8 +136,18 @@ evalElement el
                                    else evalElement (Substitute els)
                            else return res
     -- All macros and conditionals should have been expanded
-    | Choose _ _  _         <- el = error $ "Unexpanded Choose"
-    | Macro    s   _        <- el = error $ "Unexpanded macro " ++ s
+    | Choose i ei xs        <- el = do
+                        res <- evalIfThen i ei xs
+                        evalElement $ Elements emptyFormatting res
+    | Macro    s   fm       <- el = do
+                        ms <- gets (macros . env)
+                        case lookup s ms of
+                             Nothing  -> error $ "Macro " ++ show s ++ " not found!"
+                             Just els -> do
+                               res <- concat <$> mapM evalElement els
+                               if null res
+                                  then return []
+                                  else return [Output res fm]
     | otherwise                   = return []
     where
       addSpaces strng = (if take 1 strng == " " then (OSpace:) else id) .
