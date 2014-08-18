@@ -438,10 +438,9 @@ isNames :: Element -> Bool
 isNames x = case x of Names {} -> True; _ -> False
 
 hasEtAl :: [Name] -> Bool
-hasEtAl = not . null . query getEtAl
-    where getEtAl n
-              | EtAl _ _ <- n = [n]
-              | otherwise     = []
+hasEtAl = any isEtAl
+    where isEtAl (EtAl _ _) = True
+          isEtAl _          = False
 
 data Formatting
     = Formatting
