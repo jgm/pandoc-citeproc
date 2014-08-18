@@ -229,13 +229,13 @@ findTerm' :: String -> Form -> Gender -> [CslTerm] -> Maybe CslTerm
 findTerm' s f g
     = listToMaybe . filter (cslTerm &&& termForm &&& termGenderForm >>> (==) (s,(f,g)))
 
-hasOrdinals :: Data a => a -> Bool
-hasOrdinals = or . query hasOrd
+hasOrdinals :: [Locale] -> Bool
+hasOrdinals = any (any hasOrd . localeTerms)
     where
       hasOrd o
           | CT {cslTerm = t} <- o
-          , "ordinal" `isInfixOf` t = [True]
-          | otherwise               = [False]
+          , "ordinal" `isInfixOf` t = True
+          | otherwise               = False
 
 rmOrdinals :: Data a => a -> a
 rmOrdinals = proc' doRemove
