@@ -7,6 +7,9 @@ quick:
 prod:
 	cabal install --enable-tests -ftest_citeproc -fembed_data_files --enable-optimization --ghc-options '-pgmPcpphs -optP--cpp'
 
+prof:
+	cabal install --enable-library-profiling --enable-executable-profiling --enable-optimization --ghc-options '-pgmPcpphs -optP--cpp'
+
 update:
 	curl 'https://raw2.github.com/citation-style-language/styles/master/chicago-author-date.csl' > chicago-author-date.csl ; \
 	git clone 'https://github.com/citation-style-language/locales' locales-repo ; \
