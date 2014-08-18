@@ -50,7 +50,7 @@ evalLayout (Layout _ _ es) em b l m o a r
     = cleanOutput evalOut
     where
       evalOut = case evalState job initSt of
-                  [] -> if (isSorting $ em)
+                  [] -> if isSorting em
                         then []
                         else [noOutputError]
                   x | title r == Formatted [Str (citeId cit), Space, Str "not", Space,
@@ -66,8 +66,6 @@ evalLayout (Layout _ _ es) em b l m o a r
                  EvalBiblio  c -> c
       initSt = EvalState (mkRefMap r) (Env cit (localeTerms locale) m
                          (localeDate locale) o [] a) [] em b False [] [] False [] [] []
-      -- TODO: is this needed? We already remove titlecase in converting
-      -- from bibtex.
       suppTC = let getLang = take 2 . map toLower in
                case (getLang $ localeLang locale, getLang $ unLiteral $ language r) of
                  (_,  "en") -> id
