@@ -2,7 +2,6 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="chicago">
   <info>
     <title>Chicago Manual of Style 16th edition (author-date)</title>
-<!--
     <id>http://www.zotero.org/styles/chicago-author-date</id>
     <link href="http://www.zotero.org/styles/chicago-author-date" rel="self"/>
     <link href="http://www.chicagomanualofstyle.org/tools_citationguide.html" rel="documentation"/>
@@ -27,7 +26,6 @@
     <summary>The author-date variant of the Chicago style</summary>
     <updated>2014-05-23T03:53:32+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
--->
   </info>
 <!--
   <locale xml:lang="en">

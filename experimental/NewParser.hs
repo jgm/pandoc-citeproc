@@ -1,53 +1,53 @@
 {-# LANGUAGE OverloadedStrings, TupleSections #-}
 import Control.Monad.Trans.Resource
+import qualified Data.Text as T
 import qualified Data.Map as M
 import Data.Conduit (($$), Sink)
 import Data.Text (Text, unpack)
-import Text.XML.Stream.Parse
+-- import Text.XML.Stream.Parse
 import Text.CSL.Style
 import Data.XML.Types (Event)
 import Control.Applicative hiding (many)
 import qualified Text.XML as X
+import Data.Default
+import Text.XML.Cursor
 
-munpack = maybe "" unpack
+get name =
+  element (X.Name name (Just "http://purl.org/net/xbiblio/csl") Nothing)
 
-inTag name p =
-  tagName (X.Name name (Just "http://purl.org/net/xbiblio/csl") Nothing)
-    ignoreAttrs $ \_ -> p
-
-parseInfo = inTag "info" $ do
-  title <- inTag "title" content
-  return CSInfo
-      { csiTitle      = munpack title
-      , csiAuthor     = CSAuthor "" "" ""
-      , csiCategories = [] -- [CSCategory]
-      , csiId         = ""
-      , csiUpdated    = ""
-      }
-
-parseStyle = tagName "{http://purl.org/net/xbiblio/csl}style"
-  ((,) <$> requireAttr "version" <*> requireAttr "class" <* ignoreAttrs) $
-  \(version, class_) -> do
-    info <- parseInfo
-    return Style{ styleVersion = unpack version
-                , styleClass = unpack class_
-                , styleInfo = info
-                , styleDefaultLocale = ""
-                , styleLocale = []
-                , styleAbbrevs = Abbreviations M.empty
-                , csOptions = []
-                , csMacros = []
-                , citation = Citation{ citOptions = []
-                                     , citSort = []
-                                     , citLayout = Layout{
-                                           layFormat = emptyFormatting
-                                         , layDelim = ""
-                                         , elements = [] } }
-                , biblio = Nothing
-                }
+string = unpack . T.concat . content
 
 main = do
-     style <- runResourceT $
-             parseFile def "chicago-author-date.csl" $$
-               force "style required" parseStyle
-     print style
+  doc <- X.readFile def "chicago-author-date.csl"
+  let cur = fromDocument doc
+  print $ cur $| laxAttribute "version"
+  let version = unpack . T.concat $ cur $| laxAttribute "version"
+  let class_ = unpack . T.concat $ cur $| laxAttribute "class"
+  let author = head (cur $// get "info" &/ get "author") -- TODO
+  let info = CSInfo
+        { csiTitle      = cur $/ get "info" &/ get "title" &/ string
+        , csiAuthor     = CSAuthor (author $/ get "name"  &/ string)
+                                   (author $/ get "email" &/ string)
+                                   (author $/ get "uri"   &/ string)
+        , csiCategories = []  -- TODO we don't really use this, and the type
+                              -- in Style doesn't match current CSL at all
+        , csiId         = cur $/ get "info" &/ get "id" &/ string
+        , csiUpdated    = cur $/ get "info" &/ get "updated" &/ string
+        }
+  print  Style{ styleVersion = version
+              , styleClass = class_
+              , styleInfo = Just info
+              , styleDefaultLocale = ""
+              , styleLocale = []
+              , styleAbbrevs = Abbreviations M.empty
+              , csOptions = []
+              , csMacros = []
+              , citation = Citation{ citOptions = []
+                                   , citSort = []
+                                   , citLayout = Layout{
+                                         layFormat = emptyFormatting
+                                       , layDelim = ""
+                                       , elements = [] } }
+              , biblio = Nothing
+              }
+
