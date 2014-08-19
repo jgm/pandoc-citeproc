@@ -1,16 +1,16 @@
 quick: deps
-	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization
+	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization --ghc-options "-pgmPcpphs -optP--cpp"
 	cabal build
 
 full: deps
-	cabal configure --enable-tests -ftest_citeproc -fembed_data_files
+	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --ghc-options "-pgmPcpphs -optP--cpp"
 	cabal build
 
 deps:
 	cabal install --only-dependencies --enable-tests -ftest_citeproc -fembed_data_files
 
 prof: deps
-	cabal configure --enable-library-profiling --enable-executable-profiling --enable-optimization
+	cabal configure --enable-library-profiling --enable-executable-profiling --enable-optimization --ghc-options "-pgmPcpphs -optP--cpp"
 	cabal build
 
 install:
