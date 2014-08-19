@@ -23,6 +23,9 @@ main = do
   print $ cur $| laxAttribute "version"
   let version = unpack . T.concat $ cur $| laxAttribute "version"
   let class_ = unpack . T.concat $ cur $| laxAttribute "class"
+  let defaultLocale = case cur $| laxAttribute "default-locale" of
+                           (x:_) -> unpack x
+                           []    -> "en-US"
   let author = head (cur $// get "info" &/ get "author") -- TODO
   let info = CSInfo
         { csiTitle      = cur $/ get "info" &/ get "title" &/ string
@@ -34,11 +37,12 @@ main = do
         , csiId         = cur $/ get "info" &/ get "id" &/ string
         , csiUpdated    = cur $/ get "info" &/ get "updated" &/ string
         }
+  let locales = cur $// get "locale" &/ parseLocale
   print  Style{ styleVersion = version
               , styleClass = class_
               , styleInfo = Just info
-              , styleDefaultLocale = ""
-              , styleLocale = []
+              , styleDefaultLocale = defaultLocale
+              , styleLocale = locales
               , styleAbbrevs = Abbreviations M.empty
               , csOptions = []
               , csMacros = []
@@ -51,3 +55,16 @@ main = do
               , biblio = Nothing
               }
 
+parseLocale :: Cursor -> [Locale]
+parseLocale cur = [Locale
+      { localeVersion = unpack $ T.concat version
+      , localeLang    = unpack $ T.concat lang
+      , localeOptions = options
+      , localeTerms   = terms
+      , localeDate    = date
+      }]
+  where version = cur $| laxAttribute "version"
+        lang    = cur $| laxAttribute "lang"
+        options = [] -- TODO
+        terms   = [] -- TODO
+        date    = [] -- TODO
