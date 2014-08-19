@@ -10,6 +10,7 @@ import Data.XML.Types (Event)
 import Control.Applicative hiding (many)
 import qualified Text.XML as X
 import Data.Default
+import Text.Pandoc.Shared (safeRead)
 import Text.XML.Cursor
 
 get name =
@@ -55,6 +56,32 @@ main = do
               , biblio = Nothing
               }
 
+attrWithDefault :: Read a => Text -> a -> Cursor -> a
+attrWithDefault t d cur =
+  case safeRead (stringAttr t cur) of
+       Just x   -> x
+       Nothing  -> d
+
+stringAttr :: Text -> Cursor -> String
+stringAttr t cur = unpack $ T.concat $ laxAttribute t cur
+
+parseCslTerm :: Cursor -> CslTerm
+parseCslTerm cur =
+    let body = unpack $ T.strip $ T.concat $ cur $/ content
+    in CT
+      { cslTerm        = stringAttr "name" cur
+      , termForm       = attrWithDefault "form" NotSet cur
+      , termGender     = attrWithDefault "gender" Neuter cur
+      , termGenderForm = attrWithDefault "gender-form" Neuter cur
+      , termSingular   = if null body
+                            then cur $/ get "single" &/ string
+                            else body
+      , termPlural     = if null body
+                            then cur $/ get "multiple" &/ string
+                            else body
+      , termMatch      = stringAttr "match" cur
+      }
+
 parseLocale :: Cursor -> [Locale]
 parseLocale cur = [Locale
       { localeVersion = unpack $ T.concat version
@@ -66,5 +93,5 @@ parseLocale cur = [Locale
   where version = cur $| laxAttribute "version"
         lang    = cur $| laxAttribute "lang"
         options = [] -- TODO
-        terms   = [] -- TODO
+        terms   = cur $/ get "term" &| parseCslTerm
         date    = [] -- TODO
