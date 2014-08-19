@@ -40,7 +40,13 @@ getLocale s = do
                    _       -> error $ "could not find locale data for " ++ s
          _ -> case lookup ("locales-" ++ take 5 s ++ ".xml") localeFiles of
                     Just x' -> return x'
-                    _       -> error $ "could not find locale data for " ++ s
+                    _       -> -- try again with 2-letter locale
+                       let s' = take 2 s in
+                       case lookup ("locales-" ++ fromMaybe s'
+                              (lookup s' langBase) ++ ".xml") localeFiles of
+                             Just x'' -> return x''
+                             _        -> error $
+                                         "could not find locale data for " ++ s
   return $ L.fromChunks [f]
 #else
   f <- case length s of
