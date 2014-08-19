@@ -18,6 +18,7 @@ module Text.CSL.Data
     ) where
 
 import System.FilePath ()
+import Data.Maybe (fromMaybe)
 import qualified Data.ByteString.Lazy as L
 #ifdef EMBED_DATA_FILES
 import Text.CSL.Data.Embedded (localeFiles, defaultCSL)
@@ -33,14 +34,13 @@ getLocale s = do
   f <- case length s of
          0 -> maybe (return S.empty) return
               $ lookup "locales-en-US.xml" localeFiles
-         2 -> let fn = ("locales-" ++ maybe "en-US"
-                                      id (lookup s langBase) ++ ".xml")
+         2 -> let fn = ("locales-" ++ fromMaybe s (lookup s langBase) ++ ".xml")
               in case lookup fn localeFiles of
                    Just x' -> return x'
-                   _       -> error "could not load the locale file"
+                   _       -> error $ "could not find locale data for " ++ s
          _ -> case lookup ("locales-" ++ take 5 s ++ ".xml") localeFiles of
                     Just x' -> return x'
-                    _       -> error "could not load the locale file"
+                    _       -> error $ "could not find locale data for " ++ s
   return $ L.fromChunks [f]
 #else
   f <- case length s of
