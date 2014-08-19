@@ -1,14 +1,26 @@
-all:
-	cabal install --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization --ghc-options '-pgmPcpphs -optP--cpp'
+quick: deps
+	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization
+	cabal build
 
-quick:
-	cabal install --disable-optim --enable-tests -ftest_citeproc
+full: deps
+	cabal configure --enable-tests -ftest_citeproc -fembed_data_files
+	cabal build
 
-prod:
-	cabal install --enable-tests -ftest_citeproc -fembed_data_files --enable-optimization --ghc-options '-pgmPcpphs -optP--cpp'
+deps:
+	cabal install --only-dependencies --enable-tests -ftest_citeproc -fembed_data_files
 
-prof:
-	cabal install --enable-library-profiling --enable-executable-profiling --enable-optimization --ghc-options '-pgmPcpphs -optP--cpp'
+prof: deps
+	cabal configure --enable-library-profiling --enable-executable-profiling --enable-optimization
+	cabal build
+
+install:
+	cabal install
+
+test:
+	cabal test
+
+clean:
+	cabal clean
 
 update:
 	curl 'https://raw2.github.com/citation-style-language/styles/master/chicago-author-date.csl' > chicago-author-date.csl ; \
@@ -18,3 +30,5 @@ update:
 	git add locales/*.xml; \
 	git add chicago-author-date.csl; \
 	git commit -a
+
+.PHONY: quick full prof update clean install test deps
