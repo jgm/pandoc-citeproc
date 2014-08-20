@@ -119,7 +119,9 @@ getFormatting cur =
   , verticalAlign = stringAttr "vertical-align" cur
   , textCase = stringAttr "text-case" cur
   , display = stringAttr "display" cur
-  , quotes = attrWithDefault "quote" NoQuote cur
+  , quotes = if attrWithDefault "quote" False cur
+                then NativeQuote
+                else NoQuote
   , stripPeriods = attrWithDefault "strip-periods" False cur
   , noCase = attrWithDefault "no-case" False cur
   , noDecor = attrWithDefault "no-decor" False cur
