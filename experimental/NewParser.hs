@@ -7,7 +7,7 @@ import Data.Text (Text, unpack)
 -- import Text.XML.Stream.Parse
 import Text.CSL.Style
 import Data.XML.Types (Event)
-import Control.Applicative hiding (many)
+import Control.Applicative hiding (many, Const)
 import qualified Text.XML as X
 import Data.Default
 import Text.Pandoc.Shared (safeRead)
@@ -39,6 +39,7 @@ main = do
         , csiUpdated    = cur $/ get "info" &/ get "updated" &/ string
         }
   let locales = cur $// get "locale" &/ parseLocale
+  let macros  = cur $// get "macro" &| parseMacro
   print  Style{ styleVersion = version
               , styleClass = class_
               , styleInfo = Just info
@@ -46,7 +47,7 @@ main = do
               , styleLocale = locales
               , styleAbbrevs = Abbreviations M.empty
               , csOptions = []
-              , csMacros = []
+              , csMacros = macros
               , citation = Citation{ citOptions = []
                                    , citSort = []
                                    , citLayout = Layout{
@@ -95,3 +96,41 @@ parseLocale cur = [Locale
         options = [] -- TODO
         terms   = cur $/ get "term" &| parseCslTerm
         date    = [] -- TODO
+
+parseElement :: Cursor -> [Element]
+parseElement cur =
+  case node cur of
+       X.NodeElement e ->
+         case X.nameLocalName $ X.elementName e of
+              "const" -> [Const (stringAttr "value" cur) (getFormatting cur)]
+              _ -> [Const "bar" emptyFormatting]
+       _ -> []
+
+getFormatting :: Cursor -> Formatting
+getFormatting cur =
+  emptyFormatting{
+    prefix  = stringAttr "prefix" cur
+  , suffix  = stringAttr "suffix" cur
+  , fontFamily = stringAttr "font-family" cur
+  , fontStyle = stringAttr "font-style" cur
+  , fontVariant = stringAttr "font-variant" cur
+  , fontWeight = stringAttr "font-weight" cur
+  , textDecoration = stringAttr "text-decoration" cur
+  , verticalAlign = stringAttr "vertical-align" cur
+  , textCase = stringAttr "text-case" cur
+  , display = stringAttr "display" cur
+  , quotes = attrWithDefault "quote" NoQuote cur
+  , stripPeriods = attrWithDefault "strip-periods" False cur
+  , noCase = attrWithDefault "no-case" False cur
+  , noDecor = attrWithDefault "no-decor" False cur
+  }
+
+parseElements :: Cursor -> [Element]
+parseElements cur =
+  let es = cur $/ parseElement
+  in  [Elements emptyFormatting es]
+
+parseMacro :: Cursor -> MacroMap
+parseMacro cur = (name, elts)
+  where name = cur $| stringAttr "name"
+        elts = cur $/ parseElement
