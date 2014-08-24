@@ -357,14 +357,16 @@ pageRange = maybe "\x2013" termPlural . findTerm "page-range-delimiter" Long
 
 isNumericString :: String -> Bool
 isNumericString [] = False
-isNumericString s  = null . filter (not . isNumber &&& not . isSpecialChar >>> uncurry (&&)) $
-                     words s
+isNumericString s  = all (\c -> isNumber c || isSpecialChar c) $ words s
 
 isTransNumber, isSpecialChar,isNumber :: String -> Bool
-isTransNumber = and . map isDigit
-isSpecialChar = and . map (flip elem "&-,")
-isNumber      = filter (not . isLetter) >>> filter (not . flip elem "&-,") >>>
-                map isDigit >>> and &&& not . null >>> uncurry (&&)
+isTransNumber = all isDigit
+isSpecialChar = all (`elem` "&-,\x2013")
+isNumber   cs = case [c | c <- cs
+                        , not (isLetter c)
+                        , not (c `elem` "&-,\x2013")] of
+                     []  -> False
+                     xs  -> all isDigit xs
 
 breakNumericString :: [String] -> [String]
 breakNumericString [] = []
