@@ -308,7 +308,7 @@ pLocator locMap = try $ do
   rawLoc <- many
      (notFollowedBy pSpace >> notFollowedBy (pWordWithDigits True) >> anyToken)
   la <- case stringify rawLoc of
-                 ""   -> lookAhead (pSpace >> pDigit) >> return "page"
+                 ""   -> lookAhead (optional pSpace >> pDigit) >> return "page"
                  s    -> maybe mzero return $ parseLocator locMap s
   g <- pWordWithDigits True
   gs <- many (pWordWithDigits False)
