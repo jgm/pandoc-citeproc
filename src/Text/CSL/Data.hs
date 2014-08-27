@@ -18,9 +18,9 @@ module Text.CSL.Data
     ) where
 
 import System.FilePath ()
-import Data.Maybe (fromMaybe)
 import qualified Data.ByteString.Lazy as L
 #ifdef EMBED_DATA_FILES
+import Data.Maybe (fromMaybe)
 import Text.CSL.Data.Embedded (localeFiles, defaultCSL)
 import qualified Data.ByteString as S
 #else
