@@ -60,7 +60,7 @@ disambCitations s bibs cs groups
                    then if isByCite then ByCite else AllNames
                    else NoGiven
 
-      clean     = if hasGNameOpt then id else proc rmNameHash . proc rmGivenNames
+      clean     = if hasGNameOpt then id else proc rmHashAndGivenNames
       withNames = flip map duplics $ same . clean .
                   map (if hasNamesOpt then disambData else return . disambYS)
 
@@ -111,7 +111,7 @@ data GiveNameDisambiguation
 disambAddNames :: GiveNameDisambiguation -> [CiteData] -> [CiteData]
 disambAddNames b needName = addLNames
     where
-      clean     = if b == NoGiven then proc rmNameHash . proc rmGivenNames else id
+      clean     = if b == NoGiven then proc rmHashAndGivenNames else id
       disSolved = zip needName' . disambiguate . map disambData $ needName'
       needName' = nub' needName []
       addLNames = map (\(c,n) -> c { disambed = if null n then collision c else head n }) disSolved
@@ -136,7 +136,7 @@ updateContrib g c n o
                                     | otherwise             -> o
     | otherwise = o
     where
-      clean         = if g == NoGiven then proc rmNameHash . proc rmGivenNames else id
+      clean         = if g == NoGiven then proc rmHashAndGivenNames else id
       processGNames = if g /= NoGiven then updateOName n else id
 
 updateOName :: [NameData] -> Output -> Output
@@ -189,7 +189,7 @@ getDuplCiteData b1 b2 g
       $ duplicates
     where
       whatToGet  = if b1 then collision else disambYS
-      collide    = proc rmExtras . proc rmNameHash . proc rmGivenNames . whatToGet
+      collide    = proc rmExtras . proc rmHashAndGivenNames . whatToGet
       citeData   = nubBy (\a b -> collide a == collide b && key a == key b) $
                    concatMap (mapGroupOutput $ getCiteData) g
       duplicates = [c | c <- citeData , d <- citeData , collides c d]
@@ -388,16 +388,14 @@ hasYearSuf = not . null . query getYearSuf
               | OYearSuf _ _ _ _ <- o = ["a"]
               | otherwise             = []
 
--- | Removes all given names form a 'OName' element with 'proc'.
-rmGivenNames :: Output -> Output
-rmGivenNames o
-    | OName i s _ f <- o = OName i s [] f
-    | otherwise          = o
+-- | Removes all given names and name hashes from OName elements.
+rmHashAndGivenNames :: Output -> Output
+rmHashAndGivenNames (OName _ s _ f) = OName emptyAgent s [] f
+rmHashAndGivenNames o = o
 
-rmNameHash :: Output -> Output
-rmNameHash o
-    | OName _ s ss f <- o = OName emptyAgent s ss f
-    | otherwise           = o
+rmGivenNames :: Output -> Output
+rmGivenNames (OName a s _ f) = OName a s [] f
+rmGivenNames o = o
 
 -- | Add, with 'proc', a give name to the family name. Needed for
 -- disambiguation.
