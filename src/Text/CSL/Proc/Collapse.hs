@@ -75,7 +75,9 @@ groupCites (x:xs) = let equal    = filter ((==) (namesOf $ snd x) . namesOf . sn
       contribsQ o
           | OContrib _ _ c _ _ <- o = [c]
           | otherwise               = []
-      namesOf y = if null (query contribsQ y) then [] else proc rmNameHash . proc rmGivenNames $ head (query contribsQ y)
+      namesOf y = case query contribsQ y of
+                       []    -> []
+                       (z:_) -> proc rmNameHash . proc rmGivenNames $ z
 
 getYearAndSuf :: Output -> Output
 getYearAndSuf x
