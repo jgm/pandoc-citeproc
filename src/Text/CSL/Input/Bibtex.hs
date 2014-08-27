@@ -144,9 +144,10 @@ braced s = "{" ++ s ++ "}"
 inQuotes :: BibParser String
 inQuotes = do
   char '"'
-  concat <$> manyTill (try (string "\\\"")
-                     <|> many1 (noneOf "\"\\")
-                     <|> count 1 anyChar) (char '"')
+  concat <$> manyTill (  many1 (noneOf "\"\\{")
+                     <|> (char '\\' >> (\c -> ['\\',c]) <$> anyChar)
+                     <|> braced <$> inBraces
+                      ) (char '"')
 
 fieldName :: BibParser String
 fieldName = (map toLower) <$> many1 (letter <|> digit <|> oneOf "-_")
