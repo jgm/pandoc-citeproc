@@ -18,7 +18,7 @@
 
 module Text.CSL.Reference where
 
-import Data.List  ( elemIndex, isPrefixOf, intercalate )
+import Data.List  ( elemIndex, intercalate )
 import Data.List.Split ( splitWhen )
 import Data.Maybe ( fromMaybe             )
 import Data.Generics hiding (Generic)
@@ -587,28 +587,6 @@ emptyReference =
 numericVars :: [String]
 numericVars = [ "edition", "volume", "number-of-volumes", "number", "issue", "citation-number"
               , "chapter-number", "collection-number", "number-of-pages"]
-
-parseLocator :: String -> (String, String)
-parseLocator s
-    | "b"    `isPrefixOf` formatField s = mk "book"
-    | "ch"   `isPrefixOf` formatField s = mk "chapter"
-    | "co"   `isPrefixOf` formatField s = mk "column"
-    | "fi"   `isPrefixOf` formatField s = mk "figure"
-    | "fo"   `isPrefixOf` formatField s = mk "folio"
-    | "i"    `isPrefixOf` formatField s = mk "issue"
-    | "l"    `isPrefixOf` formatField s = mk "line"
-    | "n"    `isPrefixOf` formatField s = mk "note"
-    | "o"    `isPrefixOf` formatField s = mk "opus"
-    | "para" `isPrefixOf` formatField s = mk "paragraph"
-    | "part" `isPrefixOf` formatField s = mk "part"
-    | "p"    `isPrefixOf` formatField s = mk "page"
-    | "sec"  `isPrefixOf` formatField s = mk "section"
-    | "sub"  `isPrefixOf` formatField s = mk "sub verbo"
-    | "ve"   `isPrefixOf` formatField s = mk "verse"
-    | "v"    `isPrefixOf` formatField s = mk "volume"
-    | otherwise                         =    ([], [])
-    where
-      mk c = if null s then ([], []) else (,) c . unwords . tail . words $ s
 
 getReference :: [Reference] -> Cite -> Maybe Reference
 getReference  r c

@@ -32,7 +32,6 @@ module Text.CSL
     -- ** Reference Representation
     , Reference (..)
     , getReference
-    , parseLocator
     , setNearNote
 
     -- * CSL Parser, Representation, and Processing

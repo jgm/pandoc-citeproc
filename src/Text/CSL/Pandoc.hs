@@ -8,10 +8,9 @@ import Text.Pandoc.Builder (setMeta, deleteMeta, Inlines, cite)
 import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
-import Data.List (isPrefixOf)
 import Control.Applicative ((<|>))
 import Data.Aeson
-import Data.Char ( isDigit, isPunctuation, toLower )
+import Data.Char ( isDigit, isPunctuation, isSpace )
 import qualified Data.Map as M
 import Text.CSL.Reference hiding (processCites, Value)
 import Text.CSL.Input.Bibutils (readBiblioFile, convertRefs)
@@ -40,8 +39,9 @@ processCites style refs (Pandoc m1 b1) =
       Pandoc m3 b2  = evalState (walkM setHashes $ Pandoc m2 b1) 1
       grps          = query getCitation $ Pandoc m3 b2
       m4            = deleteMeta "nocites-wildcards" m3
+      locMap        = locatorMap style
       result        = citeproc procOpts style refs (setNearNote style $
-                        map (map toCslCite) grps)
+                        map (map (toCslCite locMap)) grps)
       cits_map      = M.fromList $ zip grps (citations result)
       biblioList    = map (renderPandoc' style) (bibliography result)
       Pandoc m b3   = bottomUp (mvPunct style) . deNote .
@@ -253,15 +253,14 @@ setHash c = do
   put $ ident + 1
   return c{ citationHash = ident }
 
-toCslCite :: Citation -> CSL.Cite
-toCslCite c
-    = let (l, s)  = locatorWords $ citationSuffix c
-          (la,lo) = parseLocator l
-          s'      = case (l,s) of
+toCslCite :: LocatorMap -> Citation -> CSL.Cite
+toCslCite locMap c
+    = let (la, lo, s)  = locatorWords locMap $ citationSuffix c
+          s'      = case (la,lo,s) of
                          -- treat a bare locator as if it begins with space
                          -- so @item1 [blah] is like [@item1, blah]
-                         ("",(x:_))
-                           | not (isPunct x) -> [Space] ++ s
+                         ("","",(x:_))
+                           | not (isPunct x) -> Space : s
                          _                   -> s
           isPunct (Str (x:_)) = isPunctuation x
           isPunct _           = False
@@ -280,19 +279,18 @@ toCslCite c
                      , CSL.citeHash       = citationHash c
                      }
 
-locatorWords :: [Inline] -> (String, [Inline])
-locatorWords inp =
-  case parse pLocatorWords "suffix" $ splitStrWhen (`elem` ";,\160") inp of
+locatorWords :: LocatorMap -> [Inline] -> (String, String, [Inline])
+locatorWords locMap inp =
+  case parse (pLocatorWords locMap) "suffix" $
+         splitStrWhen (\c -> isPunctuation c || isSpace c) inp of
        Right r   -> r
-       Left _    -> ("",inp)
+       Left _    -> ("","",inp)
 
-pLocatorWords :: Parsec [Inline] st (String, [Inline])
-pLocatorWords = do
-  l <- pLocator
+pLocatorWords :: LocatorMap -> Parsec [Inline] st (String, String, [Inline])
+pLocatorWords locMap = do
+  (la,lo) <- pLocator locMap
   s <- getInput -- rest is suffix
-  if length l > 0 && last l == ','
-     then return (init l, Str "," : s)
-     else return (l, s)
+  return (la, lo, s)
 
 pMatch :: (Inline -> Bool) -> Parsec [Inline] st Inline
 pMatch condition = try $ do
@@ -303,24 +301,19 @@ pMatch condition = try $ do
 pSpace :: Parsec [Inline] st Inline
 pSpace = pMatch (\t -> t == Space || t == Str "\160")
 
-pLocator :: Parsec [Inline] st String
-pLocator = try $ do
+pLocator :: LocatorMap -> Parsec [Inline] st (String, String)
+pLocator locMap = try $ do
   optional $ pMatch (== Str ",")
   optional pSpace
-  rawLoc <- many1
+  rawLoc <- many
      (notFollowedBy pSpace >> notFollowedBy (pWordWithDigits True) >> anyToken)
-  let removePeriod xs = case reverse xs of
-                             ('.':xs') -> reverse xs'
-                             _ -> xs
-  let loc = if null rawLoc
-               then "p"
-               else removePeriod $ stringify rawLoc
-  guard $ any (\x -> x `isPrefixOf` map toLower loc)
-          [ "b", "ch", "co", "fi", "fo", "i", "l", "n"
-          , "o", "para", "part", "p", "sec", "sub", "ve", "v" ]
+  la <- case stringify rawLoc of
+                 ""   -> lookAhead (pSpace >> pDigit) >> return "page"
+                 s    -> maybe mzero return $ parseLocator locMap s
   g <- pWordWithDigits True
   gs <- many (pWordWithDigits False)
-  return $ concat (loc:" ":g:gs)
+  let lo = concat (g:gs)
+  return (la, lo)
 
 -- we want to capture:  123, 123A, C22, XVII, 33-44, 22-33; 22-11
 pWordWithDigits :: Bool -> Parsec [Inline] st String
@@ -328,16 +321,34 @@ pWordWithDigits isfirst = try $ do
   punct <- if isfirst
               then return ""
               else stringify `fmap` pLocatorPunct
-  sp <- (pSpace >> return " ") <|> return ""
+  sp <- option "" (pSpace >> return " ")
   r <- many1 (notFollowedBy pSpace >> notFollowedBy pLocatorPunct >> anyToken)
   let s = stringify r
   guard $ any isDigit s || all (`elem` "IVXLCM") s
   return $ punct ++ sp ++ s
 
+pDigit :: Parsec [Inline] st ()
+pDigit = do
+  t <- anyToken
+  case t of
+      Str (d:_) | isDigit d -> return ()
+      _ -> mzero
+
 pLocatorPunct :: Parsec [Inline] st Inline
 pLocatorPunct = pMatch isLocatorPunct
 
 isLocatorPunct :: Inline -> Bool
-isLocatorPunct (Str [c]) = c `elem` ",;:"
+isLocatorPunct (Str [c]) = isPunctuation c
 isLocatorPunct _         = False
 
+type LocatorMap = M.Map String String
+
+parseLocator :: LocatorMap -> String -> Maybe String
+parseLocator locMap s = M.lookup s locMap
+
+locatorMap :: Style -> LocatorMap
+locatorMap sty =
+  foldr (\term -> M.insert (termSingular term) (cslTerm term)
+                . M.insert (termPlural term) (cslTerm term))
+    M.empty
+    (concatMap localeTerms $ styleLocale sty)
