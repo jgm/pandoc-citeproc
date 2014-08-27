@@ -17,7 +17,7 @@ Formatted with pandoc and apa.csl, 2013-10-23:
 (Yoon, Ryu, Kim, & Ahn, 2006)
 
 Yoon, M. S., Ryu, D., Kim, J., & Ahn, K. H. (2006). Palladium pincer
-complexes with reduced bond angle strain: efficient catalysts for the
+complexes with reduced bond angle strain: Efficient catalysts for the
 Heck reaction. *Organometallics*, *25*(10), 2409–2411.
 
 
@@ -41,7 +41,7 @@ references:
 - title-short: Palladium pincer complexes with reduced bond angle strain
   issue: '10'
   page: 2409-2411
-  title: ! 'Palladium pincer complexes with reduced bond angle strain: efficient catalysts
+  title: ! 'Palladium pincer complexes with reduced bond angle strain: Efficient catalysts
     for the Heck reaction'
   volume: '25'
   id: yoon

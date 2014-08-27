@@ -322,7 +322,7 @@ resolveKey lang (Formatted ils) = Formatted (Walk.walk go ils)
 
 resolveKey' :: Lang -> String -> String
 resolveKey' (Lang "en" "US") k =
-  case k of
+  case map toLower k of
        "inpreparation" -> "in preparation"
        "submitted"     -> "submitted"
        "forthcoming"   -> "forthcoming"

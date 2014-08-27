@@ -52,7 +52,7 @@ import qualified Data.Traversable
 import Text.Pandoc.Shared (safeRead, stringify)
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc
-import Data.List.Split (wordsBy, whenElt, dropBlanks, split )
+import Data.List.Split (wordsBy)
 import Control.Monad.State
 import Data.Monoid (Monoid, mappend, mempty)
 import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
@@ -166,19 +166,21 @@ splitUpStr :: [Inline] -> [Inline]
 splitUpStr = splitStrWhen (\c -> isPunctuation c || c == '\160')
 
 unTitlecase :: [Inline] -> [Inline]
-unTitlecase zs = evalState (caseTransform untc $ splitUpStr zs) SentenceBoundary
+unTitlecase zs = evalState (caseTransform untc zs) SentenceBoundary
   where untc w = do
           st <- get
           case (w, st) of
                (y, NoBoundary) -> return y
                (Str (x:xs), WordBoundary) | isUpper x ->
                  return $ Str (toLower x : xs)
+               (Str (x:xs), SentenceBoundary) | isLower x ->
+                 return $ Str (toUpper x : xs)
                (Span ("",[],[]) xs, _) | hasLowercaseWord xs ->
                  return $ Span ("",["nocase"],[]) xs
                _ -> return w
 
 protectCase :: [Inline] -> [Inline]
-protectCase zs = evalState (caseTransform protect $ splitUpStr zs) SentenceBoundary
+protectCase zs = evalState (caseTransform protect zs) SentenceBoundary
   where protect (Span ("",[],[]) xs)
           | hasLowercaseWord xs = do
             st <- get
@@ -188,16 +190,19 @@ protectCase zs = evalState (caseTransform protect $ splitUpStr zs) SentenceBound
         protect x = return x
 
 titlecase :: [Inline] -> [Inline]
-titlecase zs = evalState (caseTransform tc $ splitUpStr zs) SentenceBoundary
-  where tc (Str (x:xs)) | isLower x && not (isShortWord (x:xs)) = do
+titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
+  where tc (Str (x:xs)) = do
           st <- get
           return $ case st of
-                        WordBoundary -> Str (toUpper x : xs)
+                        WordBoundary -> if isShortWord (x:xs)
+                                           then Str (x:xs)
+                                                -- or? map toLower (x:xs)
+                                           else Str (toUpper x : xs)
                         SentenceBoundary -> Str (toUpper x : xs)
                         _ -> Str (x:xs)
         tc (Span ("",["nocase"],[]) xs) = return $ Span ("",["nocase"],[]) xs
         tc x = return x
-        isShortWord  s = s `elem`
+        isShortWord  s = map toLower s `elem`
                       ["a","an","and","as","at","but","by","c","ca","d","de"
                       ,"down","et","for","from"
                       ,"in","into","nor","of","on","onto","or","over","so"
@@ -207,7 +212,7 @@ data CaseTransformState = WordBoundary | SentenceBoundary | NoBoundary
 
 caseTransform :: (Inline -> State CaseTransformState Inline) -> [Inline]
               -> State CaseTransformState [Inline]
-caseTransform xform = fmap reverse . foldM go []
+caseTransform xform = fmap reverse . foldM go [] . splitUpStr
   where go acc Space        = do
                modify (\st ->
                  case st of
@@ -248,8 +253,13 @@ caseTransform xform = fmap reverse . foldM go []
 
 splitStrWhen :: (Char -> Bool) -> [Inline] -> [Inline]
 splitStrWhen _ [] = []
-splitStrWhen p (Str xs : ys)
-  | any p xs = map Str ((split . dropBlanks) (whenElt p) xs) ++ splitStrWhen p ys
+splitStrWhen p (Str xs : ys) = go xs ++ splitStrWhen p ys
+  where go [] = []
+        go s = case break p s of
+                     ([],[])     -> []
+                     (zs,[])     -> [Str zs]
+                     ([],(w:ws)) -> Str [w] : go ws
+                     (zs,(w:ws)) -> Str zs : Str [w] : go ws
 splitStrWhen p (x : ys) = x : splitStrWhen p ys
 
 -- | A generic processing function.
