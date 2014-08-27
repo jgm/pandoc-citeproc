@@ -220,8 +220,9 @@ getCiteData out
                         [] -> [CD [] [out] [] [] [] [] []]
                               -- allow title to disambiguate
                         xs -> xs
-      yearsQ  = query getYears
-      years o = if yearsQ o /= [] then yearsQ o else [([],[])]
+      years o = case query getYears o of
+                     []    -> [([],[])]
+                     r     -> r
       zipData = uncurry . zipWith $ \c y -> if key c /= []
                                             then c {citYear = snd y}
                                             else c {key     = fst y
