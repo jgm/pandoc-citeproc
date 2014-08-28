@@ -138,7 +138,7 @@ compressName ag = Agent{
   , literal         = literal ag
   , nameSuffix      = mempty
   , commaSuffix     = False
-  , parseNames      = pn
+  , parseNames      = True
   }
   where
   spcat (Formatted []) y = y
@@ -152,7 +152,6 @@ compressName ag = Agent{
                 [last xs <> Formatted [if commaSuffix ag
                                           then Str ",!"
                                           else Str ",", Space], ns]
-  pn = gn /= givenName ag || fn /= familyName ag
   fn = spcat (nonDroppingPart ag) (familyName ag)
 
 -- turn

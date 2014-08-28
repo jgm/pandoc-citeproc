@@ -677,7 +677,7 @@ instance FromJSON Agent where
               v .:? "suffix" .!= mempty <*>
               v .:? "literal" .!= mempty <*>
               v .:? "comma-suffix" .!= False <*>
-              v .:? "parse-names" .!= False)
+              v .:? "parse-names" .!= True)
   parseJSON _ = fail "Could not parse Agent"
 
 -- See http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#id28
@@ -689,11 +689,13 @@ nameTransform ag
   | otherwise = ag
 
 nonDroppingPartTransform :: Agent -> Agent
-nonDroppingPartTransform ag =
-  case break startWithCapital' (unFormatted $ familyName ag) of
-       ([], _)  -> ag
-       (xs, ys) -> ag { nonDroppingPart = Formatted $ trimSpace xs,
-                        familyName = Formatted ys }
+nonDroppingPartTransform ag
+  | nonDroppingPart ag == mempty =
+    case break startWithCapital' (unFormatted $ familyName ag) of
+         ([], _)  -> ag
+         (xs, ys) -> ag { nonDroppingPart = Formatted $ trimSpace xs,
+                          familyName = Formatted ys }
+  | otherwise = ag
 
 trimSpace :: [Inline] -> [Inline]
 trimSpace = reverse . dropWhile isSpace . reverse . dropWhile isSpace
@@ -701,13 +703,15 @@ trimSpace = reverse . dropWhile isSpace . reverse . dropWhile isSpace
         isSpace _     = False
 
 droppingPartTransform :: Agent -> Agent
-droppingPartTransform ag =
-  case break startWithCapital $ reverse $ givenName ag of
-        ([],_)  -> ag
-        (ys,zs) -> ag{ droppingPart = mconcat $
-                                       intersperse (Formatted [Space]) $
-                                       reverse ys
-                     , givenName = reverse zs }
+droppingPartTransform ag
+  | droppingPart ag == mempty =
+    case break startWithCapital $ reverse $ givenName ag of
+          ([],_)  -> ag
+          (ys,zs) -> ag{ droppingPart = mconcat $
+                                         intersperse (Formatted [Space]) $
+                                         reverse ys
+                       , givenName = reverse zs }
+  | otherwise = ag
 
 startWithCapital' :: Inline -> Bool
 startWithCapital' (Str (c:_)) = isUpper c && isLetter c
@@ -725,11 +729,13 @@ stripFinalComma (Formatted ils) =
        _ -> ("", Formatted ils)
 
 suffixTransform :: Agent -> Agent
-suffixTransform ag = fst $ foldl go
+suffixTransform ag
+  | nameSuffix ag == mempty = fst $ foldl go
                               (ag{ givenName   = mempty
                                  , nameSuffix  = mempty
                                  , commaSuffix = False }, False)
                               (givenName ag)
+  | otherwise = ag
   where go (ag', False) n =
                case stripFinalComma n of
                     ("", _)   -> (ag'{ givenName = givenName ag' ++ [n] }, False)
@@ -752,7 +758,7 @@ instance ToJSON Agent where
     , "suffix" .= nameSuffix agent
     , "literal" .= literal agent
     ] ++ ["comma-suffix" .= commaSuffix agent | nameSuffix agent /= mempty]
-      ++ ["parse-names" .= True | parseNames agent ]
+      ++ ["parse-names" .= False | not (parseNames agent) ]
 
 instance FromJSON [Agent] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
