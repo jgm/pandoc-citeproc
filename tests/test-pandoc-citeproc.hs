@@ -39,7 +39,7 @@ main = do
   putStrLn $ show numpasses ++ " passed; " ++ show numfailures ++
               " failed; " ++ show numskipped ++ " skipped; " ++
               show numerrors ++ " errored."
-  exitWith $ if numfailures == 0
+  exitWith $ if numfailures == 0 && numerrors == 0
                 then ExitSuccess
                 else ExitFailure $ numfailures + numerrors
 
