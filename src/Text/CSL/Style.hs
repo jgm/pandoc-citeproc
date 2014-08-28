@@ -660,17 +660,18 @@ object' = object . filter (not . isempty)
 
 data Agent
     = Agent { givenName       :: [Formatted]
-            , droppingPart    ::  Formatted
-            , nonDroppingPart ::  Formatted
-            , familyName      ::  Formatted
-            , nameSuffix      ::  Formatted
-            , literal         ::  Formatted
-            , commaSuffix     ::  Bool
+            , droppingPart    :: Formatted
+            , nonDroppingPart :: Formatted
+            , familyName      :: Formatted
+            , nameSuffix      :: Formatted
+            , literal         :: Formatted
+            , commaSuffix     :: Bool
+            , parseNames      :: Bool
             }
       deriving ( Show, Read, Eq, Ord, Typeable, Data, Generic )
 
 emptyAgent :: Agent
-emptyAgent = Agent [] mempty mempty mempty mempty mempty False
+emptyAgent = Agent [] mempty mempty mempty mempty mempty False False
 
 instance FromJSON Agent where
   parseJSON (Object v) = Agent <$>
@@ -680,7 +681,8 @@ instance FromJSON Agent where
               v .:? "family" .!= mempty <*>
               v .:? "suffix" .!= mempty <*>
               v .:? "literal" .!= mempty <*>
-              v .:? "comma-suffix" .!= False
+              v .:? "comma-suffix" .!= False <*>
+              v .:? "parse-names" .!= False
   parseJSON _ = fail "Could not parse Agent"
 
 instance ToJSON Agent where
@@ -693,6 +695,7 @@ instance ToJSON Agent where
     , "suffix" .= nameSuffix agent
     , "literal" .= literal agent
     ] ++ ["comma-suffix" .= commaSuffix agent | nameSuffix agent /= mempty]
+      ++ ["parse-names" .= True | parseNames agent ]
 
 instance FromJSON [Agent] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs

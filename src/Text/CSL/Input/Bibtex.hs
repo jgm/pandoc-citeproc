@@ -537,6 +537,7 @@ toAuthor _ [Str "others"] = return $
           , nameSuffix      = mempty
           , literal         = Formatted [Str "others"]
           , commaSuffix     = False
+          , parseNames      = False
           }
 toAuthor _ [Span ("",[],[]) ils] =
   return $ -- corporate author
@@ -547,6 +548,7 @@ toAuthor _ [Span ("",[],[]) ils] =
           , nameSuffix      = mempty
           , literal         = Formatted ils
           , commaSuffix     = False
+          , parseNames      = False
           }
 -- First von Last
 -- von Last, First
@@ -599,6 +601,7 @@ toAuthor opts ils = do
           , nameSuffix      = suffix
           , literal         = mempty
           , commaSuffix     = usecomma
+          , parseNames      = False
           }
 
 isCapitalized :: [Inline] -> Bool
