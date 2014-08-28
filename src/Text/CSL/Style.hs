@@ -20,20 +20,20 @@ module Text.CSL.Style where
 import Data.Aeson hiding (Number)
 import GHC.Generics (Generic)
 import Data.String
-import Data.Monoid (mempty, Monoid, mappend, mconcat)
+import Data.Monoid (mempty, Monoid, mappend, mconcat, (<>))
 import Control.Arrow hiding (left, right)
 import Control.Applicative hiding (Const)
 import qualified Data.Aeson as Aeson
 import Data.Aeson.Types (Pair)
-import Data.List ( nubBy, isPrefixOf, isInfixOf, intercalate )
+import Data.List ( nubBy, isPrefixOf, isInfixOf, intersperse, intercalate )
 import Data.List.Split ( splitWhen, wordsBy )
 import Data.Generics ( Data, Typeable )
 import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
-import Data.Char (isPunctuation)
+import Data.Char (isPunctuation, isUpper, isLetter)
 import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), proc', query,
-                      betterThan, trimr, tailInline, headInline, initInline,
-                      lastInline)
+                      betterThan, trimr, tailInline, headInline,
+                      initInline, lastInline, splitStrWhen)
 import Text.Pandoc.Definition hiding (Citation, Cite)
 import Text.Pandoc (readHtml, writeMarkdown, WriterOptions(..),
                     ReaderOptions(..), bottomUp, def)
@@ -49,11 +49,6 @@ import qualified Data.Text.ICU as T
 import Data.RFC5051 (compareUnicode)
 #endif
 import qualified Data.Vector as V
-
--- import Debug.Trace
---
--- tr' :: Show a => [Char] -> a -> a
--- tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
 
 -- Note:  FromJSON reads HTML, ToJSON writes Markdown.
 -- This means that they aren't proper inverses of each other, which
@@ -674,7 +669,7 @@ emptyAgent :: Agent
 emptyAgent = Agent [] mempty mempty mempty mempty mempty False False
 
 instance FromJSON Agent where
-  parseJSON (Object v) = Agent <$>
+  parseJSON (Object v) = nameTransform <$> (Agent <$>
               (v .: "given" <|> ((map Formatted . wordsBy (== Space) . unFormatted) <$> v .: "given") <|> pure []) <*>
               v .:?  "dropping-particle" .!= mempty <*>
               v .:? "non-dropping-particle" .!= mempty <*>
@@ -682,8 +677,70 @@ instance FromJSON Agent where
               v .:? "suffix" .!= mempty <*>
               v .:? "literal" .!= mempty <*>
               v .:? "comma-suffix" .!= False <*>
-              v .:? "parse-names" .!= False
+              v .:? "parse-names" .!= False)
   parseJSON _ = fail "Could not parse Agent"
+
+-- See http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#id28
+nameTransform :: Agent -> Agent
+nameTransform ag
+  | parseNames ag = nonDroppingPartTransform .
+                    droppingPartTransform .
+                    suffixTransform $ ag
+  | otherwise = ag
+
+nonDroppingPartTransform :: Agent -> Agent
+nonDroppingPartTransform ag =
+  case break startWithCapital' (unFormatted $ familyName ag) of
+       ([], _)  -> ag
+       (xs, ys) -> ag { nonDroppingPart = Formatted $ trimSpace xs,
+                        familyName = Formatted ys }
+
+trimSpace :: [Inline] -> [Inline]
+trimSpace = reverse . dropWhile isSpace . reverse . dropWhile isSpace
+  where isSpace Space = True
+        isSpace _     = False
+
+droppingPartTransform :: Agent -> Agent
+droppingPartTransform ag =
+  case break startWithCapital $ reverse $ givenName ag of
+        ([],_)  -> ag
+        (ys,zs) -> ag{ droppingPart = mconcat $
+                                       intersperse (Formatted [Space]) $
+                                       reverse ys
+                     , givenName = reverse zs }
+
+startWithCapital' :: Inline -> Bool
+startWithCapital' (Str (c:_)) = isUpper c && isLetter c
+startWithCapital' _ = False
+
+startWithCapital :: Formatted -> Bool
+startWithCapital (Formatted (x:_)) = startWithCapital' x
+startWithCapital _ = False
+
+stripFinalComma :: Formatted -> (String, Formatted)
+stripFinalComma (Formatted ils) =
+  case reverse $ splitStrWhen isPunctuation ils of
+       Str ",":xs -> (",", Formatted $ reverse xs)
+       Str "!":Str ",":xs -> (",!", Formatted $ reverse xs)
+       _ -> ("", Formatted ils)
+
+suffixTransform :: Agent -> Agent
+suffixTransform ag = fst $ foldl go
+                              (ag{ givenName   = mempty
+                                 , nameSuffix  = mempty
+                                 , commaSuffix = False }, False)
+                              (givenName ag)
+  where go (ag', False) n =
+               case stripFinalComma n of
+                    ("", _)   -> (ag'{ givenName = givenName ag' ++ [n] }, False)
+                    (",",n')  -> (ag'{ givenName = givenName ag' ++ [n'] }, True)
+                    (",!",n') -> (ag'{ givenName = givenName ag' ++ [n']
+                                     , commaSuffix = True }, True)
+                    _         -> error "stripFinalComma returned unexpected value"
+        go (ag', True) n = (ag'{ nameSuffix = if nameSuffix ag' == mempty
+                                                 then n
+                                                 else nameSuffix ag' <>
+                                                      Formatted [Space] <> n }, True)
 
 instance ToJSON Agent where
   toJSON agent = object' $ [
