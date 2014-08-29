@@ -16,7 +16,30 @@
 --
 -----------------------------------------------------------------------------
 
-module Text.CSL.Reference where
+module Text.CSL.Reference ( Literal(..)
+                          , Value(..)
+                          , ReferenceMap
+                          , mkRefMap
+                          , formatField
+                          , fromValue
+                          , isValueSet
+                          , Empty(..)
+                          , RefDate(..)
+                          , handleLiteral
+                          , toDatePart
+                          , setCirca
+                          , mkRefDate
+                          , RefType(..)
+                          , CNum(..)
+                          , Reference(..)
+                          , emptyReference
+                          , numericVars
+                          , getReference
+                          , processCites
+                          , setPageFirst
+                          , setNearNote
+                          )
+where
 
 import Data.List  ( elemIndex, intercalate )
 import Data.List.Split ( splitWhen )
