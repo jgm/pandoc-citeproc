@@ -15,7 +15,72 @@
 --
 -----------------------------------------------------------------------------
 
-module Text.CSL.Style where
+module Text.CSL.Style ( readCSLString
+                      , writeCSLString
+                      , Formatted(..)
+                      , Style(..)
+                      , Locale(..)
+                      , mergeLocales
+                      , CslTerm(..)
+                      , newTerm
+                      , findTerm
+                      , findTerm'
+                      , hasOrdinals
+                      , rmOrdinals
+                      , Abbreviations(..)
+                      , MacroMap
+                      , Citation(..)
+                      , Bibliography(..)
+                      , Option
+                      , mergeOptions
+                      , Layout(..)
+                      , Element(..)
+                      , IfThen(..)
+                      , Condition(..)
+                      , Delimiter
+                      , Match(..)
+                      , match
+                      , DatePart(..)
+                      , defaultDate
+                      , Sort(..)
+                      , Sorting(..)
+                      , compare'
+                      , Form(..)
+                      , Gender(..)
+                      , NumericForm(..)
+                      , DateForm(..)
+                      , Plural(..)
+                      , Name(..)
+                      , NameAttrs
+                      , NamePart(..)
+                      , isPlural
+                      , isName
+                      , isNames
+                      , hasEtAl
+                      , Formatting(..)
+                      , emptyFormatting
+                      , rmTitleCase
+                      , Quote(..)
+                      , unsetAffixes
+                      , mergeFM
+                      , CSInfo(..)
+                      , CSAuthor(..)
+                      , CSCategory(..)
+                      , CiteprocError(..)
+                      , Output(..)
+                      , Citations
+                      , Cite(..)
+                      , emptyCite
+                      , CitationGroup(..)
+                      , BiblioData(..)
+                      , CiteData(..)
+                      , NameData(..)
+                      , isPunctuationInQuote
+                      , object'
+                      , Agent(..)
+                      , emptyAgent
+                      )
+where
 
 import Data.Aeson hiding (Number)
 import GHC.Generics (Generic)
