@@ -106,7 +106,9 @@ evalElement el
     | Elements fm es <- el        = evalElements es >>= \os ->
                                       if null os
                                          then return []
-                                         else return [Output os fm]
+                                         else if fm == emptyFormatting
+                                                 then return os
+                                                 else return [Output os fm]
     | Const    s   fm       <- el = return $ addSpaces s
                                            $ if fm == emptyFormatting
                                                 then [OPan (readCSLString s)]
