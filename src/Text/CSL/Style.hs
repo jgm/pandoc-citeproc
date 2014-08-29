@@ -25,8 +25,6 @@ module Text.CSL.Style ( readCSLString
                       , newTerm
                       , findTerm
                       , findTerm'
-                      , hasOrdinals
-                      , rmOrdinals
                       , Abbreviations(..)
                       , MacroMap
                       , Citation(..)
@@ -96,7 +94,7 @@ import Data.Generics ( Data, Typeable )
 import Data.Maybe ( listToMaybe )
 import qualified Data.Map as M
 import Data.Char (isPunctuation, isUpper, isLetter)
-import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), proc', query,
+import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), query,
                       betterThan, trimr, tailInline, headInline,
                       initInline, lastInline, splitStrWhen)
 import Text.Pandoc.Definition hiding (Citation, Cite)
@@ -297,14 +295,12 @@ hasOrdinals = any (any hasOrd . localeTerms)
           , "ordinal" `isInfixOf` t = True
           | otherwise               = False
 
-rmOrdinals :: Data a => a -> a
-rmOrdinals = proc' doRemove
-    where
-      doRemove [] = []
-      doRemove (o:os)
-          | CT {cslTerm = t} <- o
-          , "ordinal" `isInfixOf` t =   doRemove os
-          | otherwise               = o:doRemove os
+rmOrdinals :: [CslTerm] -> [CslTerm]
+rmOrdinals [] = []
+rmOrdinals (o:os)
+  | CT {cslTerm = t} <- o
+  , "ordinal" `isInfixOf` t =   rmOrdinals os
+  | otherwise               = o:rmOrdinals os
 
 newtype Abbreviations = Abbreviations {
            unAbbreviations :: M.Map String (M.Map String (M.Map String String))
