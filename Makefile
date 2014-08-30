@@ -2,9 +2,12 @@ quick: deps
 	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization --ghc-options "-pgmPcpphs -optP--cpp"
 	cabal build
 
-full: deps
+full: deps man
 	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --ghc-options "-pgmPcpphs -optP--cpp"
 	cabal build
+
+man:
+	make -C man
 
 deps:
 	cabal install --only-dependencies --enable-tests -ftest_citeproc -fembed_data_files
@@ -32,4 +35,4 @@ update:
 	git add chicago-author-date.csl; \
 	git commit -a
 
-.PHONY: quick full prof update clean install test deps
+.PHONY: quick full prof update clean install test deps man

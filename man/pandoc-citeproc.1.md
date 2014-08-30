@@ -1,3 +1,8 @@
+---
+title: pandoc-citeproc
+section: 1
+...
+
 # NAME
 
 pandoc-citeproc - filter to resolve citations in a pandoc document.
@@ -210,10 +215,3 @@ Andrea Rossato and John MacFarlane.
 
 The pandoc-citeproc source code and all documentation may be downloaded
 from <http://github.com/jgm/pandoc-citeproc/>.
-
----
-title: pandoc-citeproc
-section: 1
-footer: pandoc-citeproc manual
-date: June 4, 2014
-...
