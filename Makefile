@@ -14,7 +14,8 @@ prof: deps
 	cabal build
 
 install:
-	cabal install
+	cabal copy
+	cabal register
 
 test:
 	cabal test
