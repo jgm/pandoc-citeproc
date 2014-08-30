@@ -1,3 +1,37 @@
+pandoc-citeproc (0.5)
+
+  * Revised locator parsing:
+    + parseLocator now looks for the "short" forms of terms in
+      the style's locale(s).  So, in English you'd use "p." or
+      "ch."; in German, "S." or "Kap."
+    + Note that the locator label must match what is in the locale
+      file, including the period.  Before this change, you could omit
+      the period: "p 12" or "p. 12" would both give you a "page."
+      Also, previously, the locators were case-insensitive; now they must
+      be in the same case as in the locale.  (English "p.", German "S.".)
+    + "no." no longer gets parsed as a "note": closes #74.
+    + Text.CSL.Reference no longer exports parseLocator.
+      parseLocator is now used only locally, in Text.CSL.Pandoc.
+  * Data.getLocale:  Try 2-letter locale lookup if longer locale not found.
+    This should fix an error that occured with less common locales
+    (jgm/pandoc#1548).
+  * Added parseNames field to Agent.  Set parse-names=true
+    when writing CSL JSON and collapsing suffix or particles into
+    first or last names.
+  * Properly handle agents with 'parse-names' set to 'true' (#77).
+    Note that parse-names defaults to true if not set, as in Zotero.
+  * Reference:  added explicit exports.
+  * Styles:  Added explicit export list.
+  * Eval: Fixed isNumericString to recognize en dash (#74).
+  * Allow bibtex double quotes to be escaped inside {} (jgm/pandoc#1568).
+  * Titlecase transform improvements (#76).
+  * Added two csl files missing from tests/.
+  * Performance improvements:  Avoid unnecessary Output groupings.
+    Eliminated some unnecessary generic traversals.  (#71)
+  * Makefile:  Use cpphs. Text.CSL.Data seems to break on OSX 10.9 without it.
+  * Added prof target to Makefile
+  * Test suite: don't exit with success if there were errors!
+
 pandoc-citeproc (0.4.0.1)
 
   * Interpret date literals with underscores (e.g. "2004_2006") as ranges.
