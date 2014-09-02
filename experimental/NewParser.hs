@@ -6,7 +6,7 @@ import Data.Conduit (($$), Sink)
 import Data.Maybe (catMaybes)
 import Data.Text (Text, unpack)
 -- import Text.XML.Stream.Parse
-import Text.CSL.Style
+import Text.CSL.Style hiding (parseNames)
 import Data.XML.Types (Event)
 import Control.Applicative hiding (many, Const)
 import qualified Text.XML as X
@@ -22,7 +22,6 @@ readCSLFile :: FilePath -> IO Style
 readCSLFile fn = do
   doc <- X.readFile def (fromString fn)
   let cur = fromDocument doc
-  print $ cur $| laxAttribute "version"
   let version = unpack . T.concat $ cur $| laxAttribute "version"
   let class_ = unpack . T.concat $ cur $| laxAttribute "class"
   let defaultLocale = case cur $| laxAttribute "default-locale" of
@@ -118,9 +117,9 @@ parseElement cur =
               "label" -> parseLabel cur
               "number" -> parseNumber cur
               "substitute" -> parseSubstitute cur
-              -- "names" -> parseNames cur
-              -- "date" -> parseDate cur
-              x -> [Const ("UNDEFINED " ++ T.unpack x) (getFormatting cur)]
+              "names" -> parseNames cur
+              "date" -> parseDate cur
+              _ -> []
        _ -> []
 
 getFormatting :: Cursor -> Formatting
@@ -145,7 +144,21 @@ getFormatting cur =
   }
 
 parseDate :: Cursor -> [Element]
-parseDate cur = undefined
+parseDate cur = [Date (words variable) form format delim parts partsAttr]
+  where variable   = stringAttr "variable" cur
+        form       = attrWithDefault "form" NoFormDate cur
+        format     = getFormatting cur
+        delim      = stringAttr "delimiter" cur
+        parts      = cur $/ get "date-part" &| parseDatePart
+        partsAttr  = stringAttr "date-parts" cur
+
+parseDatePart :: Cursor -> DatePart
+parseDatePart cur =
+  DatePart { dpName       = stringAttr "name" cur
+           , dpForm       = attrWithDefault "form" "long" cur
+           , dpRangeDelim = attrWithDefault "range-delimiter" "-" cur
+           , dpFormatting = getFormatting cur
+           }
 
 parseNames :: Cursor -> [Element]
 parseNames cur = [Names (words variable) names formatting delim elts]
@@ -156,14 +169,13 @@ parseNames cur = [Names (words variable) names formatting delim elts]
         names      = catMaybes $ cur $/ checkName isName &| parseName
         isName (X.Name n (Just "http://purl.org/net/xbiblio/csl") Nothing)
                    = n == "name" || n == "etal" || n == "label"
-        elts       = cur $/ parseElement  -- TODO is this right?
+        elts       = cur $/ checkName (not . isName) &/ parseElement
 
 parseName :: Cursor -> Maybe Name
 parseName cur =
   case node cur of
        X.NodeElement e ->
          case X.nameLocalName $ X.elementName e of
-         -- TODO - FILL THESE PLACEHOLDERS!!
               "name"   -> Just $ Name form format (nameAttrs e) delim nameParts
               "label"  -> Just $ NameLabel form format plural
               "et-al"  -> Just $ EtAl format ""
