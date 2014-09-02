@@ -7,10 +7,12 @@ import Data.Maybe (catMaybes)
 import Data.Text (Text, unpack)
 -- import Text.XML.Stream.Parse
 import Text.CSL.Style hiding (parseNames)
+-- TODO, replace toRead below with: import Text.CSL.Util (toRead)
 import Data.XML.Types (Event)
 import Control.Applicative hiding (many, Const)
 import qualified Text.XML as X
 import Data.Default
+import Data.Char (toUpper)
 import Data.String (fromString)
 import Text.Pandoc.Shared (safeRead)
 import Text.XML.Cursor
@@ -66,7 +68,7 @@ string = unpack . T.concat . content
 
 attrWithDefault :: Read a => Text -> a -> Cursor -> a
 attrWithDefault t d cur =
-  case safeRead (stringAttr t cur) of
+  case safeRead (toRead $ stringAttr t cur) of
        Just x   -> x
        Nothing  -> d
 
@@ -186,21 +188,21 @@ parseName cur =
          delim     = stringAttr "delimiter" cur
          nameParts = cur $/ get "name-part" &| parseNamePart
          nameAttrs x = [(T.unpack n, T.unpack v) |
-                 (X.Name n (Just "http://purl.org/net/xbiblio/csl")
-                     Nothing, v) <- M.toList (X.elementAttributes x),
-                 T.unpack n `elem` nameAttrKeys]
+                 (X.Name n _ _, v) <- M.toList (X.elementAttributes x),
+                 n `elem` nameAttrKeys]
          nameAttrKeys =  [ "et-al-min"
                          , "et-al-use-first"
                          , "et-al-subsequent-min"
                          , "et-al-subsequent-use-first"
                          , "et-al-use-last"
                          , "delimiter-precedes-et-al"
-                         , "et-al-min"
-                         , "et-al-use-first"
-                         , "et-al-subsequent-min"
-                         , "et-al-subsequent-use-first"
-                         , "et-al-use-last"
-                         , "delimiter-precedes-et-al" ]
+                         , "and"
+                         , "delimiter-precedes-last"
+                         , "sort-separator"
+                         , "initialize"
+                         , "initialize-with"
+                         , "name-as-sort-order" ]
+
 
 parseNamePart :: Cursor -> NamePart
 parseNamePart cur = NamePart s format
@@ -281,3 +283,15 @@ parseMacroMap :: Cursor -> MacroMap
 parseMacroMap cur = (name, elts)
   where name = cur $| stringAttr "name"
         elts = cur $/ parseElement
+
+toRead :: String -> String
+toRead    []  = []
+toRead (s:ss) = toUpper s : camel ss
+    where
+      camel x
+          | '-':y:ys <- x = toUpper y : camel ys
+          | '_':y:ys <- x = toUpper y : camel ys
+          |     y:ys <- x =         y : camel ys
+          | otherwise     = []
+
+
