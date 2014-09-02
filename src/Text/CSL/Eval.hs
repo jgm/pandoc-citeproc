@@ -235,10 +235,11 @@ evalIfThen (IfThen c' m' el') ei e = whenElse (evalCond m' c') (return el') rest
                         l <- checkCond chkLocator      isLocator       c m
                         return $ match m $ concat [t,v,n,d,p,a,l]
 
-      checkCond a f c m = if f c /= [] then mapM a (f c) else checkMatch m
-      checkMatch m
-          | All    <- m = return [True]
-          | otherwise   = return [False]
+      checkCond a f c m = case f c of
+                               []  -> case m of
+                                           All -> return [True]
+                                           _   -> return [False]
+                               xs  -> mapM a xs
 
       chkType         t = let chk = (==) (formatVariable t) . show . fromMaybe NoType . fromValue
                           in  getVar False chk "ref-type"
