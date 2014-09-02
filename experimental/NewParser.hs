@@ -169,7 +169,9 @@ parseNames cur = [Names (words variable) names formatting delim others]
         formatting = getFormatting cur
         delim      = stringAttr "delimiter" cur
         elts       = cur $/ parseName
-        names      = rights elts
+        names      = case rights elts of
+                          [] -> [Name NotSet emptyFormatting [] [] []]
+                          xs -> xs
         others     = lefts elts
 
 parseName :: Cursor -> [Either Element Name]
