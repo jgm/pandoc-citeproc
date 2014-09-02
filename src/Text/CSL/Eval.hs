@@ -130,9 +130,7 @@ evalElement el
                                    else evalElement (Substitute els)
                            else return res
     -- All macros and conditionals should have been expanded
-    | Choose i ei xs        <- el = do
-                        res <- evalIfThen i ei xs
-                        evalElements res
+    | Choose ifs xs        <- el = evalIfThen ifs xs >>= evalElements
     | Macro    s   fm       <- el = do
                         ms <- gets (macros . env)
                         case lookup s ms of
@@ -220,12 +218,11 @@ evalElement el
                                               getVar [] (getFormattedValue opts as f fm s) s >>= \r ->
                                               consumeVariable s >> return r
 
-evalIfThen :: IfThen -> [IfThen] -> [Element] -> State EvalState [Element]
-evalIfThen (IfThen c' m' el') ei e = whenElse (evalCond m' c') (return el') rest
+evalIfThen :: [IfThen] -> [Element] -> State EvalState [Element]
+evalIfThen [] e = return e
+evalIfThen (IfThen c' m' el' : ei) e =
+  whenElse (evalCond m' c') (return el') (evalIfThen ei e)
   where
-      rest = case ei of
-                  []     -> return e
-                  (x:xs) -> evalIfThen x xs e
       evalCond m c = do t <- checkCond chkType         isType          c m
                         v <- checkCond isVarSet        isSet           c m
                         n <- checkCond chkNumeric      isNumeric       c m
