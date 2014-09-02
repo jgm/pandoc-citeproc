@@ -110,6 +110,11 @@ parseElement cur =
               "text" -> parseText cur
               "choose" -> parseChoose cur
               "group" -> parseGroup cur
+              "label" -> parseLabel cur
+              "number" -> parseNumber cur
+              -- "names" -> parseNames cur
+              -- "substitute" -> parseSubstitute cur
+              -- "date" -> parseDate cur
               x -> [Const ("UNDEFINED " ++ T.unpack x) (getFormatting cur)]
        _ -> []
 
@@ -179,6 +184,19 @@ parseIf cur = IfThen cond match elts
         match = attrWithDefault "match" All cur
         elts = cur $/ parseElement
         go x = words $ stringAttr x cur
+
+parseLabel :: Cursor -> [Element]
+parseLabel cur = [Label variable form formatting plural]
+  where variable   = stringAttr "variable" cur
+        form       = attrWithDefault "form" NotSet cur
+        formatting = getFormatting cur
+        plural     = attrWithDefault "plural" Contextual cur
+
+parseNumber :: Cursor -> [Element]
+parseNumber cur = [Number variable numForm formatting]
+  where variable   = stringAttr "variable" cur
+        numForm    = attrWithDefault "form" Numeric cur
+        formatting = getFormatting cur
 
 parseGroup :: Cursor -> [Element]
 parseGroup cur =
