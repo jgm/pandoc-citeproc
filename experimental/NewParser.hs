@@ -13,11 +13,14 @@ import Data.Default
 import Text.Pandoc.Shared (safeRead)
 import Text.XML.Cursor
 
+get :: Text -> Axis
 get name =
   element (X.Name name (Just "http://purl.org/net/xbiblio/csl") Nothing)
 
+string :: Cursor -> String
 string = unpack . T.concat . content
 
+main :: IO ()
 main = do
   doc <- X.readFile def "chicago-author-date.csl"
   let cur = fromDocument doc
@@ -104,7 +107,7 @@ parseElement cur =
          case X.nameLocalName $ X.elementName e of
               "const" -> [Const (stringAttr "value" cur) (getFormatting cur)]
               "term" -> parseTerm cur
-              "elements" -> parseElements cur
+              "choose" -> parseChoose cur
               "group" -> parseGroup cur
               x -> [Const ("UNDEFINED " ++ T.unpack x) (getFormatting cur)]
        _ -> []
@@ -140,14 +143,36 @@ parseTerm cur =
   let termForm       = attrWithDefault "form" NotSet cur
       formatting     = getFormatting cur
       plural         = attrWithDefault "plural" True cur
-      name           = attrWithDefault "name" "" cur
+      name           = stringAttr "name" cur
   in  [Term name termForm formatting plural]
+
+parseChoose :: Cursor -> [Element]
+parseChoose cur =
+  let ifPart         = cur $/ get "if" &| parseIf
+      elseIfPart     = cur $/ get "else-if" &| parseIf
+      elsePart       = cur $/ get "else" &/ parseElements
+  in  [Choose (head ifPart) elseIfPart elsePart]
+
+parseIf :: Cursor -> IfThen
+parseIf cur = IfThen cond match elts
+  where cond = Condition {
+                 isType          = go "type"
+               , isSet           = go "variable"
+               , isNumeric       = go "is-numeric"
+               , isUncertainDate = go "is-uncertain-date"
+               , isPosition      = go "position"
+               , disambiguation  = go "disambiguate"
+               , isLocator       = go "locator"
+               }
+        match = attrWithDefault "match" All cur
+        elts = cur $/ parseElement
+        go x = words $ stringAttr x cur
 
 parseGroup :: Cursor -> [Element]
 parseGroup cur =
   let termForm       = attrWithDefault "form" NotSet cur
       elts           = cur $/ parseElement
-      delim          = attrWithDefault "delimiter" "" cur
+      delim          = stringAttr "delimiter" cur
       formatting     = getFormatting cur
   in  [Group formatting delim elts]
 
