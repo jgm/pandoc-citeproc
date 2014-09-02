@@ -214,7 +214,7 @@ parseSubstitute cur = cur $/ parseElement
 
 parseTerm :: Cursor -> [Element]
 parseTerm cur =
-  let termForm       = attrWithDefault "form" NotSet cur
+  let termForm       = attrWithDefault "form" Long cur
       formatting     = getFormatting cur
       plural         = attrWithDefault "plural" True cur
       name           = stringAttr "name" cur
@@ -227,12 +227,13 @@ parseText cur =
       macro          = stringAttr "macro" cur
       delim          = stringAttr "delimiter" cur
       formatting     = getFormatting cur
-      textForm       = attrWithDefault "form" NotSet cur
+      plural         = attrWithDefault "plural" True cur
+      textForm       = attrWithDefault "form" Long cur
   in  if not (null term)
-         then [Const term formatting]
+         then [Term term textForm formatting plural]
          else if not (null macro)
               then [Macro macro formatting]
-              else if not (null term)
+              else if not (null variable)
                       then [Variable (words variable) textForm formatting delim]
                       else []
 
@@ -261,7 +262,7 @@ parseIf cur = IfThen cond match elts
 parseLabel :: Cursor -> [Element]
 parseLabel cur = [Label variable form formatting plural]
   where variable   = stringAttr "variable" cur
-        form       = attrWithDefault "form" NotSet cur
+        form       = attrWithDefault "form" Long cur
         formatting = getFormatting cur
         plural     = attrWithDefault "plural" Contextual cur
 
@@ -273,7 +274,7 @@ parseNumber cur = [Number variable numForm formatting]
 
 parseGroup :: Cursor -> [Element]
 parseGroup cur =
-  let termForm       = attrWithDefault "form" NotSet cur
+  let termForm       = attrWithDefault "form" Long cur
       elts           = cur $/ parseElement
       delim          = stringAttr "delimiter" cur
       formatting     = getFormatting cur
