@@ -103,12 +103,6 @@ evalElements = concatMapM evalElement
 
 evalElement :: Element -> State EvalState [Output]
 evalElement el
-    | Elements fm es <- el        = evalElements es >>= \os ->
-                                      if null os
-                                         then return []
-                                         else if fm == emptyFormatting
-                                                 then return os
-                                                 else return [Output os fm]
     | Const    s   fm       <- el = return $ addSpaces s
                                            $ if fm == emptyFormatting
                                                 then [OPan (readCSLString s)]
@@ -138,7 +132,7 @@ evalElement el
     -- All macros and conditionals should have been expanded
     | Choose i ei xs        <- el = do
                         res <- evalIfThen i ei xs
-                        evalElement $ Elements emptyFormatting res
+                        evalElements res
     | Macro    s   fm       <- el = do
                         ms <- gets (macros . env)
                         case lookup s ms of

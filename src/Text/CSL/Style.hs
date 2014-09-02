@@ -351,7 +351,6 @@ data Element
     | Names       [String]   [Name]       Formatting Delimiter [Element]
     | Substitute  [Element]
     | Group        Formatting Delimiter  [Element]
-    | Elements     Formatting            [Element]
     | Date        [String]    DateForm    Formatting Delimiter [DatePart] String
       deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
