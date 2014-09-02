@@ -3,7 +3,7 @@ import Control.Monad.Trans.Resource
 import qualified Data.Text as T
 import qualified Data.Map as M
 import Data.Conduit (($$), Sink)
-import Data.Maybe (catMaybes)
+import Data.Either (lefts, rights)
 import Data.Text (Text, unpack)
 -- import Text.XML.Stream.Parse
 import Text.CSL.Style hiding (parseNames)
@@ -137,7 +137,7 @@ getFormatting cur =
   , verticalAlign = stringAttr "vertical-align" cur
   , textCase = stringAttr "text-case" cur
   , display = stringAttr "display" cur
-  , quotes = if attrWithDefault "quote" False cur
+  , quotes = if attrWithDefault "quotes" False cur
                 then NativeQuote
                 else NoQuote
   , stripPeriods = attrWithDefault "strip-periods" False cur
@@ -163,25 +163,25 @@ parseDatePart cur =
            }
 
 parseNames :: Cursor -> [Element]
-parseNames cur = [Names (words variable) names formatting delim elts]
+parseNames cur = [Names (words variable) names formatting delim others]
   where variable   = stringAttr "variable" cur
         form       = attrWithDefault "form" NotSet cur
         formatting = getFormatting cur
         delim      = stringAttr "delimiter" cur
-        names      = catMaybes $ cur $/ checkName isName &| parseName
-        isName (X.Name n (Just "http://purl.org/net/xbiblio/csl") Nothing)
-                   = n == "name" || n == "etal" || n == "label"
-        elts       = cur $/ checkName (not . isName) &/ parseElement
+        elts       = cur $/ parseName
+        names      = rights elts
+        others     = lefts elts
 
-parseName :: Cursor -> Maybe Name
+parseName :: Cursor -> [Either Element Name]
 parseName cur =
   case node cur of
        X.NodeElement e ->
          case X.nameLocalName $ X.elementName e of
-              "name"   -> Just $ Name form format (nameAttrs e) delim nameParts
-              "label"  -> Just $ NameLabel form format plural
-              "et-al"  -> Just $ EtAl format ""
-       _ -> Nothing
+              "name"   -> [Right $ Name form format (nameAttrs e) delim nameParts]
+              "label"  -> [Right $ NameLabel form format plural]
+              "et-al"  -> [Right $ EtAl format ""]
+              x        -> map Left $ parseElement cur
+       _ -> map Left $ parseElement cur
    where form      = attrWithDefault "form" NotSet cur
          format    = getFormatting cur
          plural    = attrWithDefault "plural" Contextual cur
@@ -210,7 +210,7 @@ parseNamePart cur = NamePart s format
          s         = stringAttr "name" cur
 
 parseSubstitute :: Cursor -> [Element]
-parseSubstitute cur = cur $/ parseElement
+parseSubstitute cur = [Substitute (cur $/ parseElement)]
 
 parseTerm :: Cursor -> [Element]
 parseTerm cur =
