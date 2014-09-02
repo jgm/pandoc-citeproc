@@ -341,7 +341,7 @@ data Layout
       } deriving ( Show, Read, Typeable, Data, Generic )
 
 data Element
-    = Choose       [IfThen]  [Element]
+    = Choose       IfThen    [IfThen]    [Element]
     | Macro        String                 Formatting
     | Const        String                 Formatting
     | Variable    [String]    Form        Formatting Delimiter

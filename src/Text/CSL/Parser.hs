@@ -424,7 +424,7 @@ xpSort
 
 xpChoose :: PU Element
 xpChoose
-    = xpWrap (\(b,t,e) -> Choose (b:t) e, \(Choose (b:t) e) -> (b,t,e)) $
+    = xpWrap (uncurry3 Choose, \(Choose b t e) -> (b,t,e)) $
       xpElem "choose" $
       xpTriple (                        xpElem "if"      xpickle)
                (xpDefault [] $ xpList $ xpElem "else-if" xpickle)
