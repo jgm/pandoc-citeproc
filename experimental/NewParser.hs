@@ -42,7 +42,7 @@ main = do
         , csiUpdated    = cur $/ get "info" &/ get "updated" &/ string
         }
   let locales = cur $// get "locale" &/ parseLocale
-  let macros  = cur $// get "macro" &| parseMacro
+  let macros  = cur $// get "macro" &| parseMacroMap
   print  Style{ styleVersion = version
               , styleClass = class_
               , styleInfo = Just info
@@ -107,6 +107,7 @@ parseElement cur =
          case X.nameLocalName $ X.elementName e of
               "const" -> [Const (stringAttr "value" cur) (getFormatting cur)]
               "term" -> parseTerm cur
+              "text" -> parseText cur
               "choose" -> parseChoose cur
               "group" -> parseGroup cur
               x -> [Const ("UNDEFINED " ++ T.unpack x) (getFormatting cur)]
@@ -133,11 +134,6 @@ getFormatting cur =
   , noDecor = attrWithDefault "no-decor" False cur
   }
 
-parseElements :: Cursor -> [Element]
-parseElements cur =
-  let es = cur $/ parseElement
-  in  [Elements emptyFormatting es]
-
 parseTerm :: Cursor -> [Element]
 parseTerm cur =
   let termForm       = attrWithDefault "form" NotSet cur
@@ -146,11 +142,27 @@ parseTerm cur =
       name           = stringAttr "name" cur
   in  [Term name termForm formatting plural]
 
+parseText :: Cursor -> [Element]
+parseText cur =
+  let term           = stringAttr "term" cur
+      variable       = stringAttr "variable" cur
+      macro          = stringAttr "macro" cur
+      delim          = stringAttr "delimiter" cur
+      formatting     = getFormatting cur
+      textForm       = attrWithDefault "form" NotSet cur
+  in  if not (null term)
+         then [Const term formatting]
+         else if not (null macro)
+              then [Macro macro formatting]
+              else if not (null term)
+                      then [Variable (words variable) textForm formatting delim]
+                      else []
+
 parseChoose :: Cursor -> [Element]
 parseChoose cur =
   let ifPart         = cur $/ get "if" &| parseIf
       elseIfPart     = cur $/ get "else-if" &| parseIf
-      elsePart       = cur $/ get "else" &/ parseElements
+      elsePart       = cur $/ get "else" &/ parseElement
   in  [Choose (head ifPart) elseIfPart elsePart]
 
 parseIf :: Cursor -> IfThen
@@ -176,7 +188,7 @@ parseGroup cur =
       formatting     = getFormatting cur
   in  [Group formatting delim elts]
 
-parseMacro :: Cursor -> MacroMap
-parseMacro cur = (name, elts)
+parseMacroMap :: Cursor -> MacroMap
+parseMacroMap cur = (name, elts)
   where name = cur $| stringAttr "name"
         elts = cur $/ parseElement
