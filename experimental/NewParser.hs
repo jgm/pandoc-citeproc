@@ -3,6 +3,7 @@ import Control.Monad.Trans.Resource
 import qualified Data.Text as T
 import qualified Data.Map as M
 import Data.Conduit (($$), Sink)
+import Data.Maybe (catMaybes)
 import Data.Text (Text, unpack)
 -- import Text.XML.Stream.Parse
 import Text.CSL.Style
@@ -143,7 +144,30 @@ parseDate :: Cursor -> [Element]
 parseDate cur = undefined
 
 parseNames :: Cursor -> [Element]
-parseNames cur = undefined
+parseNames cur = [Names (words variable) names formatting delim elts]
+  where variable   = stringAttr "variable" cur
+        form       = attrWithDefault "form" NotSet cur
+        formatting = getFormatting cur
+        delim      = stringAttr "delimiter" cur
+        names      = catMaybes $ cur $/ checkName isName &| parseName
+        isName (X.Name n (Just "http://purl.org/net/xbiblio/csl") Nothing)
+                   = n == "name" || n == "etal" || n == "label"
+        elts       = cur $/ parseElement  -- TODO is this right?
+
+parseName :: Cursor -> Maybe Name
+parseName cur =
+  case node cur of
+       X.NodeElement e ->
+         case X.nameLocalName $ X.elementName e of
+         -- TODO - FILL THESE PLACEHOLDERS!!
+              "name"   -> Just $ Name NotSet emptyFormatting [] "" []
+              "label"  -> Just $ NameLabel NotSet emptyFormatting Contextual
+              "et-al"  -> Just $ EtAl emptyFormatting ""
+       _ -> Nothing
+
+    --   Name      Form Formatting NameAttrs Delimiter [NamePart]
+    -- | NameLabel Form Formatting Plural
+    -- | EtAl           Formatting String
 
 parseSubstitute :: Cursor -> [Element]
 parseSubstitute cur = cur $/ parseElement
