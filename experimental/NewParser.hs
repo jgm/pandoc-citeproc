@@ -11,19 +11,16 @@ import Data.XML.Types (Event)
 import Control.Applicative hiding (many, Const)
 import qualified Text.XML as X
 import Data.Default
+import Data.String (fromString)
 import Text.Pandoc.Shared (safeRead)
 import Text.XML.Cursor
 
-get :: Text -> Axis
-get name =
-  element (X.Name name (Just "http://purl.org/net/xbiblio/csl") Nothing)
-
-string :: Cursor -> String
-string = unpack . T.concat . content
-
 main :: IO ()
-main = do
-  doc <- X.readFile def "chicago-author-date.csl"
+main = readCSLFile "chicago-author-date.csl" >>= print
+
+readCSLFile :: FilePath -> IO Style
+readCSLFile fn = do
+  doc <- X.readFile def (fromString fn)
   let cur = fromDocument doc
   print $ cur $| laxAttribute "version"
   let version = unpack . T.concat $ cur $| laxAttribute "version"
@@ -44,7 +41,7 @@ main = do
         }
   let locales = cur $// get "locale" &/ parseLocale
   let macros  = cur $// get "macro" &| parseMacroMap
-  print  Style{ styleVersion = version
+  return Style{ styleVersion = version
               , styleClass = class_
               , styleInfo = Just info
               , styleDefaultLocale = defaultLocale
@@ -60,6 +57,13 @@ main = do
                                        , elements = [] } }
               , biblio = Nothing
               }
+
+get :: Text -> Axis
+get name =
+  element (X.Name name (Just "http://purl.org/net/xbiblio/csl") Nothing)
+
+string :: Cursor -> String
+string = unpack . T.concat . content
 
 attrWithDefault :: Read a => Text -> a -> Cursor -> a
 attrWithDefault t d cur =
@@ -160,14 +164,36 @@ parseName cur =
        X.NodeElement e ->
          case X.nameLocalName $ X.elementName e of
          -- TODO - FILL THESE PLACEHOLDERS!!
-              "name"   -> Just $ Name NotSet emptyFormatting [] "" []
-              "label"  -> Just $ NameLabel NotSet emptyFormatting Contextual
-              "et-al"  -> Just $ EtAl emptyFormatting ""
+              "name"   -> Just $ Name form format (nameAttrs e) delim nameParts
+              "label"  -> Just $ NameLabel form format plural
+              "et-al"  -> Just $ EtAl format ""
        _ -> Nothing
+   where form      = attrWithDefault "form" NotSet cur
+         format    = getFormatting cur
+         plural    = attrWithDefault "plural" Contextual cur
+         delim     = stringAttr "delimiter" cur
+         nameParts = cur $/ get "name-part" &| parseNamePart
+         nameAttrs x = [(T.unpack n, T.unpack v) |
+                 (X.Name n (Just "http://purl.org/net/xbiblio/csl")
+                     Nothing, v) <- M.toList (X.elementAttributes x),
+                 T.unpack n `elem` nameAttrKeys]
+         nameAttrKeys =  [ "et-al-min"
+                         , "et-al-use-first"
+                         , "et-al-subsequent-min"
+                         , "et-al-subsequent-use-first"
+                         , "et-al-use-last"
+                         , "delimiter-precedes-et-al"
+                         , "et-al-min"
+                         , "et-al-use-first"
+                         , "et-al-subsequent-min"
+                         , "et-al-subsequent-use-first"
+                         , "et-al-use-last"
+                         , "delimiter-precedes-et-al" ]
 
-    --   Name      Form Formatting NameAttrs Delimiter [NamePart]
-    -- | NameLabel Form Formatting Plural
-    -- | EtAl           Formatting String
+parseNamePart :: Cursor -> NamePart
+parseNamePart cur = NamePart s format
+   where format    = getFormatting cur
+         s         = stringAttr "name" cur
 
 parseSubstitute :: Cursor -> [Element]
 parseSubstitute cur = cur $/ parseElement
