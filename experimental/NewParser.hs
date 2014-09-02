@@ -103,7 +103,10 @@ parseElement cur =
        X.NodeElement e ->
          case X.nameLocalName $ X.elementName e of
               "const" -> [Const (stringAttr "value" cur) (getFormatting cur)]
-              _ -> [Const "bar" emptyFormatting]
+              "term" -> parseTerm cur
+              "elements" -> parseElements cur
+              "group" -> parseGroup cur
+              x -> [Const ("UNDEFINED " ++ T.unpack x) (getFormatting cur)]
        _ -> []
 
 getFormatting :: Cursor -> Formatting
@@ -131,6 +134,22 @@ parseElements :: Cursor -> [Element]
 parseElements cur =
   let es = cur $/ parseElement
   in  [Elements emptyFormatting es]
+
+parseTerm :: Cursor -> [Element]
+parseTerm cur =
+  let termForm       = attrWithDefault "form" NotSet cur
+      formatting     = getFormatting cur
+      plural         = attrWithDefault "plural" True cur
+      name           = attrWithDefault "name" "" cur
+  in  [Term name termForm formatting plural]
+
+parseGroup :: Cursor -> [Element]
+parseGroup cur =
+  let termForm       = attrWithDefault "form" NotSet cur
+      elts           = cur $/ parseElement
+      delim          = attrWithDefault "delimiter" "" cur
+      formatting     = getFormatting cur
+  in  [Group formatting delim elts]
 
 parseMacro :: Cursor -> MacroMap
 parseMacro cur = (name, elts)
