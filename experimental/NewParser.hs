@@ -112,8 +112,8 @@ parseElement cur =
               "group" -> parseGroup cur
               "label" -> parseLabel cur
               "number" -> parseNumber cur
+              "substitute" -> parseSubstitute cur
               -- "names" -> parseNames cur
-              -- "substitute" -> parseSubstitute cur
               -- "date" -> parseDate cur
               x -> [Const ("UNDEFINED " ++ T.unpack x) (getFormatting cur)]
        _ -> []
@@ -138,6 +138,15 @@ getFormatting cur =
   , noCase = attrWithDefault "no-case" False cur
   , noDecor = attrWithDefault "no-decor" False cur
   }
+
+parseDate :: Cursor -> [Element]
+parseDate cur = undefined
+
+parseNames :: Cursor -> [Element]
+parseNames cur = undefined
+
+parseSubstitute :: Cursor -> [Element]
+parseSubstitute cur = cur $/ parseElement
 
 parseTerm :: Cursor -> [Element]
 parseTerm cur =
