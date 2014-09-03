@@ -16,6 +16,7 @@ import Data.Char (toUpper)
 import Data.String (fromString)
 import Text.Pandoc.Shared (safeRead)
 import Text.XML.Cursor
+import Data.Maybe (listToMaybe, fromMaybe)
 
 main :: IO ()
 main = readCSLFile "chicago-author-date.csl" >>= print
@@ -50,13 +51,11 @@ readCSLFile fn = do
               , styleAbbrevs = Abbreviations M.empty
               , csOptions = []
               , csMacros = macros
-              , citation = Citation{ citOptions = []
-                                   , citSort = []
-                                   , citLayout = Layout{
-                                         layFormat = emptyFormatting
-                                       , layDelim = ""
-                                       , elements = [] } }
-              , biblio = Nothing
+              , citation = fromMaybe (Citation [] [] Layout{ layFormat = emptyFormatting
+                                                            , layDelim = ""
+                                                            , elements = [] }) $ listToMaybe $
+                           cur $/ get "citation" &| parseCitation
+              , biblio = listToMaybe $ cur $/ get "bibliography" &| parseBiblio
               }
 
 get :: Text -> Axis
@@ -297,4 +296,50 @@ toRead (s:ss) = toUpper s : camel ss
           |     y:ys <- x =         y : camel ys
           | otherwise     = []
 
+parseCitation :: Cursor -> Citation
+parseCitation cur =  Citation{ citOptions = []
+                             , citSort = cur $/ parseSort
+                             , citLayout = Layout{
+                                  layFormat = getFormatting cur
+                                , layDelim = stringAttr "delimiter" cur
+                                , elements = cur $/ parseElement } }
+   where citOpt x = [(T.unpack n, T.unpack v) |
+                 (X.Name n _ _, v) <- M.toList (X.elementAttributes x),
+                 n `elem` citOptKeys]
+         citOptKeys  =  [ "disambiguate-add-names"
+                        , "disambiguate-add-givenname"
+                        , "disambiguate-add-year-suffix"
+                        , "givenname-disambiguation-rule"
+                        , "collapse"
+                        , "cite-group-delimiter"
+                        , "year-suffix-delimiter"
+                        , "after-collapse-delimiter"
+                        , "near-note-distance" ]
 
+parseSort :: Cursor -> [Sort]
+parseSort _ = [] -- TODO
+
+{-
+data Sort
+    = SortVariable String Sorting
+    | SortMacro    String Sorting Int Int String
+      deriving ( Eq, Show, Read, Typeable, Data, Generic )
+
+data Sorting
+    = Ascending  String
+    | Descending String
+      deriving ( Read, Show, Eq, Typeable, Data, Generic )
+
+data Layout
+    = Layout
+      { layFormat ::  Formatting
+      , layDelim  ::  Delimiter
+      , elements  :: [Element]
+      } deriving ( Show, Read, Typeable, Data, Generic )
+-}
+
+
+
+
+parseBiblio :: Cursor -> Bibliography
+parseBiblio cur = Bibliography{}
