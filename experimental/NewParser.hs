@@ -40,8 +40,8 @@ readCSLFile fn = do
         , csiId         = cur $/ get "info" &/ get "id" &/ string
         , csiUpdated    = cur $/ get "info" &/ get "updated" &/ string
         }
-  let locales = cur $// get "locale" &/ parseLocale
-  let macros  = cur $// get "macro" &| parseMacroMap
+  let locales = cur $/ get "locale" &/ parseLocale
+  let macros  = cur $/ get "macro" &| parseMacroMap
   return Style{ styleVersion = version
               , styleClass = class_
               , styleInfo = Just info
