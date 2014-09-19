@@ -89,7 +89,7 @@ processBibliography ops s rs
 -- and the bibliography.
 citeproc :: ProcOpts -> Style -> [Reference] -> Citations -> BiblioData
 citeproc ops s rs cs
-    = BD citsOutput biblioOutput
+    = BD citsOutput biblioOutput $ map (unLiteral . refId) biblioRefs
     where
       -- the list of bib entries, as a list of Reference, with
       -- position, locator and year suffix set.
