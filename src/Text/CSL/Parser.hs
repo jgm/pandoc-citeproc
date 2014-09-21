@@ -1,75 +1,40 @@
-{-# LANGUAGE PatternGuards #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
------------------------------------------------------------------------------
--- |
--- Module      :  Text.CSL.Parser
--- Copyright   :  (c) Andrea Rossato
--- License     :  BSD-style (see LICENSE)
---
--- Maintainer  :  Andrea Rossato <andrea.rossato@unitn.it>
--- Stability   :  unstable
--- Portability :  unportable
---
--- Parser for Style
---
------------------------------------------------------------------------------
-
-module Text.CSL.Parser ( readCSLFile, parseCSL, parseCSL', parseLocale, localizeCSL )
+{-# LANGUAGE OverloadedStrings, TupleSections #-}
+module Text.CSL.Parser (readCSLFile, parseCSL, parseCSL',
+                        parseLocale, localizeCSL)
 where
-
-import Control.Monad (when, mplus)
-import Control.Exception (throwIO)
-import Text.CSL.Style
-import Text.CSL.Util (toShow, toRead, readNum, readable, findFile)
-import Text.Pandoc.UTF8 (fromStringLazy)
-import qualified Data.Map as M
-import Text.Pandoc.Shared (fetchItem)
-import Text.CSL.Pickle
-import Text.CSL.Data    ( getLocale )
-import Data.Maybe       ( catMaybes, fromMaybe )
+import Control.Monad.Trans.Resource
+import qualified Data.Text as T
 import qualified Data.ByteString.Lazy as L
+import qualified Data.Map as M
+import qualified Control.Exception as E
+import Control.Monad (when)
+import Data.Conduit (($$), Sink)
+import Data.Either (lefts, rights)
+import Data.Text (Text, unpack)
+import Text.CSL.Style hiding (parseNames)
+import Text.CSL.Util (toRead, findFile)
 import System.Directory (getAppUserDataDirectory)
-#ifdef USE_NETWORK
-import Network.HTTP ( getResponseBody, mkRequest, RequestMethod(..) )
-import Network.Browser ( browse, setAllowRedirects, setUserAgent, setOutHandler, request )
-import Network.URI ( parseURI, URI(..) )
-#endif
-
--- | Read and parse a CSL style file into a localized sytle.
-readCSLFile :: Maybe String -> FilePath -> IO Style
-readCSLFile mbLocale src = do
-  csldir <- getAppUserDataDirectory "csl"
-  mbSrc <- findFile [".", csldir] src
-  fetchRes <- fetchItem Nothing (fromMaybe src mbSrc)
-  f <- case fetchRes of
-            Left err         -> throwIO err
-            Right (rawbs, _) -> return $ L.fromChunks [rawbs]
-  -- see if it's a dependent style, and if so, try to fetch its parent:
-  let mbParent = lookup "independent-parent" $ readXmlString xpLinks f
-  when (mbParent == Just src) $ do
-    error $ "Dependent CSL style " ++ src ++ " specifies itself as parent."
-  case mbParent of
-       Just parent -> do
-           -- note, we insert locale from the dependent style:
-           let mbLocale' = mbLocale `mplus` readXmlString
-                   (xpOption $ xpAttr "default-locale" xpText) f
-           readCSLFile mbLocale' parent
-       Nothing     -> localizeCSL mbLocale $ parseCSL' f
-
-xpLinks :: PU [(String, String)]
-xpLinks = xpElem "style" $ xpElem "info" $ xpList $
-          xpIElem "link" $ xpPair (xpAttr "rel" xpText) (xpAttr "href" xpText)
+import Data.XML.Types (Event)
+import Control.Applicative hiding (many, Const)
+import qualified Text.XML as X
+import Data.Default
+import Data.Char (toUpper)
+import Data.String (fromString)
+import Text.Pandoc.Shared (safeRead)
+import Text.XML.Cursor
+import Data.Maybe (listToMaybe, fromMaybe)
+import Text.Pandoc.UTF8 (fromStringLazy)
+import Text.Pandoc.Shared (fetchItem)
+import Text.CSL.Data (getLocale)
 
 -- | Parse a 'String' into a 'Style' (with default locale).
 parseCSL :: String -> Style
 parseCSL = parseCSL' . fromStringLazy
 
-parseCSL' :: L.ByteString -> Style
-parseCSL' f = readXmlString xpStyle f
-
 -- | Parse locale.
 parseLocale :: String -> IO Locale
-parseLocale locale = readXmlString xpLocale `fmap` getLocale locale
+parseLocale locale =
+  parseLocaleElement . fromDocument . X.parseLBS_ def <$> getLocale locale
 
 -- | Merge locale into a CSL style.
 localizeCSL :: Maybe String -> Style -> IO Style
@@ -78,455 +43,359 @@ localizeCSL mbLocale s = do
   l <- parseLocale locale
   return s { styleLocale = mergeLocales locale l (styleLocale s) }
 
-instance XmlPickler Layout where
-    xpickle = xpWrap (uncurry3 Layout, \(Layout f d e) -> (f,d,e)) $
-              xpIElem "layout" $
-              xpTriple xpickle xpDelimiter xpickle
+-- | Read and parse a CSL style file into a localized sytle.
+readCSLFile :: Maybe String -> FilePath -> IO Style
+readCSLFile mbLocale src = do
+  csldir <- getAppUserDataDirectory "csl"
+  mbSrc <- findFile [".", csldir] src
+  fetchRes <- fetchItem Nothing (fromMaybe src mbSrc)
+  f <- case fetchRes of
+            Left err         -> E.throwIO err
+            Right (rawbs, _) -> return $ L.fromChunks [rawbs]
+  let cur = fromDocument $ X.parseLBS_ def f
+  -- see if it's a dependent style, and if so, try to fetch its parent:
+  let linkCur = cur $/ get "style" &/ get "info" &/ get "link"
+  let parent = concatMap (stringAttr "independent-parent") linkCur
+  when (parent == src) $ do
+    error $ "Dependent CSL style " ++ src ++ " specifies itself as parent."
+  case parent of
+       ""     -> localizeCSL mbLocale $ parseCSLCursor cur
+       parent -> do
+           -- note, we insert locale from the dependent style:
+           let mbLocale' = case stringAttr "default-locale" cur of
+                                  ""   -> mbLocale
+                                  x    -> Just x
+           readCSLFile mbLocale' parent
 
-instance XmlPickler Element where
-    xpickle = xpAlt tag ps
-        where
-          tag (Choose       {}) =  0
-          tag (Macro        {}) =  1
-          tag (Const        {}) =  2
-          tag (Variable     {}) =  4
-          tag (Term         {}) =  5
-          tag (Label        {}) =  6
-          tag (Names        {}) =  7
-          tag (Substitute   {}) =  9
-          tag (Group        {}) = 10
-          tag (Number       {}) = 11
-          tag (Date         {}) = 12
-          ps = [ xpChoose
-               , xpMacro
-               , xpConst
-               , xpVariable
-               , xpTerm
-               , xpLabel
-               , xpNames
-               , xpSubStitute
-               , xpGroup
-               , xpNumber
-               , xpDate
-               ]
+parseCSL' :: L.ByteString -> Style
+parseCSL' = parseCSLCursor . fromDocument . X.parseLBS_ def
 
-instance XmlPickler IfThen where
-    xpickle = xpWrap (uncurry3 IfThen, \(IfThen c m e) -> (c,m,e)) $
-              xpTriple xpickle xpickle xpickle
+parseCSLCursor :: Cursor -> Style
+parseCSLCursor cur =
+  Style{ styleVersion = version
+       , styleClass = class_
+       , styleInfo = Just info
+       , styleDefaultLocale = defaultLocale
+       , styleLocale = locales
+       , styleAbbrevs = Abbreviations M.empty
+       , csOptions = filter (\(k,v) -> k `elem`
+                                       ["page-range-format",
+                                        "demote-non-dropping-particle",
+                                        "initialize-with-hyphen"]) $ parseOptions cur
+       , csMacros = macros
+       , citation = fromMaybe (Citation [] [] Layout{ layFormat = emptyFormatting
+                                                    , layDelim = ""
+                                                    , elements = [] }) $ listToMaybe $
+                    cur $/ get "citation" &| parseCitation
+       , biblio = listToMaybe $ cur $/ get "bibliography" &| parseBiblio
+       }
+  where version = unpack . T.concat $ cur $| laxAttribute "version"
+        class_ = unpack . T.concat $ cur $| laxAttribute "class"
+        defaultLocale = case cur $| laxAttribute "default-locale" of
+                             (x:_) -> unpack x
+                             []    -> "en-US"
+        author = case (cur $// get "info" &/ get "author") of
+                      (x:_) -> CSAuthor (x $/ get "name" &/ string)
+                                 (x $/ get "email" &/ string)
+                                 (x $/ get "uri"   &/ string)
+                      _     -> CSAuthor "" "" ""
+        info = CSInfo
+          { csiTitle      = cur $/ get "info" &/ get "title" &/ string
+          , csiAuthor     = author
+          , csiCategories = []  -- TODO we don't really use this, and the type
+                                -- in Style doesn't match current CSL at all
+          , csiId         = cur $/ get "info" &/ get "id" &/ string
+          , csiUpdated    = cur $/ get "info" &/ get "updated" &/ string
+          }
+        locales = cur $/ get "locale" &| parseLocaleElement
+        macros  = cur $/ get "macro" &| parseMacroMap
 
-instance XmlPickler Condition where
-    xpickle = xpWrap ( \ ((t,v,n),(d,p,a,l)) ->
-                           Condition (words t) (words v) (words n)
-                                     (words d) (words p) (words a) (words l),
-                       \ (Condition t v n d p a l) ->
-                           ((unwords t,unwords v,unwords n)
-                           ,(unwords d,unwords p,unwords a,unwords l))) $
-              xpPair (xpTriple (xpAttrText' "type"             )
-                               (xpAttrText' "variable"         )
-                               (xpAttrText' "is-numeric"       ))
-                     (xp4Tuple (xpAttrText' "is-uncertain-date")
-                               (xpAttrText' "position"         )
-                               (xpAttrText' "disambiguate"     )
-                               (xpAttrText' "locator"          ))
+get :: Text -> Axis
+get name =
+  element (X.Name name (Just "http://purl.org/net/xbiblio/csl") Nothing)
 
-instance XmlPickler Formatting where
-    xpickle = xpWrap ( \(((p,s,ff),(fs,fv,fw)),(td,va,tc,d),(q,sp))
-                         -> Formatting p s ff fs fv fw td va tc d
-                            (if q then NativeQuote else NoQuote) sp False False
-                     , \(Formatting p s ff fs fv fw td va tc d _ sp _ _)
-                         -> (((p,s,ff),(fs,fv,fw)),(td,va,tc,d),(False,sp))) $
-              xpTriple (xpPair (xpTriple (xpAttrText' "prefix"      )
-                                         (xpAttrText' "suffix"      )
-                                         (xpAttrText' "font-family" ))
-                               (xpTriple (xpAttrText' "font-style"  )
-                                         (xpAttrText' "font-variant")
-                                         (xpAttrText' "font-weight" )))
-                       (xp4Tuple (xpAttrText' "text-decoration")
-                                 (xpAttrText' "vertical-align" )
-                                 (xpAttrText' "text-case"      )
-                                 (xpAttrText' "display"        ))
-                       (xpPair   (xpAttrWithDefault False "quotes"        xpickle)
-                                 (xpAttrWithDefault False "strip-periods" xpickle))
+string :: Cursor -> String
+string = unpack . T.concat . content
 
-instance XmlPickler Sort where
-    xpickle = xpAlt tag ps
-        where
-          readSort = read . flip (++) " \"\"" . toRead
-          tag (SortVariable {}) = 0
-          tag (SortMacro    {}) = 1
-          ps = [ xpWrap ( \(v,s) -> SortVariable v (readSort s)
-                        , \(SortVariable v s) -> (v,toShow $ show s)) $
-                 xpElem "key" $
-                 xpPair (xpAttrText "variable")
-                        (xpAttrWithDefault "ascending" "sort" xpText)
+attrWithDefault :: Read a => Text -> a -> Cursor -> a
+attrWithDefault t d cur =
+  case safeRead (toRead $ stringAttr t cur) of
+       Just x   -> x
+       Nothing  -> d
 
-               , xpWrap ( \(v,s,a,b,c) -> SortMacro v (readSort s) (readNum a) (readNum b) c
-                        , \(SortMacro v s a b c) -> (v,toShow $ show s,show a,show b, c)) $
-                 xpElem "key" $
-                 xp5Tuple (xpAttrText "macro")
-                          (xpAttrWithDefault "ascending" "sort"            xpText)
-                          (xpAttrWithDefault ""          "names-min"       xpText)
-                          (xpAttrWithDefault ""          "names-use-first" xpText)
-                          (xpAttrWithDefault ""          "names-use-last"  xpText)
-               ]
+stringAttr :: Text -> Cursor -> String
+stringAttr t cur = unpack $ T.concat $ laxAttribute t cur
 
-instance XmlPickler Bool where
-    xpickle = xpWrap readable xpText
+parseCslTerm :: Cursor -> CslTerm
+parseCslTerm cur =
+    let body = unpack $ T.strip $ T.concat $ cur $/ content
+    in CT
+      { cslTerm        = stringAttr "name" cur
+      , termForm       = attrWithDefault "form" Long cur
+      , termGender     = attrWithDefault "gender" Neuter cur
+      , termGenderForm = attrWithDefault "gender-form" Neuter cur
+      , termSingular   = if null body
+                            then cur $/ get "single" &/ string
+                            else body
+      , termPlural     = if null body
+                            then cur $/ get "multiple" &/ string
+                            else body
+      , termMatch      = stringAttr "match" cur
+      }
 
-instance XmlPickler Gender where
-    xpickle = xpWrap readable xpText
+parseLocaleElement :: Cursor -> Locale
+parseLocaleElement cur = Locale
+      { localeVersion = unpack $ T.concat version
+      , localeLang    = unpack $ T.concat lang
+      , localeOptions = concat $ cur $/ get "style-options" &| parseOptions
+      , localeTerms   = terms
+      , localeDate    = concat $ cur $/ get "date" &| parseElement
+      }
+  where version = cur $| laxAttribute "version"
+        lang    = cur $| laxAttribute "lang"
+        terms   = cur $/ get "terms" &/ get "term" &| parseCslTerm
 
-instance XmlPickler Form where
-    xpickle = xpWrap readable
-                     (xpAttrWithDefault "long" "form" xpText)
+parseElement :: Cursor -> [Element]
+parseElement cur =
+  case node cur of
+       X.NodeElement e ->
+         case X.nameLocalName $ X.elementName e of
+              "const" -> [Const (stringAttr "value" cur) (getFormatting cur)]
+              "term" -> parseTerm cur
+              "text" -> parseText cur
+              "choose" -> parseChoose cur
+              "group" -> parseGroup cur
+              "label" -> parseLabel cur
+              "number" -> parseNumber cur
+              "substitute" -> parseSubstitute cur
+              "names" -> parseNames cur
+              "date" -> parseDate cur
+              _ -> []
+       _ -> []
 
-instance XmlPickler NumericForm where
-    xpickle = xpWrap readable
-                     (xpAttrWithDefault "numeric" "form" xpText)
+getFormatting :: Cursor -> Formatting
+getFormatting cur =
+  emptyFormatting{
+    prefix  = stringAttr "prefix" cur
+  , suffix  = stringAttr "suffix" cur
+  , fontFamily = stringAttr "font-family" cur
+  , fontStyle = stringAttr "font-style" cur
+  , fontVariant = stringAttr "font-variant" cur
+  , fontWeight = stringAttr "font-weight" cur
+  , textDecoration = stringAttr "text-decoration" cur
+  , verticalAlign = stringAttr "vertical-align" cur
+  , textCase = stringAttr "text-case" cur
+  , display = stringAttr "display" cur
+  , quotes = if attrWithDefault "quotes" False cur
+                then NativeQuote
+                else NoQuote
+  , stripPeriods = attrWithDefault "strip-periods" False cur
+  , noCase = attrWithDefault "no-case" False cur
+  , noDecor = attrWithDefault "no-decor" False cur
+  }
 
-instance XmlPickler DateForm where
-    xpickle = xpWrap (read . toRead . flip (++) "-date", const [])
-                     (xpAttrWithDefault "no-form" "form" xpText)
+parseDate :: Cursor -> [Element]
+parseDate cur = [Date (words variable) form format delim parts partsAttr]
+  where variable   = stringAttr "variable" cur
+        form       = case stringAttr "form" cur of
+                           "text"    -> TextDate
+                           "numeric" -> NumericDate
+                           _         -> NoFormDate
+        format     = getFormatting cur
+        delim      = stringAttr "delimiter" cur
+        parts      = cur $/ get "date-part" &| parseDatePart
+        partsAttr  = stringAttr "date-parts" cur
 
-instance XmlPickler Match where
-    xpickle = xpWrap readable
-                     (xpAttrWithDefault "all" "match" xpText)
+parseDatePart :: Cursor -> DatePart
+parseDatePart cur =
+  DatePart { dpName       = stringAttr "name" cur
+           , dpForm       = case stringAttr "form" cur of
+                                  ""  -> "long"
+                                  x    -> x
+           , dpRangeDelim = case stringAttr "range-delimiter" cur of
+                                  ""  -> "-"
+                                  x   -> x
+           , dpFormatting = getFormatting cur
+           }
 
-instance XmlPickler DatePart where
-    xpickle = xpWrap (uncurry4 DatePart, \(DatePart s f d fm) -> (s,f,d,fm)) $
-              xpElem "date-part" $
-              xp4Tuple (xpAttrText "name")
-                       (xpAttrWithDefault "long" "form"            xpText)
-                       (xpAttrWithDefault "-"    "range-delimiter" xpText)
-                        xpickle
+parseNames :: Cursor -> [Element]
+parseNames cur = [Names (words variable) names formatting delim others]
+  where variable   = stringAttr "variable" cur
+        form       = attrWithDefault "form" NotSet cur
+        formatting = getFormatting cur
+        delim      = stringAttr "delimiter" cur
+        elts       = cur $/ parseName
+        names      = case rights elts of
+                          [] -> [Name NotSet emptyFormatting [] [] []]
+                          xs -> xs
+        others     = lefts elts
 
-instance XmlPickler Name where
-    xpickle = xpAlt tag ps
-        where
-          tag (Name      {}) = 0
-          tag (NameLabel {}) = 1
-          tag (EtAl      {}) = 2
-          ps = [ xpWrap (uncurry5 Name, \(Name f fm nas d nps) -> (f,fm,nas,d,nps)) $
-                 xpElem "name"  $ xp5Tuple xpNameForm xpickle xpNameAttrs xpDelimiter xpickle
-               , xpWrap (uncurry3 NameLabel, \(NameLabel f fm p) -> (f, fm,p)) $
-                 xpElem "label" $ xpTriple xpickle xpickle xpPlural
-               , xpWrap (uncurry EtAl, \(EtAl fm t) -> (fm,t)) $
-                 xpElem "et-al" $ xpPair xpickle $ xpAttrText' "term"
-               ]
-          xpNameForm = xpWrap readable $ xpAttrWithDefault "not-set" "form" xpText
-
-instance XmlPickler NamePart where
-    xpickle = xpWrap (uncurry NamePart, \(NamePart s fm) -> (s,fm)) $
-              xpElem "name-part" $
-              xpPair (xpAttrText "name")
-                      xpickle
-
-instance XmlPickler CSInfo where
-    xpickle = xpWrap ( \ ((t,i,u),(a,c)) -> CSInfo t a c i u
-                     , \ s -> ((csiTitle s,  csiId s, csiUpdated s)
-                              ,(csiAuthor s, csiCategories s))) $
-              xpPair (xpTriple (get "title"  )
-                               (get "id"     )
-                               (get "updated"))
-                     (xpPair   (xpIElemWithDefault (CSAuthor   "" "" "") "author" xpickle)
-                               (xpDefault [] $ xpList $ xpIElem "category" xpickle))
-                  where
-                    get = flip xpIElem xpText
-
-instance XmlPickler CSAuthor where
-    xpickle = xpWrap   (uncurry3 CSAuthor, \(CSAuthor a b c) -> (a, b, c)) $
-              xpTriple (xpIElemWithDefault [] "name"  xpText)
-                       (xpIElemWithDefault [] "email" xpText)
-                       (xpIElemWithDefault [] "uri"   xpText)
-
-instance XmlPickler CSCategory where
-    xpickle = xpWrap   (uncurry3 CSCategory, \(CSCategory a b c) -> (a, b, c)) $
-              xpTriple (xpAttrText  "term"  )
-                       (xpAttrText' "schema")
-                       (xpAttrText' "label" )
-
-xpStyle :: PU Style
-xpStyle
-    = xpWrap ( \ ((v,sc,si,sl,l),(o,m,c,b))   -> Style v sc si sl l (Abbreviations M.empty) o m c b
-             , \ (Style v sc si sl l _ o m c b) -> ((v,sc,si,sl,l),(o,m,c,b))) $
-      xpIElem "style" $
-      xpPair (xp5Tuple (xpAttrText "version")
-                       (xpAttrText "class")
-                        xpInfo
-                       (xpAttrWithDefault "en-US" "default-locale" xpText)
-                       (xpList xpLocale))
-             (xp4Tuple  xpStyleOpts
-                        xpMacros
-                        xpCitation
-                       (xpOption xpBibliography))
-
-xpInfo :: PU (Maybe CSInfo)
-xpInfo  = xpOption . xpIElem "info" $ xpickle
-
-xpLocale :: PU Locale
-xpLocale
-    = xpWrap ( \ ((v,l),(o,t,d))   -> Locale v l o t d
-             , \ (Locale v l o t d) -> ((v,l),(o,t,d))) $
-      xpIElem "locale" $
-      xpPair (xpPair   (xpAttrText' "version" )
-                       (xpAttrText' "lang"))
-             (xpTriple (xpIElemWithDefault [] "style-options" $  xpOpt "punctuation-in-quote")
-                        xpTerms
-                        (xpList xpLocaleDate))
-
-xpTerms :: PU [CslTerm]
-xpTerms
-    = xpWrap (concat,return) $ xpList $
-      xpIElem "terms" $ xpList $ xpElem "term" $
-      xpWrap (\((n,f,g,gf,m),(s,p)) -> CT n f g gf s p m,
-             undefined) $
-             xpPair (xp5Tuple (xpAttrText "name")
-                              xpickle
-                              (xpAttrWithDefault Neuter "gender" xpickle)
-                              (xpAttrWithDefault Neuter "gender-form" xpickle)
-                              (xpAttrText' "match"))
-                    (xpChoice (xpWrap (\s -> (s,s), fst)  xpText0)
-                              (xpPair (xpIElem "single"   xpText0)
-                              (xpIElem "multiple" xpText0))
-                              xpLift)
-
-xpMacros :: PU [MacroMap]
-xpMacros
-    = xpList $ xpIElem "macro" $
-      xpPair (xpAttrText "name") xpickle
-
-xpCitation :: PU Citation
-xpCitation
-    = xpWrap (uncurry3 Citation, \(Citation o s l) -> (o,s,l)) $
-      xpIElem "citation" $
-      xpTriple xpCitOpts xpSort xpickle
-
-xpBibliography :: PU Bibliography
-xpBibliography
-    = xpWrap (uncurry3 Bibliography, \(Bibliography o s l) -> (o,s,l)) $
-      xpIElem "bibliography" $
-      xpTriple xpBibOpts xpSort xpickle
-
-xpOpt :: String -> PU [Option]
-xpOpt n
-    = xpWrap (\a -> filter ((/=) [] . snd) $ [(n,a)], const []) $
-      xpAttrText' n
-
-xpNamesOpt :: PU [Option]
-xpNamesOpt = xpOpt "names-delimiter"
-
-xpNameFormat :: PU [Option]
-xpNameFormat
-    = xpWrap (\(a,b,c,d,e,f) ->
-                  catMaybes [ checkOpt "and"                     a
-                            , checkOpt "delimiter-precedes-last" b
-                            , checkOpt "sort-separator"          c
-                            , checkOpt "initialize"              d
-                            , checkOpt "initialize-with"         e
-                            , checkOpt "name-as-sort-order"      f
-                            ] , const (Nothing, Nothing, Nothing, Nothing, Nothing, Nothing)) $
-      xp6Tuple (getOpt "and")
-               (getOpt "delimiter-precedes-last")
-               (getOpt "sort-separator")
-               (getOpt "initialize")
-               (getOpt "initialize-with")
-               (getOpt "name-as-sort-order")
-
-    where
-      getOpt n = xpOption $ xpAttr n xpText
-      checkOpt _ Nothing  = Nothing
-      checkOpt n (Just s) = Just (n,s)
-
-xpNameAttrs :: PU NameAttrs
-xpNameAttrs
-    = xpWrap (\((a,b,c,d,e),(f,g)) ->
-                  filter ((/=) [] . snd) [("et-al-min",a)
-                                         ,("et-al-use-first",b)
-                                         ,("et-al-subsequent-min",c)
-                                         ,("et-al-subsequent-use-first",d)
-                                         ,("et-al-use-last",e)
-                                         ,("delimiter-precedes-et-al",f)] ++ g
-             , const (([],[],[],[],[]),([],[]))) $
-      xpPair (xp5Tuple (xpAttrText' "et-al-min")
-                       (xpAttrText' "et-al-use-first")
-                       (xpAttrText' "et-al-subsequent-min")
-                       (xpAttrText' "et-al-subsequent-use-first")
-                       (xpAttrText' "et-al-use-last")) $
-              xpPair   (xpAttrText' "delimiter-precedes-et-al")
-                       xpNameFormat
-
-xpNameOpt :: PU [Option]
-xpNameOpt
-    = xpWrap (\(a,b,c) ->
-                  filter ((/=) [] . snd) $ a ++ [("name-delimiter",b)
-                                                ,("name-form",c)], const ([],[],[])) $
-      xpTriple  xpNameAttrs
-               (xpAttrText' "name-delimiter")
-               (xpAttrText' "name-form")
-
-xpBibOpts :: PU [Option]
-xpBibOpts
-    = xpWrap ( \((a,b,c,d,e,f),(g,h)) ->
-                 filter ((/=) [] . snd) $ [("hanging-indent",a)
-                                          ,("second-field-align",b)
-                                          ,("subsequent-author-substitute",c)
-                                          ,("subsequent-author-substitute-rule",d)
-                                          ,("line-spacing",e)
-                                          ,("entry-spacing",f)] ++ g ++ h
-                , const (([],[],[],[],[],[]),([],[]))) $
-      xpPair (xp6Tuple (xpAttrText' "hanging-indent")
-                       (xpAttrText' "second-field-align")
-                       (xpAttrText' "subsequent-author-substitute")
-                       (xpAttrText' "subsequent-author-substitute-rule")
-                       (xpAttrText' "line-spacing")
-                       (xpAttrText' "entry-spacing")) $
-             xpPair xpNameOpt xpNamesOpt
-
-xpCitOpts :: PU [Option]
-xpCitOpts
-    = xpWrap ( \((a,b,c),(d,e,f,g,h,i),(j,k)) ->
-                 filter ((/=) [] . snd) $ [("disambiguate-add-names",a)
-                                          ,("disambiguate-add-givenname",b)
-                                          ,("disambiguate-add-year-suffix",c)
-                                          ,("givenname-disambiguation-rule",d)
-                                          ,("collapse",e)
-                                          ,("cite-group-delimiter",f)
-                                          ,("year-suffix-delimiter",g)
-                                          ,("after-collapse-delimiter",h)
-                                          ,("near-note-distance",i)] ++ j ++ k
-                , const (([],[],[]),([],[],[],[],[],[]),([],[]))) $
-      xpTriple (xpTriple (xpAttrText' "disambiguate-add-names")
-                         (xpAttrText' "disambiguate-add-givenname")
-                         (xpAttrText' "disambiguate-add-year-suffix"))
-               (xp6Tuple (xpAttrText' "givenname-disambiguation-rule")
-                         (xpAttrText' "collapse")
-                         (xpAttrText' "cite-group-delimiter")
-                         (xpAttrText' "year-suffix-delimiter")
-                         (xpAttrText' "after-collapse-delimiter")
-                         (xpAttrText' "near-note-distance"))
-               (xpPair xpNameOpt xpNamesOpt)
-
-xpStyleOpts :: PU [Option]
-xpStyleOpts
-    = xpWrap ( \((a,b,c),(d,e)) ->
-                 filter ((/=) [] . snd) $ [("page-range-format",a)
-                                          ,("demote-non-dropping-particle",b)
-                                          ,("initialize-with-hyphen",c)] ++ d ++ e
-                , const (([],[],[]),([],[]))) $
-      xpPair (xpTriple (xpAttrText' "page-range-format")
-                       (xpAttrText' "demote-non-dropping-particle")
-                       (xpAttrText' "initialize-with-hyphen")) $
-               (xpPair xpNameOpt xpNamesOpt)
-
-xpSort :: PU [Sort]
-xpSort
-    = xpDefault [] $ xpElem "sort" $ xpList xpickle
-
-xpChoose :: PU Element
-xpChoose
-    = xpWrap (uncurry3 Choose, \(Choose b t e) -> (b,t,e)) $
-      xpElem "choose" $
-      xpTriple (                        xpElem "if"      xpickle)
-               (xpDefault [] $ xpList $ xpElem "else-if" xpickle)
-               (xpDefault []          $ xpElem "else"    xpickle)
-
-xpMacro :: PU Element
-xpMacro
-    = xpWrap (uncurry Macro, \(Macro s fm) -> (s,fm)) $
-      xpTextElem $ xpPair (xpAttrText "macro") xpickle
-
-xpConst :: PU Element
-xpConst
-    = xpWrap (uncurry Const, \(Const s fm) -> (s,fm)) $
-      xpTextElem $ xpPair (xpAttrText "value") xpickle
-
-xpVariable :: PU Element
-xpVariable
-    = xpWrap ( \((v,f,fm),d)        -> Variable (words v) f fm d
-             , \(Variable v f fm d) -> ((unwords v,f,fm),d)) $
-      xpTextElem $ xpPair (xpCommon "variable") xpDelimiter
-
-xpTerm :: PU Element
-xpTerm
-    = xpWrap ( \((t,f,fm),p)    -> Term t f fm p
-             , \(Term t f fm p) -> ((t,f,fm),p)) $
-      xpTextElem $ xpPair (xpCommon "term") $
-                   xpAttrWithDefault True "plural" xpickle
-
-xpNames :: PU Element
-xpNames
-    = xpWrap ( \((a,n,fm),d,sb)     -> Names (words a) n fm d sb
-             , \(Names a n fm d sb) -> ((unwords a,n,fm),d,sb)) $
-      xpElem "names" $ xpTriple names xpDelimiter xpickle
-    where names    = xpTriple (xpAttrText "variable") xpName xpickle
-          xpName   = xpChoice xpZero xpickle check
-          check [] = xpLift [Name NotSet emptyFormatting [] [] []]
-          check  l = if any isName l then xpLift l else xpZero
-
-xpLabel :: PU Element
-xpLabel
-    = xpWrap ( uncurry4 Label
-             , \(Label s f fm p) -> (s,f,fm,p)) $
-      xpElem "label" $
-      xp4Tuple (xpAttrText' "variable")
-                xpickle xpickle xpPlural
-
-xpSubStitute :: PU Element
-xpSubStitute
-    = xpWrap (Substitute, \(Substitute es) -> es) $
-      xpElem "substitute" xpickle
-
-xpGroup :: PU Element
-xpGroup
-    = xpWrap (uncurry3 Group, \(Group fm d e) -> (fm,d,e)) $
-      xpElem "group" $
-      xpTriple xpickle xpDelimiter xpickle
-
-xpNumber :: PU Element
-xpNumber
-    = xpWrap (uncurry3 Number, \(Number s f fm) -> (s,f,fm)) $
-      xpElem "number" $ xpCommon "variable"
-
-xpDate :: PU Element
-xpDate
-    = xpWrap ( \((s,f,fm),(d,dp,dp'))    -> Date (words s) f fm d dp dp'
-             , \(Date s f fm d dp dp') -> ((unwords s,f,fm),(d,dp,dp'))) $
-      xpElem  "date" $
-      xpPair (xpCommon "variable")
-             (xpTriple xpDelimiter xpickle (xpAttrText' "date-parts"))
-
-xpLocaleDate :: PU Element
-xpLocaleDate
-    = xpWrap ( \((s,f,fm),(d,dp,dp'))    -> Date (words s) f fm d dp dp'
-             , \(Date s f fm d dp dp') -> ((unwords s,f,fm),(d,dp,dp'))) $
-      xpIElem  "date" $
-      xpPair  (xpTriple (xpLift []) xpickle xpickle)
-              (xpTriple xpDelimiter xpickle (xpLift []))
-
-xpTextElem :: PU a -> PU a
-xpTextElem = xpElem "text"
-
-xpDelimiter :: PU String
-xpDelimiter = xpAttrText' "delimiter"
-
-xpPlural :: PU Plural
-xpPlural = xpWrap readable $ xpAttrWithDefault "contextual" "plural" xpText
-
-xpCommon :: (XmlPickler b, XmlPickler c) => String -> PU (String,b,c)
-xpCommon s = xpTriple (xpAttrText s) xpickle xpickle
-
--- | For mandatory attributes.
-xpAttrText :: String -> PU String
-xpAttrText n = xpAttr n xpText
-
--- | For optional attributes.
-xpAttrText' ::  String -> PU String
-xpAttrText' n = xpAttrWithDefault [] n xpText
-
-xpAttrWithDefault :: Eq a => a -> String -> PU a -> PU a
-xpAttrWithDefault d n = xpDefault d . xpAttr n
-
-xpIElemWithDefault :: Eq a => a -> String -> PU a -> PU a
-xpIElemWithDefault d n = xpDefault d . xpIElem n
+parseName :: Cursor -> [Either Element Name]
+parseName cur =
+  case node cur of
+       X.NodeElement e ->
+         case X.nameLocalName $ X.elementName e of
+              "name"   -> [Right $ Name form format (nameAttrs e) delim nameParts]
+              "label"  -> [Right $ NameLabel form format plural]
+              "et-al"  -> [Right $ EtAl format ""]
+              x        -> map Left $ parseElement cur
+       _ -> map Left $ parseElement cur
+   where form      = attrWithDefault "form" NotSet cur
+         format    = getFormatting cur
+         plural    = attrWithDefault "plural" Contextual cur
+         delim     = stringAttr "delimiter" cur
+         nameParts = cur $/ get "name-part" &| parseNamePart
+         nameAttrs x = [(T.unpack n, T.unpack v) |
+                 (X.Name n _ _, v) <- M.toList (X.elementAttributes x),
+                 n `elem` nameAttrKeys]
+         nameAttrKeys =  [ "et-al-min"
+                         , "et-al-use-first"
+                         , "et-al-subsequent-min"
+                         , "et-al-subsequent-use-first"
+                         , "et-al-use-last"
+                         , "delimiter-precedes-et-al"
+                         , "and"
+                         , "delimiter-precedes-last"
+                         , "sort-separator"
+                         , "initialize"
+                         , "initialize-with"
+                         , "name-as-sort-order" ]
 
 
+parseNamePart :: Cursor -> NamePart
+parseNamePart cur = NamePart s format
+   where format    = getFormatting cur
+         s         = stringAttr "name" cur
+
+parseSubstitute :: Cursor -> [Element]
+parseSubstitute cur = [Substitute (cur $/ parseElement)]
+
+parseTerm :: Cursor -> [Element]
+parseTerm cur =
+  let termForm       = attrWithDefault "form" Long cur
+      formatting     = getFormatting cur
+      plural         = attrWithDefault "plural" True cur
+      name           = stringAttr "name" cur
+  in  [Term name termForm formatting plural]
+
+parseText :: Cursor -> [Element]
+parseText cur =
+  let term           = stringAttr "term" cur
+      variable       = stringAttr "variable" cur
+      macro          = stringAttr "macro" cur
+      delim          = stringAttr "delimiter" cur
+      formatting     = getFormatting cur
+      plural         = attrWithDefault "plural" True cur
+      textForm       = attrWithDefault "form" Long cur
+  in  if not (null term)
+         then [Term term textForm formatting plural]
+         else if not (null macro)
+              then [Macro macro formatting]
+              else if not (null variable)
+                      then [Variable (words variable) textForm formatting delim]
+                      else []
+
+parseChoose :: Cursor -> [Element]
+parseChoose cur =
+  let ifPart         = cur $/ get "if" &| parseIf
+      elseIfPart     = cur $/ get "else-if" &| parseIf
+      elsePart       = cur $/ get "else" &/ parseElement
+  in  [Choose (head ifPart) elseIfPart elsePart]
+
+parseIf :: Cursor -> IfThen
+parseIf cur = IfThen cond match elts
+  where cond = Condition {
+                 isType          = go "type"
+               , isSet           = go "variable"
+               , isNumeric       = go "is-numeric"
+               , isUncertainDate = go "is-uncertain-date"
+               , isPosition      = go "position"
+               , disambiguation  = go "disambiguate"
+               , isLocator       = go "locator"
+               }
+        match = attrWithDefault "match" All cur
+        elts = cur $/ parseElement
+        go x = words $ stringAttr x cur
+
+parseLabel :: Cursor -> [Element]
+parseLabel cur = [Label variable form formatting plural]
+  where variable   = stringAttr "variable" cur
+        form       = attrWithDefault "form" Long cur
+        formatting = getFormatting cur
+        plural     = attrWithDefault "plural" Contextual cur
+
+parseNumber :: Cursor -> [Element]
+parseNumber cur = [Number variable numForm formatting]
+  where variable   = stringAttr "variable" cur
+        numForm    = attrWithDefault "form" Numeric cur
+        formatting = getFormatting cur
+
+parseGroup :: Cursor -> [Element]
+parseGroup cur =
+  let termForm       = attrWithDefault "form" Long cur
+      elts           = cur $/ parseElement
+      delim          = stringAttr "delimiter" cur
+      formatting     = getFormatting cur
+  in  [Group formatting delim elts]
+
+parseMacroMap :: Cursor -> MacroMap
+parseMacroMap cur = (name, elts)
+  where name = cur $| stringAttr "name"
+        elts = cur $/ parseElement
+
+parseCitation :: Cursor -> Citation
+parseCitation cur =  Citation{ citOptions = parseOptions cur
+                             , citSort = concat $ cur $/ get "sort" &| parseSort
+                             , citLayout = case cur $/ get "layout" &| parseLayout of
+                                            (x:_) -> x
+                                            []    -> Layout
+                                                      { layFormat = emptyFormatting
+                                                      , layDelim = ""
+                                                      , elements = [] }
+                             }
+
+parseSort :: Cursor -> [Sort]
+parseSort cur = concat $ cur $/ get "key" &| parseKey
+
+parseKey :: Cursor -> [Sort]
+parseKey cur =
+  case stringAttr "variable" cur of
+       "" ->
+         case stringAttr "macro" cur of
+           "" -> []
+           x  -> [SortMacro x sorting (attrWithDefault "names-min" 0 cur)
+                       (attrWithDefault "names-use-first" 0 cur)
+                       (stringAttr "name-use-last" cur)]
+       x  -> [SortVariable x sorting]
+  where sorting = case stringAttr "sort" cur of
+                       "descending"  -> Descending ""
+                       _             -> Ascending ""
+
+parseBiblio :: Cursor -> Bibliography
+parseBiblio cur =
+  Bibliography{
+    bibOptions = parseOptions cur,
+    bibSort = concat $ cur $/ get "sort" &| parseSort,
+    bibLayout = case cur $/ get "layout" &| parseLayout of
+                       (x:_) -> x
+                       []    -> Layout
+                                 { layFormat = emptyFormatting
+                                 , layDelim = ""
+                                 , elements = [] }
+    }
+
+parseOptions :: Cursor -> [Option]
+parseOptions cur =
+  case node cur of
+    X.NodeElement e ->
+     [(T.unpack n, T.unpack v) |
+      (X.Name n _ _, v) <- M.toList (X.elementAttributes e)]
+    _ -> []
+
+parseLayout :: Cursor -> Layout
+parseLayout cur =
+  Layout
+    { layFormat = getFormatting cur
+    , layDelim = stringAttr "delimiter" cur
+    , elements = cur $/ parseElement
+    }
