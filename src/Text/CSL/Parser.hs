@@ -1,4 +1,17 @@
 {-# LANGUAGE OverloadedStrings, TupleSections #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Text.CSL.Parser
+-- Copyright   :  (C) 2014 John MacFarlane
+-- License     :  BSD-style (see LICENSE)
+--
+-- Maintainer  :  John MacFarlane <jgm@berkeley.edu>
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+-- Parser for CSL XML files.
+-----------------------------------------------------------------------------
+
 module Text.CSL.Parser (readCSLFile, parseCSL, parseCSL',
                         parseLocale, localizeCSL)
 where
