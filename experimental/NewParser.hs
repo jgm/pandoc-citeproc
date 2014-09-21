@@ -133,7 +133,7 @@ parseCslTerm cur =
     let body = unpack $ T.strip $ T.concat $ cur $/ content
     in CT
       { cslTerm        = stringAttr "name" cur
-      , termForm       = attrWithDefault "form" NotSet cur
+      , termForm       = attrWithDefault "form" Long cur
       , termGender     = attrWithDefault "gender" Neuter cur
       , termGenderForm = attrWithDefault "gender-form" Neuter cur
       , termSingular   = if null body
