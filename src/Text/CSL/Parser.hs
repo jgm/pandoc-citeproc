@@ -20,13 +20,11 @@ import qualified Data.ByteString.Lazy as L
 import qualified Data.Map as M
 import qualified Control.Exception as E
 import Control.Monad (when)
-import Data.Conduit (($$), Sink)
 import Data.Either (lefts, rights)
 import Data.Text (Text, unpack)
 import Text.CSL.Style hiding (parseNames)
 import Text.CSL.Util (toRead, findFile)
 import System.Directory (getAppUserDataDirectory)
-import Data.XML.Types (Event)
 import Control.Applicative hiding (many, Const)
 import qualified Text.XML as X
 import Data.Default

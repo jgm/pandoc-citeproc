@@ -139,9 +139,7 @@ library
                       bytestring, filepath, pandoc-types >= 1.12.3, tagsoup,
                       aeson >= 0.7 && < 0.9, text, vector,
                       xml-conduit >= 1.2 && < 1.3,
-                      conduit >= 1.1 && < 1.2,
                       data-default,
-                      xml-types >= 0.3 && < 0.4,
                       split, yaml >= 0.8.8.2, pandoc >= 1.12.1
     if impl(ghc < 7.6)
        build-depends: ghc-prim
