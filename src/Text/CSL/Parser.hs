@@ -78,10 +78,11 @@ parseCSLCursor cur =
        , styleDefaultLocale = defaultLocale
        , styleLocale = locales
        , styleAbbrevs = Abbreviations M.empty
-       , csOptions = filter (\(k,v) -> k `elem`
-                                       ["page-range-format",
-                                        "demote-non-dropping-particle",
-                                        "initialize-with-hyphen"]) $ parseOptions cur
+       , csOptions = filter (\(k,v) -> k `notElem`
+                                       ["class",
+                                        "xmlns",
+                                        "version",
+                                        "default-locale"]) $ parseOptions cur
        , csMacros = macros
        , citation = fromMaybe (Citation [] [] Layout{ layFormat = emptyFormatting
                                                     , layDelim = ""
@@ -128,7 +129,8 @@ stringAttr t cur = unpack $ T.concat $ laxAttribute t cur
 
 parseCslTerm :: Cursor -> CslTerm
 parseCslTerm cur =
-    let body = unpack $ T.strip $ T.concat $ cur $/ content
+    let body = unpack $ T.dropAround (`elem` " \t\r\n") $
+                  T.concat $ cur $/ content
     in CT
       { cslTerm        = stringAttr "name" cur
       , termForm       = attrWithDefault "form" Long cur
@@ -160,7 +162,6 @@ parseElement cur =
   case node cur of
        X.NodeElement e ->
          case X.nameLocalName $ X.elementName e of
-              "const" -> [Const (stringAttr "value" cur) (getFormatting cur)]
               "term" -> parseTerm cur
               "text" -> parseText cur
               "choose" -> parseChoose cur
@@ -235,13 +236,14 @@ parseName cur =
   case node cur of
        X.NodeElement e ->
          case X.nameLocalName $ X.elementName e of
-              "name"   -> [Right $ Name form format (nameAttrs e) delim nameParts]
-              "label"  -> [Right $ NameLabel form format plural]
-              "et-al"  -> [Right $ EtAl format ""]
+              "name"   -> [Right $ Name (attrWithDefault "form" NotSet cur)
+                              format (nameAttrs e) delim nameParts]
+              "label"  -> [Right $ NameLabel (attrWithDefault "form" Long cur)
+                              format plural]
+              "et-al"  -> [Right $ EtAl format $ stringAttr "term" cur]
               x        -> map Left $ parseElement cur
        _ -> map Left $ parseElement cur
-   where form      = attrWithDefault "form" NotSet cur
-         format    = getFormatting cur
+   where format    = getFormatting cur
          plural    = attrWithDefault "plural" Contextual cur
          delim     = stringAttr "delimiter" cur
          nameParts = cur $/ get "name-part" &| parseNamePart
@@ -283,6 +285,7 @@ parseText cur =
   let term           = stringAttr "term" cur
       variable       = stringAttr "variable" cur
       macro          = stringAttr "macro" cur
+      value          = stringAttr "value" cur
       delim          = stringAttr "delimiter" cur
       formatting     = getFormatting cur
       plural         = attrWithDefault "plural" True cur
@@ -293,7 +296,9 @@ parseText cur =
               then [Macro macro formatting]
               else if not (null variable)
                       then [Variable (words variable) textForm formatting delim]
-                      else []
+                      else if not (null value)
+                           then [Const value formatting]
+                           else []
 
 parseChoose :: Cursor -> [Element]
 parseChoose cur =
@@ -365,7 +370,7 @@ parseKey cur =
            "" -> []
            x  -> [SortMacro x sorting (attrWithDefault "names-min" 0 cur)
                        (attrWithDefault "names-use-first" 0 cur)
-                       (stringAttr "name-use-last" cur)]
+                       (stringAttr "names-use-last" cur)]
        x  -> [SortVariable x sorting]
   where sorting = case stringAttr "sort" cur of
                        "descending"  -> Descending ""
