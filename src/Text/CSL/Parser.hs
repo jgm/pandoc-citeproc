@@ -15,7 +15,6 @@
 module Text.CSL.Parser (readCSLFile, parseCSL, parseCSL',
                         parseLocale, localizeCSL)
 where
-import Control.Monad.Trans.Resource
 import qualified Data.Text as T
 import qualified Data.ByteString.Lazy as L
 import qualified Data.Map as M
