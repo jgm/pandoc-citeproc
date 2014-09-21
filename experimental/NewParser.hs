@@ -1,13 +1,20 @@
 {-# LANGUAGE OverloadedStrings, TupleSections #-}
 import Control.Monad.Trans.Resource
 import qualified Data.Text as T
+import qualified Data.ByteString.Lazy as L
 import qualified Data.Map as M
+import qualified Control.Exception as E
+import Control.Monad (when)
 import Data.Conduit (($$), Sink)
 import Data.Either (lefts, rights)
 import Data.Text (Text, unpack)
 -- import Text.XML.Stream.Parse
 import Text.CSL.Style hiding (parseNames)
--- TODO, replace toRead below with: import Text.CSL.Util (toRead)
+-- TODO, replace toRead, findFile below with: import Text.CSL.Util (toRead, findFile)
+-- and remove next two imports:
+import System.FilePath ((</>))
+import System.Directory (doesFileExist)
+import System.Directory (getAppUserDataDirectory)
 import Data.XML.Types (Event)
 import Control.Applicative hiding (many, Const)
 import qualified Text.XML as X
@@ -17,49 +24,93 @@ import Data.String (fromString)
 import Text.Pandoc.Shared (safeRead)
 import Text.XML.Cursor
 import Data.Maybe (listToMaybe, fromMaybe)
+import Text.Pandoc.UTF8 (fromStringLazy)
+import Text.Pandoc.Shared (fetchItem)
+import Text.CSL.Data (getLocale)
 
 -- TODO:
 -- locale date
 -- merge in locale?
 
-readCSLFile :: FilePath -> IO Style
-readCSLFile fn = do
-  doc <- X.readFile def (fromString fn)
-  let cur = fromDocument doc
-  let version = unpack . T.concat $ cur $| laxAttribute "version"
-  let class_ = unpack . T.concat $ cur $| laxAttribute "class"
-  let defaultLocale = case cur $| laxAttribute "default-locale" of
-                           (x:_) -> unpack x
-                           []    -> "en-US"
-  let author = case (cur $// get "info" &/ get "author") of
-                    (x:_) -> CSAuthor (x $/ get "name" &/ string)
-                               (x $/ get "email" &/ string)
-                               (x $/ get "uri"   &/ string)
-                    _     -> CSAuthor "" "" ""
-  let info = CSInfo
-        { csiTitle      = cur $/ get "info" &/ get "title" &/ string
-        , csiAuthor     = author
-        , csiCategories = []  -- TODO we don't really use this, and the type
-                              -- in Style doesn't match current CSL at all
-        , csiId         = cur $/ get "info" &/ get "id" &/ string
-        , csiUpdated    = cur $/ get "info" &/ get "updated" &/ string
-        }
-  let locales = cur $/ get "locale" &/ parseLocale
-  let macros  = cur $/ get "macro" &| parseMacroMap
-  return Style{ styleVersion = version
-              , styleClass = class_
-              , styleInfo = Just info
-              , styleDefaultLocale = defaultLocale
-              , styleLocale = locales
-              , styleAbbrevs = Abbreviations M.empty
-              , csOptions = []
-              , csMacros = macros
-              , citation = fromMaybe (Citation [] [] Layout{ layFormat = emptyFormatting
-                                                            , layDelim = ""
-                                                            , elements = [] }) $ listToMaybe $
-                           cur $/ get "citation" &| parseCitation
-              , biblio = listToMaybe $ cur $/ get "bibliography" &| parseBiblio
-              }
+-- | Parse a 'String' into a 'Style' (with default locale).
+parseCSL :: String -> Style
+parseCSL = parseCSL' . fromStringLazy
+
+-- | Parse locale.
+parseLocale :: String -> IO Locale
+parseLocale locale =
+  parseLocaleElement . fromDocument . X.parseLBS_ def <$> getLocale locale
+
+-- | Merge locale into a CSL style.
+localizeCSL :: Maybe String -> Style -> IO Style
+localizeCSL mbLocale s = do
+  let locale = fromMaybe (styleDefaultLocale s) mbLocale
+  l <- parseLocale locale
+  return s { styleLocale = mergeLocales locale l (styleLocale s) }
+
+-- | Read and parse a CSL style file into a localized sytle.
+readCSLFile :: Maybe String -> FilePath -> IO Style
+readCSLFile mbLocale src = do
+  csldir <- getAppUserDataDirectory "csl"
+  mbSrc <- findFile [".", csldir] src
+  fetchRes <- fetchItem Nothing (fromMaybe src mbSrc)
+  f <- case fetchRes of
+            Left err         -> E.throwIO err
+            Right (rawbs, _) -> return $ L.fromChunks [rawbs]
+  let cur = fromDocument $ X.parseLBS_ def f
+  -- see if it's a dependent style, and if so, try to fetch its parent:
+  let linkCur = cur $/ get "style" &/ get "info" &/ get "link"
+  let parent = concatMap (stringAttr "independent-parent") linkCur
+  when (parent == src) $ do
+    error $ "Dependent CSL style " ++ src ++ " specifies itself as parent."
+  case parent of
+       ""     -> localizeCSL mbLocale $ parseCSLCursor cur
+       parent -> do
+           -- note, we insert locale from the dependent style:
+           let mbLocale' = case stringAttr "default-locale" cur of
+                                  ""   -> mbLocale
+                                  x    -> Just x
+           readCSLFile mbLocale' parent
+
+parseCSL' :: L.ByteString -> Style
+parseCSL' = parseCSLCursor . fromDocument . X.parseLBS_ def
+
+parseCSLCursor :: Cursor -> Style
+parseCSLCursor cur =
+  Style{ styleVersion = version
+       , styleClass = class_
+       , styleInfo = Just info
+       , styleDefaultLocale = defaultLocale
+       , styleLocale = locales
+       , styleAbbrevs = Abbreviations M.empty
+       , csOptions = []
+       , csMacros = macros
+       , citation = fromMaybe (Citation [] [] Layout{ layFormat = emptyFormatting
+                                                    , layDelim = ""
+                                                    , elements = [] }) $ listToMaybe $
+                    cur $/ get "citation" &| parseCitation
+       , biblio = listToMaybe $ cur $/ get "bibliography" &| parseBiblio
+       }
+  where version = unpack . T.concat $ cur $| laxAttribute "version"
+        class_ = unpack . T.concat $ cur $| laxAttribute "class"
+        defaultLocale = case cur $| laxAttribute "default-locale" of
+                             (x:_) -> unpack x
+                             []    -> "en-US"
+        author = case (cur $// get "info" &/ get "author") of
+                      (x:_) -> CSAuthor (x $/ get "name" &/ string)
+                                 (x $/ get "email" &/ string)
+                                 (x $/ get "uri"   &/ string)
+                      _     -> CSAuthor "" "" ""
+        info = CSInfo
+          { csiTitle      = cur $/ get "info" &/ get "title" &/ string
+          , csiAuthor     = author
+          , csiCategories = []  -- TODO we don't really use this, and the type
+                                -- in Style doesn't match current CSL at all
+          , csiId         = cur $/ get "info" &/ get "id" &/ string
+          , csiUpdated    = cur $/ get "info" &/ get "updated" &/ string
+          }
+        locales = cur $/ get "locale" &| parseLocaleElement
+        macros  = cur $/ get "macro" &| parseMacroMap
 
 get :: Text -> Axis
 get name =
@@ -94,17 +145,17 @@ parseCslTerm cur =
       , termMatch      = stringAttr "match" cur
       }
 
-parseLocale :: Cursor -> [Locale]
-parseLocale cur = [Locale
+parseLocaleElement :: Cursor -> Locale
+parseLocaleElement cur = Locale
       { localeVersion = unpack $ T.concat version
       , localeLang    = unpack $ T.concat lang
       , localeOptions = options
       , localeTerms   = terms
       , localeDate    = date
-      }]
+      }
   where version = cur $| laxAttribute "version"
         lang    = cur $| laxAttribute "lang"
-        terms   = cur $/ get "term" &| parseCslTerm
+        terms   = cur $/ get "terms" &/ get "term" &| parseCslTerm
         date    = [] -- TODO
         options = parseOptions cur
 
@@ -289,16 +340,6 @@ parseMacroMap cur = (name, elts)
   where name = cur $| stringAttr "name"
         elts = cur $/ parseElement
 
-toRead :: String -> String
-toRead    []  = []
-toRead (s:ss) = toUpper s : camel ss
-    where
-      camel x
-          | '-':y:ys <- x = toUpper y : camel ys
-          | '_':y:ys <- x = toUpper y : camel ys
-          |     y:ys <- x =         y : camel ys
-          | otherwise     = []
-
 parseCitation :: Cursor -> Citation
 parseCitation cur =  Citation{ citOptions = parseOptions cur
                              , citSort = cur $/ get "sort" &/ parseSort
@@ -355,3 +396,21 @@ parseLayout cur =
     , layDelim = stringAttr "delimiter" cur
     , elements = cur $/ parseElement
     }
+
+findFile :: [FilePath] -> FilePath -> IO (Maybe FilePath)
+findFile [] _ = return Nothing
+findFile (p:ps) f = do
+  exists <- doesFileExist (p </> f)
+  if exists
+     then return $ Just (p </> f)
+     else findFile ps f
+
+toRead :: String -> String
+toRead    []  = []
+toRead (s:ss) = toUpper s : camel ss
+    where
+      camel x
+          | '-':y:ys <- x = toUpper y : camel ys
+          | '_':y:ys <- x = toUpper y : camel ys
+          |     y:ys <- x =         y : camel ys
+          | otherwise     = []
