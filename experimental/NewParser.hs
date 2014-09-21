@@ -28,9 +28,16 @@ import Text.Pandoc.UTF8 (fromStringLazy)
 import Text.Pandoc.Shared (fetchItem)
 import Text.CSL.Data (getLocale)
 
--- TODO:
--- locale date
--- csOptions
+import qualified Text.CSL.Parser as Old
+import Criterion
+import Criterion.Main
+
+main :: IO ()
+main = do
+  defaultMain [
+    bench "old" $ whnfIO (Old.readCSLFile Nothing "chicago-author-date.csl"),
+    bench "new" $ whnfIO (readCSLFile Nothing "chicago-author-date.csl")
+    ]
 
 -- | Parse a 'String' into a 'Style' (with default locale).
 parseCSL :: String -> Style
