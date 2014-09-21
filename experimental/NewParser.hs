@@ -154,12 +154,11 @@ parseLocaleElement cur = Locale
       , localeLang    = unpack $ T.concat lang
       , localeOptions = concat $ cur $/ get "style-options" &| parseOptions
       , localeTerms   = terms
-      , localeDate    = date
+      , localeDate    = concat $ cur $/ get "date" &| parseElement
       }
   where version = cur $| laxAttribute "version"
         lang    = cur $| laxAttribute "lang"
         terms   = cur $/ get "terms" &/ get "term" &| parseCslTerm
-        date    = [] -- TODO
 
 parseElement :: Cursor -> [Element]
 parseElement cur =
@@ -203,7 +202,10 @@ getFormatting cur =
 parseDate :: Cursor -> [Element]
 parseDate cur = [Date (words variable) form format delim parts partsAttr]
   where variable   = stringAttr "variable" cur
-        form       = attrWithDefault "form" NoFormDate cur
+        form       = case stringAttr "form" cur of
+                           "text"    -> TextDate
+                           "numeric" -> NumericDate
+                           _         -> NoFormDate
         format     = getFormatting cur
         delim      = stringAttr "delimiter" cur
         parts      = cur $/ get "date-part" &| parseDatePart
@@ -212,8 +214,12 @@ parseDate cur = [Date (words variable) form format delim parts partsAttr]
 parseDatePart :: Cursor -> DatePart
 parseDatePart cur =
   DatePart { dpName       = stringAttr "name" cur
-           , dpForm       = attrWithDefault "form" "long" cur
-           , dpRangeDelim = attrWithDefault "range-delimiter" "-" cur
+           , dpForm       = case stringAttr "form" cur of
+                                  ""  -> "long"
+                                  x    -> x
+           , dpRangeDelim = case stringAttr "range-delimiter" cur of
+                                  ""  -> "-"
+                                  x   -> x
            , dpFormatting = getFormatting cur
            }
 
