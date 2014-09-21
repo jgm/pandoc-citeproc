@@ -298,7 +298,7 @@ toRead (s:ss) = toUpper s : camel ss
 
 parseCitation :: Cursor -> Citation
 parseCitation cur =  Citation{ citOptions = []
-                             , citSort = cur $/ parseSort
+                             , citSort = cur $/ get "sort" &/ parseSort
                              , citLayout = Layout{
                                   layFormat = getFormatting cur
                                 , layDelim = stringAttr "delimiter" cur
@@ -317,19 +317,23 @@ parseCitation cur =  Citation{ citOptions = []
                         , "near-note-distance" ]
 
 parseSort :: Cursor -> [Sort]
-parseSort _ = [] -- TODO
+parseSort cur = cur $/ get "key" &/ parseKey
+
+parseKey :: Cursor -> [Sort]
+parseKey cur =
+  case stringAttr "variable" cur of
+       "" ->
+         case stringAttr "macro" cur of
+           "" -> []
+           x  -> [SortMacro x sorting (attrWithDefault "names-min" 0 cur)
+                       (attrWithDefault "names-use-first" 0 cur)
+                       (stringAttr "name-use-last" cur)]
+       x  -> [SortVariable x sorting]
+  where sorting = case stringAttr "sort" cur of
+                       "descending"  -> Descending ""
+                       _             -> Ascending ""
 
 {-
-data Sort
-    = SortVariable String Sorting
-    | SortMacro    String Sorting Int Int String
-      deriving ( Eq, Show, Read, Typeable, Data, Generic )
-
-data Sorting
-    = Ascending  String
-    | Descending String
-      deriving ( Read, Show, Eq, Typeable, Data, Generic )
-
 data Layout
     = Layout
       { layFormat ::  Formatting
