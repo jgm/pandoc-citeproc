@@ -349,7 +349,7 @@ formatLabel :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
 formatLabel f fm p s
     | "locator" <- s = when' (gets (citeLocator . cite . env) >>= return . (/=) []) $ do
                        (l,v) <- getLocVar
-                       form (\fm' -> return . flip OLoc emptyFormatting . output fm') id l ('-' `elem` v)
+                       form (\fm' -> return . flip OLoc emptyFormatting . output fm') id l ('-' `elem` v || '\x2013' `elem` v)
     | "page"    <- s = checkPlural
     | "volume"  <- s = checkPlural
     | "ibid"    <- s = format s p
@@ -367,7 +367,7 @@ formatLabel f fm p s
                          ,"reviewed-author", "translator"]
       checkPlural = when' (isVarSet s) $ do
                       v <- getStringVar s
-                      format  s ('-' `elem` v)
+                      format  s ('-' `elem` v || '\x2013' `elem` v)
       format      = form output id
       form o g t b = return . o fm =<< g . period <$> getTerm (b && p) f t
       period      = if stripPeriods fm then filter (/= '.') else id

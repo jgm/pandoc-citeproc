@@ -369,8 +369,10 @@ breakNumericString :: [String] -> [String]
 breakNumericString [] = []
 breakNumericString (x:xs)
     | isTransNumber x = x : breakNumericString xs
-    | otherwise       = let (a,b) = break (flip elem "&-\x2013,") x
-                            (c,d) = if null b then ("","") else (take 1 b, tail b)
+    | otherwise       = let (a,b) = break (`elem` "&-\x2013,") x
+                            (c,d) = if null b
+                                       then ("","")
+                                       else span (`elem` "&-\x2013,") b
                         in filter (/= []) $  a : c : breakNumericString (d : xs)
 
 formatRange :: Formatting -> String -> State EvalState [Output]
@@ -382,10 +384,10 @@ formatRange fm p = do
       pages = tupleRange . breakNumericString . words $ p
 
       tupleRange [] = []
-      tupleRange (x:"-":[]  ) = return (x,[])
-      tupleRange (x:"\x2013":[]  ) = return (x,[])
-      tupleRange (x:"-":y:xs) = (x, y) : tupleRange xs
-      tupleRange (x:"\x2013":y:xs) = (x, y) : tupleRange xs
+      tupleRange (x:cs:[]  )
+        | cs `elem` ["-", "--", "\x2013"] = return (x,[])
+      tupleRange (x:cs:y:xs)
+        | cs `elem` ["-", "--", "\x2013"] = (x, y) : tupleRange xs
       tupleRange (x:      xs) = (x,[]) : tupleRange xs
 
       joinRange (a, []) = a
