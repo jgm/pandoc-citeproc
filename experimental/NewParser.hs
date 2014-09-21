@@ -29,15 +29,23 @@ import Text.Pandoc.Shared (fetchItem)
 import Text.CSL.Data (getLocale)
 
 import qualified Text.CSL.Parser as Old
-import Criterion
-import Criterion.Main
+import System.Environment
+import Data.Generics
+import Data.List (sort)
+import Text.Pandoc.Shared (substitute)
 
 main :: IO ()
 main = do
-  defaultMain [
-    bench "old" $ whnfIO (Old.readCSLFile Nothing "chicago-author-date.csl"),
-    bench "new" $ whnfIO (readCSLFile Nothing "chicago-author-date.csl")
-    ]
+  (x:_) <- getArgs
+  let f :: [Option] -> [Option]
+      f = sort
+  let g = everywhere (mkT f)
+  old <- show . g <$> Old.readCSLFile Nothing x
+  new <- show . g <$> readCSLFile Nothing x
+  when (new /= old) $ do
+    print x
+    writeFile (x ++ ".new") $ substitute "," ",\n" new
+    writeFile (x ++ ".old") $ substitute "," ",\n" old
 
 -- | Parse a 'String' into a 'Style' (with default locale).
 parseCSL :: String -> Style
@@ -90,10 +98,11 @@ parseCSLCursor cur =
        , styleDefaultLocale = defaultLocale
        , styleLocale = locales
        , styleAbbrevs = Abbreviations M.empty
-       , csOptions = filter (\(k,v) -> k `elem`
-                                       ["page-range-format",
-                                        "demote-non-dropping-particle",
-                                        "initialize-with-hyphen"]) $ parseOptions cur
+       , csOptions = filter (\(k,v) -> k `notElem`
+                                       ["class",
+                                        "xmlns",
+                                        "version",
+                                        "default-locale"]) $ parseOptions cur
        , csMacros = macros
        , citation = fromMaybe (Citation [] [] Layout{ layFormat = emptyFormatting
                                                     , layDelim = ""
@@ -140,7 +149,8 @@ stringAttr t cur = unpack $ T.concat $ laxAttribute t cur
 
 parseCslTerm :: Cursor -> CslTerm
 parseCslTerm cur =
-    let body = unpack $ T.strip $ T.concat $ cur $/ content
+    let strip = T.dropAround (\c -> c `elem` " \t\r\n")
+        body = unpack $ strip $ T.concat $ cur $/ content
     in CT
       { cslTerm        = stringAttr "name" cur
       , termForm       = attrWithDefault "form" Long cur
@@ -172,7 +182,6 @@ parseElement cur =
   case node cur of
        X.NodeElement e ->
          case X.nameLocalName $ X.elementName e of
-              "const" -> [Const (stringAttr "value" cur) (getFormatting cur)]
               "term" -> parseTerm cur
               "text" -> parseText cur
               "choose" -> parseChoose cur
@@ -247,9 +256,11 @@ parseName cur =
   case node cur of
        X.NodeElement e ->
          case X.nameLocalName $ X.elementName e of
-              "name"   -> [Right $ Name form format (nameAttrs e) delim nameParts]
-              "label"  -> [Right $ NameLabel form format plural]
-              "et-al"  -> [Right $ EtAl format ""]
+              "name"   -> [Right $ Name (attrWithDefault "form" NotSet cur)
+                              format (nameAttrs e) delim nameParts]
+              "label"  -> [Right $ NameLabel (attrWithDefault "form" Long cur)
+                              format plural]
+              "et-al"  -> [Right $ EtAl format $ stringAttr "term" cur]
               x        -> map Left $ parseElement cur
        _ -> map Left $ parseElement cur
    where form      = attrWithDefault "form" NotSet cur
@@ -295,6 +306,7 @@ parseText cur =
   let term           = stringAttr "term" cur
       variable       = stringAttr "variable" cur
       macro          = stringAttr "macro" cur
+      value          = stringAttr "value" cur
       delim          = stringAttr "delimiter" cur
       formatting     = getFormatting cur
       plural         = attrWithDefault "plural" True cur
@@ -305,7 +317,9 @@ parseText cur =
               then [Macro macro formatting]
               else if not (null variable)
                       then [Variable (words variable) textForm formatting delim]
-                      else []
+                      else if not (null value)
+                              then [Const value formatting]
+                              else []
 
 parseChoose :: Cursor -> [Element]
 parseChoose cur =
