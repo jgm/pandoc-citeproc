@@ -18,8 +18,9 @@ import Text.Pandoc.Shared (safeRead)
 import Text.XML.Cursor
 import Data.Maybe (listToMaybe, fromMaybe)
 
-main :: IO ()
-main = readCSLFile "chicago-author-date.csl" >>= print
+-- TODO:
+-- locale date
+-- merge in locale?
 
 readCSLFile :: FilePath -> IO Style
 readCSLFile fn = do
@@ -30,12 +31,14 @@ readCSLFile fn = do
   let defaultLocale = case cur $| laxAttribute "default-locale" of
                            (x:_) -> unpack x
                            []    -> "en-US"
-  let author = head (cur $// get "info" &/ get "author") -- TODO
+  let author = case (cur $// get "info" &/ get "author") of
+                    (x:_) -> CSAuthor (x $/ get "name" &/ string)
+                               (x $/ get "email" &/ string)
+                               (x $/ get "uri"   &/ string)
+                    _     -> CSAuthor "" "" ""
   let info = CSInfo
         { csiTitle      = cur $/ get "info" &/ get "title" &/ string
-        , csiAuthor     = CSAuthor (author $/ get "name"  &/ string)
-                                   (author $/ get "email" &/ string)
-                                   (author $/ get "uri"   &/ string)
+        , csiAuthor     = author
         , csiCategories = []  -- TODO we don't really use this, and the type
                               -- in Style doesn't match current CSL at all
         , csiId         = cur $/ get "info" &/ get "id" &/ string
@@ -101,9 +104,9 @@ parseLocale cur = [Locale
       }]
   where version = cur $| laxAttribute "version"
         lang    = cur $| laxAttribute "lang"
-        options = [] -- TODO
         terms   = cur $/ get "term" &| parseCslTerm
         date    = [] -- TODO
+        options = parseOptions cur
 
 parseElement :: Cursor -> [Element]
 parseElement cur =
@@ -297,24 +300,15 @@ toRead (s:ss) = toUpper s : camel ss
           | otherwise     = []
 
 parseCitation :: Cursor -> Citation
-parseCitation cur =  Citation{ citOptions = []
+parseCitation cur =  Citation{ citOptions = parseOptions cur
                              , citSort = cur $/ get "sort" &/ parseSort
-                             , citLayout = Layout{
-                                  layFormat = getFormatting cur
-                                , layDelim = stringAttr "delimiter" cur
-                                , elements = cur $/ parseElement } }
-   where citOpt x = [(T.unpack n, T.unpack v) |
-                 (X.Name n _ _, v) <- M.toList (X.elementAttributes x),
-                 n `elem` citOptKeys]
-         citOptKeys  =  [ "disambiguate-add-names"
-                        , "disambiguate-add-givenname"
-                        , "disambiguate-add-year-suffix"
-                        , "givenname-disambiguation-rule"
-                        , "collapse"
-                        , "cite-group-delimiter"
-                        , "year-suffix-delimiter"
-                        , "after-collapse-delimiter"
-                        , "near-note-distance" ]
+                             , citLayout = case cur $/ get "layout" &| parseLayout of
+                                            (x:_) -> x
+                                            []    -> Layout
+                                                      { layFormat = emptyFormatting
+                                                      , layDelim = ""
+                                                      , elements = [] }
+                             }
 
 parseSort :: Cursor -> [Sort]
 parseSort cur = cur $/ get "key" &/ parseKey
@@ -333,17 +327,31 @@ parseKey cur =
                        "descending"  -> Descending ""
                        _             -> Ascending ""
 
-{-
-data Layout
-    = Layout
-      { layFormat ::  Formatting
-      , layDelim  ::  Delimiter
-      , elements  :: [Element]
-      } deriving ( Show, Read, Typeable, Data, Generic )
--}
-
-
-
-
 parseBiblio :: Cursor -> Bibliography
-parseBiblio cur = Bibliography{}
+parseBiblio cur =
+  Bibliography{
+    bibOptions = parseOptions cur,
+    bibSort = cur $/ get "sort" &/ parseSort,
+    bibLayout = case cur $/ get "layout" &| parseLayout of
+                       (x:_) -> x
+                       []    -> Layout
+                                 { layFormat = emptyFormatting
+                                 , layDelim = ""
+                                 , elements = [] }
+    }
+
+parseOptions :: Cursor -> [Option]
+parseOptions cur =
+  case node cur of
+    X.NodeElement e ->
+     [(T.unpack n, T.unpack v) |
+      (X.Name n _ _, v) <- M.toList (X.elementAttributes e)]
+    _ -> []
+
+parseLayout :: Cursor -> Layout
+parseLayout cur =
+  Layout
+    { layFormat = getFormatting cur
+    , layDelim = stringAttr "delimiter" cur
+    , elements = cur $/ parseElement
+    }
