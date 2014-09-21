@@ -30,7 +30,7 @@ import Text.CSL.Data (getLocale)
 
 -- TODO:
 -- locale date
--- merge in locale?
+-- csOptions
 
 -- | Parse a 'String' into a 'Style' (with default locale).
 parseCSL :: String -> Style
@@ -83,7 +83,10 @@ parseCSLCursor cur =
        , styleDefaultLocale = defaultLocale
        , styleLocale = locales
        , styleAbbrevs = Abbreviations M.empty
-       , csOptions = []
+       , csOptions = filter (\(k,v) -> k `elem`
+                                       ["page-range-format",
+                                        "demote-non-dropping-particle",
+                                        "initialize-with-hyphen"]) $ parseOptions cur
        , csMacros = macros
        , citation = fromMaybe (Citation [] [] Layout{ layFormat = emptyFormatting
                                                     , layDelim = ""
@@ -149,7 +152,7 @@ parseLocaleElement :: Cursor -> Locale
 parseLocaleElement cur = Locale
       { localeVersion = unpack $ T.concat version
       , localeLang    = unpack $ T.concat lang
-      , localeOptions = options
+      , localeOptions = concat $ cur $/ get "style-options" &| parseOptions
       , localeTerms   = terms
       , localeDate    = date
       }
@@ -157,7 +160,6 @@ parseLocaleElement cur = Locale
         lang    = cur $| laxAttribute "lang"
         terms   = cur $/ get "terms" &/ get "term" &| parseCslTerm
         date    = [] -- TODO
-        options = parseOptions cur
 
 parseElement :: Cursor -> [Element]
 parseElement cur =
@@ -342,7 +344,7 @@ parseMacroMap cur = (name, elts)
 
 parseCitation :: Cursor -> Citation
 parseCitation cur =  Citation{ citOptions = parseOptions cur
-                             , citSort = cur $/ get "sort" &/ parseSort
+                             , citSort = concat $ cur $/ get "sort" &| parseSort
                              , citLayout = case cur $/ get "layout" &| parseLayout of
                                             (x:_) -> x
                                             []    -> Layout
@@ -352,7 +354,7 @@ parseCitation cur =  Citation{ citOptions = parseOptions cur
                              }
 
 parseSort :: Cursor -> [Sort]
-parseSort cur = cur $/ get "key" &/ parseKey
+parseSort cur = concat $ cur $/ get "key" &| parseKey
 
 parseKey :: Cursor -> [Sort]
 parseKey cur =
@@ -372,7 +374,7 @@ parseBiblio :: Cursor -> Bibliography
 parseBiblio cur =
   Bibliography{
     bibOptions = parseOptions cur,
-    bibSort = cur $/ get "sort" &/ parseSort,
+    bibSort = concat $ cur $/ get "sort" &| parseSort,
     bibLayout = case cur $/ get "layout" &| parseLayout of
                        (x:_) -> x
                        []    -> Layout
