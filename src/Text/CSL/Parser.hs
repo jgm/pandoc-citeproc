@@ -28,8 +28,6 @@ import System.Directory (getAppUserDataDirectory)
 import Control.Applicative hiding (many, Const)
 import qualified Text.XML as X
 import Data.Default
-import Data.Char (toUpper)
-import Data.String (fromString)
 import Text.Pandoc.Shared (safeRead)
 import Text.XML.Cursor
 import Data.Maybe (listToMaybe, fromMaybe)
@@ -65,17 +63,17 @@ readCSLFile mbLocale src = do
   let cur = fromDocument $ X.parseLBS_ def f
   -- see if it's a dependent style, and if so, try to fetch its parent:
   let linkCur = cur $/ get "style" &/ get "info" &/ get "link"
-  let parent = concatMap (stringAttr "independent-parent") linkCur
-  when (parent == src) $ do
+  let parent' = concatMap (stringAttr "independent-parent") linkCur
+  when (parent' == src) $ do
     error $ "Dependent CSL style " ++ src ++ " specifies itself as parent."
-  case parent of
-       ""     -> localizeCSL mbLocale $ parseCSLCursor cur
-       parent -> do
+  case parent' of
+       ""  -> localizeCSL mbLocale $ parseCSLCursor cur
+       y   -> do
            -- note, we insert locale from the dependent style:
            let mbLocale' = case stringAttr "default-locale" cur of
                                   ""   -> mbLocale
                                   x    -> Just x
-           readCSLFile mbLocale' parent
+           readCSLFile mbLocale' y
 
 parseCSL' :: L.ByteString -> Style
 parseCSL' = parseCSLCursor . fromDocument . X.parseLBS_ def
@@ -88,7 +86,7 @@ parseCSLCursor cur =
        , styleDefaultLocale = defaultLocale
        , styleLocale = locales
        , styleAbbrevs = Abbreviations M.empty
-       , csOptions = filter (\(k,v) -> k `notElem`
+       , csOptions = filter (\(k,_) -> k `notElem`
                                        ["class",
                                         "xmlns",
                                         "version",
@@ -232,7 +230,6 @@ parseDatePart cur =
 parseNames :: Cursor -> [Element]
 parseNames cur = [Names (words variable) names formatting delim others]
   where variable   = stringAttr "variable" cur
-        form       = attrWithDefault "form" NotSet cur
         formatting = getFormatting cur
         delim      = stringAttr "delimiter" cur
         elts       = cur $/ parseName
@@ -251,7 +248,7 @@ parseName cur =
               "label"  -> [Right $ NameLabel (attrWithDefault "form" Long cur)
                               format plural]
               "et-al"  -> [Right $ EtAl format $ stringAttr "term" cur]
-              x        -> map Left $ parseElement cur
+              _        -> map Left $ parseElement cur
        _ -> map Left $ parseElement cur
    where format    = getFormatting cur
          plural    = attrWithDefault "plural" Contextual cur
@@ -284,11 +281,11 @@ parseSubstitute cur = [Substitute (cur $/ parseElement)]
 
 parseTerm :: Cursor -> [Element]
 parseTerm cur =
-  let termForm       = attrWithDefault "form" Long cur
+  let termForm'      = attrWithDefault "form" Long cur
       formatting     = getFormatting cur
       plural         = attrWithDefault "plural" True cur
       name           = stringAttr "name" cur
-  in  [Term name termForm formatting plural]
+  in  [Term name termForm' formatting plural]
 
 parseText :: Cursor -> [Element]
 parseText cur =
@@ -318,7 +315,7 @@ parseChoose cur =
   in  [Choose (head ifPart) elseIfPart elsePart]
 
 parseIf :: Cursor -> IfThen
-parseIf cur = IfThen cond match elts
+parseIf cur = IfThen cond mat elts
   where cond = Condition {
                  isType          = go "type"
                , isSet           = go "variable"
@@ -328,7 +325,7 @@ parseIf cur = IfThen cond match elts
                , disambiguation  = go "disambiguate"
                , isLocator       = go "locator"
                }
-        match = attrWithDefault "match" All cur
+        mat  = attrWithDefault "match" All cur
         elts = cur $/ parseElement
         go x = words $ stringAttr x cur
 
@@ -347,8 +344,7 @@ parseNumber cur = [Number variable numForm formatting]
 
 parseGroup :: Cursor -> [Element]
 parseGroup cur =
-  let termForm       = attrWithDefault "form" Long cur
-      elts           = cur $/ parseElement
+  let elts           = cur $/ parseElement
       delim          = stringAttr "delimiter" cur
       formatting     = getFormatting cur
   in  [Group formatting delim elts]
