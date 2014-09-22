@@ -133,7 +133,14 @@ attrWithDefault t d cur =
        Nothing  -> d
 
 stringAttr :: Text -> Cursor -> String
-stringAttr t cur = unpack $ T.concat $ laxAttribute t cur
+stringAttr t cur =
+  case node cur of
+    X.NodeElement e ->
+      case M.lookup (X.Name t Nothing Nothing)
+           (X.elementAttributes e) of
+           Just x  -> unpack x
+           Nothing -> ""
+    _ -> ""
 
 parseCslTerm :: Cursor -> CslTerm
 parseCslTerm cur =
