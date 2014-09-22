@@ -1,17 +1,19 @@
 pandoc-citeproc (0.6)
 
-  * The CSL parser has been replaced with a new, xml-conduit based module.
-    The new module is faster and does not rely on C libraries.
-    It is also more correct (the old parser would remove nonbreaking
-    spaces at the beginning and end of string attribute values,
-    causing French guillemots, for example, to be formatted wrongly).
-    And it should be much easier to repair and extend in the future.
+  * The CSL parser has been replaced with a new, xml-conduit based module,
+    which does not rely on C libraries and should be easier to repair
+    and extend.  The module has been checked against the old module with all
+    CSL files in the citeproc repository.  The only differences
+    are with attribute values beginning or ending with a nonbreaking
+    space (e.g. with French guillemets), and the new parser's behavior
+    (preserving the spaces) is clearly correct.  Parsing was measured as
+    about twice as fast in a benchmark.
   * The `hexpat` cabal flag has been removed.
   * The old `Text.CSL.Pickle` and `Text.CSL.Pickle.*` modules have been
     removed.
   * Plural locator labels (e.g. 'pp.') are now used for page ranges
     containing en-dashes (#84).
-  * Removed `Elements` from `Element`.  It was entirely unnecessary,
+  * `Elements` has been removed from `Element`.  It was entirely unnecessary,
     used only once (and dispensibly) in `Text.CSL.Eval`.
     This change results in cleaner code.
   * Improved man page generation.
