@@ -17,6 +17,7 @@ pandoc-citeproc (0.6)
     used only once (and dispensibly) in `Text.CSL.Eval`.
     This change results in cleaner code.
   * Improved man page generation.
+  * Updated `chicago-author-date.csl` default style.
 
 pandoc-citeproc (0.5)
 
