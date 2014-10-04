@@ -22,9 +22,9 @@ install:
      cabal-1.18 install happy alex
      export PATH=$HOME/.cabal/bin:$PATH
    fi
- - cabal-1.18 install hsb2hs  # build dependency for embed_data_files
  - export PATH=$HOME/.cabal/bin:$PATH
- - cabal-1.18 install --only-dependencies --enable-tests
+ - cabal-1.18 install --only-dependencies --enable-tests hsb2hs .
+ - cabal-1.18 install hsb2hs  # build dependency for embed_data_files
 
 # Here starts the actual work to be performed for the package under test; any command which exits with a non-zero exit code causes the build to fail.
 script:
