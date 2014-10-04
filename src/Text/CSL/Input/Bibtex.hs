@@ -757,7 +757,7 @@ itemToReference lang locale bibtex = bib $ do
        "electronic"      -> (Webpage,mempty)
        "inbook"          -> (Chapter,mempty)
        "incollection"    -> (Chapter,mempty)
-       "inreference "    -> (Chapter,mempty)
+       "inreference"     -> (EntryEncyclopedia,mempty)
        "inproceedings"   -> (PaperConference,mempty)
        "manual"          -> (Book,mempty)
        "mastersthesis"   -> (Thesis, Formatted [Str $ resolveKey' lang "mathesis"])
