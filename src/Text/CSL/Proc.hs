@@ -288,7 +288,7 @@ formatCitLayout s (CG co f d cs)
         case ys of
              Formatted [] -> xs
              Formatted (Note _ : _) -> xs <> ys
-             Formatted (Str [c]:_) | c `elem` ", ;:" -> xs <> ys
+             Formatted (Str [c]:_) | c `elem` (", ;:" :: String) -> xs <> ys
              _ -> xs <> Formatted [Space] <> ys
       formatAuth   = formatOutput . localMod
       formatCits   = (if isNote then toNote else id) .
@@ -328,7 +328,7 @@ localModifiers s b c
     | otherwise        = id
     where
       isPunct' [] = False
-      isPunct' xs = all (`elem` ".,;:!? ") xs
+      isPunct' xs = all (`elem` (".,;:!? " :: String)) xs
       check o = case cleanOutput o of
                   [] -> ONull
                   x  -> case trim' x of
