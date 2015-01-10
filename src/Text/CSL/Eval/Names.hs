@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE PatternGuards, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Eval.Names
