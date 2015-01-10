@@ -201,10 +201,10 @@ endWithPunct xs@(_:_) = case reverse (stringify xs) of
                                        && isEndPunct c -> True
                               (c:_) | isEndPunct c     -> True
                                     | otherwise        -> False
-  where isEndPunct c = c `elem` ".,;:!?"
+  where isEndPunct c = c `elem` (".,;:!?" :: String)
 
 startWithPunct :: [Inline] -> Bool
-startWithPunct = and . map (`elem` ".,;:!?") . headInline
+startWithPunct = and . map (`elem` (".,;:!?" :: String)) . headInline
 
 deNote :: Pandoc -> Pandoc
 deNote = topDown go
@@ -324,7 +324,7 @@ pWordWithDigits isfirst = try $ do
   sp <- option "" (pSpace >> return " ")
   r <- many1 (notFollowedBy pSpace >> notFollowedBy pLocatorPunct >> anyToken)
   let s = stringify r
-  guard $ any isDigit s || all (`elem` "IVXLCM") s
+  guard $ any isDigit s || all (`elem` ("IVXLCM" :: String)) s
   return $ punct ++ sp ++ s
 
 pDigit :: Parsec [Inline] st ()
