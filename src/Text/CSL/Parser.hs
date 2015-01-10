@@ -144,7 +144,7 @@ stringAttr t cur =
 
 parseCslTerm :: Cursor -> CslTerm
 parseCslTerm cur =
-    let body = unpack $ T.dropAround (`elem` " \t\r\n") $
+    let body = unpack $ T.dropAround (`elem` (" \t\r\n" :: String)) $
                   T.concat $ cur $/ content
     in CT
       { cslTerm        = stringAttr "name" cur
