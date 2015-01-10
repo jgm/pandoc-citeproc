@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, PatternGuards #-}
+{-# LANGUAGE ScopedTypeVariables, PatternGuards, FlexibleContexts #-}
 module Text.CSL.Util
   ( safeRead
   , readNum
