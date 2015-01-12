@@ -130,7 +130,7 @@ readCSLString s = Walk.walk handleSmallCapsSpans
   -- this is needed for versions of pandoc that don't turn
   -- a span with font-variant:small-caps into a SmallCaps element:
   where handleSmallCapsSpans (Span ("",[],[("style",sty)]) ils)
-            | filter (`notElem` " \t;") sty == "font-variant:small-caps" =
+            | filter (`notElem` (" \t;" :: String)) sty == "font-variant:small-caps" =
               SmallCaps ils
         handleSmallCapsSpans x = x
 
@@ -206,15 +206,15 @@ appendWithPunct :: Formatted -> Formatted -> Formatted
 appendWithPunct (Formatted left) (Formatted right) =
   Formatted $
   case concat [lastleft, firstright] of
-       [' ',d] | d `elem` ",.:;" -> initInline left ++ right
-       [c,d] | c `elem` " ,.:;", d == c -> left ++ tailInline right
-       [c,'.'] | c `elem` ",.!:;?" -> left ++ tailInline right
-       [c,':'] | c `elem` ",!:;?" -> left ++ tailInline right  -- Mich.: 2005
-       [c,'!'] | c `elem` ",.!:;?" -> left ++ tailInline right
-       [c,'?'] | c `elem` ",.!:;?" -> left ++ tailInline right
-       [c,';'] | c `elem` ",:;" -> left ++ tailInline right -- et al.;
-       [':',c] | c `elem` ",.!:;?" -> left ++ tailInline right
-       [';',c] | c `elem` ",.!:;?" -> left ++ tailInline right
+       [' ',d] | d `elem` (",.:;" :: String) -> initInline left ++ right
+       [c,d] | c `elem` (" ,.:;" :: String), d == c -> left ++ tailInline right
+       [c,'.'] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
+       [c,':'] | c `elem` (",!:;?" :: String) -> left ++ tailInline right  -- Mich.: 2005
+       [c,'!'] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
+       [c,'?'] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
+       [c,';'] | c `elem` (",:;" :: String) -> left ++ tailInline right -- et al.;
+       [':',c] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
+       [';',c] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
        -- ".;" -> right  -- e.g. et al.;
        _    -> left ++ right
   where lastleft     = lastInline left
