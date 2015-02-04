@@ -987,6 +987,8 @@ itemToReference lang locale bibtex = bib $ do
          <|> return mempty
   isbn' <- getRawField "isbn" <|> return mempty
   issn' <- getRawField "issn" <|> return mempty
+  pmid' <- getRawField "pmid" <|> return mempty
+  pmcid' <- getRawField "pmcid" <|> return mempty
   callNumber' <- getRawField "library" <|> return mempty
 
   -- notes
@@ -1093,6 +1095,8 @@ itemToReference lang locale bibtex = bib $ do
          , doi                 = Literal doi'
          , isbn                = Literal isbn'
          , issn                = Literal issn'
+         , pmcid               = Literal pmcid'
+         , pmid                = Literal pmid'
          , language            = Literal hyphenation
          , callNumber          = Literal callNumber'
          }
