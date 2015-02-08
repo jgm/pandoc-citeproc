@@ -216,6 +216,14 @@ evalElement el
                                               if null d
                                                  then return []
                                                  else return [Output [OPan [Link [Str d] ("http://dx.doi.org/" ++ d, "")]] fm]
+                             "pmid"        -> getStringVar "pmid" >>= \d ->
+                                              if null d
+                                                 then return []
+                                                 else return [Output [OPan [Link [Str d] ("http://www.ncbi.nlm.nih.gov/pubmed/" ++ d, "")]] fm]
+                             "pmcid"       -> getStringVar "pmcid" >>= \d ->
+                                              if null d
+                                                 then return []
+                                                 else return [Output [OPan [Link [Str d] ("http://www.ncbi.nlm.nih.gov/pmc/articles/" ++ d, "")]] fm]
                              _             -> gets (env >>> options &&& abbrevs) >>= \(opts,as) ->
                                               getVar [] (getFormattedValue opts as f fm s) s >>= \r ->
                                               consumeVariable s >> return r
