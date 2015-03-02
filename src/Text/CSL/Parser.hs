@@ -62,8 +62,9 @@ readCSLFile mbLocale src = do
             Right (rawbs, _) -> return $ L.fromChunks [rawbs]
   let cur = fromDocument $ X.parseLBS_ def f
   -- see if it's a dependent style, and if so, try to fetch its parent:
-  let linkCur = cur $/ get "style" &/ get "info" &/ get "link"
-  let parent' = concatMap (stringAttr "independent-parent") linkCur
+  let pickParentCur = get "link" >=> attributeIs (X.Name "rel" Nothing Nothing) "independent-parent"
+  let parentCur = cur $/ get "info" &/ pickParentCur
+  let parent' = concatMap (stringAttr "href") parentCur
   when (parent' == src) $ do
     error $ "Dependent CSL style " ++ src ++ " specifies itself as parent."
   case parent' of
