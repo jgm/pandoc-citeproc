@@ -17,6 +17,7 @@ module Text.CSL.Input.Bibtex
     where
 
 import Text.Parsec hiding (optional, (<|>), many, State)
+import Text.Parsec.String (Parser)
 import Control.Applicative
 import Text.Pandoc
 import Data.List.Split (splitOn, splitWhen, wordsBy)
@@ -169,7 +170,26 @@ bibItem = do
   entfields <- entField `sepEndBy` (char ',')
   spaces
   char '}'
-  return $ Item entid enttype entfields
+  let entfields' = parseSuppFields entfields
+  return $ Item entid enttype entfields'
+
+-- Syntax for adding supplementary fields in note variable
+-- {:authority:Superior Court of California}{:section:A}{:original-date:1777}
+-- see http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#supplementary-fields
+parseSuppFields :: [(String, String)] -> [(String, String)]
+parseSuppFields fs =
+  case lookup "note" fs of
+       Nothing -> fs
+       Just s  -> case parse noteFields "note" s of
+                       Left err  -> error (show err)
+                       Right (s', fs') -> [(x,y) | (x,y) <- fs, x /= "note"] ++
+                                          (("note", s') : fs')
+
+noteFields :: Parser (String, [(String, String)])
+noteFields = do
+  -- TODO - actually parse the fields
+  s <- getInput
+  return (s, [])
 
 entField :: BibParser (String, String)
 entField = try $ do
