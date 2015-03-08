@@ -786,7 +786,7 @@ itemToReference lang locale bibtex = bib $ do
        "thesis"          -> (Thesis,mempty)
        "unpublished"     -> (if isEvent then Speech else Manuscript,mempty)
        "www"             -> (Webpage,mempty)
-       -- biblatex, "unsupporEd"
+       -- biblatex, "unsupported"
        "artwork"         -> (Graphic,mempty)
        "audio"           -> (Song,mempty)         -- for audio *recordings*
        "commentary"      -> (Book,mempty)
@@ -808,10 +808,6 @@ itemToReference lang locale bibtex = bib $ do
        "newsarticle"     -> (ArticleNewspaper,mempty)
        _                 -> (NoType,mempty)
   reftype' <- resolveKey lang <$> getField "type" <|> return mempty
-
-  let isContainer = et `elem` ["book","collection","proceedings","reference",
-                     "mvbook","mvcollection","mvproceedings", "mvreference",
-                     "suppbook","suppcollection"]
 
   -- hyphenation:
   let defaultHyphenation = case lang of
@@ -848,8 +844,9 @@ itemToReference lang locale bibtex = bib $ do
   -- titles
   let isArticle = et `elem` ["article", "periodical", "suppperiodical"]
   let isPeriodical = et == "periodical"
-  let hasVolumes = et `elem`
-         ["inbook","incollection","inproceedings","bookinbook"]
+  let isChapterlike = et `elem`
+         ["inbook","incollection","inproceedings","inreference","bookinbook"]
+  hasMaintitle <- (True <$ (getRawField "maintitle")) <|> return False
   let hyphenation' = if null hyphenation
                      then defaultHyphenation
                      else hyphenation
@@ -857,45 +854,44 @@ itemToReference lang locale bibtex = bib $ do
                       (x:_) -> x
                       []    -> mempty
   modify $ \s -> s{ untitlecase = la == "en" }
-  title' <- getTitle (if isPeriodical then "issuetitle" else "title")
-           <|> return mempty
-  subtitle' <- getTitle (if isPeriodical then "issuesubtitle" else "subtitle")
-              <|> return mempty
-  titleaddon' <- getTitle "titleaddon"
+
+  title' <- (guard isPeriodical >> getTitle "issuetitle")
+            <|> (guard hasMaintitle >> guard (not isChapterlike) >> getTitle "maintitle")
+            <|> getTitle "title"
+            <|> return mempty
+  subtitle' <- (guard isPeriodical >> getTitle "issuesubtitle")
+               <|> (guard hasMaintitle >> guard (not isChapterlike) >> getTitle "mainsubtitle")
+               <|> getTitle "subtitle"
                <|> return mempty
-  volumeTitle' <- (getTitle "maintitle" >> guard hasVolumes
-                    >> getTitle "booktitle")
+  titleaddon' <- (guard hasMaintitle >> guard (not isChapterlike) >> getTitle "maintitleaddon")
+                 <|> getTitle "titleaddon"
+                 <|> return mempty
+  volumeTitle' <- (guard hasMaintitle >> guard (not isChapterlike) >> getTitle "title")
+                  <|> (guard hasMaintitle >> guard isChapterlike >> getTitle "booktitle")
                   <|> return mempty
-  volumeSubtitle' <- (getTitle "maintitle" >> guard hasVolumes
-                      >> getTitle "booksubtitle")
+  volumeSubtitle' <- (guard hasMaintitle >> guard (not isChapterlike) >> getTitle "subtitle")
+                     <|> (guard hasMaintitle >> guard isChapterlike >> getTitle "booksubtitle")
                      <|> return mempty
-  volumeTitleAddon' <- (getTitle "maintitle" >> guard hasVolumes
-                                   >> getTitle "booktitleaddon")
+  volumeTitleAddon' <- (guard hasMaintitle >> guard (not isChapterlike) >> getTitle "titleaddon")
+                       <|> (guard hasMaintitle >> guard isChapterlike >> getTitle "booktitleaddon")
                        <|> return mempty
   containerTitle' <- (guard isPeriodical >> getPeriodicalTitle "title")
-                  <|> getTitle "maintitle"
-                  <|> (guard (not isContainer) >>
-                       guard (volumeTitle' == mempty) >> getTitle "booktitle")
-                  <|> getPeriodicalTitle "journaltitle"
-                  <|> getPeriodicalTitle "journal"
-                  <|> return mempty
+                     <|> (guard isChapterlike >> getTitle "maintitle")
+                     <|> (guard isChapterlike >> getTitle "booktitle")
+                     <|> getPeriodicalTitle "journaltitle"
+                     <|> getPeriodicalTitle "journal"
+                     <|> return mempty
   containerSubtitle' <- (guard isPeriodical >> getPeriodicalTitle "subtitle")
-                       <|> getTitle "mainsubtitle"
-                       <|> (guard (not isContainer) >>
-                            guard (volumeSubtitle' == mempty) >>
-                             getTitle "booksubtitle")
-                       <|> getPeriodicalTitle "journalsubtitle"
-                       <|> return mempty
+                        <|> (guard isChapterlike >> getTitle "mainsubtitle")
+                        <|> (guard isChapterlike >> getTitle "booksubtitle")
+                        <|> getPeriodicalTitle "journalsubtitle"
+                        <|> return mempty
   containerTitleAddon' <- (guard isPeriodical >> getPeriodicalTitle "titleaddon")
-                       <|> getTitle "maintitleaddon"
-                       <|> (guard (not isContainer) >>
-                            guard (volumeTitleAddon' == mempty) >>
-                             getTitle "booktitleaddon")
-                       <|> return mempty
-  containerTitleShort' <- (guard isPeriodical >> getField "shorttitle")
-                        <|> (guard (not isContainer) >>
-                             getTitle "booktitleshort")
-                        <|> getPeriodicalTitle "journaltitleshort"
+                          <|> (guard isChapterlike >> getTitle "maintitleaddon")
+                          <|> (guard isChapterlike >> getTitle "booktitleaddon")
+                          <|> return mempty
+  containerTitleShort' <- (guard isPeriodical >> guard (not hasMaintitle) 
+                       >> getField "shorttitle")
                         <|> getPeriodicalTitle "shortjournal"
                         <|> return mempty
   -- change numerical series title to e.g. 'series 3'
@@ -905,8 +901,8 @@ itemToReference lang locale bibtex = bib $ do
       fixSeriesTitle x = x
   seriesTitle' <- (fixSeriesTitle . resolveKey lang) <$>
                       getTitle "series" <|> return mempty
-  shortTitle' <- getTitle "shorttitle"
-               <|> if subtitle' /= mempty
+  shortTitle' <- (guard (not hasMaintitle) >> getTitle "shorttitle")
+               <|> if subtitle' /= mempty && (not hasMaintitle)
                       then getShortTitle False "title"
                       else getShortTitle True  "title"
                <|> return mempty
