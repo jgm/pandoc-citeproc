@@ -3,27 +3,27 @@
 Adapted from biblatex-example.bib
 
 
-Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+Formatted with pandoc and chicago-author-date.csl, 2015-03-08:
 
 (Nietzsche 1988)
 
-Nietzsche, Friedrich. 1988. *Die Geburt der Tragödie. Unzeitgemäße
-Betrachtungen I–IV. Nachgelassene Schriften 1870–1973*. Edited by
-Giorgio Colli and Mazzino Montinari. *Sämtliche Werke: Kritische
-Studienausgabe*. 2nd ed. Vol. 1. München; Berlin; New York: Deutscher
-Taschenbuch-Verlag; Walter de Gruyter.
+Nietzsche, Friedrich. 1988. *Sämtliche Werke: Kritische Studienausgabe*.
+Edited by Giorgio Colli and Mazzino Montinari. 2nd ed. Vol. 1. München;
+Berlin; New York: Deutscher Taschenbuch-Verlag; Walter de Gruyter.
 
 
-Formatted with pandoc and apa.csl, 2013-10-23:
+Formatted with pandoc and apa.csl, 2015-03-08:
 
 (Nietzsche, 1988)
 
-Nietzsche, F. (1988). *Die Geburt der Tragödie. Unzeitgemäße
-Betrachtungen I–IV. Nachgelassene Schriften 1870–1973*. (G. Colli & M.
-Montinari, eds.)*Sämtliche Werke: Kritische Studienausgabe* (2nd ed.,
-Vol. 1). München; Berlin; New York: Deutscher Taschenbuch-Verlag; Walter
-de Gruyter.
+Nietzsche, F. (1988). *Sämtliche Werke: Kritische Studienausgabe*. (G.
+Colli & M. Montinari, eds., F. Nietzsche) (2nd ed., Vol. 1). München;
+Berlin; New York: Deutscher Taschenbuch-Verlag; Walter de Gruyter.
 
+
+NOTES:
+
+- volume-title currently not implemented by chicago-author-date.csl and apa.csl.
 
 }
 
@@ -58,12 +58,11 @@ de Gruyter.
 
 ---
 references:
-- title-short: "Sämtliche Werke I"
-  annote: "A single volume from the critical edition of Nietzsche’s works.
+- annote: "A single volume from the critical edition of Nietzsche’s works.
     This book entry explicitly refers to the first volume only. Note the title and
     maintitle fields. Also note the sorttitle and sortyear fields. We want this entry
     to be listed after the entry referring to the entire edition"
-  title: "Die Geburt der Tragödie. Unzeitgemäße Betrachtungen I–IV.
+  volume-title: "Die Geburt der Tragödie. Unzeitgemäße Betrachtungen I–IV.
     Nachgelassene Schriften 1870–1973"
   volume: '1'
   id: nietzsche:ksa1
@@ -73,8 +72,8 @@ references:
   author:
   - given: Friedrich
     family: Nietzsche
-  container-title: "Sämtliche Werke: Kritische Studienausgabe"
-  container-author:
+  title: "Sämtliche Werke: Kritische Studienausgabe"
+  volume-author:
   - given: Friedrich
     family: Nietzsche
   edition: '2'
