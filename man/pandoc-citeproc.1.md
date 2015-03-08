@@ -102,11 +102,11 @@ the input:
 :    If this has a true value, the bibliography will be left off.
      Otherwise a bibliography will be added to the end of the document.
 
-`ref-section-title`
+`reference-section-title`
 :    If this has a value, a section header with this title will be
      added before the bibliography.  Otherwise, the bibliography will
      simply be added to the end of the document.  If
-     `ref-section-title` is not specified and the document ends with
+     `reference-section-title` is not specified and the document ends with
      a section header, this final header will be treated as the
      bibliography header.
 

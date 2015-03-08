@@ -63,7 +63,7 @@ processCites style refs (Pandoc m1 b1) =
 
 refTitle :: Meta -> Maybe [Inline]
 refTitle meta =
-  case lookupMeta "ref-section-title" meta of
+  case lookupMeta "reference-section-title" meta of
     Just (MetaString s)           -> Just [Str s]
     Just (MetaInlines ils)        -> Just ils
     Just (MetaBlocks [Plain ils]) -> Just ils
