@@ -663,6 +663,7 @@ data BiblioData
     = BD
       { citations    :: [Formatted]
       , bibliography :: [Formatted]
+      , citationIds  :: [String]
       } deriving ( Show, Typeable, Data, Generic )
 
 -- | A record with all the data to produce the 'Formatted' of a

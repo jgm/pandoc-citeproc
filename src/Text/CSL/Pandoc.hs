@@ -43,7 +43,7 @@ processCites style refs (Pandoc m1 b1) =
       result        = citeproc procOpts style refs (setNearNote style $
                         map (map (toCslCite locMap)) grps)
       cits_map      = M.fromList $ zip grps (citations result)
-      biblioList    = map (renderPandoc' style) (bibliography result)
+      biblioList    = map (renderPandoc' style) $ zip (bibliography result) (citationIds result)
       Pandoc m b3   = bottomUp (mvPunct style) . deNote .
                         topDown (processCite style cits_map) $ Pandoc m4 b2
       (bs, lastb)    = case reverse b3 of
