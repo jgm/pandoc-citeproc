@@ -52,11 +52,29 @@ processCites style refs (Pandoc m1 b1) =
                             where classes' = "unnumbered" :
                                        [c | c <- classes, c /= "unnumbered"]
                           _                                      -> (b3,  [])
+      refHeader = case refTitle m of
+        Just ils -> lastb ++ [Header 1 ("bibliography", ["unnumbered"], []) ils]
+        _        -> lastb
+      refDiv    = case isRefRemove m of
+        True  -> []
+        False -> [Div ("",["references"],[]) (refHeader ++ biblioList)]
   in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
-               $ bs ++
-                 if lookupMeta "suppress-bibliography" m == Just (MetaBool True)
-                    then []
-                    else [Div ("",["references"],[]) (lastb ++ biblioList)]
+               $ bs ++ refDiv
+
+refTitle :: Meta -> Maybe [Inline]
+refTitle meta =
+  case lookupMeta "ref-section-title" meta of
+    Just (MetaString s)           -> Just [Str s]
+    Just (MetaInlines ils)        -> Just ils
+    Just (MetaBlocks [Plain ils]) -> Just ils
+    Just (MetaBlocks [Para ils])  -> Just ils
+    _                             -> Nothing
+
+isRefRemove :: Meta -> Bool
+isRefRemove meta =
+  case lookupMeta "suppress-bibliography" meta of
+    Just (MetaBool True) -> True
+    _                    -> False
 
 -- if the 'nocite' Meta field contains a citation with id = '*',
 -- create a cite with to all the references.
