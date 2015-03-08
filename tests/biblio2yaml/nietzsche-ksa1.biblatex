@@ -73,7 +73,7 @@ references:
   - given: Friedrich
     family: Nietzsche
   title: "Sämtliche Werke: Kritische Studienausgabe"
-  volume-author:
+  container-author:
   - given: Friedrich
     family: Nietzsche
   edition: '2'

@@ -16,8 +16,7 @@
 
 ---
 references:
-- title: ! 'Title of the Book: Subtitle. Titleaddon'
-  title-short: Title of the Book
+- volume-title: ! 'Title of the Book: Subtitle. Titleaddon'
   id: item1
   issued:
     date-parts:
@@ -25,7 +24,7 @@ references:
   author:
   - given: Al
     family: Author
-  container-title: ! 'Maintitle: Mainsubtitle. Maintitleaddon'
+  title: ! 'Maintitle: Mainsubtitle. Maintitleaddon'
   publisher: Publisher
   collection-title: Series
   type: book

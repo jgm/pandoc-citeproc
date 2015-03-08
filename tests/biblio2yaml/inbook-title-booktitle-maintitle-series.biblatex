@@ -20,7 +20,6 @@
 ---
 references:
 - title: ! 'Title of the “@inbook” Entry: Subtitle. Titleaddon'
-  title-short: Title of the “@inbook” Entry
   id: item1
   type: chapter
   issued:

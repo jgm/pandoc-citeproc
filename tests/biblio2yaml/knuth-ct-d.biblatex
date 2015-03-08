@@ -50,6 +50,7 @@ references:
     fields
   volume-title: 'METAFONT: The program'
   volume: D
+  title-short: METAFONT
   id: knuth:ct:d
   issued:
     date-parts:

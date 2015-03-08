@@ -23,11 +23,11 @@ Combine biblatex “volume = 7” and “part = 2” to CSL “volume: 7.2”
 	Volume = 7}
 ---
 references:
-- title-short: Biographia literaria
+- title: The collected works of Samuel Taylor Coleridge
   annote: One (partial) volume of a multivolume book. This is a book entry with a
     volume and a part field which explicitly refers to the second (physical) part
     of the seventh (logical) volume. Also note the series and number fields
-  title: Biographia literaria, or Biographical sketches of my literary life and opinions
+  volume-title: Biographia literaria, or Biographical sketches of my literary life and opinions
   volume: '7.2'
   id: coleridge
   issued:
@@ -36,7 +36,6 @@ references:
   author:
   - given: Samuel Taylor
     family: Coleridge
-  container-title: The collected works of Samuel Taylor Coleridge
   editor:
   - given: Kathleen
     family: Coburn

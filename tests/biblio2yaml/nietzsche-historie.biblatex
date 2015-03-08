@@ -60,8 +60,7 @@ Walter de Gruyter.
 
 ---
 references:
-- title-short: Vom Nutzen und Nachtheil der Historie
-  annote: "A single essay from the critical edition of Nietzsche’s works. This
+- annote: "A single essay from the critical edition of Nietzsche’s works. This
     inbook entry explicitly refers to an essay found in the first volume. Note the
     title, booktitle, and maintitle fields. Also note the sorttitle and sortyear fields.
     We want this entry to be listed after the entry referring to the entire first

@@ -75,8 +75,8 @@ references:
   type: chapter
   publisher-place: Location
 
-- title: Tragedies [title field of book-1]
-  container-title: Collected works [title field of mvbook-1]
+- volume-title: Tragedies [title field of book-1]
+  title: Collected works [title field of mvbook-1]
   author:
   - family: Shakespeare
   container-author:

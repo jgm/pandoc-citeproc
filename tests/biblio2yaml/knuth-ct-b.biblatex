@@ -49,6 +49,7 @@ references:
     fields. Also note the indexsorttitle field
   volume-title: 'TeX: The program'
   volume: B
+  title-short: TeX
   id: knuth:ct:b
   issued:
     date-parts:
