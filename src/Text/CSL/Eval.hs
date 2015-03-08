@@ -215,7 +215,7 @@ evalElement el
                              "doi"         -> getStringVar "doi" >>= \d ->
                                               if null d
                                                  then return []
-                                                 else return [Output [OPan [Link [Str d] ("http://dx.doi.org/" ++ d, "")]] fm]
+                                                 else return [Output [OPan [Link [Str d] ("http://doi.org/" ++ d, "")]] fm]
                              "pmid"        -> getStringVar "pmid" >>= \d ->
                                               if null d
                                                  then return []
