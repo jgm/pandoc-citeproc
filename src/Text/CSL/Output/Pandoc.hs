@@ -35,8 +35,8 @@ renderPandoc :: Style -> Formatted -> [Inline]
 renderPandoc sty
     = proc (convertQuoted sty) . proc' (clean' sty) . flipFlop . unFormatted
 
-renderPandoc' :: Style -> Formatted -> Block
-renderPandoc' sty = Para . renderPandoc sty
+renderPandoc' :: Style -> (Formatted, String) -> Block
+renderPandoc' sty (form, citId) = Div ("ref-" ++ citId, [], []) [Para $ renderPandoc sty form]
 
 clean' :: Style -> [Inline] -> [Inline]
 clean' _   []  = []
