@@ -3,21 +3,25 @@
 Adapted from biblatex-example.bib
 
 
-Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
+Formatted with pandoc and chicago-author-date.csl, 2015-03-08:
 
 (Knuth 1986)
 
-Knuth, Donald E. 1986. *The METAFONTbook*. *Computers & Typesetting*.
-Vol. C. Reading, Mass.: Addison-Wesley.
+Knuth, Donald E. 1986. *Computers & Typesetting*. Vol. C. Reading,
+Mass.: Addison-Wesley.
 
 
-Formatted with pandoc and apa.csl, 2013-10-23:
+Formatted with pandoc and apa.csl, 2015-03-08:
 
 (Knuth, 1986)
 
-Knuth, D. E. (1986). *The METAFONTbook*. *Computers & typesetting* (Vol.
-C). Reading, Mass.: Addison-Wesley.
+Knuth, D. E. (1986). *Computers & typesetting* (Vol. C). Reading, Mass.:
+Addison-Wesley.
 
+
+NOTES:
+
+- volume-title currently not implemented by chicago-author-date.csl and apa.csl.
 
 }
 
@@ -41,10 +45,9 @@ C). Reading, Mass.: Addison-Wesley.
 
 ---
 references:
-- title-short: METAFONTbook
-  annote: The third volume of a five-volume book. Note the sorttitle and sortyear
+- annote: The third volume of a five-volume book. Note the sorttitle and sortyear
     fields as well as the indextitle field
-  title: The METAFONTbook
+  volume-title: The METAFONTbook
   volume: C
   id: knuth:ct:c
   issued:
@@ -53,7 +56,7 @@ references:
   author:
   - given: Donald E.
     family: Knuth
-  container-title: Computers & typesetting
+  title: Computers & typesetting
   publisher: Addison-Wesley
   type: book
   publisher-place: Reading, Mass.
