@@ -7,17 +7,21 @@ Formatted with pandoc and chicago-author-date.csl, 2013-10-23:
 
 (Knuth 1984)
 
-Knuth, Donald E. 1984. *The TeX Book*. *Computers & Typesetting*. Vol.
-A. Reading, Mass.: Addison-Wesley.
+Knuth, Donald E. 1984. *Computers & Typesetting*. Vol. A. Reading,
+Mass.: Addison-Wesley.
 
 
 Formatted with pandoc and apa.csl, 2013-10-23:
 
 (Knuth, 1984)
 
-Knuth, D. E. (1984). *The TeX book*. *Computers & typesetting* (Vol. A).
-Reading, Mass.: Addison-Wesley.
+Knuth, D. E. (1984). *Computers & typesetting* (Vol. A). Reading, Mass.:
+Addison-Wesley.
 
+
+NOTES:
+
+- volume-title currently not implemented by chicago-author-date.csl and apa.csl.
 
 }
 
@@ -46,13 +50,12 @@ Reading, Mass.: Addison-Wesley.
 
 ---
 references:
-- title-short: TeXbook
-  annote: "The first volume of a five-volume book. Note the sorttitle and sortyear
+- annote: "The first volume of a five-volume book. Note the sorttitle and sortyear
     fields. We want this volume to be listed after the entry referring to the entire
     five-volume set. Also note the indextitle and indexsorttitle fields. Indexing
     packages that don’t generate robust index entries require some control sequences
     to be protected from expansion"
-  title: The TeX book
+  volume-title: The TeX book
   volume: A
   id: knuth:ct:a
   issued:
@@ -61,7 +64,7 @@ references:
   author:
   - given: Donald E.
     family: Knuth
-  container-title: Computers & typesetting
+  title: Computers & typesetting
   publisher: Addison-Wesley
   type: book
   publisher-place: Reading, Mass.
