@@ -12,7 +12,6 @@ pandoc-citeproc - filter to resolve citations in a pandoc document.
 pandoc-citeproc [options] [file..]
 
 # DESCRIPTION
-
 The `pandoc-citeproc` executable has two modes, filter mode and convert mode.
 
 ## Filter mode
@@ -36,9 +35,10 @@ class `references`.
 pandoc-citeproc will look for the following metadata fields in
 the input:
 
-`bibliography`:  A path, or YAML list of paths, of bibliography
-files to use.  These may be in any of the formats supported by
-bibutils.
+`bibliography`
+:   A path, or YAML list of paths, of bibliography
+    files to use.  These may be in any of the formats supported by
+    bibutils.
 
     Format            File extension
     ------------      --------------
@@ -53,45 +53,62 @@ bibutils.
     Copac             .copac
     JSON citeproc     .json
 
-`references`:  A YAML list of references.  Each reference is a YAML
-object.  The format is essentially CSL JSON format.  Here is an example:
+`references`
+:   A YAML list of references.  Each reference is a YAML
+    object.  The format is essentially CSL JSON format.  Here is an example:
 
-    - id: doe2006
-      author:
-        family: Doe
-        given: [John, F.]
-      title: Article
-      page: 33-34
-      issued:
-        year: 2006
-      type: article-journal
-      volume: 6
-      container-title: Journal of Generic Studies
+        - id: doe2006
+          author:
+            family: Doe
+            given: [John, F.]
+          title: Article
+          page: 33-34
+          issued:
+            year: 2006
+          type: article-journal
+          volume: 6
+          container-title: Journal of Generic Studies
 
-The contents of fields will be interpreted as markdown when
-appropriate:  so, for example, emphasis and strong emphasis can
-be used in title fileds. Simple tex math will also be
-parsed and rendered appropriately.
+    The contents of fields will be interpreted as markdown when
+    appropriate:  so, for example, emphasis and strong emphasis can
+    be used in title fileds. Simple tex math will also be
+    parsed and rendered appropriately.
 
-`csl` or `citation-style`: Path or URL of a CSL style file.
-If the file is not found relative to the working directory,
-pandoc-citeproc will look in the `$HOME/.csl` directory (or
-`C:\Users\USERNAME\AppData\Roaming\csl` in Windows 7).  If this is left
-off, pandoc-citeproc will look for `$HOME/.csl/chicago-author-date.csl`,
-and if this is not present, it will use its own version of
-`chicago-author-date.csl`.
+`csl` or `citation-style`
+:   Path or URL of a CSL style file.
+    If the file is not found relative to the working directory,
+    pandoc-citeproc will look in the `$HOME/.csl` directory (or
+    `C:\Users\USERNAME\AppData\Roaming\csl` in Windows 7).  If this is left
+    off, pandoc-citeproc will look for `$HOME/.csl/chicago-author-date.csl`,
+    and if this is not present, it will use its own version of
+    `chicago-author-date.csl`.
 
-`citation-abbreviations`:  Path to a CSL abbreviations JSON file. The format
-is described [here](http://citationstylist.org/2011/10/19/abbreviations-for-zotero-test-release).  Here is a short example:
+`citation-abbreviations`
+:   Path to a CSL abbreviations JSON file. The format
+    is described
+    [here](http://citationstylist.org/2011/10/19/abbreviations-for-zotero-test-release).
+    Here is a short example:
 
-    { "default": {
-        "container-title": {
-                "Lloyd's Law Reports": "Lloyd's Rep",
-                "Estates Gazette": "EG",
-                "Scots Law Times": "SLT"
+        { "default": {
+            "container-title": {
+                    "Lloyd's Law Reports": "Lloyd's Rep",
+                    "Estates Gazette": "EG",
+                    "Scots Law Times": "SLT"
+            }
+          }
         }
-      }
-    }
+
+`suppress-bibliography`
+:    If this has a true value, the bibliography will be left off.
+     Otherwise a bibliography will be added to the end of the document.
+
+`ref-section-title`
+:    If this has a value, a section header with this title will be
+     added before the bibliography.  Otherwise, the bibliography will
+     simply be added to the end of the document.  If
+     `ref-section-title` is not specified and the document ends with
+     a section header, this final header will be treated as the
+     bibliography header.
 
 The metadata must contain either `references` or `bibliography` or
 both as a source of references.  `csl` and `citation-abbreviations`

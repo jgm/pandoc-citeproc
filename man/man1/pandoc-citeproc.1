@@ -1,4 +1,5 @@
-.TH "pandoc\-citeproc" "1" "2014-09-21" "0.6" ""
+.\"t
+.TH "pandoc\-citeproc" "1" "2015-03-08" "0.6" ""
 .SH NAME
 .PP
 pandoc\-citeproc \- filter to resolve citations in a pandoc document.
@@ -35,32 +36,80 @@ class \f[C]references\f[].
 .PP
 pandoc\-citeproc will look for the following metadata fields in the
 input:
-.PP
-\f[C]bibliography\f[]: A path, or YAML list of paths, of bibliography
-files to use.
+.TP
+.B \f[C]bibliography\f[]
+A path, or YAML list of paths, of bibliography files to use.
 These may be in any of the formats supported by bibutils.
-.IP
-.nf
-\f[C]
-Format\ \ \ \ \ \ \ \ \ \ \ \ File\ extension
-\-\-\-\-\-\-\-\-\-\-\-\-\ \ \ \ \ \ \-\-\-\-\-\-\-\-\-\-\-\-\-\-
-MODS\ \ \ \ \ \ \ \ \ \ \ \ \ \ .mods
-BibLaTeX\ \ \ \ \ \ \ \ \ \ .bib
-BibTeX\ \ \ \ \ \ \ \ \ \ \ \ .bibtex
-RIS\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .ris
-EndNote\ \ \ \ \ \ \ \ \ \ \ .enl
-EndNote\ XML\ \ \ \ \ \ \ .xml
-ISI\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .wos
-MEDLINE\ \ \ \ \ \ \ \ \ \ \ .medline
-Copac\ \ \ \ \ \ \ \ \ \ \ \ \ .copac
-JSON\ citeproc\ \ \ \ \ .json
-\f[]
-.fi
+.RS
 .PP
-\f[C]references\f[]: A YAML list of references.
+.TS
+tab(@);
+l l.
+T{
+Format
+T}@T{
+File extension
+T}
+_
+T{
+MODS
+T}@T{
+\&.mods
+T}
+T{
+BibLaTeX
+T}@T{
+\&.bib
+T}
+T{
+BibTeX
+T}@T{
+\&.bibtex
+T}
+T{
+RIS
+T}@T{
+\&.ris
+T}
+T{
+EndNote
+T}@T{
+\&.enl
+T}
+T{
+EndNote XML
+T}@T{
+\&.xml
+T}
+T{
+ISI
+T}@T{
+\&.wos
+T}
+T{
+MEDLINE
+T}@T{
+\&.medline
+T}
+T{
+Copac
+T}@T{
+\&.copac
+T}
+T{
+JSON citeproc
+T}@T{
+\&.json
+T}
+.TE
+.RE
+.TP
+.B \f[C]references\f[]
+A YAML list of references.
 Each reference is a YAML object.
 The format is essentially CSL JSON format.
 Here is an example:
+.RS
 .IP
 .nf
 \f[C]
@@ -82,9 +131,10 @@ The contents of fields will be interpreted as markdown when appropriate:
 so, for example, emphasis and strong emphasis can be used in title
 fileds.
 Simple tex math will also be parsed and rendered appropriately.
-.PP
-\f[C]csl\f[] or \f[C]citation\-style\f[]: Path or URL of a CSL style
-file.
+.RE
+.TP
+.B \f[C]csl\f[] or \f[C]citation\-style\f[]
+Path or URL of a CSL style file.
 If the file is not found relative to the working directory,
 pandoc\-citeproc will look in the \f[C]$HOME/.csl\f[] directory (or
 \f[C]C:\\Users\\USERNAME\\AppData\\Roaming\\csl\f[] in Windows 7).
@@ -92,11 +142,15 @@ If this is left off, pandoc\-citeproc will look for
 \f[C]$HOME/.csl/chicago\-author\-date.csl\f[], and if this is not
 present, it will use its own version of
 \f[C]chicago\-author\-date.csl\f[].
-.PP
-\f[C]citation\-abbreviations\f[]: Path to a CSL abbreviations JSON file.
+.RS
+.RE
+.TP
+.B \f[C]citation\-abbreviations\f[]
+Path to a CSL abbreviations JSON file.
 The format is described
 here (http://citationstylist.org/2011/10/19/abbreviations-for-zotero-test-release).
 Here is a short example:
+.RS
 .IP
 .nf
 \f[C]
@@ -110,6 +164,24 @@ Here is a short example:
 }
 \f[]
 .fi
+.RE
+.TP
+.B \f[C]suppress\-bibliography\f[]
+If this has a true value, the bibliography will be left off.
+Otherwise a bibliography will be added to the end of the document.
+.RS
+.RE
+.TP
+.B \f[C]ref\-section\-title\f[]
+If this has a value, a section header with this title will be added
+before the bibliography.
+Otherwise, the bibliography will simply be added to the end of the
+document.
+If \f[C]ref\-section\-title\f[] is not specified and the document ends
+with a section header, this final header will be treated as the
+bibliography header.
+.RS
+.RE
 .PP
 The metadata must contain either \f[C]references\f[] or
 \f[C]bibliography\f[] or both as a source of references.
