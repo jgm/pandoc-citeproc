@@ -922,7 +922,8 @@ itemToReference lang locale bibtex = bib $ do
   seriesTitle' <- (fixSeriesTitle . resolveKey lang) <$>
                       getTitle "series" <|> return mempty
   shortTitle' <- (guard (not hasMaintitle) >> getTitle "shorttitle")
-               <|> if subtitle' /= mempty && (not hasMaintitle)
+               <|> if (subtitle' /= mempty || titleaddon' /= mempty) &&
+                      (not hasMaintitle)
                       then getShortTitle False "title"
                       else getShortTitle True  "title"
                <|> return mempty
