@@ -1,5 +1,5 @@
 name:               pandoc-citeproc
-version:            0.6
+version:            0.7
 cabal-version:      >= 1.12
 synopsis:           Supports using pandoc with citeproc
 
@@ -17,7 +17,7 @@ description:        The pandoc-citeproc library exports functions for
                     depend on citeproc-hs.
                     .
                     This package also contains an executable: pandoc-citeproc,
-                    which works as a pandoc filter (pandoc >= 1.12), and
+                    which works as a pandoc filter, and
                     also has a mode for converting bibliographic databases
                     a YAML format suitable for inclusion in pandoc YAML
                     metadata.
@@ -140,7 +140,7 @@ library
                       aeson >= 0.7 && < 0.9, text, vector,
                       xml-conduit >= 1.2 && < 1.3,
                       data-default,
-                      split, yaml >= 0.8.8.2, pandoc >= 1.12.1
+                      split, yaml >= 0.8.8.2, pandoc >= 1.14
     if impl(ghc < 7.6)
        build-depends: ghc-prim
 
@@ -188,7 +188,7 @@ executable test-citeproc
   else
     Buildable:    False
   build-depends:  base >= 4, aeson, directory, text,
-                  pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
+                  pandoc-types >= 1.12.3, pandoc >= 1.14, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.2, containers >= 0.4 && < 0.6,
                   vector >= 0.10 && < 0.11
@@ -200,7 +200,7 @@ test-suite test-pandoc-citeproc
   Other-Modules:  JSON
   Hs-Source-Dirs: tests
   build-depends:  base >= 4, aeson, directory, text,
-                  pandoc-types >= 1.12.3, pandoc >= 1.12.1, filepath,
+                  pandoc-types >= 1.12.3, pandoc >= 1.14, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.2
   default-language: Haskell98

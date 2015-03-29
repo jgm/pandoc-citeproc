@@ -146,8 +146,10 @@ getExt :: String -> String
 getExt = takeExtension . map toLower
 
 readYamlBib :: String -> Either String [Reference]
-readYamlBib s = convertRefs $ lookupMeta "references" meta
-  where  Pandoc meta _ = readMarkdown def{readerStandalone = True} s
+readYamlBib s = case readMarkdown def{readerStandalone = True} s of
+                     Right (Pandoc meta _) -> convertRefs
+                                 (lookupMeta "references" meta)
+                     Left e                -> Left (show e)
 
 convertRefs :: Maybe MetaValue -> Either String [Reference]
 convertRefs Nothing = Right []

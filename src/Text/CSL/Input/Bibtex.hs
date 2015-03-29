@@ -51,9 +51,9 @@ adjustSpans _ x = [x]
 parseRawLaTeX :: Lang -> String -> [Inline]
 parseRawLaTeX lang ('\\':xs) =
   case readLaTeX def{readerParseRaw = True} contents of
-       Pandoc _ [Para ys]  -> f command ys
-       Pandoc _ [Plain ys] -> f command ys
-       _                   -> []
+       Right (Pandoc _ [Para ys])  -> f command ys
+       Right (Pandoc _ [Plain ys]) -> f command ys
+       _                           -> []
    where (command', contents') = break (=='{') xs
          command  = trim command'
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
@@ -639,8 +639,9 @@ optionSet key opts = case lookup key opts of
                       _           -> False
 
 latex' :: String -> [Block]
-latex' s = bs
-  where Pandoc _ bs = readLaTeX def{readerParseRaw = True} s
+latex' s = case readLaTeX def{readerParseRaw = True} s of
+                Right (Pandoc _ bs) -> bs
+                _                   -> []
 
 latex :: String -> Bib Formatted
 latex s = blocksToFormatted $ latex' $ trim s

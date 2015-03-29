@@ -124,9 +124,10 @@ readCSLString s = Walk.walk handleSmallCapsSpans
                 $ case readHtml def{ readerSmart = True
                                    , readerParseRaw = True }
                                 (adjustScTags s) of
-                        Pandoc _ [Plain ils]   -> ils
-                        Pandoc _ [Para  ils]   -> ils
-                        Pandoc _ x             -> Walk.query (:[]) x
+                        Right (Pandoc _ [Plain ils])   -> ils
+                        Right (Pandoc _ [Para  ils])   -> ils
+                        Right (Pandoc _ x)             -> Walk.query (:[]) x
+                        Left  _                        -> []
   -- this is needed for versions of pandoc that don't turn
   -- a span with font-variant:small-caps into a SmallCaps element:
   where handleSmallCapsSpans (Span ("",[],[("style",sty)]) ils)
