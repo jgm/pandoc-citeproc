@@ -1,3 +1,10 @@
+pandoc-citeproc (0.6.0.1)
+
+  * Added pandoc-types upper bound.
+  * Removed `auto-all` from profiling options.
+  * Fixed CSL dependent style support (#105, Tim Lin).
+  * Updates to build with GHC 7.10.1 (Mark Wright).
+
 pandoc-citeproc (0.6)
 
   * The CSL parser has been replaced with a new, xml-conduit based module,
