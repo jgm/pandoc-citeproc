@@ -149,6 +149,7 @@ library
        build-depends: ghc-prim
 
     if flag(debug)
+       build-depends:   pretty-show
        default-extensions: CPP
        cpp-options:     -DTRACE
 

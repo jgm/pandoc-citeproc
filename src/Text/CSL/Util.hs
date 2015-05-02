@@ -59,11 +59,14 @@ import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
                        everywhere', everything, mkT, mkQ )
 import System.FilePath
 import System.Directory (doesFileExist)
+#ifdef TRACE
 import qualified Debug.Trace
+import Text.Show.Pretty (ppShow)
+#endif
 
 tr' :: Show a => String -> a -> a
 #ifdef TRACE
-tr' note' x = Debug.Trace.trace ("=== " ++ note' ++ "\n" ++ show x ++ "\n") x
+tr' note' x = Debug.Trace.trace ("=== " ++ note' ++ "\n" ++ ppShow x ++ "\n") x
 #else
 tr' _ x = x
 #endif
