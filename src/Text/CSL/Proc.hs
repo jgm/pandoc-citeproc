@@ -22,7 +22,7 @@ import Data.List
 import Data.Ord  ( comparing )
 import Data.Maybe ( mapMaybe )
 import Text.CSL.Eval
-import Text.CSL.Util ( capitalize, proc, proc', query, toShow )
+import Text.CSL.Util ( capitalize, proc, proc', query, toShow, tr' )
 import Text.CSL.Proc.Collapse
 import Text.CSL.Proc.Disamb
 import Text.CSL.Reference
@@ -101,9 +101,10 @@ citeproc ops s rs cs
                           procBiblio (bibOpts ops) s biblioRefs
                      else map formatOutputList $
                           procBiblio (bibOpts ops) s biblioRefs
-      citsAndRefs  = processCites biblioRefs cs
+      citsAndRefs  = tr' "citeproc:citsAndRefs" $ processCites biblioRefs cs
       (yearS,citG) = disambCitations s biblioRefs cs $ map (procGroup s) citsAndRefs
-      citsOutput   = map (formatCitLayout s) . collapseCitGroups s $ citG
+      citsOutput   = map (formatCitLayout s) . collapseCitGroups s $
+                     tr' "citeproc:citG" citG
 
 -- | Given the CSL 'Style' and the list of 'Reference's sort the list
 -- according to the 'Style' and assign the citation number to each

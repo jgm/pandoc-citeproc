@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings, PatternGuards, DeriveDataTypeable,
     ScopedTypeVariables, FlexibleInstances, DeriveGeneric,
-    GeneralizedNewtypeDeriving #-}
+    GeneralizedNewtypeDeriving, CPP #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Style
@@ -121,7 +121,8 @@ import qualified Data.Vector as V
 
 readCSLString :: String -> [Inline]
 readCSLString s = Walk.walk handleSmallCapsSpans
-                $ case readHtml def{ readerSmart = True
+                $ case maybeRight
+                $ readHtml def{ readerSmart = True
                                    , readerParseRaw = True }
                                 (adjustScTags s) of
                         Right (Pandoc _ [Plain ils])   -> ils
@@ -134,6 +135,11 @@ readCSLString s = Walk.walk handleSmallCapsSpans
             | filter (`notElem` (" \t;" :: String)) sty == "font-variant:small-caps" =
               SmallCaps ils
         handleSmallCapsSpans x = x
+#if MIN_VERSION_pandoc(1,14,0)
+        maybeRight = id
+#else
+        maybeRight = Right
+#endif
 
 -- <sc> is not a real HTML tag, but a CSL convention.  So we
 -- replace it with a real tag that the HTML reader will understand.

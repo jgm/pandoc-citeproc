@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
+{-# LANGUAGE CPP #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Input.Bibtex
@@ -50,7 +51,7 @@ adjustSpans _ x = [x]
 
 parseRawLaTeX :: Lang -> String -> [Inline]
 parseRawLaTeX lang ('\\':xs) =
-  case readLaTeX def{readerParseRaw = True} contents of
+  case maybeRight $ readLaTeX def{readerParseRaw = True} contents of
        Right (Pandoc _ [Para ys])  -> f command ys
        Right (Pandoc _ [Plain ys]) -> f command ys
        _                           -> []
@@ -61,6 +62,11 @@ parseRawLaTeX lang ('\\':xs) =
          f "textnormal" ils = [Span ("",["nodecor"],[]) ils]
          f "bibstring" [Str s] = [Str $ resolveKey' lang s]
          f _            ils = [Span nullAttr ils]
+#if MIN_VERSION_pandoc(1,14,0)
+         maybeRight = id
+#else
+         maybeRight = Right
+#endif
 parseRawLaTeX _ _ = []
 
 inlinesToFormatted :: [Inline] -> Bib Formatted
