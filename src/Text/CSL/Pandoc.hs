@@ -28,7 +28,7 @@ import Data.Monoid (mempty)
 import Control.Monad.State
 import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)
-import Text.CSL.Util (findFile, splitStrWhen)
+import Text.CSL.Util (findFile, splitStrWhen, tr')
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -42,7 +42,7 @@ processCites style refs (Pandoc m1 b1) =
       locMap        = locatorMap style
       result        = citeproc procOpts style refs (setNearNote style $
                         map (map (toCslCite locMap)) grps)
-      cits_map      = M.fromList $ zip grps (citations result)
+      cits_map      = tr' "cits_map" $ M.fromList $ zip grps (citations result)
       biblioList    = map (renderPandoc' style) $ zip (bibliography result) (citationIds result)
       Pandoc m b3   = bottomUp (mvPunct style) . deNote .
                         topDown (processCite style cits_map) $ Pandoc m4 b2

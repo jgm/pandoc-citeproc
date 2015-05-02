@@ -1,3 +1,7 @@
+debug: deps
+	cabal configure --enable-tests -ftest_citeproc -fembed_data_files -fdebug --disable-optimization --ghc-options "-pgmPcpphs -optP--cpp"
+	cabal build
+
 quick: deps
 	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization --ghc-options "-pgmPcpphs -optP--cpp"
 	cabal build

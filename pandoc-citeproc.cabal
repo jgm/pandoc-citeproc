@@ -111,6 +111,10 @@ flag test_citeproc
   description: Build the test-citeproc program
   default:     False
 
+flag debug
+  description: Turn on debug tracing.
+  default:     False
+
 library
     hs-source-dirs:   src
     exposed-modules:  Text.CSL.Pandoc
@@ -143,6 +147,10 @@ library
                       split, yaml >= 0.8.8.2, pandoc >= 1.14
     if impl(ghc < 7.6)
        build-depends: ghc-prim
+
+    if flag(debug)
+       default-extensions: CPP
+       cpp-options:     -DTRACE
 
     if flag(bibutils)
        build-depends:   hs-bibutils >= 0.3

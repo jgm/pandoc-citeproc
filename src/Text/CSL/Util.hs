@@ -61,6 +61,13 @@ import System.FilePath
 import System.Directory (doesFileExist)
 import qualified Debug.Trace
 
+tr' :: Show a => String -> a -> a
+#ifdef TRACE
+tr' note' x = Debug.Trace.trace ("=== " ++ note' ++ "\n" ++ show x ++ "\n") x
+#else
+tr' _ x = x
+#endif
+
 readNum :: String -> Int
 readNum s = case reads s of
               [(x,"")] -> x
@@ -356,9 +363,6 @@ mapHeadInline f (i:xs)
     | Link      is t <- i = Link        (mapHeadInline f is) t : xs
     | Span     at is <- i = Span at     (mapHeadInline f is)   : xs
     | otherwise           = i : xs
-
-tr' :: Show a => String -> a -> a
-tr' note' x = Debug.Trace.trace (note' ++ ": " ++ show x) x
 
 findFile :: [FilePath] -> FilePath -> IO (Maybe FilePath)
 findFile [] _ = return Nothing
