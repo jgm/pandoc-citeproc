@@ -103,8 +103,12 @@ citeproc ops s rs cs
                           procBiblio (bibOpts ops) s biblioRefs
       citsAndRefs  = tr' "citeproc:citsAndRefs" $ processCites biblioRefs cs
       (yearS,citG) = disambCitations s biblioRefs cs $ map (procGroup s) citsAndRefs
-      citsOutput   = map (formatCitLayout s) . collapseCitGroups s $
-                     tr' "citeproc:citG" citG
+      citsOutput   = tr' "citeproc:afterlayout" .
+                     map (formatCitLayout s) .
+                     tr' "citeproc:collapsed" .
+                     collapseCitGroups s .
+                     tr' "citeproc:citG" $
+                     citG
 
 -- | Given the CSL 'Style' and the list of 'Reference's sort the list
 -- according to the 'Style' and assign the citation number to each
