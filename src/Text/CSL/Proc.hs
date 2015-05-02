@@ -103,12 +103,17 @@ citeproc ops s rs cs
                           procBiblio (bibOpts ops) s biblioRefs
       citsAndRefs  = tr' "citeproc:citsAndRefs" $ processCites biblioRefs cs
       (yearS,citG) = disambCitations s biblioRefs cs $ map (procGroup s) citsAndRefs
-      citsOutput   = tr' "citeproc:afterlayout" .
-                     map (formatCitLayout s) .
+      citsOutput   = map (formatCitLayout s) .
                      tr' "citeproc:collapsed" .
                      collapseCitGroups s .
+                     (if styleClass s == "in-text" then proc addLink else id) .
                      tr' "citeproc:citG" $
                      citG
+      addLink (OYear y citeid f) =
+         OYear y citeid f{hyperlink = "#ref-" ++ citeid}
+      addLink (OYearSuf y citeid d f) =
+         OYearSuf y citeid d f{hyperlink = "#ref-" ++ citeid}
+      addLink x = x
 
 -- | Given the CSL 'Style' and the list of 'Reference's sort the list
 -- according to the 'Style' and assign the citation number to each
