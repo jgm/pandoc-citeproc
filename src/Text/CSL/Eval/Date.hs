@@ -35,8 +35,8 @@ evalDate (Date s f fm dl dp dp') = do
   tm <- gets $ terms . env
   k  <- getStringVar "ref-id"
   em <- gets mode
-  let updateFM (Formatting aa ab ac ad ae af ag ah ai aj ak al am an)
-               (Formatting _  _  bc bd be bf bg bh _  bj bk _ _ _) =
+  let updateFM (Formatting aa ab ac ad ae af ag ah ai aj ak al am an ahl)
+               (Formatting _  _  bc bd be bf bg bh _  bj bk _ _ _ _) =
                    Formatting aa ab (updateS ac bc)
                                     (updateS ad bd)
                                     (updateS ae be)
@@ -46,7 +46,7 @@ evalDate (Date s f fm dl dp dp') = do
                                     ai
                                     (updateS aj bj)
                                     (if bk /= ak then bk else ak)
-                                    al am an
+                                    al am an ahl
       updateS a b = if b /= a && b /= [] then b else a
   case f of
     NoFormDate -> mapM getDateVar s >>= return . outputList fm dl .

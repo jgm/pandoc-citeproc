@@ -85,6 +85,7 @@ import GHC.Generics (Generic)
 import Data.String
 import Data.Monoid (mempty, Monoid, mappend, mconcat, (<>))
 import Control.Arrow hiding (left, right)
+import Control.Monad (mplus)
 import Control.Applicative hiding (Const)
 import qualified Data.Aeson as Aeson
 import Data.Aeson.Types (Pair)
@@ -520,6 +521,7 @@ data Formatting
       , stripPeriods   :: Bool
       , noCase         :: Bool
       , noDecor        :: Bool
+      , hyperlink      :: String  -- null for no link
       } deriving ( Read, Eq, Ord, Typeable, Data, Generic )
 
 -- custom instance to make debugging output less busy
@@ -542,7 +544,8 @@ instance Show Formatting where
                        ,("quotes", show . quotes)
                        ,("stripPeriods", show . stripPeriods)
                        ,("noCase", show . noCase)
-                       ,("noDecor", show . noDecor)],
+                       ,("noDecor", show . noDecor)
+                       ,("hyperlink", show . hyperlink)],
              f x /= f emptyFormatting ]
         ++ "}"
 
@@ -557,14 +560,14 @@ data Quote
 
 emptyFormatting :: Formatting
 emptyFormatting
-    = Formatting [] [] [] [] [] [] [] [] [] [] NoQuote False False False
+    = Formatting [] [] [] [] [] [] [] [] [] [] NoQuote False False False []
 
 unsetAffixes :: Formatting -> Formatting
 unsetAffixes f = f {prefix = [], suffix = []}
 
 mergeFM :: Formatting -> Formatting -> Formatting
-mergeFM (Formatting aa ab ac ad ae af ag ah ai aj ak al am an)
-        (Formatting ba bb bc bd be bf bg bh bi bj bk bl bm bn) =
+mergeFM (Formatting aa ab ac ad ae af ag ah ai aj ak al am an ahl)
+        (Formatting ba bb bc bd be bf bg bh bi bj bk bl bm bn bhl) =
                    Formatting (ba `betterThan` aa)
                               (bb `betterThan` ab)
                               (bc `betterThan` ac)
@@ -579,6 +582,7 @@ mergeFM (Formatting aa ab ac ad ae af ag ah ai aj ak al am an)
                               (bl || al)
                               (bm || am)
                               (bn || an)
+                              (bhl `mplus` ahl)
 
 data CSInfo
     = CSInfo

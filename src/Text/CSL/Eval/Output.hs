@@ -116,7 +116,7 @@ formatOutput o =
                                      [Strong [Str "???"]]]
       OLabel   []      _  -> Formatted []
       OLabel   s       f  -> formatOutput (OStr s f)
-      ODate    os         -> format os
+      ODate    os         -> formatOutputList os
       OYear    s _     f  -> formatOutput (OStr s f)
       OYearSuf s _ _   f  -> formatOutput (OStr s f)
       ONum     i       f  -> formatOutput (OStr (show i) f)
@@ -124,17 +124,18 @@ formatOutput o =
                                 then Formatted [Strong [Str "???"]]
                                 else formatOutput (OStr (show i) f)
       OName  _ os _    f  -> formatOutput (Output os f)
-      OContrib _ _ os _ _ -> format os
+      OContrib _ _ os _ _ -> formatOutputList os
       OLoc     os      f  -> formatOutput (Output os f)
       Output   []      _  -> Formatted []
-      Output   os      f  -> addFormatting f $ format os
+      Output   os      f  -> addFormatting f $ formatOutputList os
       _                   -> Formatted []
-    where
-      format = mconcat . map formatOutput
 
 addFormatting :: Formatting -> Formatted -> Formatted
-addFormatting f = addSuffix . pref . quote . font . text_case
-  where pref i = case prefix f of
+addFormatting f = addLink . addSuffix . pref . quote . font . text_case
+  where addLink i = case hyperlink f of
+                         ""  -> i
+                         url -> Formatted [Link (unFormatted i) (url, "")]
+        pref i = case prefix f of
                       "" -> i
                       x  -> fromString x <> i
         addSuffix i
