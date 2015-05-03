@@ -103,7 +103,8 @@ citeproc ops s rs cs
                           procBiblio (bibOpts ops) s biblioRefs
       citsAndRefs  = tr' "citeproc:citsAndRefs" $ processCites biblioRefs cs
       (yearS,citG) = disambCitations s biblioRefs cs $ map (procGroup s) citsAndRefs
-      citsOutput   = map (formatCitLayout s) .
+      citsOutput   = tr' "citeproc:after formatCitLayout" .
+                     map (formatCitLayout s) .
                      tr' "citeproc:collapsed" .
                      collapseCitGroups s .
                      (if styleClass s == "in-text" then proc addLink else id) .
@@ -368,7 +369,8 @@ localModifiers s b c
           | otherwise         = o:os
       rmFormatting f
           | Formatting {} <- f = emptyFormatting { prefix = prefix f
-                                                 , suffix = suffix f}
+                                                 , suffix = suffix f
+                                                 , hyperlink = hyperlink f}
           | otherwise          = f
       rmCitNum o
           | OCitNum {} <- o = ONull
