@@ -18,6 +18,7 @@ import qualified Data.ByteString.Char8 as B
 import qualified Text.Pandoc.UTF8 as UTF8
 import Text.Pandoc.Shared (normalize)
 import Text.Pandoc.Process (pipeProcess)
+import Text.Pandoc.Options (WriterOptions(..))
 import qualified Data.Yaml as Yaml
 import Text.Pandoc (writeNative, writeHtmlString, readNative, def)
 import Text.CSL.Pandoc (processCites')
@@ -80,7 +81,8 @@ testCase regenerate csl = do
              showDiff (UTF8.fromStringLazy $ writeNative def expectedDoc)
                       (UTF8.fromStringLazy $ writeNative def outDoc)
              when regenerate $
-               UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $ show outDoc
+               UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
+                  writeNative def{ writerStandalone = True } outDoc
              return Failed
      else do
        err "ERROR"
