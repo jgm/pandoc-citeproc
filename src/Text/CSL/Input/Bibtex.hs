@@ -645,9 +645,15 @@ optionSet key opts = case lookup key opts of
                       _           -> False
 
 latex' :: String -> [Block]
-latex' s = case readLaTeX def{readerParseRaw = True} s of
+latex' s = case mbRight $ readLaTeX def{readerParseRaw = True} s of
                 Right (Pandoc _ bs) -> bs
                 _                   -> []
+  where
+#if MIN_VERSION_pandoc(1,14,0)
+    mbRight = id
+#else
+    mbRight = Right
+#endif
 
 latex :: String -> Bib Formatted
 latex s = blocksToFormatted $ latex' $ trim s
