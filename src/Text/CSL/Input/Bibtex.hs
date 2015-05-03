@@ -51,10 +51,17 @@ adjustSpans _ x = [x]
 
 parseRawLaTeX :: Lang -> String -> [Inline]
 parseRawLaTeX lang ('\\':xs) =
-  case maybeRight $ readLaTeX def{readerParseRaw = True} contents of
+#if MIN_VERSION_pandoc(1,14,0)
+  case readLaTeX def{readerParseRaw = True} contents of
        Right (Pandoc _ [Para ys])  -> f command ys
        Right (Pandoc _ [Plain ys]) -> f command ys
        _                           -> []
+#else
+  case readLaTeX def{readerParseRaw = True} contents of
+       Pandoc _ [Para ys]  -> f command ys
+       Pandoc _ [Plain ys] -> f command ys
+       _                   -> []
+#endif
    where (command', contents') = break (=='{') xs
          command  = trim command'
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
@@ -62,11 +69,6 @@ parseRawLaTeX lang ('\\':xs) =
          f "textnormal" ils = [Span ("",["nodecor"],[]) ils]
          f "bibstring" [Str s] = [Str $ resolveKey' lang s]
          f _            ils = [Span nullAttr ils]
-#if MIN_VERSION_pandoc(1,14,0)
-         maybeRight = id
-#else
-         maybeRight = Right
-#endif
 parseRawLaTeX _ _ = []
 
 inlinesToFormatted :: [Inline] -> Bib Formatted
@@ -645,14 +647,14 @@ optionSet key opts = case lookup key opts of
                       _           -> False
 
 latex' :: String -> [Block]
-latex' s = case mbRight $ readLaTeX def{readerParseRaw = True} s of
+latex' s =
+#if MIN_VERSION_pandoc(1,14,0)
+  case readLaTeX def{readerParseRaw = True} s of
                 Right (Pandoc _ bs) -> bs
                 _                   -> []
-  where
-#if MIN_VERSION_pandoc(1,14,0)
-    mbRight = id
 #else
-    mbRight = Right
+  case readLaTeX def{readerParseRaw = True} s of
+                Pandoc _ bs         -> bs
 #endif
 
 latex :: String -> Bib Formatted

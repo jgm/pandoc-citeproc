@@ -147,14 +147,13 @@ getExt = takeExtension . map toLower
 
 readYamlBib :: String -> Either String [Reference]
 readYamlBib s =
-  case maybeRight $ readMarkdown def{readerStandalone = True} s of
+#if MIN_VERSION_pandoc(1,14,0)
+  case readMarkdown def{readerStandalone = True} s of
        Right (Pandoc meta _) -> convertRefs (lookupMeta "references" meta)
        Left e                -> Left (show e)
-  where
-#if MIN_VERSION_pandoc(1,14,0)
-    maybeRight = id
 #else
-    maybeRight = Right
+  case readMarkdown def{readerStandalone = True} s of
+       Pandoc (Pandoc meta _) -> convertRefs (lookupMeta "references" meta)
 #endif
 
 convertRefs :: Maybe MetaValue -> Either String [Reference]
