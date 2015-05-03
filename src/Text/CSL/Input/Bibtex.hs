@@ -925,7 +925,7 @@ itemToReference lang locale bibtex = bib $ do
                           <|> (guard isChapterlike >> getTitle "maintitleaddon")
                           <|> (guard isChapterlike >> getTitle "booktitleaddon")
                           <|> return mempty
-  containerTitleShort' <- (guard isPeriodical >> guard (not hasMaintitle) 
+  containerTitleShort' <- (guard isPeriodical >> guard (not hasMaintitle)
                        >> getField "shorttitle")
                         <|> getPeriodicalTitle "shortjournal"
                         <|> return mempty
@@ -936,7 +936,8 @@ itemToReference lang locale bibtex = bib $ do
       fixSeriesTitle x = x
   seriesTitle' <- (fixSeriesTitle . resolveKey lang) <$>
                       getTitle "series" <|> return mempty
-  shortTitle' <- (guard (not hasMaintitle) >> getTitle "shorttitle")
+  shortTitle' <- (guard (not hasMaintitle || isChapterlike) >>
+                        getTitle "shorttitle")
                <|> if (subtitle' /= mempty || titleaddon' /= mempty) &&
                       (not hasMaintitle)
                       then getShortTitle False "title"
