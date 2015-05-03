@@ -28,7 +28,6 @@ module Text.CSL.Util
   , procM
   , query
   , betterThan
-  , readable
   , toShow
   , toRead
   , inlinesToString
@@ -292,9 +291,6 @@ query f = everything mappend (mempty `mkQ` f)
 betterThan :: [a] -> [a] -> [a]
 betterThan [] b = b
 betterThan a  _ = a
-
-readable :: (Read a, Show b) => (String -> a, b -> String)
-readable =  (read . toRead, toShow . show)
 
 toShow :: String -> String
 toShow = foldr g [] . f
