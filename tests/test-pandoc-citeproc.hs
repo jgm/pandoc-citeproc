@@ -22,12 +22,17 @@ import qualified Data.Yaml as Yaml
 import Text.Pandoc (writeNative, writeHtmlString, readNative, def)
 import Text.CSL.Pandoc (processCites')
 import Data.List (isSuffixOf)
+import System.Environment
+import Control.Monad (when)
 
+main :: IO ()
 main = do
+  args <- getArgs
+  let regenerate = args == ["--regenerate"]
   testnames <- fmap (map (dropExtension . takeBaseName) .
                      filter (".in.native" `isSuffixOf`)) $
                getDirectoryContents "tests"
-  citeprocTests <- mapM testCase testnames
+  citeprocTests <- mapM (testCase regenerate) testnames
   fs <- filter (\f -> takeExtension f `elem` [".bibtex",".biblatex"])
            `fmap` getDirectoryContents "tests/biblio2yaml"
   biblio2yamlTests <- mapM biblio2yamlTest fs
@@ -53,8 +58,8 @@ data TestResult =
   | Errored
   deriving (Show, Eq)
 
-testCase :: String -> IO TestResult
-testCase csl = do
+testCase :: Bool -> String -> IO TestResult
+testCase regenerate csl = do
   hPutStr stderr $ "[" ++ csl ++ ".in.native] "
   indataNative <- readFile $ "tests/" ++ csl ++ ".in.native"
   expectedNative <- readFile $ "tests/" ++ csl ++ ".expected.native"
@@ -74,6 +79,9 @@ testCase csl = do
              err $ "FAILED"
              showDiff (UTF8.fromStringLazy $ writeNative def expectedDoc)
                       (UTF8.fromStringLazy $ writeNative def outDoc)
+             when regenerate $
+               UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
+                      writeNative def outDoc
              return Failed
      else do
        err "ERROR"
