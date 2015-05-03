@@ -109,11 +109,15 @@ citeproc ops s rs cs
                      (if styleClass s == "in-text" then proc addLink else id) .
                      tr' "citeproc:citG" $
                      citG
-      addLink (OYear y citeid f) =
+      addLink :: (Cite, Output) -> (Cite, Output)
+      addLink (cit, outp) = (cit, proc (addLink' (citeId cit)) outp)
+      addLink' citeid (OYear y _ f) =
          OYear y citeid f{hyperlink = "#ref-" ++ citeid}
-      addLink (OYearSuf y citeid d f) =
+      addLink' citeid (OYearSuf y _ d f) =
          OYearSuf y citeid d f{hyperlink = "#ref-" ++ citeid}
-      addLink x = x
+      addLink' citeid (OCitNum n f) =
+         OCitNum n f{hyperlink = "#ref-" ++ citeid}
+      addLink' _ x = x
 
 -- | Given the CSL 'Style' and the list of 'Reference's sort the list
 -- according to the 'Style' and assign the citation number to each
