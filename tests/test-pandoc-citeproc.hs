@@ -80,8 +80,7 @@ testCase regenerate csl = do
              showDiff (UTF8.fromStringLazy $ writeNative def expectedDoc)
                       (UTF8.fromStringLazy $ writeNative def outDoc)
              when regenerate $
-               UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
-                      writeNative def outDoc
+               UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $ show outDoc
              return Failed
      else do
        err "ERROR"
