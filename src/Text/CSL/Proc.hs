@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards, DeriveDataTypeable, OverloadedStrings #-}
+{-# LANGUAGE PatternGuards, OverloadedStrings #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Proc
