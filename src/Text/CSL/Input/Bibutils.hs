@@ -153,7 +153,7 @@ readYamlBib s =
        Left e                -> Left (show e)
 #else
   case readMarkdown def{readerStandalone = True} s of
-       Pandoc (Pandoc meta _) -> convertRefs (lookupMeta "references" meta)
+       Pandoc meta _ -> convertRefs (lookupMeta "references" meta)
 #endif
 
 convertRefs :: Maybe MetaValue -> Either String [Reference]

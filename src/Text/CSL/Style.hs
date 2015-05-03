@@ -134,7 +134,6 @@ readCSLString s = Walk.walk handleSmallCapsSpans
                         Pandoc _ [Plain ils]   -> ils
                         Pandoc _ [Para  ils]   -> ils
                         Pandoc _ x             -> Walk.query (:[]) x
-                        _                      -> []
 #endif
   -- this is needed for versions of pandoc that don't turn
   -- a span with font-variant:small-caps into a SmallCaps element:
