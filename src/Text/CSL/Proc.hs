@@ -22,7 +22,7 @@ import Data.List
 import Data.Ord  ( comparing )
 import Data.Maybe ( mapMaybe )
 import Text.CSL.Eval
-import Text.CSL.Util ( capitalize, proc, proc', query, toShow, tr' )
+import Text.CSL.Util ( capitalize, proc, proc', query, uncamelize, tr' )
 import Text.CSL.Proc.Collapse
 import Text.CSL.Proc.Disamb
 import Text.CSL.Reference
@@ -258,7 +258,7 @@ filterRefs bos refs
                         x              -> look x
           where
             look s = case lookup s (mkRefMap r) of
-                       Just x | Just v' <- (fromValue x :: Maybe RefType  ) -> v == toShow (show v')
+                       Just x | Just v' <- (fromValue x :: Maybe RefType  ) -> v == uncamelize (show v')
                               | Just v' <- (fromValue x :: Maybe String   ) -> v  == v'
                               | Just v' <- (fromValue x :: Maybe [String] ) -> v `elem` v'
                               | Just v' <- (fromValue x :: Maybe [Agent]  ) -> v == [] && v' == [] || v == show v'

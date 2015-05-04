@@ -52,10 +52,10 @@ import Data.Aeson.Types (Parser)
 import Control.Applicative ((<$>), (<*>), (<|>), pure)
 import qualified Data.Text as T
 import qualified Data.Vector as V
-import Data.Char (toLower, isUpper, isLower, isDigit)
+import Data.Char (toLower, isUpper, isDigit)
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Util (parseString, parseInt, parseBool, safeRead, readNum,
-                      inlinesToString, capitalize, camelize)
+                      inlinesToString, capitalize, camelize, uncamelize)
 import Text.Pandoc (Inline(Str))
 import Data.String
 
@@ -258,13 +258,7 @@ instance FromJSON RefType where
   parseJSON _ = fail "Could not parse RefType"
 
 instance ToJSON RefType where
-  toJSON reftype = toJSON (uncamelize $ uncapitalize $ show reftype)
-   where uncamelize [] = []
-         uncamelize (x:y:zs)
-          | isLower x && isUpper y = x:'-':toLower y:uncamelize zs
-         uncamelize (x:xs) = x : uncamelize xs
-         uncapitalize (x:xs) = toLower x : xs
-         uncapitalize []     = []
+  toJSON reftype = toJSON (uncamelize $ show reftype)
 
 newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data, Generic )
 

@@ -5,6 +5,7 @@ module Text.CSL.Util
   , (<^>)
   , capitalize
   , camelize
+  , uncamelize
   , isPunct
   , last'
   , init'
@@ -28,7 +29,6 @@ module Text.CSL.Util
   , procM
   , query
   , betterThan
-  , toShow
   , toRead
   , inlinesToString
   , headInline
@@ -96,6 +96,12 @@ camelize ('-':y:ys) = toUpper y : camelize ys
 camelize ('_':y:ys) = toUpper y : camelize ys
 camelize     (y:ys) =         y : camelize ys
 camelize      _     = []
+
+uncamelize :: String -> String
+uncamelize = foldr g [] . f
+    where g    x xs  = if isUpper x then '-' : toLower x : xs else x : xs
+          f (  x:xs) = toLower x : xs
+          f       [] = []
 
 last' :: [a] -> [a]
 last' [] = []
@@ -291,12 +297,6 @@ query f = everything mappend (mempty `mkQ` f)
 betterThan :: [a] -> [a] -> [a]
 betterThan [] b = b
 betterThan a  _ = a
-
-toShow :: String -> String
-toShow = foldr g [] . f
-    where g    x xs  = if isUpper x then '-' : toLower x : xs else x : xs
-          f (  x:xs) = toLower x : xs
-          f       [] = []
 
 toRead :: String -> String
 toRead    []  = []
