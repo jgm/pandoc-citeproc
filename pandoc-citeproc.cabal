@@ -92,9 +92,6 @@ source-repository head
   type:          git
   location:      git://github.com/jgm/pandoc-citeproc.git
 
-flag small_base
-  description: Choose the new smaller, split-up base package.
-
 flag bibutils
   description: Use Chris Putnam's Bibutils.
   default:     True
