@@ -243,10 +243,12 @@ data RefType
       deriving ( Read, Eq, Typeable, Data, Generic )
 
 instance Show RefType where
-    show MotionPicture = "motion_picture"
-    show MusicalScore = "musical_score"
-    show PersonalCommunication = "personal_communication"
-    show LegalCase = "legal_case"
+    -- TODO: clean up this mess. For now, commenting these out makes
+    -- motion pictures work properly again.
+    -- show MotionPicture = "motion_picture"
+    -- show MusicalScore = "musical_score"
+    -- show PersonalCommunication = "personal_communication"
+    -- show LegalCase = "legal_case"
     show x = map toLower . formatField . showConstr . toConstr $ x
 
 instance FromJSON RefType where
