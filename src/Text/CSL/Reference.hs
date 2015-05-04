@@ -20,7 +20,6 @@ module Text.CSL.Reference ( Literal(..)
                           , Value(..)
                           , ReferenceMap
                           , mkRefMap
-                          , formatField
                           , fromValue
                           , isValueSet
                           , Empty(..)
@@ -52,7 +51,7 @@ import Data.Aeson.Types (Parser)
 import Control.Applicative ((<$>), (<*>), (<|>), pure)
 import qualified Data.Text as T
 import qualified Data.Vector as V
-import Data.Char (toLower, isUpper, isDigit)
+import Data.Char (toLower, isDigit)
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Util (parseString, parseInt, parseBool, safeRead, readNum,
                       inlinesToString, capitalize, camelize, uncamelize)
@@ -83,13 +82,7 @@ type ReferenceMap = [(String, Value)]
 
 mkRefMap :: Data a => a -> ReferenceMap
 mkRefMap a = zip fields (gmapQ Value a)
-    where fields = map formatField . constrFields . toConstr $ a
-
-formatField :: String -> String
-formatField = foldr f [] . g
-    where f  x xs  = if isUpper x then '-' : toLower x : xs else x : xs
-          g (x:xs) = toLower x : xs
-          g     [] = []
+    where fields = map uncamelize . constrFields . toConstr $ a
 
 fromValue :: Data a => Value -> Maybe a
 fromValue (Value a) = cast a
@@ -249,7 +242,7 @@ instance Show RefType where
     -- show MusicalScore = "musical_score"
     -- show PersonalCommunication = "personal_communication"
     -- show LegalCase = "legal_case"
-    show x = map toLower . formatField . showConstr . toConstr $ x
+    show x = map toLower . uncamelize . showConstr . toConstr $ x
 
 instance FromJSON RefType where
   parseJSON (String t) = safeRead (capitalize . camelize . T.unpack $ t)
