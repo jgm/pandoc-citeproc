@@ -201,7 +201,7 @@ mvPunct _ (Cite cs ils : ys) |
      length ils > 1
    , isNote (last ils)
    , startWithPunct ys
-   = Cite cs (init ils ++ [Str (headInline ys) | not (endWithPunct (init ils))]
+   = Cite cs (init ils ++ [Str (headInline ys) | not (endWithPunct False (init ils))]
      ++ [last ils]) : tailFirstInlineStr ys
 mvPunct sty (q@(Quoted _ _) : w@(Str _) : x : ys)
   | isNote x, isPunctuationInQuote sty  =
@@ -210,15 +210,16 @@ mvPunct _ (Space : x : ys) | isNote x = x : ys
 mvPunct _ (Space : x@(Cite _ (Superscript _ : _)) : ys) = x : ys
 mvPunct _ xs = xs
 
-endWithPunct :: [Inline] -> Bool
-endWithPunct [] = True
-endWithPunct xs@(_:_) = case reverse (stringify xs) of
-                              []                       -> True
-                              -- covers .), .", etc.:
-                              (d:c:_) | isPunctuation d
-                                       && isEndPunct c -> True
-                              (c:_) | isEndPunct c     -> True
-                                    | otherwise        -> False
+endWithPunct :: Bool -> [Inline] -> Bool
+endWithPunct _ [] = True
+endWithPunct onlyFinal xs@(_:_) =
+  case reverse (stringify xs) of
+       []                       -> True
+       -- covers .), .", etc.:
+       (d:c:_) | isPunctuation d && not onlyFinal
+                && isEndPunct c -> True
+       (c:_) | isEndPunct c     -> True
+             | otherwise        -> False
   where isEndPunct c = c `elem` (".,;:!?" :: String)
 
 startWithPunct :: [Inline] -> Bool
@@ -241,13 +242,13 @@ deNote = topDown go
           | c == ',' || c == '.' || c == ':' = xs
         removeLeadingPunct xs = xs
         comb f xs ys =
-           let xs' = if startWithPunct ys && endWithPunct xs
+           let xs' = if startWithPunct ys && endWithPunct True xs
                         then initInline $ removeLeadingPunct xs
                         else removeLeadingPunct xs
            in f xs' ++ ys
         sanitize :: [Block] -> [Block]
         sanitize [Para xs] =
-           [Para $ toCapital xs ++ if endWithPunct xs then [Space] else []]
+           [Para $ toCapital xs ++ if endWithPunct False xs then [Space] else []]
         sanitize bs = bs
 
 isTextualCitation :: [Citation] -> Bool
