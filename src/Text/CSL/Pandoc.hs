@@ -175,11 +175,7 @@ decodeEntities (x:xs) = x : decodeEntities xs
 processCite :: Style -> M.Map [Citation] Formatted -> Inline -> Inline
 processCite s cs (Cite t _) =
    case M.lookup t cs of
-        Just (Formatted (x:xs))
-          | isTextualCitation t && not (null xs) ->
-                         Cite t (renderPandoc s (Formatted [x]) ++
-                                 renderPandoc s (Formatted xs))
-          | otherwise -> Cite t (renderPandoc s (Formatted (x:xs)))
+        Just (Formatted (x:xs)) -> Cite t (renderPandoc s (Formatted (x:xs)))
         _             -> Strong [Str "???"]  -- TODO raise error instead?
 processCite _ _ x = x
 
