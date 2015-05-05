@@ -96,8 +96,8 @@ citeproc ops s rs cs
       biblioRefs   = procRefs s . mapMaybe (getReference rs) .
                      nubBy (\a b -> citeId a == citeId b) . concat $ cs
       biblioOutput = if "disambiguate-add-year-suffix" `elem` getCitDisambOptions s
-                     then map formatOutputList $
-                          map (proc (updateYearSuffixes yearS) . map addYearSuffix) $
+                     then map (formatOutputList .
+                               proc (updateYearSuffixes yearS) . map addYearSuffix) $
                           procBiblio (bibOpts ops) s biblioRefs
                      else map formatOutputList $
                           procBiblio (bibOpts ops) s biblioRefs
@@ -137,7 +137,7 @@ sortItems [] = []
 sortItems l
     = case head . concatMap (map snd) $ result of
         [] -> concatMap (map fst) result
-        _  -> if or $ map ((<) 1 . length) result
+        _  -> if any ((<) 1 . length) result
               then concatMap sortItems result
               else concatMap (map fst) result
     where
@@ -160,8 +160,8 @@ procBiblio bos (Style {biblio = mb, csMacros = ms , styleLocale = l,
       render  b   = subsequentAuthorSubstitute b . map (evalBib b) . filterRefs bos $ rs
 
       evalBib :: Bibliography -> Reference -> [Output]
-      evalBib b r = evalLayout (bibLayout b) (EvalBiblio emptyCite {citePosition = "first"}) False l ms
-                               (mergeOptions (bibOptions b) opts) as r
+      evalBib b = evalLayout (bibLayout b) (EvalBiblio emptyCite {citePosition = "first"}) False l ms
+                             (mergeOptions (bibOptions b) opts) as
 
 subsequentAuthorSubstitute :: Bibliography -> [[Output]] -> [[Output]]
 subsequentAuthorSubstitute b = if null subAuthStr then id else chkCreator
@@ -177,8 +177,8 @@ subsequentAuthorSubstitute b = if null subAuthStr then id else chkCreator
                           "partial-each"  ->          query namesQ  . queryContrib
                           _               ->                          queryContrib
 
-      getPartialEach x xs = concat . take 1 . map fst . reverse .
-                            sortBy (comparing $ length . snd) . filter ((<) 0 . length . snd) .
+      getPartialEach x xs = concat . take 1 . map fst .
+                            sortBy (flip (comparing $ length . snd)) . filter ((<) 0 . length . snd) .
                             zip xs . map (takeWhile id . map (uncurry (==)) . zip x) $ xs
 
       chkCreator = if subAuthRule == "partial-each" then chPartialEach [] else chkCr []
@@ -261,8 +261,8 @@ filterRefs bos refs
                        Just x | Just v' <- (fromValue x :: Maybe RefType  ) -> v == uncamelize (show v')
                               | Just v' <- (fromValue x :: Maybe String   ) -> v  == v'
                               | Just v' <- (fromValue x :: Maybe [String] ) -> v `elem` v'
-                              | Just v' <- (fromValue x :: Maybe [Agent]  ) -> v == [] && v' == [] || v == show v'
-                              | Just v' <- (fromValue x :: Maybe [RefDate]) -> v == [] && v' == [] || v == show v'
+                              | Just v' <- (fromValue x :: Maybe [Agent]  ) -> null v && null v' || v == show v'
+                              | Just v' <- (fromValue x :: Maybe [RefDate]) -> null v && null v' || v == show v'
                        _                                                    -> False
 
 -- | Given the CSL 'Style' and the list of 'Cite's coupled with their
@@ -275,7 +275,7 @@ procGroup (Style {citation = ct, csMacros = ms , styleLocale = l,
     where
       (co, authIn) = case cr of
                        (c:_) -> if authorInText (fst c)
-                                then (filter (eqCites (/=) c) $ result,
+                                then (filter (eqCites (/=) c) result,
                                       take 1 .  filter (eqCites (==) c) $ result)
                                 else (result, [])
                        _     -> (result, [])
@@ -293,7 +293,7 @@ formatCitLayout :: Style -> CitationGroup -> Formatted
 formatCitLayout s (CG co f d cs)
     | [a] <- co = combine (formatAuth a)
                   (formatCits $
-                   (fst >>> citeId &&& citeHash >>> setAsSupAu $ a) $ cs)
+                   (fst >>> citeId &&& citeHash >>> setAsSupAu $ a) cs)
     | otherwise = formatCits cs
     where
       isNote    = styleClass s == "note"
@@ -313,9 +313,9 @@ formatCitLayout s (CG co f d cs)
       formatting   = unsetAffixes f
       localMod     = uncurry $ localModifiers s (not $ null co)
       setAsSupAu h = map $ \(c,o) -> if (citeId c, citeHash c) == h
-                                     then flip (,) o c { authorInText   = False
-                                                       , suppressAuthor = True }
-                                     else flip (,) o c
+                                     then (c { authorInText   = False
+                                             , suppressAuthor = True }, o)
+                                     else (c, o)
 
 addAffixes :: Formatting -> [Output] -> [Output]
 addAffixes f os
@@ -325,7 +325,7 @@ addAffixes f os
     | otherwise                = pref ++ suff
     where
       pref = if not (null (prefix f))
-             then [OStr (prefix f) emptyFormatting] ++ os
+             then OStr (prefix f) emptyFormatting : os
              else os
       suff = case suffix f of
                   []     -> []
