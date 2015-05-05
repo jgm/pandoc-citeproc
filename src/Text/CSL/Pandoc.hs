@@ -279,18 +279,14 @@ toCslCite locMap c
                          _                   -> s
           isPunct (Str (x:_)) = isPunctuation x
           isPunct _           = False
-          citMode = case citationMode c of
-                      AuthorInText   -> (True, False)
-                      SuppressAuthor -> (False,True )
-                      NormalCitation -> (False,False)
       in   emptyCite { CSL.citeId         = citationId c
                      , CSL.citePrefix     = Formatted $ citationPrefix c
                      , CSL.citeSuffix     = Formatted s'
                      , CSL.citeLabel      = la
                      , CSL.citeLocator    = lo
                      , CSL.citeNoteNumber = show $ citationNoteNum c
-                     , CSL.authorInText   = fst citMode
-                     , CSL.suppressAuthor = snd citMode
+                     , CSL.authorInText   = citationMode c == AuthorInText
+                     , CSL.suppressAuthor = citationMode c == SuppressAuthor
                      , CSL.citeHash       = citationHash c
                      }
 
