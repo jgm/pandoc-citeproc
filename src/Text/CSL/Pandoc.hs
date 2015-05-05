@@ -247,10 +247,6 @@ deNote = topDown go
            [Para $ toCapital xs ++ if endWithPunct False xs then [Space] else []]
         sanitize bs = bs
 
-isTextualCitation :: [Citation] -> Bool
-isTextualCitation (c:_) = citationMode c == AuthorInText
-isTextualCitation _     = False
-
 -- | Retrieve all citations from a 'Pandoc' docuument. To be used with
 -- 'query'.
 getCitation :: Inline -> [[Citation]]
