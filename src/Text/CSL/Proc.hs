@@ -338,7 +338,7 @@ addAffixes f os
 -- pandoc terminology).
 localModifiers :: Style -> Bool -> Cite -> Output -> Output
 localModifiers s b c
-    | authorInText   c = check . return . proc rmFormatting . contribOnly s
+    | authorInText   c = check . return . contribOnly s
     | suppressAuthor c = check . rmContrib . return
     | otherwise        = id
     where
@@ -367,11 +367,6 @@ localModifiers s b c
           | OStr    x f <- o  = OStr x (if isPunct' (prefix f)
                                         then f { prefix = []} else f) : os
           | otherwise         = o:os
-      rmFormatting f
-          | Formatting {} <- f = emptyFormatting { prefix = prefix f
-                                                 , suffix = suffix f
-                                                 , hyperlink = hyperlink f}
-          | otherwise          = f
       rmCitNum o
           | OCitNum {} <- o = ONull
           | otherwise       = o
