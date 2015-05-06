@@ -135,7 +135,7 @@ library
     other-modules:    Text.CSL.Util
                       Paths_pandoc_citeproc
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
-    ghc-prof-options: -prof -auto-all
+    ghc-prof-options: -fprof-auto-exported -rtsopts
     build-depends:    containers, directory, mtl,
                       bytestring, filepath, pandoc-types >= 1.12.3, tagsoup,
                       aeson >= 0.7 && < 0.9, text, vector,
@@ -180,7 +180,7 @@ executable pandoc-citeproc
     main-is:          pandoc-citeproc.hs
     hs-source-dirs:   .
     ghc-options:      -funbox-strict-fields -Wall
-    ghc-prof-options: -prof -auto-all
+    ghc-prof-options: -fprof-auto-exported -rtsopts
     build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12.3, aeson,
                       aeson-pretty, yaml, bytestring, syb, attoparsec, text,
                       filepath
