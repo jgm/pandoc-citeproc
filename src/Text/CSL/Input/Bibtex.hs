@@ -760,6 +760,7 @@ itemToReference lang locale bibtex = bib $ do
   isEvent <- (True <$ (getRawField "eventdate"
                      <|> getRawField "eventtitle"
                      <|> getRawField "venue")) <|> return False
+  reftype' <- resolveKey lang <$> getField "type" <|> return mempty
   let (reftype, refgenre) = case et of
        "article"
          | st == "magazine"  -> (ArticleMagazine,mempty)
@@ -775,7 +776,9 @@ itemToReference lang locale bibtex = bib $ do
        "inreference"     -> (EntryEncyclopedia,mempty)
        "inproceedings"   -> (PaperConference,mempty)
        "manual"          -> (Book,mempty)
-       "mastersthesis"   -> (Thesis, Formatted [Str $ resolveKey' lang "mathesis"])
+       "mastersthesis"   -> (Thesis, if reftype' == mempty
+                                        then Formatted [Str $ resolveKey' lang "mathesis"]
+                                        else reftype')
        "misc"            -> (NoType,mempty)
        "mvbook"          -> (Book,mempty)
        "mvcollection"    -> (Book,mempty)
@@ -787,7 +790,9 @@ itemToReference lang locale bibtex = bib $ do
          | st == "magazine"  -> (ArticleMagazine,mempty)
          | st == "newspaper" -> (ArticleNewspaper,mempty)
          | otherwise         -> (ArticleJournal,mempty)
-       "phdthesis"       -> (Thesis, Formatted [Str $ resolveKey' lang "phdthesis"])
+       "phdthesis"       -> (Thesis, if reftype' == mempty
+                                        then Formatted [Str $ resolveKey' lang "phdthesis"]
+                                        else reftype')
        "proceedings"     -> (Book,mempty)
        "reference"       -> (Book,mempty)
        "report"          -> (Report,mempty)
@@ -822,7 +827,6 @@ itemToReference lang locale bibtex = bib $ do
        "letters"         -> (PersonalCommunication,mempty)
        "newsarticle"     -> (ArticleNewspaper,mempty)
        _                 -> (NoType,mempty)
-  reftype' <- resolveKey lang <$> getField "type" <|> return mempty
 
   -- hyphenation:
   let defaultHyphenation = case lang of
