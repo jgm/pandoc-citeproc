@@ -8,6 +8,7 @@ import Text.Pandoc.Builder (setMeta, deleteMeta, Inlines, cite)
 import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
+import System.Environment (setEnv)
 import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Char ( isDigit, isPunctuation, isSpace )
@@ -127,6 +128,11 @@ processCites' (Pandoc meta blocks) = do
                            then L.readFile f
                            else getDefaultCSL
                  localizeCSL mbLocale $ parseCSL' raw
+  -- set LANG environment from locale; this affects unicode collation
+  -- if pandoc-citeproc compiled with unicode_collation flag
+  setEnv "LANG" $ case styleLocale csl of
+                        (l:_) -> localeLang l
+                        _     -> "en-US"
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
   let skipLeadingSpace = L.dropWhile (\s -> s == 32 || (s >= 9 && s <= 13))
   abbrevs <- maybe (return (Abbreviations M.empty))
