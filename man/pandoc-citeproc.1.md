@@ -42,16 +42,20 @@ the input:
 
     Format            File extension
     ------------      --------------
-    MODS              .mods
     BibLaTeX          .bib
     BibTeX            .bibtex
-    RIS               .ris
+    Copac             .copac
+    CSL JSON          .json
+    CSL YAML          .yaml
     EndNote           .enl
     EndNote XML       .xml
     ISI               .wos
     MEDLINE           .medline
-    Copac             .copac
-    JSON citeproc     .json
+    MODS              .mods
+    RIS               .ris
+
+    Note that `.bib` can generally be used with both BibTeX and BibLaTeX
+    files, but you can use `.bibtex` to force BibTeX.
 
 `references`
 :   A YAML list of references.  Each reference is a YAML
@@ -97,6 +101,12 @@ the input:
             }
           }
         }
+
+`locale`
+:    Locale to use in formatting citations.  If this is not set, the
+     locale is taken from the `default-locale` attribute of the CSL
+     file.  `en-US` is used if a locale is not specified in either the
+     metadata or the CSL file.
 
 `suppress-bibliography`
 :    If this has a true value, the bibliography will be left off.
