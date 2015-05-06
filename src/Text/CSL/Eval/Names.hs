@@ -190,7 +190,7 @@ formatNames ea del p s as n
                           case getOptionVal "delimiter-precedes-et-al" o of
                             "never"  -> return . (++) [OSpace] $ output fm x
                             "always" -> return . (++) [ODel d] $ output fm x
-                            _        -> if i > 1
+                            _        -> if i > 1 && not (null d)
                                         then return . (++) [ODel d] $ output fm x
                                         else return . (++) [OSpace] $ output fm x
 
