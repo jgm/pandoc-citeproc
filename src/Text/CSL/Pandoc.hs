@@ -111,9 +111,6 @@ processCites' (Pandoc meta blocks) = do
   let inlineRefError s = error $ "Error parsing references: " ++ s
   let inlineRefs = either inlineRefError id
                    $ convertRefs $ lookupMeta "references" meta
-  bibRefs <- getBibRefs $ maybe (MetaList []) id
-                        $ lookupMeta "bibliography" meta
-  let refs = inlineRefs ++ bibRefs
   let cslfile = (lookupMeta "csl" meta <|> lookupMeta "citation-style" meta)
                 >>= toPath
   let mbLocale = lookupMeta "locale" meta >>= toPath
@@ -133,6 +130,9 @@ processCites' (Pandoc meta blocks) = do
   setEnv "LANG" $ case styleLocale csl of
                         (l:_) -> localeLang l
                         _     -> "en-US"
+  bibRefs <- getBibRefs $ maybe (MetaList []) id
+                        $ lookupMeta "bibliography" meta
+  let refs = inlineRefs ++ bibRefs
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
   let skipLeadingSpace = L.dropWhile (\s -> s == 32 || (s >= 9 && s <= 13))
   abbrevs <- maybe (return (Abbreviations M.empty))
