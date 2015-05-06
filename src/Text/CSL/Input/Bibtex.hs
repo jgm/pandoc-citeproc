@@ -88,9 +88,9 @@ readBibtexInputString isBibtex bibstring = do
   env <- getEnvironment
   let lang = case lookup "LANG" env of
                   Just x  -> case splitWhen (\c -> c == '.' || c == '_') x of
-                                   (w:z:_) -> Lang w z
-                                   [w]     -> Lang w mempty
-                                   _       -> Lang "en" "US"
+                                   (w:z:_)            -> Lang w z
+                                   [w] | not (null w) -> Lang w mempty
+                                   _                  -> Lang "en" "US"
                   Nothing -> Lang "en" "US"
   let items = case runParser (bibEntries <* eof) [] "stdin" bibstring of
                    Left err -> error (show err)
