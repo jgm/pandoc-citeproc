@@ -141,6 +141,7 @@ library
                       aeson >= 0.7 && < 0.9, text, vector,
                       xml-conduit >= 1.2 && < 1.3,
                       data-default,
+                      setenv >= 0.1 && < 0.2,
                       split, yaml >= 0.8.8.2, pandoc >= 1.13
     if impl(ghc < 7.6)
        build-depends: ghc-prim

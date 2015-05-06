@@ -8,7 +8,7 @@ import Text.Pandoc.Builder (setMeta, deleteMeta, Inlines, cite)
 import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
-import System.Environment (setEnv)
+import System.SetEnv (setEnv)
 import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Char ( isDigit, isPunctuation, isSpace )
