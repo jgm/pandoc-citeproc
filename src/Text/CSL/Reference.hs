@@ -200,16 +200,6 @@ instance ToJSON [RefDate] where
                  ["circa" .= (1 :: Int) | or (map circa xs)] ++
                  ["season" .= s | s <- map season xs, s /= mempty])
 
-instance ToYaml [RefDate] where
-  toYaml [] = Y.array []
-  toYaml xs = mapping' $
-    case filter (not . null) (map toDatePart xs) of
-         []  -> [ "literal" &= T.pack (intercalate "; " (map (unLiteral . other) xs))]
-         dps -> [ "date-parts" &= dps
-                , "circa" &= T.pack (if any circa xs then "1" else "")
-                , "season" &= filter (/= mempty) (map season xs)
-                ]
-
 -- instance ToJSON [RefDate]
 -- toJSON xs  = Array (V.fromList $ map toJSON xs)
 
