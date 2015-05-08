@@ -117,17 +117,11 @@ biblio2yamlTest fp = do
                      ["--bib2yaml", "-f", drop 1 $ takeExtension fp] bib
   if ec == ExitSuccess
      then do
-       let expectedDoc :: Maybe Aeson.Value
-           expectedDoc = Yaml.decode $ B.concat $ BL.toChunks expected
-       let resultDoc   :: Maybe Aeson.Value
-           resultDoc   = Yaml.decode $ B.concat $ BL.toChunks result
-       let result'   = BL.fromChunks [Yaml.encode resultDoc]
-       let expected' = BL.fromChunks [Yaml.encode expectedDoc]
-       if expected' == result'
+       if expected == result
           then err "PASSED" >> return Passed
           else do
             err $ "FAILED"
-            showDiff expected' result'
+            showDiff expected result
             return Failed
      else do
        err "ERROR"
