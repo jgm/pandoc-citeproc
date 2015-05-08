@@ -86,7 +86,7 @@ readBibtexInput isBibtex f = UTF8.readFile f >>= readBibtexInputString isBibtex
 readBibtexInputString :: Bool -> String -> IO [Reference]
 readBibtexInputString isBibtex bibstring = do
   env <- getEnvironment
-  let lang = case lookup "LC_ALL" env `mplus` lookup "LANG" env of
+  let lang = case lookup "LANG" env of
                   Just x  -> case splitWhen (\c -> c == '.' || c == '_' || c == '-') x of
                                    (w:z:_)            -> Lang w z
                                    [w] | not (null w) -> Lang w mempty
