@@ -51,8 +51,7 @@ references:
   - family: Bochmann
     given: Manfred
   issued:
-    date-parts:
-    - - 1999
+  - year: 1999
   title: Advanced inorganic chemistry
   publisher: Wiley
   publisher-place: Chichester

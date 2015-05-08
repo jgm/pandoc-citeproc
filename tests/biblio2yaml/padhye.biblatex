@@ -77,8 +77,7 @@ references:
   - family: Towsley
     given: Don
   issued:
-    date-parts:
-    - - 1999
+  - year: 1999
   title: A stochastic model of TCP Reno congestion avoidance and control
   publisher: University of Massachusetts
   publisher-place: Amherst, Mass.

@@ -49,9 +49,8 @@ references:
   - family: Knuth
     given: Donald E.
   issued:
-    date-parts:
-    - - 1984
-    - - 1986
+  - year: 1984
+  - year: 1986
   title: Computers & typesetting
   publisher: Addison-Wesley
   publisher-place: Reading, Mass.

@@ -16,7 +16,6 @@
 	Title = {Title of the "@inbook" Entry},
 	Titleaddon = {Titleaddon},
 	Volume = {4}}
-
 ---
 references:
 - id: item1
@@ -25,8 +24,7 @@ references:
   - family: Author
     given: Al
   issued:
-    date-parts:
-    - - 2011
+  - year: 2011
   title: 'Title of the “@inbook” Entry: Subtitle. Titleaddon'
   container-title: 'Maintitle: Mainsubtitle. Maintitleaddon'
   volume-title: 'Booktitle: Booksubtitle. Booktitleaddon'

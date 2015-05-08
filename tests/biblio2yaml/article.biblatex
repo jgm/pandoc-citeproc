@@ -85,10 +85,9 @@ references:
   - family: Author
     given: Ann
   issued:
-    date-parts:
-    - - 2013
-      - 7
-      - 29
+  - year: 2013
+    month: 7
+    day: 29
   title: An article entry with just the required fields
   container-title: The Journaltitle
   language: en-US
@@ -105,15 +104,13 @@ references:
   - family: Translator
     given: Ted
   issued:
-    date-parts:
-    - - 2008
-      - 12
-      - 31
+  - year: 2008
+    month: 12
+    day: 31
   accessed:
-    date-parts:
-    - - 2013
-      - 7
-      - 29
+  - year: 2013
+    month: 7
+    day: 29
   title: 'An article entry with the required and all optional fields: The subtitle.
     The titleaddon'
   title-short: An article entry with the required and all optional fields

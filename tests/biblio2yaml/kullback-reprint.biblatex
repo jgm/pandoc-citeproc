@@ -52,11 +52,9 @@ references:
   - family: Kullback
     given: Solomon
   issued:
-    date-parts:
-    - - 1997
+  - year: 1997
   original-date:
-    date-parts:
-    - - 1959
+  - year: 1959
   title: Information theory and statistics
   publisher: Dover Publications
   original-publisher: John Wiley & Sons

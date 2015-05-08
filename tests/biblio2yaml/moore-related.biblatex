@@ -48,8 +48,7 @@ references:
   - family: Moore
     given: Gordon E.
   issued:
-    date-parts:
-    - - 1998
+  - year: 1998
   title: Cramming more components onto integrated circuits
   container-title: Proceedings of the IEEE
   page: 82-85

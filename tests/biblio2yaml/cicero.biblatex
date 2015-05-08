@@ -63,8 +63,7 @@ references:
   - family: Blank-Sangmeister
     given: Ursula
   issued:
-    date-parts:
-    - - 1995
+  - year: 1995
   title: De natura deorum. Über das Wesen der Götter
   title-short: De natura deorum
   publisher: Reclam

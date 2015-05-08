@@ -70,8 +70,7 @@ references:
   - family: Kant
     given: Immanuel
   issued:
-    date-parts:
-    - - 1968
+  - year: 1968
   title: Kritik der praktischen Vernunft
   title-short: Kritik der praktischen Vernunft
   container-title: Kants Werke. Akademie Textausgabe
@@ -95,8 +94,7 @@ references:
   - family: Kant
     given: Immanuel
   issued:
-    date-parts:
-    - - 1968
+  - year: 1968
   title: Kritik der Urtheilskraft
   container-title: Kants Werke. Akademie Textausgabe
   volume-title: Kritik der praktischen Vernunft. Kritik der Urtheilskraft
@@ -122,8 +120,7 @@ references:
   - family: Nietzsche
     given: Friedrich
   issued:
-    date-parts:
-    - - 1988
+  - year: 1988
   title: 'Unzeitgemässe Betrachtungen. Zweites Stück: Vom Nutzen und Nachtheil der
     Historie für das Leben'
   title-short: Vom Nutzen und Nachtheil der Historie

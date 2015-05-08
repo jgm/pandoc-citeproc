@@ -37,8 +37,7 @@ references:
   - family: Glashow
     given: Sheldon
   issued:
-    date-parts:
-    - - 1961
+  - year: 1961
   title: Partial symmetries of weak interactions
   container-title: Nucl. Phys.
   page: 579-588

@@ -62,8 +62,7 @@ references:
   - family: Bland
     given: Kalman P.
   issued:
-    date-parts:
-    - - 1982
+  - year: 1982
   title: The epistle on the possibility of conjunction with the active intellect by
     Ibn Rushd with the commentary of Moses Narboni
   title-short: Possibility of conjunction

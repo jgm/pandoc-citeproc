@@ -84,9 +84,8 @@ references:
   - family: Author
     given: Al
   issued:
-    date-parts:
-    - - 1999
-      - 8
+  - year: 1999
+    month: 8
   title: Year and month, bibtex style, supported by biblatex for backwards compatibility
   container-title: Journal
 - id: year-month-new
@@ -95,9 +94,8 @@ references:
   - family: Author
     given: Al
   issued:
-    date-parts:
-    - - 1999
-      - 8
+  - year: 1999
+    month: 08
   title: Year and month, biblatex style; note that biblatex does not have a “day”
     field
   container-title: Journal
@@ -107,25 +105,21 @@ references:
   - family: Author
     given: Al
   issued:
-    date-parts:
-    - - 2012
-      - 12
-      - 13
+  - year: 2012
+    month: 12
+    day: 13
   event-date:
-    date-parts:
-    - - 2011
-      - 10
-      - 3
+  - year: 2011
+    month: 10
+    day: 3
   accessed:
-    date-parts:
-    - - 1999
-      - 5
-      - 23
+  - year: 1999
+    month: 5
+    day: 23
   original-date:
-    date-parts:
-    - - 1888
-      - 10
-      - 1
+  - year: 1888
+    month: 10
+    day: 1
   title: Dates, default biblatex style; year, month to be ignored if date exists
   container-title: Journal
 - id: date-ranges-different-years
@@ -134,35 +128,31 @@ references:
   - family: Author
     given: Al
   issued:
-    date-parts:
-    - - 1999
-      - 10
-      - 14
-    - - 2010
-      - 1
-      - 23
+  - year: 1999
+    month: 10
+    day: 14
+  - year: 2010
+    month: 1
+    day: 23
   event-date:
-    date-parts:
-    - - 1999
-      - 12
-    - - 2000
-      - 1
+  - year: 1999
+    month: 12
+  - year: 2000
+    month: 1
   accessed:
-    date-parts:
-    - - 2012
-      - 10
-      - 12
-    - - 2013
-      - 1
-      - 31
+  - year: 2012
+    month: 10
+    day: 12
+  - year: 2013
+    month: 1
+    day: 31
   original-date:
-    date-parts:
-    - - 1888
-      - 1
-      - 2
-    - - 1913
-      - 12
-      - 13
+  - year: 1888
+    month: 1
+    day: 2
+  - year: 1913
+    month: 12
+    day: 13
   title: Date ranges; different years
   container-title: Journal
 - id: date-ranges-same-year
@@ -171,35 +161,31 @@ references:
   - family: Author
     given: Al
   issued:
-    date-parts:
-    - - 1999
-      - 10
-      - 14
-    - - 1999
-      - 10
-      - 15
+  - year: 1999
+    month: 10
+    day: 14
+  - year: 1999
+    month: 10
+    day: 15
   event-date:
-    date-parts:
-    - - 1999
-      - 10
-    - - 1999
-      - 11
+  - year: 1999
+    month: 10
+  - year: 1999
+    month: 11
   accessed:
-    date-parts:
-    - - 2012
-      - 10
-      - 31
-    - - 2012
-      - 11
-      - 1
+  - year: 2012
+    month: 10
+    day: 31
+  - year: 2012
+    month: 11
+    day: 1
   original-date:
-    date-parts:
-    - - 1888
-      - 1
-      - 2
-    - - 1888
-      - 12
-      - 13
+  - year: 1888
+    month: 1
+    day: 2
+  - year: 1888
+    month: 12
+    day: 13
   title: Date ranges; same year
   container-title: Journal
 - id: date-ranges-open
@@ -208,24 +194,24 @@ references:
   - family: Author
     given: Al
   issued:
-    date-parts:
-    - - 1999
-      - 10
-      - 14
+  - year: 1999
+    month: 10
+    day: 14
+  - {}
   event-date:
-    date-parts:
-    - - 1999
-      - 10
+  - year: 1999
+    month: 10
+  - {}
   accessed:
-    date-parts:
-    - - 2012
-      - 10
-      - 31
+  - year: 2012
+    month: 10
+    day: 31
+  - {}
   original-date:
-    date-parts:
-    - - 1888
-      - 1
-      - 2
+  - year: 1888
+    month: 1
+    day: 2
+  - {}
   title: Date ranges, open-ended
   container-title: Journal
 - id: dates-very-old
@@ -234,25 +220,21 @@ references:
   - family: Author
     given: Al
   issued:
-    date-parts:
-    - - 712
-      - 12
-      - 13
+  - year: 712
+    month: 12
+    day: 13
   event-date:
-    date-parts:
-    - - 311
-      - 10
-      - 3
+  - year: 311
+    month: 10
+    day: 3
   accessed:
-    date-parts:
-    - - 999
-      - 12
-      - 14
+  - year: 999
+    month: 12
+    day: 14
   original-date:
-    date-parts:
-    - - 88
-      - 10
-      - 1
+  - year: 88
+    month: 10
+    day: 1
   title: Dates, year less than 1000
   container-title: Journal
 ...

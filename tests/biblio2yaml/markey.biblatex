@@ -47,15 +47,13 @@ references:
   - family: Markey
     given: Nicolas
   issued:
-    date-parts:
-    - - 2005
-      - 10
-      - 16
+  - year: 2005
+    month: 10
+    day: 16
   accessed:
-    date-parts:
-    - - 2006
-      - 10
-      - 1
+  - year: 2006
+    month: 10
+    day: 1
   title: 'Tame the BeaST: The B to X of BibTeX'
   title-short: Tame the BeaST
   version: 1.3

@@ -46,8 +46,7 @@ references:
   - family: Nussbaum
     given: Martha
   issued:
-    date-parts:
-    - - 1978
+  - year: 1978
   title: Aristotle’s “De Motu Animalium”
   publisher: Princeton University Press
   publisher-place: Princeton

@@ -46,8 +46,7 @@ references:
   - family: Lucas
     given: D. W.
   issued:
-    date-parts:
-    - - 1968
+  - year: 1968
   title: Poetics
   title-short: Poetics
   collection-title: Clarendon Aristotle

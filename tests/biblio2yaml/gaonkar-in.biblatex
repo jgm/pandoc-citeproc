@@ -46,8 +46,7 @@ references:
   - family: Gaonkar
     given: Dilip Parameshwar
   issued:
-    date-parts:
-    - - 2001
+  - year: 2001
   title: On alternative modernities
   container-title: Alternative modernities
   publisher: Duke University Press

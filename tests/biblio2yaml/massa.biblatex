@@ -40,8 +40,7 @@ references:
   - family: Massa
     given: Werner
   issued:
-    date-parts:
-    - - 2004
+  - year: 2004
   title: Crystal structure determination
   publisher: Spinger
   publisher-place: Berlin

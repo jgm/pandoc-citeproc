@@ -48,8 +48,7 @@ references:
   - family: Knuth
     given: Donald E.
   issued:
-    date-parts:
-    - - 1986
+  - year: 1986
   title: Computers & typesetting
   volume-title: Computer modern typefaces
   publisher: Addison-Wesley

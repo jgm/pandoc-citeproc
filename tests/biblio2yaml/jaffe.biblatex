@@ -63,9 +63,8 @@ references:
   - family: Jaffé
     given: Philipp
   issued:
-    date-parts:
-    - - 1885
-    - - 1888
+  - year: 1885
+  - year: 1888
   title: Regesta Pontificum Romanorum ab condita ecclesia ad annum post Christum natum
     <span style="font-variant:small-caps;">mcxcviii</span>
   title-short: Regesta Pontificum Romanorum

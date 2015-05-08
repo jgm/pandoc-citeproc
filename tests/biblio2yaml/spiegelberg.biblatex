@@ -55,8 +55,7 @@ references:
   - family: Spiegelberg
     given: Herbert
   issued:
-    date-parts:
-    - - 1969
+  - year: 1969
   title: “Intention” und “Intentionalität” in der Scholastik, bei Brentano und Husserl
   title-short: Intention und Intentionalität
   container-title: Studia Philosophica

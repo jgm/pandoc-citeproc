@@ -51,8 +51,7 @@ references:
   - family: Reese
     given: Trevor R.
   issued:
-    date-parts:
-    - - 1958
+  - year: 1958
   title: Georgia in Anglo-Spanish diplomacy, 1736-1739
   container-title: William and Mary Quarterly
   collection-title: 3rd ser.

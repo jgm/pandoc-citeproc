@@ -64,8 +64,7 @@ references:
   - family: Kant
     given: Immanuel
   issued:
-    date-parts:
-    - - 1968
+  - year: 1968
   title: Kritik der praktischen Vernunft
   title-short: Kritik der praktischen Vernunft
   container-title: Kants Werke. Akademie Textausgabe

@@ -71,8 +71,7 @@ references:
   - family: Westfahl
     given: Gary
   issued:
-    date-parts:
-    - - 2000
+  - year: 2000
   title: 'The true frontier: Confronting and avoiding the realities of space in
     American science fiction films'
   title-short: The true frontier
@@ -89,8 +88,7 @@ references:
   - family: Westfahl
     given: Gary
   issued:
-    date-parts:
-    - - 2000
+  - year: 2000
   title: 'Space and beyond: The frontier theme in science fiction'
   title-short: Space and beyond
   publisher: Greenwood

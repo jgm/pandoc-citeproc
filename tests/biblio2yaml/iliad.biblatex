@@ -49,8 +49,7 @@ references:
   - family: Schadewaldt
     given: Wolfgang
   issued:
-    date-parts:
-    - - 2004
+  - year: 2004
   title: Die Ilias
   title-short: Ilias
   publisher: Artemis & Winkler

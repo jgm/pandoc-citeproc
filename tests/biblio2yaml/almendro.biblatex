@@ -54,8 +54,7 @@ references:
   - family: Nozal
     given: Fernando
   issued:
-    date-parts:
-    - - 1998
+  - year: 1998
   title: Elektromagnetisches Signalhorn
   jurisdiction: France; United Kingdom; Germany
   annote: This is a patent entry with a location field. The number is given in the

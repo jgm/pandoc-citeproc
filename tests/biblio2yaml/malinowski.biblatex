@@ -47,8 +47,7 @@ references:
   - family: Malinowski
     given: Bronisław
   issued:
-    date-parts:
-    - - 1972
+  - year: 1972
   title: 'Argonauts of the Western Pacific: An account of native enterprise and
     adventure in the <span class="nocase">Archipelagoes of Melanesian New Guinea</span>'
   title-short: Argonauts

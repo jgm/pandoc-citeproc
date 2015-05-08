@@ -72,8 +72,7 @@ references:
   - family: Nietzsche
     given: Friedrich
   issued:
-    date-parts:
-    - - 1988
+  - year: 1988
   title: 'Sämtliche Werke: Kritische Studienausgabe'
   volume-title: Die Geburt der Tragödie. Unzeitgemäße Betrachtungen I–IV. Nachgelassene
     Schriften 1870–1973

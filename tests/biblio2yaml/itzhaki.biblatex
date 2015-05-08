@@ -59,10 +59,9 @@ references:
   - family: Itzhaki
     given: Nissan
   issued:
-    date-parts:
-    - - 1996
-      - 3
-      - 11
+  - year: 1996
+    month: 3
+    day: 11
   title: Some remarks on ’<span class="nocase">t Hooft’s</span> S-matrix for black
     holes
   version: 1

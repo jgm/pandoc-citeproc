@@ -60,8 +60,7 @@ references:
   - family: Kant
     given: Immanuel
   issued:
-    date-parts:
-    - - 1968
+  - year: 1968
   title: Kritik der Urtheilskraft
   container-title: Kants Werke. Akademie Textausgabe
   volume-title: Kritik der praktischen Vernunft. Kritik der Urtheilskraft

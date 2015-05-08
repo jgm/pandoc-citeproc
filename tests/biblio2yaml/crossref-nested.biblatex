@@ -43,8 +43,7 @@ references:
   container-author:
   - family: Shakespeare
   issued:
-    date-parts:
-    - - 1975
+  - year: 1975
   title: Macbeth [title field of bookinbook-1]
   container-title: Collected works [title field of mvbook-1]
   volume-title: Tragedies [title field of book-1]
@@ -61,8 +60,7 @@ references:
   container-author:
   - family: Shakespeare
   issued:
-    date-parts:
-    - - 1975
+  - year: 1975
   title: Macbeth [title field of inbook-1]
   container-title: Collected works [title field of mvbook-1]
   volume-title: Tragedies [title field of book-1]
@@ -79,8 +77,7 @@ references:
   container-author:
   - family: Shakespeare
   issued:
-    date-parts:
-    - - 1975
+  - year: 1975
   title: Collected works [title field of mvbook-1]
   volume-title: Tragedies [title field of book-1]
   publisher: Publisher
@@ -92,9 +89,8 @@ references:
   author:
   - family: Shakespeare
   issued:
-    date-parts:
-    - - 1970
-    - - 1980
+  - year: 1970
+  - year: 1980
   title: Collected works [title field of mvbook-1]
   publisher: Publisher
   publisher-place: Location

@@ -51,10 +51,9 @@ references:
   - family: Lauda
     given: Aaron D.
   issued:
-    date-parts:
-    - - 2004
-      - 10
-      - 27
+  - year: 2004
+    month: 10
+    day: 27
   title: 'Higher-dimensional algebra V: 2-groups'
   title-short: Higher-dimensional algebra V
   version: 3

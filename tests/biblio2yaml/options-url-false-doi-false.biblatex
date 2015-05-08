@@ -36,8 +36,7 @@ references:
   - family: Author
     given: Andy
   issued:
-    date-parts:
-    - - 2012
+  - year: 2012
   title: Title, any entry type except online
   container-title: Journal
 - id: item2
@@ -46,8 +45,7 @@ references:
   - family: Author
     given: Andy
   issued:
-    date-parts:
-    - - 2012
+  - year: 2012
   title: Title, entry type online
   container-title: Journal
   URL: http://foo.bar
