@@ -6,7 +6,7 @@ import Data.Generics ( everywhere, mkT )
 import Data.List (group, sort)
 import Data.Char (chr, toLower)
 import Data.Monoid
-import Data.Yaml
+import Data.Yaml.Builder (toByteString)
 import Control.Applicative
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy.Char8 as BL8
@@ -59,7 +59,7 @@ main = do
        readBiblioString bibformat bibstring >>=
          warnDuplicateKeys >>=
          if Bib2YAML `elem` flags
-            then outputYamlBlock . unescapeTags . encode
+            then outputYamlBlock . unescapeTags . toByteString
             else BL8.putStrLn .
               encodePretty' Config{ confIndent = 2
                                   , confCompare = compare } .

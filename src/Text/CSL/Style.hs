@@ -767,9 +767,9 @@ instance ToYaml Agent where
                        , "literal" &= literal ag
                        , "comma-suffix" &= T.pack (if commaSuffix ag
                                                       then "true"
-                                                      else "false")
+                                                      else "")
                        , "parse-names" &= T.pack (if parseNames ag
-                                                     then "true"
+                                                     then ""
                                                      else "false")
                        ]
 

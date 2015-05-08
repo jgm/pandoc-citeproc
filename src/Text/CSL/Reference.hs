@@ -543,6 +543,90 @@ instance ToJSON Reference where
     , "citation-label" .= citationLabel ref
     ]
 
+instance ToYaml Reference where
+  toYaml ref = mapping' [
+      "id" &= refId ref
+    , (("type" Y..= refType ref) :)
+    , "author" &= author ref
+    , "editor" &= editor ref
+    , "translator" &= translator ref
+    , "recipient" &= recipient ref
+    , "interviewer" &= interviewer ref
+    , "composer" &= composer ref
+    , "director" &= director ref
+    , "illustrator" &= illustrator ref
+    , "original-author" &= originalAuthor ref
+    , "container-author" &= containerAuthor ref
+    , "collection-editor" &= collectionEditor ref
+    , "editorial-director" &= editorialDirector ref
+    , "reviewed-author" &= reviewedAuthor ref
+    , "issued" &= issued ref
+    , "event-date" &= eventDate ref
+    , "accessed" &= accessed ref
+    , "container" &= container ref
+    , "original-date" &= originalDate ref
+    , "submitted" &= submitted ref
+    , "title" &= title ref
+    , "title-short" &= titleShort ref
+    , "reviewed-title" &= reviewedTitle ref
+    , "container-title" &= containerTitle ref
+    , "volume-title" &= volumeTitle ref
+    , "collection-title" &= collectionTitle ref
+    , "container-title-short" &= containerTitleShort ref
+    , "collection-number" &= collectionNumber ref
+    , "original-title" &= originalTitle ref
+    , "publisher" &= publisher ref
+    , "original-publisher" &= originalPublisher ref
+    , "publisher-place" &= publisherPlace ref
+    , "original-publisher-place" &= originalPublisherPlace ref
+    , "authority" &= authority ref
+    , "jurisdiction" &= jurisdiction ref
+    , "archive" &= archive ref
+    , "archive-place" &= archivePlace ref
+    , "archive_location" &= archiveLocation ref
+    , "event" &= event ref
+    , "event-place" &= eventPlace ref
+    , "page" &= page ref
+    , "page-first" &= (if page ref == mempty then pageFirst ref else mempty)
+    , "number-of-pages" &= numberOfPages ref
+    , "version" &= version ref
+    , "volume" &= volume ref
+    , "number-of-volumes" &= numberOfVolumes ref
+    , "issue" &= issue ref
+    , "chapter-number" &= chapterNumber ref
+    , "medium" &= medium ref
+    , "status" &= status ref
+    , "edition" &= edition ref
+    , "section" &= section ref
+    , "source" &= source ref
+    , "genre" &= genre ref
+    , "note" &= note ref
+    , "annote" &= annote ref
+    , "abstract" &= abstract ref
+    , "keyword" &= keyword ref
+    , "number" &= number ref
+    , "references" &= references ref
+    , "URL" &= url ref
+    , "DOI" &= doi ref
+    , "ISBN" &= isbn ref
+    , "ISSN" &= issn ref
+    , "PMCID" &= pmcid ref
+    , "PMID" &= pmid ref
+    , "call-number" &= callNumber ref
+    , "dimensions" &= dimensions ref
+    , "scale" &= scale ref
+    , "categories" &= categories ref
+    , "language" &= language ref
+    , if citationNumber ref == CNum 0
+         then id
+         else (("citation-number" Y..= citationNumber ref) :)
+    , if firstReferenceNoteNumber ref == 0
+         then id
+         else (("first-reference-note-number" Y..=
+                firstReferenceNoteNumber ref) :)
+    , "citation-label" &= citationLabel ref
+    ]
+
 emptyReference :: Reference
 emptyReference =
     Reference
