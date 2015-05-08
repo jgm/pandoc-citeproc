@@ -49,26 +49,17 @@ import Data.Monoid
 import Data.Aeson hiding (Value)
 import Data.Aeson.Types (Parser)
 import qualified Data.Yaml.Builder as Y
-import Data.Yaml.Builder (ToYaml(..), YamlBuilder)
+import Data.Yaml.Builder (ToYaml(..))
 import Control.Applicative ((<$>), (<*>), (<|>), pure)
 import qualified Data.Text as T
-import Data.Text (Text)
 import qualified Data.Vector as V
 import Data.Char (toLower, isDigit)
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Util (parseString, parseInt, parseBool, safeRead, readNum,
-                      inlinesToString, capitalize, camelize, uncamelize)
+                      inlinesToString, capitalize, camelize, uncamelize,
+                      (&=), mapping')
 import Text.Pandoc (Inline(Str))
 import Data.String
-
-(&=) :: (ToYaml a, Monoid a, Eq a)
-     => Text -> a -> [(Text, YamlBuilder)] -> [(Text, YamlBuilder)]
-x &= y = \acc -> if y == mempty
-                    then acc
-                    else (x Y..= y) : acc
-
-mapping' :: [[(Text, YamlBuilder)] -> [(Text, YamlBuilder)]] -> YamlBuilder
-mapping' = Y.mapping . foldr ($) []
 
 newtype Literal = Literal { unLiteral :: String }
   deriving ( Show, Read, Eq, Data, Typeable, Monoid, Generic )

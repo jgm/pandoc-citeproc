@@ -40,6 +40,8 @@ module Text.CSL.Util
   , mapHeadInline
   , tr'
   , findFile
+  , (&=)
+  , mapping'
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -58,6 +60,8 @@ import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
                        everywhere', everything, mkT, mkQ )
 import System.FilePath
 import System.Directory (doesFileExist)
+import qualified Data.Yaml.Builder as Y
+import Data.Yaml.Builder (ToYaml(..), YamlBuilder)
 #ifdef TRACE
 import qualified Debug.Trace
 import Text.Show.Pretty (ppShow)
@@ -371,3 +375,11 @@ findFile (p:ps) f = do
      then return $ Just (p </> f)
      else findFile ps f
 
+(&=) :: (ToYaml a, Monoid a, Eq a)
+     => Text -> a -> [(Text, YamlBuilder)] -> [(Text, YamlBuilder)]
+x &= y = \acc -> if y == mempty
+                    then acc
+                    else (x Y..= y) : acc
+
+mapping' :: [[(Text, YamlBuilder)] -> [(Text, YamlBuilder)]] -> YamlBuilder
+mapping' = Y.mapping . foldr ($) []
