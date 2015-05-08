@@ -127,7 +127,7 @@ processCites' (Pandoc meta blocks) = do
                  localizeCSL mbLocale $ parseCSL' raw
   -- set LANG environment from locale; this affects unicode collation
   -- if pandoc-citeproc compiled with unicode_collation flag
-  setEnv "LANG" $ case styleLocale csl of
+  setEnv "LC_ALL" $ case styleLocale csl of
                         (l:_) -> localeLang l
                         _     -> "en-US"
   bibRefs <- getBibRefs $ maybe (MetaList []) id
