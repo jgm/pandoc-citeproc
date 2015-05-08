@@ -21,19 +21,19 @@
 references:
 - id: item1
   type: chapter
-  title: 'Title of the “@inbook” Entry: Subtitle. Titleaddon'
   author:
-  - given: Al
-    family: Author
+  - family: Author
+    given: Al
   issued:
     date-parts:
     - - 2011
-  volume: 4
-  volume-title: ! 'Booktitle: Booksubtitle. Booktitleaddon'
-  container-title: ! 'Maintitle: Mainsubtitle. Maintitleaddon'
+  title: 'Title of the “@inbook” Entry: Subtitle. Titleaddon'
+  container-title: 'Maintitle: Mainsubtitle. Maintitleaddon'
+  volume-title: 'Booktitle: Booksubtitle. Booktitleaddon'
   collection-title: Series
   collection-number: 3
   publisher: Publisher
   publisher-place: Location
+  volume: 4
   language: fr-FR
 ...
