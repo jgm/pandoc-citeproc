@@ -48,8 +48,11 @@ import GHC.Generics (Generic)
 import Data.Monoid
 import Data.Aeson hiding (Value)
 import Data.Aeson.Types (Parser)
+import qualified Data.Yaml.Builder as Y
+import Data.Yaml.Builder (ToYaml(..), YamlBuilder)
 import Control.Applicative ((<$>), (<*>), (<|>), pure)
 import qualified Data.Text as T
+import Data.Text (Text)
 import qualified Data.Vector as V
 import Data.Char (toLower, isDigit)
 import Text.CSL.Style hiding (Number)
@@ -57,6 +60,15 @@ import Text.CSL.Util (parseString, parseInt, parseBool, safeRead, readNum,
                       inlinesToString, capitalize, camelize, uncamelize)
 import Text.Pandoc (Inline(Str))
 import Data.String
+
+(&=) :: (ToYaml a, Monoid a, Eq a)
+     => Text -> a -> [(Text, YamlBuilder)] -> [(Text, YamlBuilder)]
+x &= y = \acc -> if y == mempty
+                    then acc
+                    else (x Y..= y) : acc
+
+mapping' :: [[(Text, YamlBuilder)] -> [(Text, YamlBuilder)]] -> YamlBuilder
+mapping' = Y.mapping . foldr ($) []
 
 newtype Literal = Literal { unLiteral :: String }
   deriving ( Show, Read, Eq, Data, Typeable, Monoid, Generic )
@@ -66,6 +78,9 @@ instance FromJSON Literal where
 
 instance ToJSON Literal where
   toJSON = toJSON . unLiteral
+
+instance ToYaml Literal where
+  toYaml = Y.string . T.pack . unLiteral
 
 instance IsString Literal where
   fromString = Literal
@@ -141,6 +156,15 @@ instance ToJSON RefDate where
     [ "circa" .= circa refdate | circa refdate ]
 -}
 
+instance ToYaml RefDate where
+  toYaml r = mapping' [ "year" &= year r
+                      , "month" &= month r
+                      , "season" &= season r
+                      , "day" &= day r
+                      , "other" &= other r
+                      , "circa" &= T.pack (if circa r then "1" else "")
+                      ]
+
 instance FromJSON [RefDate] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
   parseJSON (Object v) = do
@@ -184,6 +208,16 @@ instance ToJSON [RefDate] where
          dps -> (["date-parts" .= dps ] ++
                  ["circa" .= (1 :: Int) | or (map circa xs)] ++
                  ["season" .= s | s <- map season xs, s /= mempty])
+
+instance ToYaml [RefDate] where
+  toYaml [] = Y.array []
+  toYaml xs = mapping' $
+    case filter (not . null) (map toDatePart xs) of
+         []  -> [ "literal" &= T.pack (intercalate "; " (map (unLiteral . other) xs))]
+         dps -> [ "date-parts" &= dps
+                , "circa" &= T.pack (if any circa xs then "1" else "")
+                , "season" &= filter (/= mempty) (map season xs)
+                ]
 
 -- instance ToJSON [RefDate]
 -- toJSON xs  = Array (V.fromList $ map toJSON xs)
@@ -253,6 +287,9 @@ instance FromJSON RefType where
 instance ToJSON RefType where
   toJSON reftype = toJSON (uncamelize $ show reftype)
 
+instance ToYaml RefType where
+  toYaml r = Y.string (T.pack $ uncamelize $ show r)
+
 newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data, Generic )
 
 instance FromJSON CNum where
@@ -260,6 +297,9 @@ instance FromJSON CNum where
 
 instance ToJSON CNum where
   toJSON (CNum n) = toJSON n
+
+instance ToYaml CNum where
+  toYaml r = Y.string (T.pack $ show $ unCNum r)
 
 -- | The 'Reference' record.
 data Reference =
