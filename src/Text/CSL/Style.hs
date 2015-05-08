@@ -760,7 +760,10 @@ instance FromJSON Agent where
 
 instance ToYaml Agent where
   toYaml ag = mapping' [ "family" &= familyName ag
-                       , "given" &= givenName ag
+                       , case givenName ag of
+                              []    -> id
+                              [x]   -> "given" &= x
+                              xs    -> "given" &= xs
                        , "non-dropping-particle" &= nonDroppingPart ag
                        , "dropping-particle" &= droppingPart ag
                        , "suffix" &= nameSuffix ag
