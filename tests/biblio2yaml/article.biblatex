@@ -110,7 +110,6 @@ references:
   author:
   - suffix: Jr.
     given: Ann A.
-    comma-suffix: false
     family: Author
   accessed:
     date-parts:

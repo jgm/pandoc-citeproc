@@ -28,7 +28,7 @@ references:
     volume and a part field which explicitly refers to the second (physical) part
     of the seventh (logical) volume. Also note the series and number fields
   volume-title: Biographia literaria, or Biographical sketches of my literary life and opinions
-  volume: '7.2'
+  volume: 7.2
   id: coleridge
   issued:
     date-parts:
