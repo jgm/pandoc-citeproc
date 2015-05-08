@@ -97,7 +97,10 @@ import qualified Data.Map as M
 import Data.Char (isPunctuation, isUpper, isLetter)
 import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), query,
                       betterThan, trimr, tailInline, headInline,
-                      initInline, lastInline, splitStrWhen)
+                      initInline, lastInline, splitStrWhen, mapping',
+                      (&=))
+import Data.Yaml.Builder(ToYaml(..))
+import qualified Data.Yaml.Builder as Y
 import Text.Pandoc.Definition hiding (Citation, Cite)
 import Text.Pandoc (readHtml, writeMarkdown, WriterOptions(..),
                     ReaderOptions(..), bottomUp, def)
@@ -187,6 +190,9 @@ instance FromJSON Formatted where
 
 instance ToJSON Formatted where
   toJSON = toJSON . writeCSLString . unFormatted
+
+instance ToYaml Formatted where
+  toYaml = Y.string . T.pack . writeCSLString . unFormatted
 
 instance IsString Formatted where
   fromString = Formatted . toStr
@@ -751,6 +757,21 @@ instance FromJSON Agent where
               v .:? "comma-suffix" .!= False <*>
               v .:? "parse-names" .!= True)
   parseJSON _ = fail "Could not parse Agent"
+
+instance ToYaml Agent where
+  toYaml ag = mapping' [ "family" &= familyName ag
+                       , "given" &= givenName ag
+                       , "non-dropping-particle" &= nonDroppingPart ag
+                       , "dropping-particle" &= droppingPart ag
+                       , "suffix" &= nameSuffix ag
+                       , "literal" &= literal ag
+                       , "comma-suffix" &= T.pack (if commaSuffix ag
+                                                      then "true"
+                                                      else "false")
+                       , "parse-names" &= T.pack (if parseNames ag
+                                                     then "true"
+                                                     else "false")
+                       ]
 
 -- See http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#id28
 nameTransform :: Agent -> Agent
