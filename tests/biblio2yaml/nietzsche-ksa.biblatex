@@ -69,8 +69,8 @@ references:
   author:
   - given: Friedrich
     family: Nietzsche
-  edition: '2'
-  number-of-volumes: '15'
+  edition: 2
+  number-of-volumes: 15
   editor:
   - given: Giorgio
     family: Colli

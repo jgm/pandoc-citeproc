@@ -58,7 +58,7 @@ references:
     family: Baez
   - given: Aaron D.
     family: Lauda
-  version: '3'
+  version: 3
   type: webpage
   language: en-US
   URL: http://arxiv.org/abs/math/0307200v3

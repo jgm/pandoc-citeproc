@@ -55,8 +55,8 @@ references:
     family: Mittelbach
   - given: Alexander
     family: Samarin
-  number-of-pages: '528'
-  edition: '1'
+  number-of-pages: 528
+  edition: 1
   publisher: Addison-Wesley
   type: book
   publisher-place: Reading, Mass.

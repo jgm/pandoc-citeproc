@@ -67,7 +67,7 @@ references:
   author:
   - given: Nissan
     family: Itzhaki
-  version: '1'
+  version: 1
   type: webpage
   abstract: "We discuss the limitations of ’t Hooft’s proposal for the
     black hole S-matrix. We find that the validity of the S-matrix implies violation

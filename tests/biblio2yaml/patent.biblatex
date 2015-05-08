@@ -91,7 +91,7 @@ references:
     family: Kowalik
   - given: M.
     family: Isard
-  number: '9500261'
+  number: 9500261
   type: patent
   language: fr-FR
 - annote: This is a patent entry with a holder field. Note the format of the type
@@ -129,7 +129,7 @@ references:
     family: Braun
   - given: Norbert
     family: Ebner
-  number: '1700367'
+  number: 1700367
   type: patent
   abstract: The invention relates to an electric device comprising a generator, in
     particular for use in the vehicle electric system of a motor vehicle and a controller
@@ -154,7 +154,7 @@ references:
     family: Reinhardt
   - given: Steven A.
     family: Vaughn
-  number: '5668842'
+  number: 5668842
   type: patent
   language: en-US
 ...

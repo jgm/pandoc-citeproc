@@ -36,10 +36,10 @@ references:
   issued:
     date-parts:
     - - 1975
-  volume: '3'
-  chapter-number: '7'
+  volume: 3
+  chapter-number: 7
   page: 100-200
-  number-of-volumes: '4'
+  number-of-volumes: 4
   publisher: Publisher
   publisher-place: Location
 
@@ -52,7 +52,7 @@ references:
     date-parts:
     - - 1970
     - - 1980
-  number-of-volumes: '4'
+  number-of-volumes: 4
   publisher: Publisher
   publisher-place: Location
 ...

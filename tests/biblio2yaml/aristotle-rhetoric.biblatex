@@ -63,7 +63,7 @@ references:
     - - 1877
   author:
   - family: Aristotle
-  number-of-volumes: '3'
+  number-of-volumes: 3
   editor:
   - given: Edward Meredith
     family: Cope

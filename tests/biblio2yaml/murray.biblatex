@@ -54,12 +54,12 @@ references:
 - title-short: Alkanethiolate gold cluster molecules
   annote: An article entry with author authors. By default, long author and editor
     lists are automatically truncated. This is configurable
-  issue: '1'
+  issue: 1
   page: 17-30
   title: ! 'Alkanethiolate gold cluster molecules with core diameters from 1.5 to
     5.2 <span class="nocase">nm</span>: Core and monolayer properties as a function
     of core size'
-  volume: '14'
+  volume: 14
   id: murray
   issued:
     date-parts:

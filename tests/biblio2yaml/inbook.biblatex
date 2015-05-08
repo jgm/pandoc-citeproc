@@ -68,7 +68,7 @@ references:
     author and bookauthor fields are identical"
   page: 1-163
   title: Kritik der praktischen Vernunft
-  volume: '5'
+  volume: 5
   id: kant:kpv
   issued:
     date-parts:
@@ -91,7 +91,7 @@ references:
     not to the entire fifth volume"
   page: 165-485
   title: Kritik der Urtheilskraft
-  volume: '5'
+  volume: 5
   id: kant:ku
   issued:
     date-parts:
@@ -116,7 +116,7 @@ references:
   page: 243-334
   title: "Unzeitgemässe Betrachtungen. Zweites Stück: Vom Nutzen und Nachtheil
     der Historie für das Leben"
-  volume: '1'
+  volume: 1
   id: nietzsche:historie
   issued:
     date-parts:

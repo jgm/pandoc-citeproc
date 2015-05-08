@@ -52,7 +52,7 @@ references:
     baez/online, which is the same item given as an online entry
   page: 423-491
   title: ! 'Higher-dimensional algebra V: 2-groups'
-  volume: '12'
+  volume: 12
   id: baez-article
   issued:
     date-parts:
@@ -62,7 +62,7 @@ references:
     family: Baez
   - given: Aaron D.
     family: Lauda
-  version: '3'
+  version: 3
   container-title: Theory and Applications of Categories
   type: article-journal
   URL: http://arxiv.org/abs/math/0307200v3

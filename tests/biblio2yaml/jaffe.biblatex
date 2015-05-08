@@ -67,8 +67,8 @@ references:
     date-parts:
     - - 1885
     - - 1888
-  edition: '2'
-  number-of-volumes: '2'
+  edition: 2
+  number-of-volumes: 2
   editor:
   - given: Philipp
     family: Jaffé

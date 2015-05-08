@@ -43,7 +43,7 @@ references:
   author:
   - given: Werner
     family: Massa
-  edition: '2'
+  edition: 2
   publisher: Spinger
   type: book
   publisher-place: Berlin

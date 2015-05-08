@@ -43,10 +43,10 @@ NOTES:
 ---
 references:
 - annote: "A reprint of Moore’s law. Note the related and relatedtype fields"
-  issue: '1'
+  issue: 1
   page: 82-85
   title: Cramming more components onto integrated circuits
-  volume: '86'
+  volume: 86
   id: moore:related
   issued:
     date-parts:

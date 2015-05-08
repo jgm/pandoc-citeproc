@@ -67,8 +67,8 @@ references:
   issued:
     date-parts:
     - - 2003
-  edition: '15'
-  number-of-volumes: '32'
+  edition: 15
+  number-of-volumes: 32
   editor:
   - given: Warren E.
     family: Preece

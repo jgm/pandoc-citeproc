@@ -37,12 +37,12 @@ Nested crossreferences (see biber manual v 1.7)
 ---
 references:
 
-- chapter-number: '7'
+- chapter-number: 7
   page: 100-200
   title: Macbeth [title field of bookinbook-1]
   volume-title: Tragedies [title field of book-1]
   container-title: Collected works [title field of mvbook-1]
-  volume: '3'
+  volume: 3
   id: bookinbook-1
   issued:
     date-parts:
@@ -51,7 +51,7 @@ references:
   - family: Shakespeare
   container-author:
   - family: Shakespeare
-  number-of-volumes: '4'
+  number-of-volumes: 4
   publisher: Publisher
   type: chapter
   publisher-place: Location
@@ -63,14 +63,14 @@ references:
   - family: Shakespeare
   container-author:
   - family: Shakespeare
-  volume: '3'
-  chapter-number: '7'
+  volume: 3
+  chapter-number: 7
   page: 100-200
   id: inbook-1
   issued:
     date-parts:
     - - 1975
-  number-of-volumes: '4'
+  number-of-volumes: 4
   publisher: Publisher
   type: chapter
   publisher-place: Location
@@ -81,12 +81,12 @@ references:
   - family: Shakespeare
   container-author:
   - family: Shakespeare
-  volume: '3'
+  volume: 3
   id: book-1
   issued:
     date-parts:
     - - 1975
-  number-of-volumes: '4'
+  number-of-volumes: 4
   publisher: Publisher
   type: book
   publisher-place: Location
@@ -99,7 +99,7 @@ references:
     date-parts:
     - - 1970
     - - 1980
-  number-of-volumes: '4'
+  number-of-volumes: 4
   publisher: Publisher
   type: book
   publisher-place: Location
