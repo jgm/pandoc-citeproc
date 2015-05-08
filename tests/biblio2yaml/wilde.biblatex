@@ -42,18 +42,18 @@ NOTES:
 
 ---
 references:
-- title-short: The importance of being earnest
-  annote: A book with eprint and eprinttype fields.
-  title: ! 'The importance of being earnest: A trivial comedy for serious people'
-  id: wilde
+- id: wilde
+  type: book
+  author:
+  - family: Wilde
+    given: Oscar
   issued:
     date-parts:
     - - 1899
-  author:
-  - given: Oscar
-    family: Wilde
-  publisher: Leonard Smithers and Company
+  title: 'The importance of being earnest: A trivial comedy for serious people'
+  title-short: The importance of being earnest
   collection-title: English and american drama of the nineteenth century
-  type: book
+  publisher: Leonard Smithers and Company
+  annote: A book with eprint and eprinttype fields.
   URL: http://books.google.com?id=4HIWAAAAYAAJ
 ...

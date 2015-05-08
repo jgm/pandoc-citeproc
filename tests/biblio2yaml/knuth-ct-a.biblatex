@@ -50,23 +50,23 @@ NOTES:
 
 ---
 references:
-- annote: "The first volume of a five-volume book. Note the sorttitle and sortyear
-    fields. We want this volume to be listed after the entry referring to the entire
-    five-volume set. Also note the indextitle and indexsorttitle fields. Indexing
-    packages that don’t generate robust index entries require some control sequences
-    to be protected from expansion"
-  volume-title: The TeX book
-  volume: A
-  id: knuth:ct:a
+- id: knuth:ct:a
+  type: book
+  author:
+  - family: Knuth
+    given: Donald E.
   issued:
     date-parts:
     - - 1984
-  author:
-  - given: Donald E.
-    family: Knuth
   title: Computers & typesetting
+  volume-title: The TeX book
   publisher: Addison-Wesley
-  type: book
   publisher-place: Reading, Mass.
+  volume: A
+  annote: The first volume of a five-volume book. Note the sorttitle and sortyear
+    fields. We want this volume to be listed after the entry referring to the entire
+    five-volume set. Also note the indextitle and indexsorttitle fields. Indexing
+    packages that don’t generate robust index entries require some control sequences
+    to be protected from expansion
   language: en-US
 ...

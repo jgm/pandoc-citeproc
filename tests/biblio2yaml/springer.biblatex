@@ -35,19 +35,19 @@ Springer, O. (1950). Mediaeval pilgrim routes from Scandinavia to Rome.
 
 ---
 references:
-- title-short: Mediaeval pilgrim routes
-  annote: A plain article entry
-  page: 92-122
-  title: Mediaeval pilgrim routes from Scandinavia to Rome
-  volume: 12
-  id: springer
+- id: springer
+  type: article-journal
+  author:
+  - family: Springer
+    given: Otto
   issued:
     date-parts:
     - - 1950
-  author:
-  - given: Otto
-    family: Springer
+  title: Mediaeval pilgrim routes from Scandinavia to Rome
+  title-short: Mediaeval pilgrim routes
   container-title: Mediaeval Studies
-  type: article-journal
+  page: 92-122
+  volume: 12
+  annote: A plain article entry
   language: en-GB
 ...

@@ -53,27 +53,27 @@ NOTES:
 
 ---
 references:
-- title-short: Drei Abhandlungen
-  annote: A book entry. Note the concatenation of the editor and translator fields
-    as well as the indextitle and indexsorttitle fields
-  keyword: primary
-  title: "Drei Abhandlungen über die Conjunction des separaten Intellects mit
-    dem Menschen: Von Averroes (Vater und Sohn), aus dem Arabischen übersetzt von
-    Samuel Ibn Tibbon"
-  id: averroes-hercz
-  issued:
-    date-parts:
-    - - 1869
+- id: averroes-hercz
+  type: book
   author:
   - family: Averroes
   editor:
-  - given: J.
-    family: Hercz
+  - family: Hercz
+    given: J.
   translator:
-  - given: J.
-    family: Hercz
-  publisher: "S. Hermann"
-  type: book
+  - family: Hercz
+    given: J.
+  issued:
+    date-parts:
+    - - 1869
+  title: 'Drei Abhandlungen über die Conjunction des separaten Intellects mit dem
+    Menschen: Von Averroes (Vater und Sohn), aus dem Arabischen übersetzt von Samuel
+    Ibn Tibbon'
+  title-short: Drei Abhandlungen
+  publisher: S. Hermann
   publisher-place: Berlin
+  annote: A book entry. Note the concatenation of the editor and translator fields
+    as well as the indextitle and indexsorttitle fields
+  keyword: primary
   language: de-DE
 ...

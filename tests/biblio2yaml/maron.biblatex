@@ -43,23 +43,23 @@ NOTES:
 
 ---
 references:
-- title-short: Animal triste
-  annote: ! 'An English translation of a German novel with a French title. In other
-    words: a book entry with a translator field. Note the origlanguage field which
-    is concatenated with the translator'
-  title: Animal triste
-  id: maron
+- id: maron
+  type: book
+  author:
+  - family: Maron
+    given: Monika
+  translator:
+  - family: Goldstein
+    given: Brigitte
   issued:
     date-parts:
     - - 2000
-  author:
-  - given: Monika
-    family: Maron
-  translator:
-  - given: Brigitte
-    family: Goldstein
+  title: Animal triste
+  title-short: Animal triste
   publisher: University of Nebraska Press
-  type: book
   publisher-place: Lincoln
+  annote: 'An English translation of a German novel with a French title. In other
+    words: a book entry with a translator field. Note the origlanguage field which
+    is concatenated with the translator'
   language: en-US
 ...

@@ -41,24 +41,24 @@ l’utilisant. French patent request.
 
 ---
 references:
-- annote: This is a patent entry for a French patent request with a full date. The
-    number is given in the number field. Note the format of the type and date fields
-    in the database file. Compare almendro, laufenberg, and sorace
-  genre: French patent request
-  title: "Estimateur d’un défaut de fonctionnement d’un modulateur
-    en quadrature et étage de modulation l’utilisant"
-  id: kowalik
+- id: kowalik
+  type: patent
+  author:
+  - family: Kowalik
+    given: F.
+  - family: Isard
+    given: M.
   issued:
     date-parts:
     - - 1995
       - 1
       - 11
-  author:
-  - given: F.
-    family: Kowalik
-  - given: M.
-    family: Isard
+  title: Estimateur d’un défaut de fonctionnement d’un modulateur en quadrature et
+    étage de modulation l’utilisant
+  genre: French patent request
+  annote: This is a patent entry for a French patent request with a full date. The
+    number is given in the number field. Note the format of the type and date fields
+    in the database file. Compare almendro, laufenberg, and sorace
   number: 9500261
-  type: patent
   language: fr-FR
 ...

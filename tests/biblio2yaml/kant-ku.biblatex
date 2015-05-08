@@ -51,26 +51,26 @@ NOTES:
 
 ---
 references:
-- annote: "An edition of Kant’s *Collected Works*, volume five. This is
-    an inbook entry which explicitly refers to the *Critique of Judgment* only,
-    not to the entire fifth volume"
-  page: 165-485
-  title: Kritik der Urtheilskraft
-  volume: 5
-  id: kant:ku
+- id: kant:ku
+  type: chapter
+  author:
+  - family: Kant
+    given: Immanuel
+  container-author:
+  - family: Kant
+    given: Immanuel
   issued:
     date-parts:
     - - 1968
-  author:
-  - given: Immanuel
-    family: Kant
+  title: Kritik der Urtheilskraft
   container-title: Kants Werke. Akademie Textausgabe
-  container-author:
-  - given: Immanuel
-    family: Kant
-  publisher: Walter de Gruyter
-  type: chapter
-  publisher-place: Berlin
   volume-title: Kritik der praktischen Vernunft. Kritik der Urtheilskraft
+  publisher: Walter de Gruyter
+  publisher-place: Berlin
+  page: 165-485
+  volume: 5
+  annote: An edition of Kant’s *Collected Works*, volume five. This is an inbook entry
+    which explicitly refers to the *Critique of Judgment* only, not to the entire
+    fifth volume
   language: de-DE
 ...

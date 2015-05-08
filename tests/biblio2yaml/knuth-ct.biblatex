@@ -43,20 +43,20 @@ NOTES:
 
 ---
 references:
-- annote: A five-volume book cited as a whole. This is a book entry, note the volumes
-    field
-  title: Computers & typesetting
-  id: knuth:ct
+- id: knuth:ct
+  type: book
+  author:
+  - family: Knuth
+    given: Donald E.
   issued:
     date-parts:
     - - 1984
     - - 1986
-  author:
-  - given: Donald E.
-    family: Knuth
-  number-of-volumes: 5
+  title: Computers & typesetting
   publisher: Addison-Wesley
-  type: book
   publisher-place: Reading, Mass.
+  number-of-volumes: 5
+  annote: A five-volume book cited as a whole. This is a book entry, note the volumes
+    field
   language: en-US
 ...

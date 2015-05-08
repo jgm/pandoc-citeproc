@@ -38,31 +38,31 @@ CSL “container-title-short” could also be set
 }
 ---
 references:
-- title-short: The shorttitle
-  title: "The title: With a colon in the “title” field: And a subtitle,
-    in two separate fields; plus a separate “shorttitle” field"
-  id: item4
+- id: item4
   type: book
-- title-short: The title
-  title: "The title: With a colon in the “title” field: And a subtitle,
-    in two separate fields"
-  id: item3
+  title: 'The title: With a colon in the “title” field: And a subtitle, in two separate
+    fields; plus a separate “shorttitle” field'
+  title-short: The shorttitle
+- id: item3
   type: book
-- title: ! 'The title: The subtitle, in two separate fields'
+  title: 'The title: With a colon in the “title” field: And a subtitle, in two separate
+    fields'
   title-short: The title
-  id: item2
+- id: item2
   type: book
-- title-short: The title
-  title: "The title: And the subtitle, all in the “title” field"
-  id: item1
+  title: 'The title: The subtitle, in two separate fields'
+  title-short: The title
+- id: item1
   type: book
-- title-short: The inbook title
-  title: "The inbook title: And the subtitle, all in the “title” field"
-  id: item5
-  container-title: "The title: And the subtitle, all in the “title” field"
+  title: 'The title: And the subtitle, all in the “title” field'
+  title-short: The title
+- id: item5
   type: chapter
-- title-short: The shorttitle
-  title: "The title: And the subtitle, all in the “title” field"
-  id: item6
+  title: 'The inbook title: And the subtitle, all in the “title” field'
+  title-short: The inbook title
+  container-title: 'The title: And the subtitle, all in the “title” field'
+- id: item6
   type: book
+  title: 'The title: And the subtitle, all in the “title” field'
+  title-short: The shorttitle
 ...

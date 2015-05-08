@@ -36,19 +36,19 @@ Durham; London: Duke University Press.
 
 ---
 references:
-- title-short: City of suspects
-  annote: This is a book entry. Note the format of the location field in the database
-    file
-  title: "City of suspects: Crime in Mexico City, 1900–1931"
-  id: piccato
+- id: piccato
+  type: book
+  author:
+  - family: Piccato
+    given: Pablo
   issued:
     date-parts:
     - - 2001
-  author:
-  - given: Pablo
-    family: Piccato
+  title: 'City of suspects: Crime in Mexico City, 1900–1931'
+  title-short: City of suspects
   publisher: Duke University Press
-  type: book
   publisher-place: Durham; London
+  annote: This is a book entry. Note the format of the location field in the database
+    file
   language: en-US
 ...

@@ -30,25 +30,25 @@ discarded, even if options contains url=false.
 
 ---
 references:
-- title: Title, any entry type except online
-  id: item1
-  issued:
-    date-parts:
-    - - 2012
-  author:
-  - given: Andy
-    family: Author
-  container-title: Journal
+- id: item1
   type: article-journal
-- title: Title, entry type online
-  id: item2
+  author:
+  - family: Author
+    given: Andy
   issued:
     date-parts:
     - - 2012
-  author:
-  - given: Andy
-    family: Author
+  title: Title, any entry type except online
   container-title: Journal
+- id: item2
   type: webpage
+  author:
+  - family: Author
+    given: Andy
+  issued:
+    date-parts:
+    - - 2012
+  title: Title, entry type online
+  container-title: Journal
   URL: http://foo.bar
 ...

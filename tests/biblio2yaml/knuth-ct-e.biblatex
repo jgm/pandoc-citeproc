@@ -42,20 +42,20 @@ NOTES:
 
 ---
 references:
-- annote: The fifth volume of a five-volume book. Note the sorttitle and sortyear
-    fields
-  volume-title: Computer modern typefaces
-  volume: E
-  id: knuth:ct:e
+- id: knuth:ct:e
+  type: book
+  author:
+  - family: Knuth
+    given: Donald E.
   issued:
     date-parts:
     - - 1986
-  author:
-  - given: Donald E.
-    family: Knuth
   title: Computers & typesetting
+  volume-title: Computer modern typefaces
   publisher: Addison-Wesley
-  type: book
   publisher-place: Reading, Mass.
+  volume: E
+  annote: The fifth volume of a five-volume book. Note the sorttitle and sortyear
+    fields
   language: en-US
 ...

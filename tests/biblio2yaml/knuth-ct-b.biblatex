@@ -45,21 +45,21 @@ NOTES:
 
 ---
 references:
-- annote: The second volume of a five-volume book. Note the sorttitle and sortyear
-    fields. Also note the indexsorttitle field
-  volume-title: 'TeX: The program'
-  volume: B
-  title-short: TeX
-  id: knuth:ct:b
+- id: knuth:ct:b
+  type: book
+  author:
+  - family: Knuth
+    given: Donald E.
   issued:
     date-parts:
     - - 1986
-  author:
-  - given: Donald E.
-    family: Knuth
   title: Computers & typesetting
+  title-short: TeX
+  volume-title: 'TeX: The program'
   publisher: Addison-Wesley
-  type: book
   publisher-place: Reading, Mass.
+  volume: B
+  annote: The second volume of a five-volume book. Note the sorttitle and sortyear
+    fields. Also note the indexsorttitle field
   language: en-US
 ...

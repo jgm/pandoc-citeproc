@@ -48,26 +48,26 @@ America Press.
 
 ---
 references:
-- title-short: "Aristotle’s theory of the intellect"
-  annote: An incollection entry with a series and number field
-  keyword: secondary
-  page: 161-191
-  title: "Aristotle’s theory of the intellect and its interpretation by Averroes"
-  id: hyman
+- id: hyman
+  type: chapter
+  author:
+  - family: Hyman
+    given: Arthur
+  editor:
+  - family: O’Meara
+    given: Dominic J.
   issued:
     date-parts:
     - - 1981
-  author:
-  - given: Arthur
-    family: Hyman
+  title: Aristotle’s theory of the intellect and its interpretation by Averroes
+  title-short: Aristotle’s theory of the intellect
   container-title: Studies in Aristotle
-  editor:
-  - given: Dominic J.
-    family: "O’Meara"
-  publisher: The Catholic University of America Press
   collection-title: Studies in philosophy and the history of philosophy
-  type: chapter
-  publisher-place: Washington, D.C.
   collection-number: 9
+  publisher: The Catholic University of America Press
+  publisher-place: Washington, D.C.
+  page: 161-191
+  annote: An incollection entry with a series and number field
+  keyword: secondary
   language: en-US
 ...

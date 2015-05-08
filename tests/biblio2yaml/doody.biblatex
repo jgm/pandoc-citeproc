@@ -63,36 +63,36 @@ NOTES
 
 ---
 references:
-- annote: An article entry cited as an excerpt from a collection entry. Note the format
-    of the related and relatedstring fields
-  issue: 3
-  page: 212-225
-  title: "Hemingway’s style and Jake’s narration"
-  volume: 4
-  id: doody
+- id: doody
+  type: article-journal
+  author:
+  - family: Doody
+    given: Terrence
   issued:
     date-parts:
     - - 1974
-  author:
-  - given: Terrence
-    family: Doody
+  title: Hemingway’s style and Jake’s narration
   container-title: The Journal of Narrative Technique
-  type: article-journal
+  page: 212-225
+  volume: 4
+  issue: 3
+  annote: An article entry cited as an excerpt from a collection entry. Note the format
+    of the related and relatedstring fields
   language: en-US
-- annote: A collection entry providing the excerpt information for the doody entry.
-    Note the format of the pages field
-  page: 204-208
-  title: Contemporary literary criticism
-  volume: 61
-  id: matuz:doody
+- id: matuz:doody
+  type: book
+  editor:
+  - family: Matuz
+    given: Roger
   issued:
     date-parts:
     - - 1990
-  editor:
-  - given: Roger
-    family: Matuz
+  title: Contemporary literary criticism
   publisher: Gale
-  type: book
   publisher-place: Detroit
+  page: 204-208
+  volume: 61
+  annote: A collection entry providing the excerpt information for the doody entry.
+    Note the format of the pages field
   language: en-US
 ...

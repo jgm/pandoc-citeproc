@@ -34,18 +34,18 @@ Spinger.
 
 ---
 references:
-- annote: A book entry with an edition field
-  title: Crystal structure determination
-  id: massa
+- id: massa
+  type: book
+  author:
+  - family: Massa
+    given: Werner
   issued:
     date-parts:
     - - 2004
-  author:
-  - given: Werner
-    family: Massa
-  edition: 2
+  title: Crystal structure determination
   publisher: Spinger
-  type: book
   publisher-place: Berlin
+  edition: 2
+  annote: A book entry with an edition field
   language: en-GB
 ...

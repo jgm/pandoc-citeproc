@@ -53,108 +53,108 @@ TODO: Is there a CSL counterpart for the biblatex field "holder"?}
 
 ---
 references:
-- annote: This is a patent entry with a location field. The number is given in the
-    number field. Note the format of the location field in the database file. Compare
-    laufenberg, sorace, and kowalik
-  title: Elektromagnetisches Signalhorn
-  id: almendro
+- id: almendro
+  type: patent
+  author:
+  - family: Almendro
+    given: José L.
+  - family: Martín
+    given: Jacinto
+  - family: Sánchez
+    given: Alberto
+  - family: Nozal
+    given: Fernando
   issued:
     date-parts:
     - - 1998
-  author:
-  - given: José L.
-    family: Almendro
-  - given: Jacinto
-    family: Martín
-  - given: Alberto
-    family: Sánchez
-  - given: Fernando
-    family: Nozal
-  number: EU-29702195U
-  type: patent
+  title: Elektromagnetisches Signalhorn
   jurisdiction: France; United Kingdom; Germany
+  annote: This is a patent entry with a location field. The number is given in the
+    number field. Note the format of the location field in the database file. Compare
+    laufenberg, sorace, and kowalik
+  number: EU-29702195U
   language: de-DE
-- annote: This is a patent entry for a French patent request with a full date. The
-    number is given in the number field. Note the format of the type and date fields
-    in the database file. Compare almendro, laufenberg, and sorace
-  genre: French patent request
-  title: "Estimateur d’un défaut de fonctionnement d’un modulateur
-    en quadrature et étage de modulation l’utilisant"
-  id: kowalik
+- id: kowalik
+  type: patent
+  author:
+  - family: Kowalik
+    given: F.
+  - family: Isard
+    given: M.
   issued:
     date-parts:
     - - 1995
       - 1
       - 11
-  author:
-  - given: F.
-    family: Kowalik
-  - given: M.
-    family: Isard
+  title: Estimateur d’un défaut de fonctionnement d’un modulateur en quadrature et
+    étage de modulation l’utilisant
+  genre: French patent request
+  annote: This is a patent entry for a French patent request with a full date. The
+    number is given in the number field. Note the format of the type and date fields
+    in the database file. Compare almendro, laufenberg, and sorace
   number: 9500261
-  type: patent
   language: fr-FR
-- annote: This is a patent entry with a holder field. Note the format of the type
-    and location fields in the database file. Compare almendro, sorace, and kowalik
-  genre: European patent
-  title: Elektrische Einrichtung und Betriebsverfahren
-  id: laufenberg
+- id: laufenberg
+  type: patent
+  author:
+  - family: Laufenberg
+    given: Xaver
+  - family: Eynius
+    given: Dominique
+  - family: Suelzle
+    given: Helmut
+  - family: Usbeck
+    given: Stephan
+  - family: Spaeth
+    given: Matthias
+  - family: Neuser-Hoffmann
+    given: Miriam
+  - family: Myrzik
+    given: Christian
+  - family: Schmid
+    given: Manfred
+  - family: Nietfeld
+    given: Franz
+  - family: Thiel
+    given: Alexander
+  - family: Braun
+    given: Harald
+  - family: Ebner
+    given: Norbert
   issued:
     date-parts:
     - - 2006
       - 9
       - 13
-  author:
-  - given: Xaver
-    family: Laufenberg
-  - given: Dominique
-    family: Eynius
-  - given: Helmut
-    family: Suelzle
-  - given: Stephan
-    family: Usbeck
-  - given: Matthias
-    family: Spaeth
-  - given: Miriam
-    family: Neuser-Hoffmann
-  - given: Christian
-    family: Myrzik
-  - given: Manfred
-    family: Schmid
-  - given: Franz
-    family: Nietfeld
-  - given: Alexander
-    family: Thiel
-  - given: Harald
-    family: Braun
-  - given: Norbert
-    family: Ebner
-  number: 1700367
-  type: patent
+  title: Elektrische Einrichtung und Betriebsverfahren
+  genre: European patent
+  annote: This is a patent entry with a holder field. Note the format of the type
+    and location fields in the database file. Compare almendro, sorace, and kowalik
   abstract: The invention relates to an electric device comprising a generator, in
     particular for use in the vehicle electric system of a motor vehicle and a controller
     for controlling the generator voltage. The device is equipped with a control zone,
     in which the voltage is controlled and zones, in which the torque is controlled.
     The invention also relates to methods for operating a device of this type.
+  number: 1700367
   language: de-DE
-- annote: This is a patent entry with a holder field. Note the format of the type
-    and date fields in the database file. Compare almendro, laufenberg, and kowalik
-  genre: U.S. patent
-  title: High-speed digital-to-RF converter
-  id: sorace
+- id: sorace
+  type: patent
+  author:
+  - family: Sorace
+    given: Ronald E.
+  - family: Reinhardt
+    given: Victor S.
+  - family: Vaughn
+    given: Steven A.
   issued:
     date-parts:
     - - 1997
       - 9
       - 16
-  author:
-  - given: Ronald E.
-    family: Sorace
-  - given: Victor S.
-    family: Reinhardt
-  - given: Steven A.
-    family: Vaughn
+  title: High-speed digital-to-RF converter
+  genre: U.S. patent
+  annote: This is a patent entry with a holder field. Note the format of the type
+    and date fields in the database file. Compare almendro, laufenberg, and kowalik
   number: 5668842
-  type: patent
   language: en-US
 ...

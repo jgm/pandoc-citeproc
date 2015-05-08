@@ -40,22 +40,22 @@ maps on Riemann surfaces. *J. Amer. Math. Soc.*, *9*(2), 529–571.
 
 ---
 references:
-- title-short: Gromov invariants
-  annote: An article entry with a volume and a number field
-  issue: 2
-  page: 529-571
-  title: Gromov invariants for holomorphic maps on Riemann surfaces
-  volume: 9
-  id: bertram
+- id: bertram
+  type: article-journal
+  author:
+  - family: Bertram
+    given: Aaron
+  - family: Wentworth
+    given: Richard
   issued:
     date-parts:
     - - 1996
-  author:
-  - given: Aaron
-    family: Bertram
-  - given: Richard
-    family: Wentworth
-  container-title: "J. Amer. Math. Soc."
-  type: article-journal
+  title: Gromov invariants for holomorphic maps on Riemann surfaces
+  title-short: Gromov invariants
+  container-title: J. Amer. Math. Soc.
+  page: 529-571
+  volume: 9
+  issue: 2
+  annote: An article entry with a volume and a number field
   language: en-US
 ...

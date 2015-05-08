@@ -79,55 +79,54 @@ wouldn't fit all styles or locales.
 
 ---
 references:
-- title: An article entry with just the required fields
-  id: article-req
+- id: article-req
+  type: article-journal
+  author:
+  - family: Author
+    given: Ann
   issued:
     date-parts:
     - - 2013
-      - 07
+      - 7
       - 29
-  author:
-  - given: Ann
-    family: Author
+  title: An article entry with just the required fields
   container-title: The Journaltitle
-  type: article-journal
   language: en-US
-- ISSN: issn
-  status: in press
-  issue: number, issue
-  page: pages
-  note: The Note. The Addendum
-  title: ! 'An article entry with the required and all optional fields: The subtitle.
-    The titleaddon'
-  title-short: An article entry with the required and all optional fields
-  volume: volume
-  id: article-opt
+- id: article-opt
+  type: article-journal
+  author:
+  - family: Author
+    given: Ann A.
+    suffix: Jr.
+  editor:
+  - family: Editor
+    given: Edward
+  translator:
+  - family: Translator
+    given: Ted
   issued:
     date-parts:
     - - 2008
       - 12
       - 31
-  author:
-  - suffix: Jr.
-    given: Ann A.
-    family: Author
   accessed:
     date-parts:
     - - 2013
-      - 07
+      - 7
       - 29
-  version: version
-  container-title: ! 'The Journaltitle: The Journalsubtitle'
-  editor:
-  - given: Edward
-    family: Editor
-  translator:
-  - given: Ted
-    family: Translator
-  URL: http://foo.bar.baz/
-  type: article-journal
+  title: 'An article entry with the required and all optional fields: The subtitle.
+    The titleaddon'
+  title-short: An article entry with the required and all optional fields
+  container-title: 'The Journaltitle: The Journalsubtitle'
   collection-title: new series
+  page: pages
+  version: version
+  volume: volume
+  issue: number, issue
+  status: in press
+  note: The Note. The Addendum
+  URL: http://foo.bar.baz/
   DOI: 10.1086/520976
+  ISSN: issn
   language: en-US
 ...
-

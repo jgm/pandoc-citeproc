@@ -55,29 +55,29 @@ NOTES:
 
 ---
 references:
-- annote: "The critical edition of Nietzsche’s works. This is a book entry
-    referring to a 15-volume work as a whole. Note the volumes field and the format
-    of the publisher and location fields in the database file. Also note the sorttitle
-    and sortyear fields which are used to fine-tune the sorting order of the bibliography.
-    We want this item listed first in the bibliography"
-  title: "Sämtliche Werke: Kritische Studienausgabe"
-  title-short: Sämtliche Werke
-  id: nietzsche:ksa
+- id: nietzsche:ksa
+  type: book
+  author:
+  - family: Nietzsche
+    given: Friedrich
+  editor:
+  - family: Colli
+    given: Giorgio
+  - family: Montinari
+    given: Mazzino
   issued:
     date-parts:
     - - 1988
-  author:
-  - given: Friedrich
-    family: Nietzsche
-  edition: 2
-  number-of-volumes: 15
-  editor:
-  - given: Giorgio
-    family: Colli
-  - given: Mazzino
-    family: Montinari
+  title: 'Sämtliche Werke: Kritische Studienausgabe'
+  title-short: Sämtliche Werke
   publisher: Deutscher Taschenbuch-Verlag; Walter de Gruyter
-  type: book
-  publisher-place: "München; Berlin; New York"
+  publisher-place: München; Berlin; New York
+  number-of-volumes: 15
+  edition: 2
+  annote: The critical edition of Nietzsche’s works. This is a book entry referring
+    to a 15-volume work as a whole. Note the volumes field and the format of the publisher
+    and location fields in the database file. Also note the sorttitle and sortyear
+    fields which are used to fine-tune the sorting order of the bibliography. We want
+    this item listed first in the bibliography
   language: de-DE
 ...

@@ -55,29 +55,29 @@ NOTES:
 
 ---
 references:
-- annote: "An edition of Kant’s *Collected Works*, volume five. This is
-    an inbook entry which explicitly refers to the *Critique of Practical Reason*
-    only, not to the entire fifth volume. Note the author and bookauthor fields in
-    the database file. By default, the bookauthor is omitted if the values of the
-    author and bookauthor fields are identical"
-  page: 1-163
-  title: Kritik der praktischen Vernunft
-  volume: 5
-  id: kant:kpv
+- id: kant:kpv
+  type: chapter
+  author:
+  - family: Kant
+    given: Immanuel
+  container-author:
+  - family: Kant
+    given: Immanuel
   issued:
     date-parts:
     - - 1968
-  author:
-  - given: Immanuel
-    family: Kant
-  container-title: Kants Werke. Akademie Textausgabe
+  title: Kritik der praktischen Vernunft
   title-short: Kritik der praktischen Vernunft
-  container-author:
-  - given: Immanuel
-    family: Kant
-  publisher: Walter de Gruyter
-  type: chapter
-  publisher-place: Berlin
+  container-title: Kants Werke. Akademie Textausgabe
   volume-title: Kritik der praktischen Vernunft. Kritik der Urtheilskraft
+  publisher: Walter de Gruyter
+  publisher-place: Berlin
+  page: 1-163
+  volume: 5
+  annote: An edition of Kant’s *Collected Works*, volume five. This is an inbook entry
+    which explicitly refers to the *Critique of Practical Reason* only, not to the
+    entire fifth volume. Note the author and bookauthor fields in the database file.
+    By default, the bookauthor is omitted if the values of the author and bookauthor
+    fields are identical
   language: de-DE
 ...

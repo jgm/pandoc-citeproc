@@ -53,27 +53,27 @@ NOTES:
 
 ---
 references:
-- title-short: "Über die Möglichkeit der Conjunktion"
+- id: averroes-hannes
+  type: book
+  author:
+  - family: Averroes
+  editor:
+  - family: Hannes
+    given: Ludwig
+  translator:
+  - family: Hannes
+    given: Ludwig
+  issued:
+    date-parts:
+    - - 1892
+  title: 'Des Averroës Abhandlung: “Über die Möglichkeit der Conjunktion” oder “Über
+    den materiellen Intellekt”'
+  title-short: Über die Möglichkeit der Conjunktion
+  publisher: C. A. Kaemmerer
+  publisher-place: Halle an der Saale
   annote: An annotated edition. Note the concatenation of the editor, translator,
     and annotator fields. Also note the shorttitle, indextitle, sorttitle, and indexsorttitle
     fields
   keyword: primary
-  title: "Des Averroës Abhandlung: “Über die Möglichkeit der Conjunktion”
-    oder “Über den materiellen Intellekt”"
-  id: averroes-hannes
-  issued:
-    date-parts:
-    - - 1892
-  author:
-  - family: Averroes
-  editor:
-  - given: Ludwig
-    family: Hannes
-  translator:
-  - given: Ludwig
-    family: Hannes
-  publisher: "C. A. Kaemmerer"
-  type: book
-  publisher-place: Halle an der Saale
   language: de-DE
 ...

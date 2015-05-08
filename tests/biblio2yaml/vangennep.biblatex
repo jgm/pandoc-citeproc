@@ -37,20 +37,20 @@ van Gennep, A. (1909). *Les rites de passage*. Paris: Nourry.
 
 ---
 references:
-- title-short: Rites de passage
-  annote: A book entry. Note the format of the printed name and compare the useprefix
-    option in the options field as well as brandt and geer
-  title: Les rites de passage
-  id: vangennep
+- id: vangennep
+  type: book
+  author:
+  - family: Gennep
+    given: Arnold
+    non-dropping-particle: van
   issued:
     date-parts:
     - - 1909
-  author:
-  - given: Arnold
-    family: Gennep
-    non-dropping-particle: van
+  title: Les rites de passage
+  title-short: Rites de passage
   publisher: Nourry
-  type: book
   publisher-place: Paris
+  annote: A book entry. Note the format of the printed name and compare the useprefix
+    option in the options field as well as brandt and geer
   language: fr-FR
 ...

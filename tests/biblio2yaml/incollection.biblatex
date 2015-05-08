@@ -54,72 +54,73 @@
 
 ---
 references:
-- title-short: Die nordischen Länder
-  annote: An incollection entry with a series and a number. Note the format of the
-    printed name and compare the useprefix option in the options field as well as
-    vangennep. Also note the indextitle, and indexsorttitle fields
-  page: 884-917
-  title: "Die nordischen Länder von der Mitte des 11. Jahrhunderts bis 1448"
-  id: brandt
+- id: brandt
+  type: chapter
+  author:
+  - family: Brandt
+    given: Ahasver
+    dropping-particle: von
+  - family: Hoffmann
+    given: Erich
+  editor:
+  - family: Seibt
+    given: Ferdinand
   issued:
     date-parts:
     - - 1987
-  author:
-  - given: Ahasver
-    dropping-particle: von
-    family: Brandt
-  - given: Erich
-    family: Hoffmann
-  container-title: "Europa im Hoch- und Spätmittelalter"
-  editor:
-  - given: Ferdinand
-    family: Seibt
-  publisher: Klett-Cotta
-  collection-title: "Handbuch der europäischen Geschichte"
-  type: chapter
-  publisher-place: Stuttgart
+  title: Die nordischen Länder von der Mitte des 11. Jahrhunderts bis 1448
+  title-short: Die nordischen Länder
+  container-title: Europa im Hoch- und Spätmittelalter
+  collection-title: Handbuch der europäischen Geschichte
   collection-number: 2
+  publisher: Klett-Cotta
+  publisher-place: Stuttgart
+  page: 884-917
+  annote: An incollection entry with a series and a number. Note the format of the
+    printed name and compare the useprefix option in the options field as well as
+    vangennep. Also note the indextitle, and indexsorttitle fields
   language: de-DE
-- title-short: "Aristotle’s theory of the intellect"
-  annote: An incollection entry with a series and number field
-  keyword: secondary
-  page: 161-191
-  title: "Aristotle’s theory of the intellect and its interpretation by Averroes"
-  id: hyman
+- id: hyman
+  type: chapter
+  author:
+  - family: Hyman
+    given: Arthur
+  editor:
+  - family: O’Meara
+    given: Dominic J.
   issued:
     date-parts:
     - - 1981
-  author:
-  - given: Arthur
-    family: Hyman
+  title: Aristotle’s theory of the intellect and its interpretation by Averroes
+  title-short: Aristotle’s theory of the intellect
   container-title: Studies in Aristotle
-  editor:
-  - given: Dominic J.
-    family: "O’Meara"
-  publisher: The Catholic University of America Press
   collection-title: Studies in philosophy and the history of philosophy
-  type: chapter
-  publisher-place: Washington, D.C.
   collection-number: 9
-  language: en-US
-- title-short: Limitations of human knowledge
-  annote: A typical incollection entry. Note the indextitle field
+  publisher: The Catholic University of America Press
+  publisher-place: Washington, D.C.
+  page: 161-191
+  annote: An incollection entry with a series and number field
   keyword: secondary
-  page: 82-109
-  title: 'The limitations of human knowledge according to Al-Farabi, <span class="nocase">ibn Bajja</span>, and Maimonides'
-  id: pines
+  language: en-US
+- id: pines
+  type: chapter
+  author:
+  - family: Pines
+    given: Shlomo
+  editor:
+  - family: Twersky
+    given: Isadore
   issued:
     date-parts:
     - - 1979
-  author:
-  - given: Shlomo
-    family: Pines
+  title: The limitations of human knowledge according to Al-Farabi, <span class="nocase">ibn
+    Bajja</span>, and Maimonides
+  title-short: Limitations of human knowledge
   container-title: Studies in medieval Jewish history and literature
-  editor:
-  - given: Isadore
-    family: Twersky
   publisher: Harvard University Press
-  type: chapter
   publisher-place: Cambridge, Mass.
+  page: 82-109
+  annote: A typical incollection entry. Note the indextitle field
+  keyword: secondary
   language: en-US
 ...

@@ -20,24 +20,24 @@
 
 ---
 references:
-- title: ! 'Title of the “inbook” Entry: Subtitle. Titleaddon'
-  volume: 4
-  id: item1
+- id: item1
+  type: chapter
+  author:
+  - family: Author
+    given: Al
+  container-author:
+  - family: Bookauthor
+    given: Bob
   issued:
     date-parts:
     - - 2011
-  author:
-  - given: Al
-    family: Author
-  container-title: ! 'Maintitle: Mainsubtitle. Maintitleaddon'
-  container-author:
-  - given: Bob
-    family: Bookauthor
-  publisher: Publisher
+  title: 'Title of the “inbook” Entry: Subtitle. Titleaddon'
+  container-title: 'Maintitle: Mainsubtitle. Maintitleaddon'
+  volume-title: 'Booktitle: Booksubtitle. Booktitleaddon'
   collection-title: Series
-  type: chapter
-  publisher-place: Location
   collection-number: 3
-  volume-title: ! 'Booktitle: Booksubtitle. Booktitleaddon'
+  publisher: Publisher
+  publisher-place: Location
+  volume: 4
   language: fr-FR
 ...

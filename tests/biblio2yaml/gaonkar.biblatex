@@ -36,19 +36,19 @@ Duke University Press.
 
 ---
 references:
-- annote: This is a collection entry. Note the format of the location field in the
-    database file as well as the isbn field
-  title: Alternative modernities
-  id: gaonkar
+- id: gaonkar
+  type: book
+  editor:
+  - family: Gaonkar
+    given: Dilip Parameshwar
   issued:
     date-parts:
     - - 2001
-  editor:
-  - given: Dilip Parameshwar
-    family: Gaonkar
+  title: Alternative modernities
   publisher: Duke University Press
-  ISBN: 0-822-32714-7
-  type: book
   publisher-place: Durham; London
+  annote: This is a collection entry. Note the format of the location field in the
+    database file as well as the isbn field
+  ISBN: 0-822-32714-7
   language: en-US
 ...

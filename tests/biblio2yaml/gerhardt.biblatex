@@ -40,19 +40,19 @@ Press.
 
 ---
 references:
-- title-short: Federal appointments process
-  annote: This is a book entry. Note the format of the location field as well as the
-    sorttitle and indextitle fields
-  title: ! 'The federal appointments process: A constitutional and historical analysis'
-  id: gerhardt
+- id: gerhardt
+  type: book
+  author:
+  - family: Gerhardt
+    given: Michael J.
   issued:
     date-parts:
     - - 2000
-  author:
-  - given: Michael J.
-    family: Gerhardt
+  title: 'The federal appointments process: A constitutional and historical analysis'
+  title-short: Federal appointments process
   publisher: Duke University Press
-  type: book
   publisher-place: Durham; London
+  annote: This is a book entry. Note the format of the location field as well as the
+    sorttitle and indextitle fields
   language: en-US
 ...

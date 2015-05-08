@@ -32,16 +32,16 @@ Wiley & Sons.
 
 ---
 references:
-- title: Information theory and statistics
-  id: kullback
+- id: kullback
+  type: book
+  author:
+  - family: Kullback
+    given: Solomon
   issued:
     date-parts:
     - - 1959
-  author:
-  - given: Solomon
-    family: Kullback
+  title: Information theory and statistics
   publisher: John Wiley & Sons
-  type: book
   publisher-place: New York
   language: en-US
 ...

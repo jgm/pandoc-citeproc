@@ -46,25 +46,25 @@ NOTES:
 
 ---
 references:
-- title-short: Peregrinaciones
-  annote: A multivolume book cited as a whole. This is a book entry with volumes,
-    note, sorttitle, and indextitle fields
-  note: "Ed. facs. de la realizada en 1948–49"
-  title: Las Peregrinaciones a Santiago de Compostela
-  id: vazques-de-parga
+- id: vazques-de-parga
+  type: book
+  author:
+  - family: Vázques de Parga
+    given: Luis
+  - family: Lacarra
+    given: José María
+  - family: Uría Ríu
+    given: Juan
   issued:
     date-parts:
     - - 1993
-  author:
-  - given: Luis
-    family: Vázques de Parga
-  - given: José María
-    family: Lacarra
-  - given: Juan
-    family: Uría Ríu
-  number-of-volumes: 3
+  title: Las Peregrinaciones a Santiago de Compostela
+  title-short: Peregrinaciones
   publisher: Iberdrola
-  type: book
   publisher-place: Pamplona
+  number-of-volumes: 3
+  note: Ed. facs. de la realizada en 1948–49
+  annote: A multivolume book cited as a whole. This is a book entry with volumes,
+    note, sorttitle, and indextitle fields
   language: es-ES
 ...

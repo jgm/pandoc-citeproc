@@ -34,18 +34,18 @@ chemist*. New York: Marcel Dekker.
 
 ---
 references:
-- title-short: Heterogeneous catalysis
-  annote: A plain book entry
-  title: Heterogeneous catalysis for the synthetic chemist
-  id: augustine
+- id: augustine
+  type: book
+  author:
+  - family: Augustine
+    given: Robert L.
   issued:
     date-parts:
     - - 1995
-  author:
-  - given: Robert L.
-    family: Augustine
+  title: Heterogeneous catalysis for the synthetic chemist
+  title-short: Heterogeneous catalysis
   publisher: Marcel Dekker
-  type: book
   publisher-place: New York
+  annote: A plain book entry
   language: en-US
 ...

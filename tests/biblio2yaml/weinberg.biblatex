@@ -32,16 +32,16 @@ Weinberg, S. (1967). A model of leptons. *Phys. Rev. Lett.*, *19*,
 
 ---
 references:
-- page: 1264-1266
-  title: A model of leptons
-  volume: 19
-  id: weinberg
+- id: weinberg
+  type: article-journal
+  author:
+  - family: Weinberg
+    given: Steven
   issued:
     date-parts:
     - - 1967
-  author:
-  - given: Steven
-    family: Weinberg
-  container-title: "Phys. Rev. Lett."
-  type: article-journal
+  title: A model of leptons
+  container-title: Phys. Rev. Lett.
+  page: 1264-1266
+  volume: 19
 ...

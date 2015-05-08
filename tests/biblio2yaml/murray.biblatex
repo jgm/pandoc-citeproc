@@ -51,49 +51,49 @@ properties as a function of core size. *Langmuir*, *14*(1), 17–30.
 
 ---
 references:
-- title-short: Alkanethiolate gold cluster molecules
-  annote: An article entry with author authors. By default, long author and editor
-    lists are automatically truncated. This is configurable
-  issue: 1
-  page: 17-30
-  title: ! 'Alkanethiolate gold cluster molecules with core diameters from 1.5 to
-    5.2 <span class="nocase">nm</span>: Core and monolayer properties as a function
-    of core size'
-  volume: 14
-  id: murray
+- id: murray
+  type: article-journal
+  author:
+  - family: Hostetler
+    given: Michael J.
+  - family: Wingate
+    given: Julia E.
+  - family: Zhong
+    given: Chuan-Jian
+  - family: Harris
+    given: Jay E.
+  - family: Vachet
+    given: Richard W.
+  - family: Clark
+    given: Michael R.
+  - family: Londono
+    given: J. David
+  - family: Green
+    given: Stephen J.
+  - family: Stokes
+    given: Jennifer J.
+  - family: Wignall
+    given: George D.
+  - family: Glish
+    given: Gary L.
+  - family: Porter
+    given: Marc D.
+  - family: Evans
+    given: Neal D.
+  - family: Murray
+    given: Royce W.
   issued:
     date-parts:
     - - 1998
-  author:
-  - given: Michael J.
-    family: Hostetler
-  - given: Julia E.
-    family: Wingate
-  - given: Chuan-Jian
-    family: Zhong
-  - given: Jay E.
-    family: Harris
-  - given: Richard W.
-    family: Vachet
-  - given: Michael R.
-    family: Clark
-  - given: J. David
-    family: Londono
-  - given: Stephen J.
-    family: Green
-  - given: Jennifer J.
-    family: Stokes
-  - given: George D.
-    family: Wignall
-  - given: Gary L.
-    family: Glish
-  - given: Marc D.
-    family: Porter
-  - given: Neal D.
-    family: Evans
-  - given: Royce W.
-    family: Murray
+  title: 'Alkanethiolate gold cluster molecules with core diameters from 1.5 to
+    5.2 <span class="nocase">nm</span>: Core and monolayer properties as a function
+    of core size'
+  title-short: Alkanethiolate gold cluster molecules
   container-title: Langmuir
-  type: article-journal
+  page: 17-30
+  volume: 14
+  issue: 1
+  annote: An article entry with author authors. By default, long author and editor
+    lists are automatically truncated. This is configurable
   language: en-US
 ...

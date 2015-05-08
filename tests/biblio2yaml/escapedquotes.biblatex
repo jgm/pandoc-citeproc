@@ -15,7 +15,8 @@
 
 ---
 references:
-- container-title: Journal of digital imaging
+- id: Koff2009-gn
+  type: article-journal
   author:
   - family: Koff
     given: David
@@ -37,8 +38,7 @@ references:
     given: Harry
   - family: Volkening
     given: Andrew
-  id: Koff2009-gn
   title: Pan-canadian evaluation of irreversible compression ratios ("lossy" compression)
     for development of national guidelines
-  type: article-journal
+  container-title: Journal of digital imaging
 ...

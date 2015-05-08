@@ -42,23 +42,23 @@ Uppsala Universitet, Uppsala.
 
 ---
 references:
-- annote: This is a typical thesis entry for a PhD thesis. Note the type field in
-    the database file which uses a localization key. Also note the format of the printed
-    name and compare the useprefix option in the options field as well as vangennep
-  genre: PhD thesis
-  title: "Earl, saint, bishop, skald – and music: The Orkney earldom of the
-    twelfth century. A musicological study"
-  title-short: Earl, saint, bishop, skald – and music
-  id: geer
+- id: geer
+  type: thesis
+  author:
+  - family: Geer
+    given: Ingrid
+    dropping-particle: de
   issued:
     date-parts:
     - - 1985
-  author:
-  - given: Ingrid
-    dropping-particle: de
-    family: Geer
+  title: 'Earl, saint, bishop, skald – and music: The Orkney earldom of the twelfth
+    century. A musicological study'
+  title-short: Earl, saint, bishop, skald – and music
   publisher: Uppsala Universitet
-  type: thesis
   publisher-place: Uppsala
+  genre: PhD thesis
+  annote: This is a typical thesis entry for a PhD thesis. Note the type field in
+    the database file which uses a localization key. Also note the format of the printed
+    name and compare the useprefix option in the options field as well as vangennep
   language: en-GB
 ...

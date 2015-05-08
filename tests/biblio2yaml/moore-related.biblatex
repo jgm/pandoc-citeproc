@@ -42,19 +42,19 @@ NOTES:
 
 ---
 references:
-- annote: "A reprint of Moore’s law. Note the related and relatedtype fields"
-  issue: 1
-  page: 82-85
-  title: Cramming more components onto integrated circuits
-  volume: 86
-  id: moore:related
+- id: moore:related
+  type: article-journal
+  author:
+  - family: Moore
+    given: Gordon E.
   issued:
     date-parts:
     - - 1998
-  author:
-  - given: Gordon E.
-    family: Moore
+  title: Cramming more components onto integrated circuits
   container-title: Proceedings of the IEEE
-  type: article-journal
+  page: 82-85
+  volume: 86
+  issue: 1
+  annote: A reprint of Moore’s law. Note the related and relatedtype fields
   language: en-US
 ...

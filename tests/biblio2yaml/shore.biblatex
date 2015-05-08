@@ -40,22 +40,22 @@ cultural cognition. *American Anthropologist, new series*, *93*(1),
 
 ---
 references:
-- annote: An article entry with series, volume, and number fields. Note the format
-    of the series which is a localization key
-  issue: 1
-  page: 9-27
-  title: ! 'Twice-born, once conceived: Meaning construction and cultural cognition'
-  title-short: Twice-born, once conceived
-  volume: 93
-  id: shore
+- id: shore
+  type: article-journal
+  author:
+  - family: Shore
+    given: Bradd
   issued:
     date-parts:
     - - 1991
       - 3
-  author:
-  - given: Bradd
-    family: Shore
+  title: 'Twice-born, once conceived: Meaning construction and cultural cognition'
+  title-short: Twice-born, once conceived
   container-title: American Anthropologist
-  type: article-journal
   collection-title: new series
+  page: 9-27
+  volume: 93
+  issue: 1
+  annote: An article entry with series, volume, and number fields. Note the format
+    of the series which is a localization key
 ...

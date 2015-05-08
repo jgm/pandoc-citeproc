@@ -38,22 +38,22 @@ for automatic capturing of the font outlines. *Computers and Graphics*,
 
 ---
 references:
-- title-short: Technical section
-  annote: An article entry with an issn field
-  ISSN: 0097-8493
-  issue: 5
-  page: 795-804
-  title: ! 'Technical section: An algorithm for automatic capturing of the font outlines'
-  volume: 26
-  id: sarfraz
+- id: sarfraz
+  type: article-journal
+  author:
+  - family: Sarfraz
+    given: M.
+  - family: Razzak
+    given: M. F. A.
   issued:
     date-parts:
     - - 2002
-  author:
-  - given: M.
-    family: Sarfraz
-  - given: M. F. A.
-    family: Razzak
+  title: 'Technical section: An algorithm for automatic capturing of the font outlines'
+  title-short: Technical section
   container-title: Computers and Graphics
-  type: article-journal
+  page: 795-804
+  volume: 26
+  issue: 5
+  annote: An article entry with an issn field
+  ISSN: 0097-8493
 ...

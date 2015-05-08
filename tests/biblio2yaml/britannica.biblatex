@@ -56,24 +56,24 @@ NOTES:
 
 ---
 references:
-- title-short: "Encyclopædia Britannica"
-  annote: "This is a collection entry for an encyclopedia. Note the useeditor option
-    in the options field as well as the sorttitle field. We want this entry to be
-    cited and alphabetized by title even though there is an editor. In addition to
-    that, we want the title to be alphabetized under “E” rather than “T”.
-    Also note the label field which is provided for author-year citation styles"
-  title: "The new encyclopædia Britannica"
-  id: britannica
+- id: britannica
+  type: book
+  editor:
+  - family: Preece
+    given: Warren E.
   issued:
     date-parts:
     - - 2003
-  edition: 15
-  number-of-volumes: 32
-  editor:
-  - given: Warren E.
-    family: Preece
-  publisher: "Encyclopædia Britannica"
-  type: book
+  title: The new encyclopædia Britannica
+  title-short: Encyclopædia Britannica
+  publisher: Encyclopædia Britannica
   publisher-place: Chicago, Ill.
+  number-of-volumes: 32
+  edition: 15
+  annote: This is a collection entry for an encyclopedia. Note the useeditor option
+    in the options field as well as the sorttitle field. We want this entry to be
+    cited and alphabetized by title even though there is an editor. In addition to
+    that, we want the title to be alphabetized under “E” rather than “T”. Also note
+    the label field which is provided for author-year citation styles
   language: en-GB
 ...

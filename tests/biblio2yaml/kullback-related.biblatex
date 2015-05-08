@@ -40,18 +40,18 @@ NOTES:
 
 ---
 references:
-- annote: A reprint of the kullback entry. Note the format of the related and relatedtype
-    fields
-  title: Information theory and statistics
-  id: kullback:related
+- id: kullback:related
+  type: book
+  author:
+  - family: Kullback
+    given: Solomon
   issued:
     date-parts:
     - - 1997
-  author:
-  - given: Solomon
-    family: Kullback
+  title: Information theory and statistics
   publisher: Dover Publications
-  type: book
   publisher-place: New York
+  annote: A reprint of the kullback entry. Note the format of the related and relatedtype
+    fields
   language: en-US
 ...

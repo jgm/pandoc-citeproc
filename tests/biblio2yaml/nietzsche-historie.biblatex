@@ -60,36 +60,36 @@ Walter de Gruyter.
 
 ---
 references:
-- title-short: Vom Nutzen und Nachtheil der Historie
-  annote: "A single essay from the critical edition of Nietzsche’s works. This
-    inbook entry explicitly refers to an essay found in the first volume. Note the
-    title, booktitle, and maintitle fields. Also note the sorttitle and sortyear fields.
-    We want this entry to be listed after the entry referring to the entire first
-    volume"
-  page: 243-334
-  title: "Unzeitgemässe Betrachtungen. Zweites Stück: Vom Nutzen und Nachtheil
-    der Historie für das Leben"
-  volume: 1
-  id: nietzsche:historie
+- id: nietzsche:historie
+  type: chapter
+  author:
+  - family: Nietzsche
+    given: Friedrich
+  editor:
+  - family: Colli
+    given: Giorgio
+  - family: Montinari
+    given: Mazzino
+  container-author:
+  - family: Nietzsche
+    given: Friedrich
   issued:
     date-parts:
     - - 1988
-  author:
-  - given: Friedrich
-    family: Nietzsche
-  container-title: "Sämtliche Werke: Kritische Studienausgabe"
-  container-author:
-  - given: Friedrich
-    family: Nietzsche
-  editor:
-  - given: Giorgio
-    family: Colli
-  - given: Mazzino
-    family: Montinari
+  title: 'Unzeitgemässe Betrachtungen. Zweites Stück: Vom Nutzen und Nachtheil der
+    Historie für das Leben'
+  title-short: Vom Nutzen und Nachtheil der Historie
+  container-title: 'Sämtliche Werke: Kritische Studienausgabe'
+  volume-title: Die Geburt der Tragödie. Unzeitgemäße Betrachtungen I–IV. Nachgelassene
+    Schriften 1870–1973
   publisher: Deutscher Taschenbuch-Verlag; Walter de Gruyter
-  type: chapter
-  publisher-place: "München; Berlin; New York"
-  volume-title: "Die Geburt der Tragödie. Unzeitgemäße Betrachtungen I–IV.
-    Nachgelassene Schriften 1870–1973"
+  publisher-place: München; Berlin; New York
+  page: 243-334
+  volume: 1
+  annote: A single essay from the critical edition of Nietzsche’s works. This inbook
+    entry explicitly refers to an essay found in the first volume. Note the title,
+    booktitle, and maintitle fields. Also note the sorttitle and sortyear fields.
+    We want this entry to be listed after the entry referring to the entire first
+    volume
   language: de-DE
 ...

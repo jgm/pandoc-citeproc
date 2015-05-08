@@ -45,20 +45,20 @@ NOTES:
 
 ---
 references:
-- title-short: Rites de passage
-  annote: A variant of the vangennep entry related to its translation. Note the format
-    of the related and relatedtype fields
-  title: Les rites de passage
-  id: vangennep:related
+- id: vangennep:related
+  type: book
+  author:
+  - family: Gennep
+    given: Arnold
+    non-dropping-particle: van
   issued:
     date-parts:
     - - 1909
-  author:
-  - given: Arnold
-    family: Gennep
-    non-dropping-particle: van
+  title: Les rites de passage
+  title-short: Rites de passage
   publisher: Nourry
-  type: book
   publisher-place: Paris
+  annote: A variant of the vangennep entry related to its translation. Note the format
+    of the related and relatedtype fields
   language: fr-FR
 ...

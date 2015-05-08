@@ -39,25 +39,25 @@ Cotton, F. A., Wilkinson, G., Murillio, C. A., & Bochmann, M. (1999).
 
 ---
 references:
-- annote: A book entry with author authors and an edition field. By default, long
-    author and editor lists are automatically truncated. This is configurable
-  title: Advanced inorganic chemistry
-  id: cotton
+- id: cotton
+  type: book
+  author:
+  - family: Cotton
+    given: Frank Albert
+  - family: Wilkinson
+    given: Geoffrey
+  - family: Murillio
+    given: Carlos A.
+  - family: Bochmann
+    given: Manfred
   issued:
     date-parts:
     - - 1999
-  author:
-  - given: Frank Albert
-    family: Cotton
-  - given: Geoffrey
-    family: Wilkinson
-  - given: Carlos A.
-    family: Murillio
-  - given: Manfred
-    family: Bochmann
-  edition: 6
+  title: Advanced inorganic chemistry
   publisher: Wiley
-  type: book
   publisher-place: Chichester
+  edition: 6
+  annote: A book entry with author authors and an edition field. By default, long
+    author and editor lists are automatically truncated. This is configurable
   language: en-GB
 ...

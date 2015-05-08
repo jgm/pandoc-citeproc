@@ -42,19 +42,19 @@ NOTES:
 }
 ---
 references:
-- annote: This is a typical thesis entry for an MA thesis. Note the type field in
-    the database file which uses a localization key
-  genre: "Master’s thesis"
-  title: High-resolution micromachined interferometric accelerometer
-  id: loh
+- id: loh
+  type: thesis
+  author:
+  - family: Loh
+    given: Nin C.
   issued:
     date-parts:
     - - 1992
-  author:
-  - given: Nin C.
-    family: Loh
+  title: High-resolution micromachined interferometric accelerometer
   publisher: Massachusetts Institute of Technology
-  type: thesis
   publisher-place: Cambridge, Mass.
+  genre: Master’s thesis
+  annote: This is a typical thesis entry for an MA thesis. Note the type field in
+    the database file which uses a localization key
   language: en-US
 ...

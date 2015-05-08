@@ -36,23 +36,23 @@ Trans.). New York: G. P. Putnam.
 
 ---
 references:
-- title-short: Physics
-  annote: A book entry with a translator field
-  keyword: primary
-  title: Physics
-  id: aristotle:physics
-  issued:
-    date-parts:
-    - - 1929
+- id: aristotle:physics
+  type: book
   author:
   - family: Aristotle
   translator:
-  - given: P. H.
-    family: Wicksteed
-  - given: F. M.
-    family: Cornford
+  - family: Wicksteed
+    given: P. H.
+  - family: Cornford
+    given: F. M.
+  issued:
+    date-parts:
+    - - 1929
+  title: Physics
+  title-short: Physics
   publisher: G. P. Putnam
-  type: book
   publisher-place: New York
+  annote: A book entry with a translator field
+  keyword: primary
   language: en-US
 ...

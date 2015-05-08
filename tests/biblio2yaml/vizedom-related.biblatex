@@ -44,20 +44,20 @@ NOTES:
 
 ---
 references:
-- title-short: Rites of passage
-  annote: A translated work from vangennep. Note the format of the related and relatedtype
-    fields
-  title: The rites of passage
-  id: vizedom:related
+- id: vizedom:related
+  type: book
+  translator:
+  - family: Vizedom
+    given: Monika B.
+  - family: Caffee
+    given: Gabrielle L.
   issued:
     date-parts:
     - - 1960
-  translator:
-  - given: Monika B.
-    family: Vizedom
-  - given: Gabrielle L.
-    family: Caffee
+  title: The rites of passage
+  title-short: Rites of passage
   publisher: University of Chicago Press
-  type: book
+  annote: A translated work from vangennep. Note the format of the related and relatedtype
+    fields
   language: en-US
 ...

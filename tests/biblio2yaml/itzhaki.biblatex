@@ -53,27 +53,27 @@ NOTES:
 
 ---
 references:
-- annote: An online reference from arXiv. Note the eprint and eprinttype fields. Also
-    note that the arXiv reference is transformed into a clickable link if hyperref
-    support has been enabled
-  title: "Some remarks on ’<span class=\"nocase\">t Hooft’s</span> S-matrix
-    for black holes"
-  id: itzhaki
+- id: itzhaki
+  type: webpage
+  author:
+  - family: Itzhaki
+    given: Nissan
   issued:
     date-parts:
     - - 1996
       - 3
       - 11
-  author:
-  - given: Nissan
-    family: Itzhaki
+  title: Some remarks on ’<span class="nocase">t Hooft’s</span> S-matrix for black
+    holes
   version: 1
-  type: webpage
-  abstract: "We discuss the limitations of ’t Hooft’s proposal for the
-    black hole S-matrix. We find that the validity of the S-matrix implies violation
-    of the semi-classical approximation at scales large compared to the Planck scale.
-    We also show that the effect of the centrifugal barrier on the S-matrix is crucial
-    even for large transverse distances."
-  language: en-US
+  annote: An online reference from arXiv. Note the eprint and eprinttype fields. Also
+    note that the arXiv reference is transformed into a clickable link if hyperref
+    support has been enabled
+  abstract: We discuss the limitations of ’t Hooft’s proposal for the black hole S-matrix.
+    We find that the validity of the S-matrix implies violation of the semi-classical
+    approximation at scales large compared to the Planck scale. We also show that
+    the effect of the centrifugal barrier on the S-matrix is crucial even for large
+    transverse distances.
   URL: http://arxiv.org/abs/hep-th/9603067
+  language: en-US
 ...

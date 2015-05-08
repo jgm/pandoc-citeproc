@@ -19,15 +19,15 @@
 
 ---
 references:
-- title: ! 'Title of the “@inbook” Entry: Subtitle. Titleaddon'
-  id: item1
+- id: item1
   type: chapter
-  issued:
-    date-parts:
-    - - 2011
+  title: 'Title of the “@inbook” Entry: Subtitle. Titleaddon'
   author:
   - given: Al
     family: Author
+  issued:
+    date-parts:
+    - - 2011
   volume: 4
   volume-title: ! 'Booktitle: Booksubtitle. Booktitleaddon'
   container-title: ! 'Maintitle: Mainsubtitle. Maintitleaddon'

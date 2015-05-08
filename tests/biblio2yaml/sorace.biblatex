@@ -38,24 +38,24 @@ High-speed digital-to-RF converter. U.S. patent.
 
 ---
 references:
-- annote: This is a patent entry with a holder field. Note the format of the type
-    and date fields in the database file. Compare almendro, laufenberg, and kowalik
-  genre: U.S. patent
-  title: High-speed digital-to-RF converter
-  id: sorace
+- id: sorace
+  type: patent
+  author:
+  - family: Sorace
+    given: Ronald E.
+  - family: Reinhardt
+    given: Victor S.
+  - family: Vaughn
+    given: Steven A.
   issued:
     date-parts:
     - - 1997
       - 9
       - 16
-  author:
-  - given: Ronald E.
-    family: Sorace
-  - given: Victor S.
-    family: Reinhardt
-  - given: Steven A.
-    family: Vaughn
+  title: High-speed digital-to-RF converter
+  genre: U.S. patent
+  annote: This is a patent entry with a holder field. Note the format of the type
+    and date fields in the database file. Compare almendro, laufenberg, and kowalik
   number: 5668842
-  type: patent
   language: en-US
 ...

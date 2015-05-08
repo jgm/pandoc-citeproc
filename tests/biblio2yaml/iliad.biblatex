@@ -41,23 +41,23 @@ Düsseldorf; Zürich: Artemis & Winkler.
 
 ---
 references:
-- title-short: Ilias
-  annote: A German translation of the *Iliad*. Note the translator and introduction
-    fields and the format of the location field in the database file. Also note the
-    sorttitle and indextitle fields
-  title: Die Ilias
-  id: iliad
+- id: iliad
+  type: book
+  author:
+  - family: Homer
+  translator:
+  - family: Schadewaldt
+    given: Wolfgang
   issued:
     date-parts:
     - - 2004
-  author:
-  - family: Homer
-  edition: 3
-  translator:
-  - given: Wolfgang
-    family: Schadewaldt
+  title: Die Ilias
+  title-short: Ilias
   publisher: Artemis & Winkler
-  type: book
   publisher-place: Düsseldorf; Zürich
+  edition: 3
+  annote: A German translation of the *Iliad*. Note the translator and introduction
+    fields and the format of the location field in the database file. Also note the
+    sorttitle and indextitle fields
   language: de-DE
 ...

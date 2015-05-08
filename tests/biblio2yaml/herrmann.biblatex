@@ -40,26 +40,25 @@ C–C coupling reactions. *Angew. Chem. Int. Ed.*, *45*(23), 3859–3862.
 
 ---
 references:
-- issue: 23
-  page: 3859-3862
-  title: "A carbocyclic carbene as an efficient catalyst ligand for C–C coupling
-    reactions"
-  volume: 45
-  id: herrmann
+- id: herrmann
+  type: article-journal
+  author:
+  - family: Herrmann
+    given: Wolfgang A.
+  - family: Öfele
+    given: Karl
+  - family: Schneider
+    given: Sabine K.
+  - family: Herdtweck
+    given: Eberhardt
+  - family: Hoffmann
+    given: Stephan D.
   issued:
     date-parts:
     - - 2006
-  author:
-  - given: Wolfgang A.
-    family: Herrmann
-  - given: Karl
-    family: Öfele
-  - given: Sabine K.
-    family: Schneider
-  - given: Eberhardt
-    family: Herdtweck
-  - given: Stephan D.
-    family: Hoffmann
-  container-title: "Angew. Chem. Int. Ed."
-  type: article-journal
+  title: A carbocyclic carbene as an efficient catalyst ligand for C–C coupling reactions
+  container-title: Angew. Chem. Int. Ed.
+  page: 3859-3862
+  volume: 45
+  issue: 23
 ...

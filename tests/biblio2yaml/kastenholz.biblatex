@@ -77,23 +77,24 @@ NOTES:
 
 ---
 references:
-- annote: An article entry with an eid and a doi field. Note that the <span style="font-variant:small-caps;">doi</span>
-    is transformed into a clickable link if hyperref support has been enabled
-  title: ! 'Computation of methodology-independent ionic solvation free energies from
-    molecular simulations: I. The electrostatic potential in molecular liquids'
-  title-short: Computation of methodology-independent ionic solvation free energies from molecular simulations
-  volume: 124
-  id: kastenholz
+- id: kastenholz
+  type: article-journal
+  author:
+  - family: Kastenholz
+    given: M. A.
+  - family: Hünenberger
+    given: Philippe H.
   issued:
     date-parts:
     - - 2006
-  author:
-  - given: M. A.
-    family: Kastenholz
-  - given: Philippe H.
-    family: Hünenberger
-  container-title: "J. Chem. Phys."
-  type: article-journal
+  title: 'Computation of methodology-independent ionic solvation free energies from
+    molecular simulations: I. The electrostatic potential in molecular liquids'
+  title-short: Computation of methodology-independent ionic solvation free energies
+    from molecular simulations
+  container-title: J. Chem. Phys.
+  volume: 124
+  annote: An article entry with an eid and a doi field. Note that the <span style="font-variant:small-caps;">doi</span>
+    is transformed into a clickable link if hyperref support has been enabled
   abstract: The computation of ionic solvation free energies from atomistic simulations
     is a surprisingly difficult problem that has found no satisfactory solution for
     more than 15 years. The reason is that the charging free energies evaluated from

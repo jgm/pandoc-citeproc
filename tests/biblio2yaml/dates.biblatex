@@ -78,30 +78,40 @@
 
 ---
 references:
-- author:
+- id: year-month-old
+  type: article-journal
+  author:
   - family: Author
     given: Al
+  issued:
+    date-parts:
+    - - 1999
+      - 8
   title: Year and month, bibtex style, supported by biblatex for backwards compatibility
-  id: year-month-old
-  issued:
-    date-parts:
-    - - 1999
-      - 8
-  type: article-journal
   container-title: Journal
-- author:
+- id: year-month-new
+  type: article-journal
+  author:
   - family: Author
     given: Al
-  title: "Year and month, biblatex style; note that biblatex does not have a “day”
-    field"
-  id: year-month-new
   issued:
     date-parts:
     - - 1999
       - 8
-  type: article-journal
+  title: Year and month, biblatex style; note that biblatex does not have a “day”
+    field
   container-title: Journal
-- event-date:
+- id: dates
+  type: article-journal
+  author:
+  - family: Author
+    given: Al
+  issued:
+    date-parts:
+    - - 2012
+      - 12
+      - 13
+  event-date:
     date-parts:
     - - 2011
       - 10
@@ -111,24 +121,27 @@ references:
     - - 1999
       - 5
       - 23
-  author:
-  - family: Author
-    given: Al
   original-date:
     date-parts:
     - - 1888
       - 10
       - 1
   title: Dates, default biblatex style; year, month to be ignored if date exists
-  id: dates
+  container-title: Journal
+- id: date-ranges-different-years
+  type: article-journal
+  author:
+  - family: Author
+    given: Al
   issued:
     date-parts:
-    - - 2012
-      - 12
-      - 13
-  type: article-journal
-  container-title: Journal
-- event-date:
+    - - 1999
+      - 10
+      - 14
+    - - 2010
+      - 1
+      - 23
+  event-date:
     date-parts:
     - - 1999
       - 12
@@ -142,9 +155,6 @@ references:
     - - 2013
       - 1
       - 31
-  author:
-  - family: Author
-    given: Al
   original-date:
     date-parts:
     - - 1888
@@ -154,18 +164,21 @@ references:
       - 12
       - 13
   title: Date ranges; different years
-  id: date-ranges-different-years
+  container-title: Journal
+- id: date-ranges-same-year
+  type: article-journal
+  author:
+  - family: Author
+    given: Al
   issued:
     date-parts:
     - - 1999
       - 10
       - 14
-    - - 2010
-      - 1
-      - 23
-  type: article-journal
-  container-title: Journal
-- event-date:
+    - - 1999
+      - 10
+      - 15
+  event-date:
     date-parts:
     - - 1999
       - 10
@@ -179,9 +192,6 @@ references:
     - - 2012
       - 11
       - 1
-  author:
-  - family: Author
-    given: Al
   original-date:
     date-parts:
     - - 1888
@@ -191,18 +201,18 @@ references:
       - 12
       - 13
   title: Date ranges; same year
-  id: date-ranges-same-year
+  container-title: Journal
+- id: date-ranges-open
+  type: article-journal
+  author:
+  - family: Author
+    given: Al
   issued:
     date-parts:
     - - 1999
       - 10
       - 14
-    - - 1999
-      - 10
-      - 15
-  type: article-journal
-  container-title: Journal
-- event-date:
+  event-date:
     date-parts:
     - - 1999
       - 10
@@ -211,24 +221,24 @@ references:
     - - 2012
       - 10
       - 31
-  author:
-  - family: Author
-    given: Al
   original-date:
     date-parts:
     - - 1888
       - 1
       - 2
   title: Date ranges, open-ended
-  id: date-ranges-open
+  container-title: Journal
+- id: dates-very-old
+  type: article-journal
+  author:
+  - family: Author
+    given: Al
   issued:
     date-parts:
-    - - 1999
-      - 10
-      - 14
-  type: article-journal
-  container-title: Journal
-- event-date:
+    - - 712
+      - 12
+      - 13
+  event-date:
     date-parts:
     - - 311
       - 10
@@ -238,21 +248,11 @@ references:
     - - 999
       - 12
       - 14
-  author:
-  - family: Author
-    given: Al
   original-date:
     date-parts:
     - - 88
       - 10
       - 1
   title: Dates, year less than 1000
-  id: dates-very-old
-  issued:
-    date-parts:
-    - - 712
-      - 12
-      - 13
-  type: article-journal
   container-title: Journal
 ...

@@ -42,8 +42,17 @@ Almquist & Wiksell.
 
 ---
 references:
-- page: 367-377
-  title: Weak and electromagnetic interactions
+- id: salam
+  type: paper-conference
+  author:
+  - family: Salam
+    given: Abdus
+  editor:
+  - family: Svartholm
+    given: Nils
+  issued:
+    date-parts:
+    - - 1968
   event-date:
     date-parts:
     - - 1968
@@ -52,20 +61,11 @@ references:
     - - 1968
       - 5
       - 25
-  id: salam
-  issued:
-    date-parts:
-    - - 1968
-  author:
-  - given: Abdus
-    family: Salam
-  container-title: ! 'Elementary particle theory: Relativistic groups and analyticity.
+  title: Weak and electromagnetic interactions
+  container-title: 'Elementary particle theory: Relativistic groups and analyticity.
     Proceedings of the eighth Nobel symposium'
-  editor:
-  - given: Nils
-    family: Svartholm
   publisher: Almquist & Wiksell
-  type: paper-conference
   publisher-place: Stockholm
   event-place: Aspenäsgarden, Lerum
+  page: 367-377
 ...

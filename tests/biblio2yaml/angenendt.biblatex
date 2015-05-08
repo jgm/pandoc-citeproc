@@ -41,20 +41,20 @@ Patrozinienkunde. *Revue d’Histoire Ecclésiastique*, *97*, 431–456,
 
 ---
 references:
-- title-short: In Honore Salvatoris
-  annote: A German article in a French journal. Apart from that, a typical article
-    entry. Note the indextitle field
-  page: 431-456, 791-823
-  title: "In Honore Salvatoris – Vom Sinn und Unsinn der Patrozinienkunde"
-  volume: 97
-  id: angenendt
+- id: angenendt
+  type: article-journal
+  author:
+  - family: Angenendt
+    given: Arnold
   issued:
     date-parts:
     - - 2002
-  author:
-  - given: Arnold
-    family: Angenendt
-  container-title: "Revue d’Histoire Ecclésiastique"
-  type: article-journal
+  title: In Honore Salvatoris – Vom Sinn und Unsinn der Patrozinienkunde
+  title-short: In Honore Salvatoris
+  container-title: Revue d’Histoire Ecclésiastique
+  page: 431-456, 791-823
+  volume: 97
+  annote: A German article in a French journal. Apart from that, a typical article
+    entry. Note the indextitle field
   language: de-DE
 ...

@@ -52,22 +52,22 @@ NOTES:
 
 ---
 references:
-- title-short: Rhetoric
-  annote: A commented edition. Note the concatenation of the editor and commentator
-    fields as well as the volumes, sorttitle, and indextitle fields
-  keyword: primary
-  title: The rhetoric of Aristotle with a commentary by the late Edward Meredith Cope
-  id: aristotle:rhetoric
+- id: aristotle:rhetoric
+  type: book
+  author:
+  - family: Aristotle
+  editor:
+  - family: Cope
+    given: Edward Meredith
   issued:
     date-parts:
     - - 1877
-  author:
-  - family: Aristotle
-  number-of-volumes: 3
-  editor:
-  - given: Edward Meredith
-    family: Cope
+  title: The rhetoric of Aristotle with a commentary by the late Edward Meredith Cope
+  title-short: Rhetoric
   publisher: Cambridge University Press
-  type: book
+  number-of-volumes: 3
+  annote: A commented edition. Note the concatenation of the editor and commentator
+    fields as well as the volumes, sorttitle, and indextitle fields
+  keyword: primary
   language: en-GB
 ...

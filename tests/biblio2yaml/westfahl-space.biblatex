@@ -62,40 +62,40 @@ science fiction*. Westport, Conn.; London: Greenwood.
 }
 ---
 references:
-- annote: A cross-referenced article from a collection. This is an incollection entry
-    with a crossref field. Note the subtitle and indextitle fields
-  page: 55-65
-  title: ! 'The true frontier: Confronting and avoiding the realities of space in
+- id: westfahl:space
+  type: chapter
+  author:
+  - family: Westfahl
+    given: Gary
+  editor:
+  - family: Westfahl
+    given: Gary
+  issued:
+    date-parts:
+    - - 2000
+  title: 'The true frontier: Confronting and avoiding the realities of space in
     American science fiction films'
   title-short: The true frontier
-  id: westfahl:space
-  issued:
-    date-parts:
-    - - 2000
-  author:
-  - given: Gary
-    family: Westfahl
-  container-title: ! 'Space and beyond: The frontier theme in science fiction'
-  editor:
-  - given: Gary
-    family: Westfahl
+  container-title: 'Space and beyond: The frontier theme in science fiction'
   publisher: Greenwood
-  type: chapter
   publisher-place: Westport, Conn.; London
+  page: 55-65
+  annote: A cross-referenced article from a collection. This is an incollection entry
+    with a crossref field. Note the subtitle and indextitle fields
   language: en-US
-- annote: This is a collection entry. Note the format of the location field as well
-    as the subtitle and booksubtitle fields
-  title: ! 'Space and beyond: The frontier theme in science fiction'
-  title-short: Space and beyond
-  id: westfahl:frontier
+- id: westfahl:frontier
+  type: book
+  editor:
+  - family: Westfahl
+    given: Gary
   issued:
     date-parts:
     - - 2000
-  editor:
-  - given: Gary
-    family: Westfahl
+  title: 'Space and beyond: The frontier theme in science fiction'
+  title-short: Space and beyond
   publisher: Greenwood
-  type: book
   publisher-place: Westport, Conn.; London
+  annote: This is a collection entry. Note the format of the location field as well
+    as the subtitle and booksubtitle fields
   language: en-US
 ...

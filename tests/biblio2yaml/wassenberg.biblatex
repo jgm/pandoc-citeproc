@@ -50,29 +50,29 @@ NOTES:
 
 ---
 references:
-- annote: A recent online reference from arXiv using the new (April 2007 onward) identifier
-    format. Note the eprint, eprinttype, and eprintclass fields. Also note that the
-    arXiv reference is transformed into a clickable link if hyperref support has been
-    enabled
-  title: Faster radix sort via virtual memory and write-combining
-  id: wassenberg
+- id: wassenberg
+  type: webpage
+  author:
+  - family: Wassenberg
+    given: Jan
+  - family: Sanders
+    given: Peter
   issued:
     date-parts:
     - - 2010
       - 8
       - 17
-  author:
-  - given: Jan
-    family: Wassenberg
-  - given: Peter
-    family: Sanders
+  title: Faster radix sort via virtual memory and write-combining
   version: 1
-  type: webpage
+  annote: A recent online reference from arXiv using the new (April 2007 onward) identifier
+    format. Note the eprint, eprinttype, and eprintclass fields. Also note that the
+    arXiv reference is transformed into a clickable link if hyperref support has been
+    enabled
   abstract: Sorting algorithms are the deciding factor for the performance of common
     operations such as removal of duplicates or database sort-merge joins. This work
     focuses on 32-bit integer keys, optionally paired with a 32-bit value. We present
     a fast radix sorting algorithm that builds upon a microarchitecture-aware variant
     of counting sort
-  language: en-US
   URL: http://arxiv.org/abs/1008.2849v1
+  language: en-US
 ...

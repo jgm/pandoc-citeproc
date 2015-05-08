@@ -67,26 +67,25 @@ Amherst, Mass.: University of Massachusetts.
 
 ---
 references:
-- annote: This is a report entry for a technical report. Note the format of the type
-    field in the database file which uses a localization key. The number of the report
-    is given in the number field. Also note the sorttitle and indextitle fields
-  genre: technical report
-  title: A stochastic model of TCP Reno congestion avoidance and control
-  id: padhye
+- id: padhye
+  type: report
+  author:
+  - family: Padhye
+    given: Jitendra
+  - family: Firoiu
+    given: Victor
+  - family: Towsley
+    given: Don
   issued:
     date-parts:
     - - 1999
-  author:
-  - given: Jitendra
-    family: Padhye
-  - given: Victor
-    family: Firoiu
-  - given: Don
-    family: Towsley
+  title: A stochastic model of TCP Reno congestion avoidance and control
   publisher: University of Massachusetts
-  number: 99-02
-  type: report
   publisher-place: Amherst, Mass.
+  genre: technical report
+  annote: This is a report entry for a technical report. Note the format of the type
+    field in the database file which uses a localization key. The number of the report
+    is given in the number field. Also note the sorttitle and indextitle fields
   abstract: The steady state performance of a bulk transfer TCP flow (i.e. a flow
     with a large amount of data to send, such as FTP transfers) may be characterized
     by three quantities. The first is the send rate, which is the amount of data sent
@@ -103,5 +102,6 @@ references:
     build upon the previous analysis to provide both an approximate formula as well
     as a more accurate stochastic model for the steady state throughput of a bulk
     transfer TCP flow.
+  number: 99-02
   language: en-US
 ...

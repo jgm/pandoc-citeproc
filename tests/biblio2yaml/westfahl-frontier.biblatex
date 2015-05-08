@@ -37,19 +37,19 @@ science fiction*. Westport, Conn.; London: Greenwood.
 
 ---
 references:
-- annote: This is a collection entry. Note the format of the location field as well
-    as the subtitle and booksubtitle fields
-  title: ! 'Space and beyond: The frontier theme in science fiction'
-  title-short: Space and beyond
-  id: westfahl:frontier
+- id: westfahl:frontier
+  type: book
+  editor:
+  - family: Westfahl
+    given: Gary
   issued:
     date-parts:
     - - 2000
-  editor:
-  - given: Gary
-    family: Westfahl
+  title: 'Space and beyond: The frontier theme in science fiction'
+  title-short: Space and beyond
   publisher: Greenwood
-  type: book
   publisher-place: Westport, Conn.; London
+  annote: This is a collection entry. Note the format of the location field as well
+    as the subtitle and booksubtitle fields
   language: en-US
 ...

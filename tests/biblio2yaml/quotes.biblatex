@@ -21,19 +21,19 @@
 
 ---
 references:
-- annote: A book entry. Note the sorttitle and indexsorttitle fields and the markup
-    of the quotes in the database file
-  keyword: secondary
-  title: "Aristotle’s “De Motu Animalium”"
-  id: nussbaum
+- id: nussbaum
+  type: book
+  author:
+  - family: Nussbaum
+    given: Martha
   issued:
     date-parts:
     - - 1978
-  author:
-  - given: Martha
-    family: Nussbaum
+  title: Aristotle’s “De Motu Animalium”
   publisher: Princeton University Press
-  type: book
   publisher-place: Princeton
+  annote: A book entry. Note the sorttitle and indexsorttitle fields and the markup
+    of the quotes in the database file
+  keyword: secondary
   language: en-US
 ...

@@ -24,22 +24,22 @@
 }
 ---
 references:
-- title-short: Chicago manual of style
-  annote: "This is a manual entry without an author or editor. Note the label field
-    in the database file which is provided for author-year citation styles. Also note
-    the sorttitle and indextitle fields. By default, all entries without an author
-    or editor are alphabetized by title but we want this entry to be alphabetized
-    under “C” rather than “T”. There’s also an isbn field"
-  title: ! 'The Chicago manual of style: The essential guide for writers, editors,
-    and publishers'
-  id: cms
+- id: cms
+  type: book
   issued:
     date-parts:
     - - 2003
-  edition: 15
+  title: 'The Chicago manual of style: The essential guide for writers, editors,
+    and publishers'
+  title-short: Chicago manual of style
   publisher: University of Chicago Press
-  ISBN: 0-226-10403-6
-  type: book
   publisher-place: Chicago, Ill.
+  edition: 15
+  annote: This is a manual entry without an author or editor. Note the label field
+    in the database file which is provided for author-year citation styles. Also note
+    the sorttitle and indextitle fields. By default, all entries without an author
+    or editor are alphabetized by title but we want this entry to be alphabetized
+    under “C” rather than “T”. There’s also an isbn field
+  ISBN: 0-226-10403-6
   language: en-US
 ...

@@ -36,72 +36,67 @@ Nested crossreferences (see biber manual v 1.7)
 
 ---
 references:
-
-- chapter-number: 7
-  page: 100-200
+- id: bookinbook-1
+  type: chapter
+  author:
+  - family: Shakespeare
+  container-author:
+  - family: Shakespeare
+  issued:
+    date-parts:
+    - - 1975
   title: Macbeth [title field of bookinbook-1]
-  volume-title: Tragedies [title field of book-1]
   container-title: Collected works [title field of mvbook-1]
-  volume: 3
-  id: bookinbook-1
-  issued:
-    date-parts:
-    - - 1975
-  author:
-  - family: Shakespeare
-  container-author:
-  - family: Shakespeare
-  number-of-volumes: 4
+  volume-title: Tragedies [title field of book-1]
   publisher: Publisher
-  type: chapter
   publisher-place: Location
-
-- title: Macbeth [title field of inbook-1]
-  volume-title: Tragedies [title field of book-1]
-  container-title: Collected works [title field of mvbook-1]
-  author:
-  - family: Shakespeare
-  container-author:
-  - family: Shakespeare
-  volume: 3
-  chapter-number: 7
   page: 100-200
-  id: inbook-1
-  issued:
-    date-parts:
-    - - 1975
+  volume: 3
   number-of-volumes: 4
-  publisher: Publisher
+  chapter-number: 7
+- id: inbook-1
   type: chapter
-  publisher-place: Location
-
-- volume-title: Tragedies [title field of book-1]
-  title: Collected works [title field of mvbook-1]
   author:
   - family: Shakespeare
   container-author:
   - family: Shakespeare
-  volume: 3
-  id: book-1
   issued:
     date-parts:
     - - 1975
-  number-of-volumes: 4
+  title: Macbeth [title field of inbook-1]
+  container-title: Collected works [title field of mvbook-1]
+  volume-title: Tragedies [title field of book-1]
   publisher: Publisher
-  type: book
   publisher-place: Location
-
-- title: Collected works [title field of mvbook-1]
+  page: 100-200
+  volume: 3
+  number-of-volumes: 4
+  chapter-number: 7
+- id: book-1
+  type: book
   author:
   - family: Shakespeare
-  id: mvbook-1
+  container-author:
+  - family: Shakespeare
+  issued:
+    date-parts:
+    - - 1975
+  title: Collected works [title field of mvbook-1]
+  volume-title: Tragedies [title field of book-1]
+  publisher: Publisher
+  publisher-place: Location
+  volume: 3
+  number-of-volumes: 4
+- id: mvbook-1
+  type: book
+  author:
+  - family: Shakespeare
   issued:
     date-parts:
     - - 1970
     - - 1980
-  number-of-volumes: 4
+  title: Collected works [title field of mvbook-1]
   publisher: Publisher
-  type: book
   publisher-place: Location
+  number-of-volumes: 4
 ...
-

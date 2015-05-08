@@ -44,29 +44,30 @@ reactions. *J. Organomet. Chem.*, *691*(13), 3027–3036.
 
 ---
 references:
-- issue: 13
-  page: 3027-3036
-  title: Effect of immobilization on catalytic characteristics of saturated Pd-N-heterocyclic carbenes in Mizoroki-Heck reactions
-  volume: 691
-  id: aksin
+- id: aksin
+  type: article-journal
+  author:
+  - family: Aksin
+    given: Özge
+  - family: Türkmen
+    given: Hayati
+  - family: Artok
+    given: Levent
+  - family: Çetinkaya
+    given: Bekir
+  - family: Ni
+    given: Chaoying
+  - family: Büyükgüngör
+    given: Orhan
+  - family: Özkal
+    given: Erhan
   issued:
     date-parts:
     - - 2006
-  author:
-  - given: Özge
-    family: Aksin
-  - given: Hayati
-    family: Türkmen
-  - given: Levent
-    family: Artok
-  - given: Bekir
-    family: Çetinkaya
-  - given: Chaoying
-    family: Ni
-  - given: Orhan
-    family: Büyükgüngör
-  - given: Erhan
-    family: Özkal
-  container-title: "J. Organomet. Chem."
-  type: article-journal
+  title: Effect of immobilization on catalytic characteristics of saturated Pd-N-heterocyclic
+    carbenes in Mizoroki-Heck reactions
+  container-title: J. Organomet. Chem.
+  page: 3027-3036
+  volume: 691
+  issue: 13
 ...

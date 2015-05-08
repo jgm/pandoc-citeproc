@@ -38,20 +38,20 @@ University Press.
 
 ---
 references:
-- annote: A book entry with an author and an editor
-  keyword: primary
-  title: De anima
-  id: aristotle:anima
-  issued:
-    date-parts:
-    - - 1907
+- id: aristotle:anima
+  type: book
   author:
   - family: Aristotle
   editor:
-  - given: Robert Drew
-    family: Hicks
+  - family: Hicks
+    given: Robert Drew
+  issued:
+    date-parts:
+    - - 1907
+  title: De anima
   publisher: Cambridge University Press
-  type: book
   publisher-place: Cambridge
+  annote: A book entry with an author and an editor
+  keyword: primary
   language: en-GB
 ...

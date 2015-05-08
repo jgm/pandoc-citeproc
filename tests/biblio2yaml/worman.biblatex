@@ -38,18 +38,18 @@ Austin: University of Texas Press.
 
 ---
 references:
-- title-short: Cast of character
-  annote: A book entry. Note the sorttitle and indextitle fields
-  title: ! 'The cast of character: Style in Greek literature'
-  id: worman
+- id: worman
+  type: book
+  author:
+  - family: Worman
+    given: Nancy
   issued:
     date-parts:
     - - 2002
-  author:
-  - given: Nancy
-    family: Worman
+  title: 'The cast of character: Style in Greek literature'
+  title-short: Cast of character
   publisher: University of Texas Press
-  type: book
   publisher-place: Austin
+  annote: A book entry. Note the sorttitle and indextitle fields
   language: en-US
 ...

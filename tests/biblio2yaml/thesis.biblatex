@@ -27,38 +27,38 @@ TODO: Uppercase letters follwing hyphens need to be converted to lowercase, too 
 
 ---
 references:
-- annote: This is a typical thesis entry for a PhD thesis. Note the type field in
-    the database file which uses a localization key. Also note the format of the printed
-    name and compare the useprefix option in the options field as well as vangennep
-  genre: PhD thesis
-  title: "Earl, saint, bishop, skald – and music: The Orkney earldom of the
-    twelfth century. A musicological study"
-  title-short: Earl, saint, bishop, skald – and music
-  id: geer
+- id: geer
+  type: thesis
+  author:
+  - family: Geer
+    given: Ingrid
+    dropping-particle: de
   issued:
     date-parts:
     - - 1985
-  author:
-  - given: Ingrid
-    dropping-particle: de
-    family: Geer
+  title: 'Earl, saint, bishop, skald – and music: The Orkney earldom of the twelfth
+    century. A musicological study'
+  title-short: Earl, saint, bishop, skald – and music
   publisher: Uppsala Universitet
-  type: thesis
   publisher-place: Uppsala
+  genre: PhD thesis
+  annote: This is a typical thesis entry for a PhD thesis. Note the type field in
+    the database file which uses a localization key. Also note the format of the printed
+    name and compare the useprefix option in the options field as well as vangennep
   language: en-GB
-- annote: This is a typical thesis entry for an MA thesis. Note the type field in
-    the database file which uses a localization key
-  genre: "Master’s thesis"
-  title: High-resolution micromachined interferometric accelerometer
-  id: loh
+- id: loh
+  type: thesis
+  author:
+  - family: Loh
+    given: Nin C.
   issued:
     date-parts:
     - - 1992
-  author:
-  - given: Nin C.
-    family: Loh
+  title: High-resolution micromachined interferometric accelerometer
   publisher: Massachusetts Institute of Technology
-  type: thesis
   publisher-place: Cambridge, Mass.
+  genre: Master’s thesis
+  annote: This is a typical thesis entry for an MA thesis. Note the type field in
+    the database file which uses a localization key
   language: en-US
 ...

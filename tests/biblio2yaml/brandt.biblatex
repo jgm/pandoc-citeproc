@@ -52,30 +52,30 @@ und Spätmittelalter* (pp. 884–917). Stuttgart: Klett-Cotta.
 
 ---
 references:
-- title-short: "Die nordischen Länder"
-  annote: An incollection entry with a series and a number. Note the format of the
-    printed name and compare the useprefix option in the options field as well as
-    vangennep. Also note the indextitle, and indexsorttitle fields
-  page: 884-917
-  title: "Die nordischen Länder von der Mitte des 11. Jahrhunderts bis 1448"
-  id: brandt
+- id: brandt
+  type: chapter
+  author:
+  - family: Brandt
+    given: Ahasver
+    dropping-particle: von
+  - family: Hoffmann
+    given: Erich
+  editor:
+  - family: Seibt
+    given: Ferdinand
   issued:
     date-parts:
     - - 1987
-  author:
-  - given: Ahasver
-    dropping-particle: von
-    family: Brandt
-  - given: Erich
-    family: Hoffmann
-  container-title: "Europa im Hoch- und Spätmittelalter"
-  editor:
-  - given: Ferdinand
-    family: Seibt
-  publisher: Klett-Cotta
-  collection-title: "Handbuch der europäischen Geschichte"
-  type: chapter
-  publisher-place: Stuttgart
+  title: Die nordischen Länder von der Mitte des 11. Jahrhunderts bis 1448
+  title-short: Die nordischen Länder
+  container-title: Europa im Hoch- und Spätmittelalter
+  collection-title: Handbuch der europäischen Geschichte
   collection-number: 2
+  publisher: Klett-Cotta
+  publisher-place: Stuttgart
+  page: 884-917
+  annote: An incollection entry with a series and a number. Note the format of the
+    printed name and compare the useprefix option in the options field as well as
+    vangennep. Also note the indextitle, and indexsorttitle fields
   language: de-DE
 ...

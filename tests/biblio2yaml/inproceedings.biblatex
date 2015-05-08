@@ -36,36 +36,45 @@
 	Venue = {Aspenäsgarden, Lerum}}
 ---
 references:
-- title-short: "*De Anima* dans la tradition grècque"
-  annote: This is a typical inproceedings entry. Note the booksubtitle, shorttitle,
-    indextitle, and indexsorttitle fields. Also note the eventdate field.
-  keyword: secondary
-  page: 281-324
-  title: "Le *De Anima* dans la tradition grècque: Quelques aspects de l’interpretation
-    du traité, de Theophraste à Themistius"
-  event-date:
-    date-parts:
-    - - 1975
-  id: moraux
+- id: moraux
+  type: paper-conference
+  author:
+  - family: Moraux
+    given: Paul
+  editor:
+  - family: Lloyd
+    given: G. E. R.
+  - family: Owen
+    given: G. E. L.
   issued:
     date-parts:
     - - 1979
-  author:
-  - given: Paul
-    family: Moraux
+  event-date:
+    date-parts:
+    - - 1975
+  title: 'Le *De Anima* dans la tradition grècque: Quelques aspects de l’interpretation
+    du traité, de Theophraste à Themistius'
+  title-short: '*De Anima* dans la tradition grècque'
   container-title: Aristotle on Mind and the Senses. Proceedings of the Seventh Symposium
     Aristotelicum
-  editor:
-  - given: G. E. R.
-    family: Lloyd
-  - given: G. E. L.
-    family: Owen
   publisher: Cambridge University Press
-  type: paper-conference
   publisher-place: Cambridge
+  page: 281-324
+  annote: This is a typical inproceedings entry. Note the booksubtitle, shorttitle,
+    indextitle, and indexsorttitle fields. Also note the eventdate field.
+  keyword: secondary
   language: fr-FR
-- page: 367-377
-  title: Weak and electromagnetic interactions
+- id: salam
+  type: paper-conference
+  author:
+  - family: Salam
+    given: Abdus
+  editor:
+  - family: Svartholm
+    given: Nils
+  issued:
+    date-parts:
+    - - 1968
   event-date:
     date-parts:
     - - 1968
@@ -74,20 +83,11 @@ references:
     - - 1968
       - 5
       - 25
-  id: salam
-  issued:
-    date-parts:
-    - - 1968
-  author:
-  - given: Abdus
-    family: Salam
-  container-title: ! 'Elementary particle theory: Relativistic groups and analyticity.
+  title: Weak and electromagnetic interactions
+  container-title: 'Elementary particle theory: Relativistic groups and analyticity.
     Proceedings of the eighth Nobel symposium'
-  editor:
-  - given: Nils
-    family: Svartholm
   publisher: Almquist & Wiksell
-  type: paper-conference
   publisher-place: Stockholm
   event-place: Aspenäsgarden, Lerum
+  page: 367-377
 ...

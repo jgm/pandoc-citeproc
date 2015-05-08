@@ -38,22 +38,22 @@ Press.
 
 ---
 references:
-- title-short: Poetics
-  annote: A book entry with an author and an editor as well as a series field
-  keyword: primary
-  title: Poetics
-  id: aristotle:poetics
-  issued:
-    date-parts:
-    - - 1968
+- id: aristotle:poetics
+  type: book
   author:
   - family: Aristotle
   editor:
-  - given: D. W.
-    family: Lucas
-  publisher: Clarendon Press
+  - family: Lucas
+    given: D. W.
+  issued:
+    date-parts:
+    - - 1968
+  title: Poetics
+  title-short: Poetics
   collection-title: Clarendon Aristotle
-  type: book
+  publisher: Clarendon Press
   publisher-place: Oxford
+  annote: A book entry with an author and an editor as well as a series field
+  keyword: primary
   language: en-GB
 ...

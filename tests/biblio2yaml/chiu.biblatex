@@ -49,23 +49,23 @@ NOTES:
 
 ---
 references:
-- annote: This is a report entry for a research report. Note the format of the type
-    field in the database file which uses a localization key. The number of the report
-    is given in the number field. Also note the sorttitle and indextitle fields
-  genre: research report
-  title: A hybrid hierarchical model of a multiple virtual storage (MVS) operating
-    system
-  id: chiu
+- id: chiu
+  type: report
+  author:
+  - family: Chiu
+    given: Willy W.
+  - family: Chow
+    given: We Min
   issued:
     date-parts:
     - - 1978
-  author:
-  - given: Willy W.
-    family: Chiu
-  - given: We Min
-    family: Chow
+  title: A hybrid hierarchical model of a multiple virtual storage (MVS) operating
+    system
   publisher: IBM
+  genre: research report
+  annote: This is a report entry for a research report. Note the format of the type
+    field in the database file which uses a localization key. The number of the report
+    is given in the number field. Also note the sorttitle and indextitle fields
   number: RC-6947
-  type: report
   language: en-US
 ...

@@ -41,22 +41,21 @@ Guinea* (8th ed.). London: Routledge and Kegan Paul.
 
 ---
 references:
-- title-short: Argonauts
-  annote: This is a book entry. Note the format of the publisher and edition fields
-    as well as the subtitle field
-  title: ! 'Argonauts of the Western Pacific: An account of native enterprise and
-    adventure in the <span class="nocase">Archipelagoes of Melanesian New
-    Guinea</span>'
-  id: malinowski
+- id: malinowski
+  type: book
+  author:
+  - family: Malinowski
+    given: Bronisław
   issued:
     date-parts:
     - - 1972
-  author:
-  - given: Bronisław
-    family: Malinowski
-  edition: 8
+  title: 'Argonauts of the Western Pacific: An account of native enterprise and
+    adventure in the <span class="nocase">Archipelagoes of Melanesian New Guinea</span>'
+  title-short: Argonauts
   publisher: Routledge and Kegan Paul
-  type: book
   publisher-place: London
+  edition: 8
+  annote: This is a book entry. Note the format of the publisher and edition fields
+    as well as the subtitle field
   language: en-GB
 ...

@@ -16,19 +16,19 @@
 
 ---
 references:
-- volume-title: ! 'Title of the Book: Subtitle. Titleaddon'
-  id: item1
+- id: item1
+  type: book
+  author:
+  - family: Author
+    given: Al
   issued:
     date-parts:
     - - 2013
-  author:
-  - given: Al
-    family: Author
-  title: ! 'Maintitle: Mainsubtitle. Maintitleaddon'
-  publisher: Publisher
+  title: 'Maintitle: Mainsubtitle. Maintitleaddon'
+  volume-title: 'Title of the Book: Subtitle. Titleaddon'
   collection-title: Series
-  type: book
-  publisher-place: Location
   collection-number: 3
+  publisher: Publisher
+  publisher-place: Location
   language: fr-FR
 ...

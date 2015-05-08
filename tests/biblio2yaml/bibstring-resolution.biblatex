@@ -7,7 +7,7 @@
 references:
 - id: item1
   type: book
-  title: "The title: new series"
+  title: 'The title: new series'
   title-short: The title
   language: en-US
 ...

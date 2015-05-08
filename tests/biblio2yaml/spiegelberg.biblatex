@@ -49,21 +49,20 @@ NOTES:
 
 ---
 references:
-- title-short: "Intention und Intentionalität"
-  annote: An article entry. Note the sorttitle and indexsorttitle fields and the markup
-    of the quotes in the database file
-  page: 189-216
-  title: "“Intention” und “Intentionalität” in der Scholastik,
-    bei Brentano und Husserl"
-  volume: 29
-  id: spiegelberg
+- id: spiegelberg
+  type: article-journal
+  author:
+  - family: Spiegelberg
+    given: Herbert
   issued:
     date-parts:
     - - 1969
-  author:
-  - given: Herbert
-    family: Spiegelberg
+  title: “Intention” und “Intentionalität” in der Scholastik, bei Brentano und Husserl
+  title-short: Intention und Intentionalität
   container-title: Studia Philosophica
-  type: article-journal
+  page: 189-216
+  volume: 29
+  annote: An article entry. Note the sorttitle and indexsorttitle fields and the markup
+    of the quotes in the database file
   language: de-DE
 ...

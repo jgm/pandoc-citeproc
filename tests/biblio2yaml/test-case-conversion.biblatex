@@ -52,16 +52,17 @@ and a {camelCase} Word and Some Units, 400~{nm}, 3~{cm}, and a Quote,
 
 ---
 references:
-- title: A title, in English, with a Proper Name and an ACRONYM and a <span class="nocase">camelCase</span> word and some units, 400 <span class="nocase">nm</span>, 3 <span class="nocase">cm</span>, and a quote, *Alea <span class="nocase">iacta est</span>*
-  id: item1
+- id: item1
+  type: article-journal
+  author:
+  - family: Author
+    given: Ann
   issued:
     date-parts:
     - - 2013
-  author:
-  - given: Ann
-    family: Author
+  title: A title, in English, with a Proper Name and an ACRONYM and a <span class="nocase">camelCase</span>
+    word and some units, 400 <span class="nocase">nm</span>, 3 <span class="nocase">cm</span>,
+    and a quote, *Alea <span class="nocase">iacta est</span>*
   container-title: Journal
-  type: article-journal
   language: en-US
 ...
-

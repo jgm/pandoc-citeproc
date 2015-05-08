@@ -39,19 +39,19 @@ Oxford: International Union of Crystallography; Oxford University Press.
 
 ---
 references:
-- title-short: Crystallography and diffraction
-  annote: A book entry. Note the sorttitle and indextitle fields as well as the format
-    of the publisher field
-  title: The basics of crystallography and diffraction
-  id: hammond
+- id: hammond
+  type: book
+  author:
+  - family: Hammond
+    given: Christopher
   issued:
     date-parts:
     - - 1997
-  author:
-  - given: Christopher
-    family: Hammond
+  title: The basics of crystallography and diffraction
+  title-short: Crystallography and diffraction
   publisher: International Union of Crystallography; Oxford University Press
-  type: book
   publisher-place: Oxford
+  annote: A book entry. Note the sorttitle and indextitle fields as well as the format
+    of the publisher field
   language: en-GB
 ...
