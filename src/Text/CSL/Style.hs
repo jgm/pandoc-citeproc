@@ -762,8 +762,9 @@ instance ToYaml Agent where
   toYaml ag = mapping' [ "family" &= familyName ag
                        , case givenName ag of
                               []    -> id
-                              [x]   -> "given" &= x
-                              xs    -> "given" &= xs
+                              xs    -> "given" &= Formatted
+                                                  (intercalate [Space]
+                                                    (map unFormatted xs))
                        , "non-dropping-particle" &= nonDroppingPart ag
                        , "dropping-particle" &= droppingPart ag
                        , "suffix" &= nameSuffix ag
