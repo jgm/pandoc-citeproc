@@ -176,21 +176,12 @@ adjustCSL :: Bool -> Inline -> [Inline]
 adjustCSL _ (Span ("",[],[]) xs) = xs
 adjustCSL _ (Span ("",["citeproc-no-output"],[]) _) =
   [Str "[CSL STYLE ERROR: reference with no printed form.]"]
-adjustCSL False (SmallCaps xs) =
-  RawInline (Format "html") "<span style=\"font-variant:small-caps;\">" : xs
-    ++ [RawInline (Format "html") "</span>"]
 adjustCSL True (SmallCaps xs) =
   RawInline (Format "html") "<sc>" : xs
     ++ [RawInline (Format "html") "</sc>"]
-adjustCSL False (Subscript xs) =
-  RawInline (Format "html") "<span style=\"vertical-align:sub;\">" : xs
-    ++ [RawInline (Format "html") "</span>"]
 adjustCSL True (Subscript xs) =
   RawInline (Format "html") "<sub>" : xs
     ++ [RawInline (Format "html") "</sub>"]
-adjustCSL False (Superscript xs) =
-  RawInline (Format "html") "<span style=\"vertical-align:sup;\">" : xs
-    ++ [RawInline (Format "html") "</span>"]
 adjustCSL True (Superscript xs) =
   RawInline (Format "html") "<sup>" : xs
     ++ [RawInline (Format "html") "</sup>"]
