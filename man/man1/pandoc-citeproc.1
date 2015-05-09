@@ -1,5 +1,5 @@
 .\"t
-.TH "pandoc\-citeproc" "1" "2015-03-08" "0.6" ""
+.TH "pandoc\-citeproc" "1" "2015-05-08" "0.7" ""
 .SH NAME
 .PP
 pandoc\-citeproc \- filter to resolve citations in a pandoc document.
@@ -52,11 +52,6 @@ File extension
 T}
 _
 T{
-MODS
-T}@T{
-\&.mods
-T}
-T{
 BibLaTeX
 T}@T{
 \&.bib
@@ -67,9 +62,19 @@ T}@T{
 \&.bibtex
 T}
 T{
-RIS
+Copac
 T}@T{
-\&.ris
+\&.copac
+T}
+T{
+CSL JSON
+T}@T{
+\&.json
+T}
+T{
+CSL YAML
+T}@T{
+\&.yaml
 T}
 T{
 EndNote
@@ -92,16 +97,19 @@ T}@T{
 \&.medline
 T}
 T{
-Copac
+MODS
 T}@T{
-\&.copac
+\&.mods
 T}
 T{
-JSON citeproc
+RIS
 T}@T{
-\&.json
+\&.ris
 T}
 .TE
+.PP
+Note that \f[C]\&.bib\f[] can generally be used with both BibTeX and
+BibLaTeX files, but you can use \f[C]\&.bibtex\f[] to force BibTeX.
 .RE
 .TP
 .B \f[C]references\f[]
@@ -164,6 +172,15 @@ Here is a short example:
 }
 \f[]
 .fi
+.RE
+.TP
+.B \f[C]locale\f[]
+Locale to use in formatting citations.
+If this is not set, the locale is taken from the
+\f[C]default\-locale\f[] attribute of the CSL file.
+\f[C]en\-US\f[] is used if a locale is not specified in either the
+metadata or the CSL file.
+.RS
 .RE
 .TP
 .B \f[C]suppress\-bibliography\f[]
