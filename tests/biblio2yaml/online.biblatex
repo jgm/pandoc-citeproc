@@ -46,6 +46,7 @@ references:
     in the database file.
   URL: http://tug.ctan.org/tex-archive/info/bibtex/tamethebeast/ttb_en.pdf
   language: en-US
+
 - id: CTAN
   type: webpage
   issued:

@@ -53,6 +53,7 @@ references:
   volume: 3
   number-of-volumes: 4
   chapter-number: 7
+
 - id: inbook-1
   type: chapter
   author:
@@ -70,6 +71,7 @@ references:
   volume: 3
   number-of-volumes: 4
   chapter-number: 7
+
 - id: book-1
   type: book
   author:
@@ -84,6 +86,7 @@ references:
   publisher-place: Location
   volume: 3
   number-of-volumes: 4
+
 - id: mvbook-1
   type: book
   author:

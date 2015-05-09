@@ -13,9 +13,10 @@
 	Publisher = {Publisher},
 	Series = {Series},
 	Subtitle = {Subtitle},
-	Title = {Title of the "@inbook" Entry},
+	Title = {Title of the "inbook" Entry},
 	Titleaddon = {Titleaddon},
 	Volume = {4}}
+
 ---
 references:
 - id: item1
@@ -25,7 +26,7 @@ references:
     given: Al
   issued:
   - year: 2011
-  title: 'Title of the “@inbook” Entry: Subtitle. Titleaddon'
+  title: 'Title of the “inbook” Entry: Subtitle. Titleaddon'
   container-title: 'Maintitle: Mainsubtitle. Maintitleaddon'
   volume-title: 'Booktitle: Booksubtitle. Booktitleaddon'
   collection-title: Series

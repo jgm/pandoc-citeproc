@@ -43,24 +43,29 @@ references:
   title: 'The title: With a colon in the “title” field: And a subtitle, in two separate
     fields; plus a separate “shorttitle” field'
   title-short: The shorttitle
+
 - id: item3
   type: book
   title: 'The title: With a colon in the “title” field: And a subtitle, in two separate
     fields'
   title-short: The title
+
 - id: item2
   type: book
   title: 'The title: The subtitle, in two separate fields'
   title-short: The title
+
 - id: item1
   type: book
   title: 'The title: And the subtitle, all in the “title” field'
   title-short: The title
+
 - id: item5
   type: chapter
   title: 'The inbook title: And the subtitle, all in the “title” field'
   title-short: The inbook title
   container-title: 'The title: And the subtitle, all in the “title” field'
+
 - id: item6
   type: book
   title: 'The title: And the subtitle, all in the “title” field'

@@ -40,6 +40,7 @@ references:
   volume: 3
   number-of-volumes: 4
   chapter-number: 7
+
 - id: mvbook-1
   type: book
   author:

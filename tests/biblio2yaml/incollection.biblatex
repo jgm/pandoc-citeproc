@@ -79,6 +79,7 @@ references:
     printed name and compare the useprefix option in the options field as well as
     vangennep. Also note the indextitle, and indexsorttitle fields
   language: de-DE
+
 - id: hyman
   type: chapter
   author:
@@ -100,6 +101,7 @@ references:
   annote: An incollection entry with a series and number field
   keyword: secondary
   language: en-US
+
 - id: pines
   type: chapter
   author:

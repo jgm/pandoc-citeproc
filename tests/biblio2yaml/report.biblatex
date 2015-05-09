@@ -69,6 +69,7 @@ references:
     is given in the number field. Also note the sorttitle and indextitle fields
   number: RC-6947
   language: en-US
+
 - id: padhye
   type: report
   author:

@@ -85,6 +85,7 @@ references:
     By default, the bookauthor is omitted if the values of the author and bookauthor
     fields are identical
   language: de-DE
+
 - id: kant:ku
   type: chapter
   author:
@@ -106,6 +107,7 @@ references:
     which explicitly refers to the *Critique of Judgment* only, not to the entire
     fifth volume
   language: de-DE
+
 - id: nietzsche:historie
   type: chapter
   author:

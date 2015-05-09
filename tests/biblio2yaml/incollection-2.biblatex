@@ -59,6 +59,7 @@ references:
   annote: A cross-referenced article from a collection. This is an incollection entry
     with a crossref field. Note the subtitle and indextitle fields
   language: en-US
+
 - id: gaonkar:in
   type: chapter
   author:
@@ -75,6 +76,7 @@ references:
   publisher-place: Durham; London
   page: 1-23
   ISBN: 0-822-32714-7
+
 - id: westfahl:frontier
   type: book
   editor:

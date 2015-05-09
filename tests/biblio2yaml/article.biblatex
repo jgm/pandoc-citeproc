@@ -91,6 +91,7 @@ references:
   title: An article entry with just the required fields
   container-title: The Journaltitle
   language: en-US
+
 - id: article-opt
   type: article-journal
   author:

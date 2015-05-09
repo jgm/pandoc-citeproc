@@ -75,6 +75,7 @@ references:
     and translator fields as well as the indextitle field
   keyword: primary
   language: en-US
+
 - id: averroes/hannes
   type: book
   author:
@@ -97,6 +98,7 @@ references:
     fields
   keyword: primary
   language: de-DE
+
 - id: averroes/hercz
   type: book
   author:

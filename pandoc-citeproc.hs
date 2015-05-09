@@ -59,7 +59,9 @@ main = do
        readBiblioString bibformat bibstring >>=
          warnDuplicateKeys >>=
          if Bib2YAML `elem` flags
-            then outputYamlBlock . unescapeTags . toByteString
+            then outputYamlBlock .
+                 B8.intercalate (B.singleton 10) .
+                 map (unescapeTags . toByteString . (:[]))
             else BL8.putStrLn .
               encodePretty' Config{ confIndent = 2
                                   , confCompare = compare } .

@@ -82,6 +82,7 @@ references:
   annote: A cross-referenced article from a collection. This is an incollection entry
     with a crossref field. Note the subtitle and indextitle fields
   language: en-US
+
 - id: westfahl:frontier
   type: book
   editor:

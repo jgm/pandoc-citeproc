@@ -62,6 +62,7 @@ references:
     indextitle, and indexsorttitle fields. Also note the eventdate field.
   keyword: secondary
   language: fr-FR
+
 - id: salam
   type: paper-conference
   author:

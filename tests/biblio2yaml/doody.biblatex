@@ -78,6 +78,7 @@ references:
   annote: An article entry cited as an excerpt from a collection entry. Note the format
     of the related and relatedstring fields
   language: en-US
+
 - id: matuz:doody
   type: book
   editor:

@@ -39,6 +39,7 @@ references:
   - year: 2012
   title: Title, any entry type except online
   container-title: Journal
+
 - id: item2
   type: webpage
   author:

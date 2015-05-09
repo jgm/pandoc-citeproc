@@ -73,6 +73,7 @@ references:
     laufenberg, sorace, and kowalik
   number: EU-29702195U
   language: de-DE
+
 - id: kowalik
   type: patent
   author:
@@ -92,6 +93,7 @@ references:
     in the database file. Compare almendro, laufenberg, and sorace
   number: 9500261
   language: fr-FR
+
 - id: laufenberg
   type: patent
   author:
@@ -134,6 +136,7 @@ references:
     The invention also relates to methods for operating a device of this type.
   number: 1700367
   language: de-DE
+
 - id: sorace
   type: patent
   author:

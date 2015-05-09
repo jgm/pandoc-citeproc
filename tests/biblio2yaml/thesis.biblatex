@@ -45,6 +45,7 @@ references:
     the database file which uses a localization key. Also note the format of the printed
     name and compare the useprefix option in the options field as well as vangennep
   language: en-GB
+
 - id: loh
   type: thesis
   author:
