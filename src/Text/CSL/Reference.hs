@@ -441,7 +441,7 @@ instance FromJSON Reference where
        v .:? "categories" .!= [] <*>
        v .:? "language" .!= "" <*>
        v .:? "citation-number" .!= CNum 0 <*>
-       ((v .: "first-reference-note-number" >>= parseInt) <|> return 1) <*>
+       ((v .: "first-reference-note-number" >>= parseInt) <|> return 0) <*>
        v .:? "citation-label" .!= "")
     where takeFirstNum (Formatted (Str xs : _)) =
             case takeWhile isDigit xs of
