@@ -87,6 +87,7 @@ readFormat = go . map toLower
         go "copac"    = Just Copac
         go "json"     = Just Json
         go "mods"     = Just Mods
+        go "yaml"     = Just Yaml
         go _          = Nothing
 
 
