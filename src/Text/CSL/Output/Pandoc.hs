@@ -42,6 +42,7 @@ clean' :: Style -> [Inline] -> [Inline]
 clean' _   []  = []
 clean' sty (i:is) =
   case (i:is) of
+      (Span ("",[],[]) inls : _) -> inls ++ clean' sty is
       (Span ("",["csl-inquote"],kvs) inls : _) ->
          let isOuter = lookup "position" kvs == Just "outer"
          in  case headInline is of
