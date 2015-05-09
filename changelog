@@ -1,3 +1,52 @@
+pandoc-citeproc (0.7)
+
+  * Improved YAML output:
+    + Fields are now in a deterministic and rational order, id at top.
+    + Blank lines between entries for readability.
+    + Use human-friendlier year, month, etc. rather than date-part.
+    + The test suite no longer normalizes YAML output before comparing,
+      since we now control the order of fields.
+  * Use `locale` in metadata in converting bibtex (#98).
+  * Use `locale` in metadata for unicode collation, when compiled with
+    the `unicode_collation` flag (#122).
+  * Made pandoc-citeproc sensitive to metadata fields
+    `reference-section-title` and `suppress-bibliography` (Jesse
+    Rosenthal).  The former specifies a title for a new reference section.
+    The second suppresses the bibliography altogether.  Existing
+    documents should behave as before if these fields are not used.
+  * Strip empty span elements from output (#126).
+  * Allow conversion FROM yaml to other formats (#124).
+  * Improved CSL JSON output. Use the rich markup syntax described at
+    http://docs.citationstyles.org/en/1.0/release-notes.html#rich-text-markup-within-fields
+  * Fixed extraction of language from LANG env variable in Bibtex (#98).
+  * Fixed `ghc-prof-options` so we don't get warning with recent cabal.
+    Added French, German localizations to Bibtex converter (#98).
+  * Bibtex: Use type field to further specify mastersthesis or phdthesis (#98).
+  * Ensure that "et al" has a space before it, if no delimiter defined (#93).
+  * Allow "et al" to be formatted (#91).
+  * Depend on `setenv` package for the `setEnv` function, which is found
+    only in base 4.7+.
+  * Fixed problem with droppped final punctuation in some footnotes (#82).
+  * `Text.CSL.Util`: Removed unused `readable`. Renamed `toShow` to
+    `uncamelize`. Use `ppShow` in `tr'`.
+  * Use `doi.org` instead of `dx.doi.org` (#107).
+  * Fixed treatment of `motion_picture` title (#118).
+  * Include preface and suffix of DOI in linked text (#107).
+  * Added `--regenerate` flag to `test-pandoc-citeproc`.
+  * Added `hyperlink` field to `Formatting` (API change).
+  * Made hyperlinked citations work with numerical  and author-year styles.
+  * Bibtex: improved short title logic.
+  * Map biblatex title/maintitle to CSL volume-title/title (Nick Bart).
+  * Fix CSL dependent style support (Tim Lin, #105).
+  * Added support for PMCID and PMID fields in bibtex (jgm/pandoc#1923).
+  * Map biblatex `inreference` to `EntryEncyclopedia` rather than `NoType`
+    (#88).
+  * Wrap bibliography entries in Div with id=ref-citationId
+  * Updated `chicago-author-date.csl`.
+  * Allow compilation against pandoc 1.14 (the next release).
+  * Removed obsolete `small_base` cabal flag.
+  * Added `debug` cabal flag which turns on tracing.
+
 pandoc-citeproc (0.6.0.1)
 
   * Added pandoc-types upper bound.
