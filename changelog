@@ -1,3 +1,9 @@
+pandoc-citeproc (0.7.0.1)
+
+  * In YAML use pandoc markdown syntax for super, subscript (#128).
+    Added test case for rich text formatting.
+  * Change default for first-reference-note-number to 0 on reading (#128).
+
 pandoc-citeproc (0.7)
 
   * Improved YAML output:
