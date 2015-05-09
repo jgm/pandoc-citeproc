@@ -9,7 +9,7 @@ import Data.Monoid
 import Data.Yaml.Builder (toByteString)
 import Control.Applicative
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy.Char8 as BL8
+import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Char8 as B8
 import Data.Attoparsec.ByteString.Char8 as Attoparsec
 import qualified Data.Text as T
@@ -62,7 +62,7 @@ main = do
             then outputYamlBlock .
                  B8.intercalate (B.singleton 10) .
                  map (unescapeTags . toByteString . (:[]))
-            else BL8.putStrLn .
+            else B8.putStrLn . unescapeUnicode . B.concat . BL.toChunks .
               encodePretty' Config{ confIndent = 2
                                   , confCompare = compare } .
               everywhere (mkT compressName)
@@ -162,6 +162,11 @@ compressName ag = Agent{
 -- id: пункт3
 unescapeTags :: B.ByteString -> B.ByteString
 unescapeTags bs = case parseOnly (many $ tag <|> other) bs of
+                       Left e  -> error e
+                       Right r -> B.concat r
+
+unescapeUnicode :: B.ByteString -> B.ByteString
+unescapeUnicode bs = case parseOnly (many other) bs of
                        Left e  -> error e
                        Right r -> B.concat r
 

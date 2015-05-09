@@ -102,8 +102,8 @@ import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), query,
 import Data.Yaml.Builder(ToYaml(..))
 import qualified Data.Yaml.Builder as Y
 import Text.Pandoc.Definition hiding (Citation, Cite)
-import Text.Pandoc (readHtml, writeMarkdown, WriterOptions(..),
-                    ReaderOptions(..), bottomUp, def)
+import Text.Pandoc (readHtml, writeMarkdown,
+                    WriterOptions(..), ReaderOptions(..), bottomUp, def)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.Builder as B
 import qualified Data.Text as T
@@ -157,25 +157,50 @@ adjustScTags zs =
        []                       -> []
 
 
+writeYAMLString :: [Inline] -> String
+writeYAMLString ils =
+  trimr $ writeMarkdown def{writerWrapText = False}
+        $ Pandoc nullMeta
+          [Plain $ bottomUp (concatMap (adjustCSL False)) ils]
+
 writeCSLString :: [Inline] -> String
 writeCSLString ils =
   trimr $ writeMarkdown def{writerWrapText = False}
-        $ Pandoc nullMeta [Plain $ bottomUp (concatMap adjustCSL) ils]
+        $ Pandoc nullMeta
+          [Plain $ bottomUp (concatMap (adjustCSL True)) ils]
 
-adjustCSL :: Inline -> [Inline]
-adjustCSL (Span ("",[],[]) xs) = xs
-adjustCSL (Span ("",["citeproc-no-output"],[]) _) =
+-- If the first param is True, we use special rich text conventions
+-- for CSL JSON, described here:
+-- http://docs.citationstyles.org/en/1.0/release-notes.html#rich-text-markup-within-fields
+adjustCSL :: Bool -> Inline -> [Inline]
+adjustCSL _ (Span ("",[],[]) xs) = xs
+adjustCSL _ (Span ("",["citeproc-no-output"],[]) _) =
   [Str "[CSL STYLE ERROR: reference with no printed form.]"]
-adjustCSL (SmallCaps xs) =
+adjustCSL False (SmallCaps xs) =
   RawInline (Format "html") "<span style=\"font-variant:small-caps;\">" : xs
     ++ [RawInline (Format "html") "</span>"]
-adjustCSL (Subscript xs) =
+adjustCSL True (SmallCaps xs) =
+  RawInline (Format "html") "<sc>" : xs
+    ++ [RawInline (Format "html") "</sc>"]
+adjustCSL False (Subscript xs) =
   RawInline (Format "html") "<span style=\"vertical-align:sub;\">" : xs
     ++ [RawInline (Format "html") "</span>"]
-adjustCSL (Superscript xs) =
+adjustCSL True (Subscript xs) =
+  RawInline (Format "html") "<sub>" : xs
+    ++ [RawInline (Format "html") "</sub>"]
+adjustCSL False (Superscript xs) =
   RawInline (Format "html") "<span style=\"vertical-align:sup;\">" : xs
     ++ [RawInline (Format "html") "</span>"]
-adjustCSL x = [x]
+adjustCSL True (Superscript xs) =
+  RawInline (Format "html") "<sup>" : xs
+    ++ [RawInline (Format "html") "</sup>"]
+adjustCSL True (Emph xs) =
+  RawInline (Format "html") "<i>" : xs
+    ++ [RawInline (Format "html") "</i>"]
+adjustCSL True (Strong xs) =
+  RawInline (Format "html") "<b>" : xs
+    ++ [RawInline (Format "html") "</b>"]
+adjustCSL _ x = [x]
 
 -- We use a newtype wrapper so we can have custom ToJSON, FromJSON
 -- instances.
@@ -192,7 +217,7 @@ instance ToJSON Formatted where
   toJSON = toJSON . writeCSLString . unFormatted
 
 instance ToYaml Formatted where
-  toYaml = Y.string . T.pack . writeCSLString . unFormatted
+  toYaml = Y.string . T.pack . writeYAMLString . unFormatted
 
 instance IsString Formatted where
   fromString = Formatted . toStr
