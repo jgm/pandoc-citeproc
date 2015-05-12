@@ -139,7 +139,7 @@ library
     build-depends:    containers, directory, mtl,
                       bytestring, filepath, pandoc-types >= 1.12.3, tagsoup,
                       aeson >= 0.7 && < 0.9, text, vector,
-                      xml-conduit >= 1.2 && < 1.3,
+                      xml-conduit >= 1.2 && < 1.4,
                       data-default,
                       setenv >= 0.1 && < 0.2,
                       split, yaml >= 0.8.8.7, pandoc >= 1.13
