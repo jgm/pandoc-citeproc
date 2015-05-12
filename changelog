@@ -1,3 +1,7 @@
+pandoc-citeproc (0.7.0.2)
+
+  * Bump version bound for xml-conduit.
+
 pandoc-citeproc (0.7.0.1)
 
   * In YAML use pandoc markdown syntax for super, subscript (#128).
