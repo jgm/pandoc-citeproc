@@ -45,9 +45,10 @@ getCollapseOptions
     = map snd . filter ((==) "collapse" . fst) . citOptions . citation
 
 collapseNumber :: CitationGroup -> CitationGroup
-collapseNumber (CG as f d os) = mapCitationGroup process $ CG as f d os'
+collapseNumber (CG _ f d os) = mapCitationGroup process $ CG [] f d os
+-- note:  for numerical styles, we treat author-in-text citations just
+-- like any others.
     where
-      os' = if null as then os else drop 1 os
       hasLocator = or . query hasLocator'
       hasLocator' o
           | OLoc _ _ <- o = [True]
