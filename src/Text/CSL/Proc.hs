@@ -22,7 +22,7 @@ import Data.List
 import Data.Ord  ( comparing )
 import Data.Maybe ( mapMaybe )
 import Text.CSL.Eval
-import Text.CSL.Util ( capitalize, proc, proc', query, uncamelize, tr' )
+import Text.CSL.Util ( proc, proc', query, uncamelize, tr' )
 import Text.CSL.Proc.Collapse
 import Text.CSL.Proc.Disamb
 import Text.CSL.Reference
@@ -410,8 +410,7 @@ localModifiers s b c
 contribOnly :: Style -> Output -> Output
 contribOnly s o
     | isNumStyle [o]
-    , OCitNum  {} <- o = Output [ OStr (query getRefTerm s) emptyFormatting
-                                , OSpace, o] emptyFormatting
+    , OCitNum  {} <- o = o
     | OContrib _ "author"
             _ _ _ <- o = o
     | OContrib _ "authorsub"
@@ -421,8 +420,3 @@ contribOnly s o
     , "ibid" <- filter (/= '.')
        (map toLower x) = o
     | otherwise        = ONull
-    where
-      getRefTerm :: CslTerm -> String
-      getRefTerm t
-          | CT "reference" Long _ _ x _ _ <- t = capitalize x
-          | otherwise                          = []
