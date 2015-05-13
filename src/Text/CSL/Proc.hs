@@ -30,7 +30,7 @@ import Text.CSL.Style
 import Data.Aeson
 import Data.Monoid ((<>))
 import Control.Applicative ((<|>))
-import Text.Pandoc.Definition (Inline(Space, Str, LineBreak, Note), Block(Para))
+import Text.Pandoc.Definition (Inline(Space, Str, Note), Block(Para))
 
 data ProcOpts
     = ProcOpts
@@ -158,7 +158,7 @@ procBiblio bos (Style {biblio = mb, csMacros = ms , styleLocale = l,
         | secondFieldAlign == Just "flush"  =
             [Output (OCitNum n f : OSpace : xs) f']
         | secondFieldAlign == Just "margin" =
-            [Output (OCitNum n f : OPan [LineBreak] : xs) f']
+            [Output (OCitNum n f : OSpace : xs) f']
         | otherwise = [Output (OCitNum n f : xs) f']
       addSpaceAfterCitNum xs = xs
 
