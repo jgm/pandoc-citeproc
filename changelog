@@ -1,3 +1,18 @@
+pandoc-citeproc (0.7.1)
+
+  * Improvements to numerical styles:
+    + Space is now inserted after the reference number in the
+      bibliography when `second-field-align` is `margin` or `flush`.
+    + Author-in-text citations are now treated just like other citations
+      in numerical styles.  So, brackets are used, and the term
+      "Reference" is not added: instead of `Reference 1 says...`
+      we have `[1] says...`.  This seems to accord better with e.g.
+      IEEE practice.
+    + Improved citation collapsing.  Now both the new and the old versions
+      of `ieee.csl` work properly.  Previously brackets were dropped with
+      the new version (#55).
+    + Use new `ieee.csl` for testing.
+
 pandoc-citeproc (0.7.0.2)
 
   * Bump version bound for xml-conduit.
