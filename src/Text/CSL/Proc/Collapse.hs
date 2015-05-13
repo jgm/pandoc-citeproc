@@ -16,10 +16,11 @@
 
 module Text.CSL.Proc.Collapse where
 
+import Data.Ord (comparing)
 import Data.Monoid (mempty, Any(..))
 import Control.Arrow ( (&&&), (>>>), second )
 import Data.Char
-import Data.List ( groupBy, sort )
+import Data.List ( groupBy, sortBy )
 import Text.CSL.Util ( query, proc, proc', betterThan )
 import Text.CSL.Eval
 import Text.CSL.Proc.Disamb
@@ -44,27 +45,28 @@ getCollapseOptions
     = map snd . filter ((==) "collapse" . fst) . citOptions . citation
 
 collapseNumber :: CitationGroup -> CitationGroup
-collapseNumber cg
-    | CG [a] f d os <- cg = mapCitationGroup process . CG [a] f d $ drop 1 os
-    | otherwise           = mapCitationGroup process cg
+collapseNumber (CG as f d os) = mapCitationGroup process $ CG as f d os'
     where
+      os' = if null as then os else drop 1 os
       hasLocator = or . query hasLocator'
       hasLocator' o
           | OLoc _ _ <- o = [True]
           | otherwise     = [False]
-      citNum o
-          | OCitNum i f <- o = [(i,f)]
-          | otherwise        = []
-      numOf  = foldr (\x _ -> x) (0,emptyFormatting) . query citNum
-      newNum = map numOf >>> (map fst >>> groupConsec) &&& map snd >>> uncurry zip
-      process xs = if  hasLocator xs then xs else
-                   flip concatMap (newNum xs) $
-                   \(x,f) -> if length x > 2
-                             then return $ Output [ OCitNum (head x) f
-                                                  , OPan [Str "\x2013"]
-                                                  , OCitNum (last x) f
-                                                  ] emptyFormatting
-                             else map (flip OCitNum f) x
+      citNums (OCitNum i _) = [i]
+      citNums (Output xs _) = concatMap citNums xs
+      citNums _             = []
+      numOf  = foldr (\x _ -> x) 0 . citNums
+      process xs = if hasLocator xs
+                      then xs
+                      else let ys = concat (groupConsecWith numOf xs)
+                           in if length ys > 2
+                                 then [ Output [
+                                            head ys
+                                          , OPan [Str "\x2013"]
+                                          , last ys
+                                          ] emptyFormatting
+                                      ]
+                                 else ys
 
 groupCites :: [(Cite, Output)] -> [(Cite, Output)]
 groupCites []     = []
@@ -215,10 +217,12 @@ isNumStyle = getAny . query ocitnum
 --
 -- > groupConsec [1,2,3,5,6,8,9] == [[1,2,3],[5,6],[8,9]]
 groupConsec :: [Int] -> [[Int]]
-groupConsec = foldr go [] . sort
-  where go :: Int -> [[Int]] -> [[Int]]
-        go x []     = [[x]]
-        go x ((y:ys):gs) = if x + 1 == y
-                         then ((x:y:ys):gs)
-                         else ([x]:(y:ys):gs)
+groupConsec = groupConsecWith id
+
+groupConsecWith ::  (a -> Int) -> [a] -> [[a]]
+groupConsecWith f = foldr go [] . sortBy (comparing f)
+  where go x []     = [[x]]
+        go x ((y:ys):gs) = if (f x + 1) == (f y)
+                              then ((x:y:ys):gs)
+                              else ([x]:(y:ys):gs)
         go _ ([]:_) = error "groupConsec: head of list is empty"
