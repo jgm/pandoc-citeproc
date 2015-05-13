@@ -30,7 +30,7 @@ import Text.CSL.Style
 import Data.Aeson
 import Data.Monoid ((<>))
 import Control.Applicative ((<|>))
-import Text.Pandoc.Definition (Inline(Space, Str, Note), Block(Para))
+import Text.Pandoc.Definition (Inline(Space, Str, LineBreak, Note), Block(Para))
 
 data ProcOpts
     = ProcOpts
@@ -100,11 +100,11 @@ citeproc ops s rs cs
                                proc (updateYearSuffixes yearS) . map addYearSuffix) $
                           procBiblio (bibOpts ops) s biblioRefs
                      else map formatOutputList $
+                          tr' "citeproc:after procBiblio" $
                           procBiblio (bibOpts ops) s biblioRefs
-      citsAndRefs  = tr' "citeproc:citsAndRefs" $ processCites biblioRefs cs
+      citsAndRefs  = processCites biblioRefs cs
       (yearS,citG) = disambCitations s biblioRefs cs $ map (procGroup s) citsAndRefs
-      citsOutput   = tr' "citeproc:after formatCitLayout" .
-                     map (formatCitLayout s) .
+      citsOutput   = map (formatCitLayout s) .
                      tr' "citeproc:collapsed" .
                      collapseCitGroups s .
                      (if styleClass s == "in-text" then proc addLink else id) .
@@ -151,8 +151,19 @@ sortItems l
 procBiblio :: BibOpts -> Style -> [Reference] -> [[Output]]
 procBiblio bos (Style {biblio = mb, csMacros = ms , styleLocale = l,
                        styleAbbrevs = as, csOptions = opts}) rs
-    = maybe [] process mb
+    = map addSpaceAfterCitNum $ maybe [] process mb
     where
+      -- handle second-field-align (sort of)
+      addSpaceAfterCitNum [Output (OCitNum n f : xs) f']
+        | secondFieldAlign == Just "flush"  =
+            [Output (OCitNum n f : OSpace : xs) f']
+        | secondFieldAlign == Just "margin" =
+            [Output (OCitNum n f : OPan [LineBreak] : xs) f']
+        | otherwise = [Output (OCitNum n f : xs) f']
+      addSpaceAfterCitNum xs = xs
+
+      secondFieldAlign = lookup "second-field-align" $ maybe [] bibOptions mb
+
       process :: Bibliography -> [[Output]]
       process b   = map (formatBiblioLayout (layFormat $ bibLayout b) (layDelim $ bibLayout b)) $ render b
 
