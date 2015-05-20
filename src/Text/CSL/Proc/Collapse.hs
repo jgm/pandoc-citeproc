@@ -59,8 +59,9 @@ collapseNumber (CG _ f d os) = mapCitationGroup process $ CG [] f d os
       numOf  = foldr (\x _ -> x) 0 . citNums
       process xs = if hasLocator xs
                       then xs
-                      else let ys = concat (groupConsecWith numOf xs)
-                           in if length ys > 2
+                      else flip concatMap (groupConsecWith numOf xs)
+                           $ \ys ->
+                              if length ys > 2
                                  then [ Output [
                                             head ys
                                           , OPan [Str "\x2013"]
