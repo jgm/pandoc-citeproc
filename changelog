@@ -1,3 +1,7 @@
+pandoc-citeproc (0.7.1.1)
+
+  * Fixed regression in numerical citation collapsing (#131).
+
 pandoc-citeproc (0.7.1)
 
   * Improvements to numerical styles:
