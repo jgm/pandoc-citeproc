@@ -22,7 +22,7 @@
     <term name="anonymous">nafnlaus</term>
     <term name="anonymous" form="short">nafnl.</term>
     <term name="at">af</term>
-    <term name="available at">available at</term>
+    <term name="available at">aðgengilegt á</term>
     <term name="by">eftir</term>
     <term name="circa">sirka</term>
     <term name="circa" form="short">u.þ.b.</term>
@@ -55,7 +55,7 @@
     </term>
     <term name="retrieved">sótt</term>
     <term name="scale">scale</term>
-    <term name="version">version</term>
+    <term name="version">útgáfa</term>
 
     <!-- ANNO DOMINI; BEFORE CHRIST -->
     <term name="ad">e.Kr.</term>
@@ -105,16 +105,16 @@
       <multiple>handrit</multiple>
     </term>
     <term name="issue">
-      <single>númer</single>
-      <multiple>númer</multiple>
+      <single>tölublað</single>
+      <multiple>tölublöð</multiple>
     </term>
     <term name="line">
       <single>lína</single>
       <multiple>línur</multiple>
     </term>
     <term name="note">
-      <single>skilaboð</single>
-      <multiple>skilaboð</multiple>
+      <single>athugasemd</single>
+      <multiple>athugasemdir</multiple>
     </term>
     <term name="opus">
       <single>tónverk</single>
@@ -154,14 +154,14 @@
     </term>
 
     <!-- SHORT LOCATOR FORMS -->
-    <term name="book" form="short">b.</term>
+    <term name="book" form="short">bók</term>
     <term name="chapter" form="short">k.</term>
     <term name="column" form="short">d.</term>
     <term name="figure" form="short">mynd.</term>
     <term name="folio" form="short">handr.</term>
-    <term name="issue" form="short">nr.</term>
+    <term name="issue" form="short">tbl.</term>
     <term name="line" form="short">l.</term>
-    <term name="note" form="short">n.</term>
+    <term name="note" form="short">ath.</term>
     <term name="opus" form="short">tónv.</term>
     <term name="page" form="short">
       <single>bls.</single>
@@ -183,8 +183,8 @@
       <multiple>v.</multiple>
     </term>
     <term name="volume" form="short">
-      <single>bindi</single>
-      <multiple>bindi</multiple>
+      <single>b.</single>
+      <multiple>b.</multiple>
     </term>
 
     <!-- SYMBOL LOCATOR FORMS -->
@@ -199,8 +199,8 @@
 
     <!-- LONG ROLE FORMS -->
     <term name="director">
-      <single>director</single>
-      <multiple>directors</multiple>
+      <single>leikstjóri</single>
+      <multiple>leikstjórar</multiple>
     </term>
     <term name="editor">
       <single>ritstjóri</single>
@@ -211,8 +211,8 @@
       <multiple>ritstjórar</multiple>
     </term>
     <term name="illustrator">
-      <single>illustrator</single>
-      <multiple>illustrators</multiple>
+      <single>höfundur myndskreytinga</single>
+      <multiple>höfundar myndskreytinga</multiple>
     </term>
     <term name="translator">
       <single>þýðandi</single>
@@ -225,8 +225,8 @@
 
     <!-- SHORT ROLE FORMS -->
     <term name="director" form="short">
-      <single>dir.</single>
-      <multiple>dirs.</multiple>
+      <single>leikstj.</single>
+      <multiple>leikstj.</multiple>
     </term>
     <term name="editor" form="short">
       <single>ritstj.</single>
@@ -237,8 +237,8 @@
       <multiple>ritstj.</multiple>
     </term>
     <term name="illustrator" form="short">
-      <single>ill.</single>
-      <multiple>ills.</multiple>
+      <single>höf. mynd.</single>
+      <multiple>höf. mynd.</multiple>
     </term>
     <term name="translator" form="short">
       <single>þýð.</single>
@@ -250,24 +250,24 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
-    <term name="director" form="verb">directed by</term>
-    <term name="editor" form="verb">ritstjóri</term>
-    <term name="editorial-director" form="verb">ritstjóri</term>
-    <term name="illustrator" form="verb">illustrated by</term>
+    <term name="director" form="verb">leikstýrt af</term>
+    <term name="editor" form="verb">ritstýrt af</term>
+    <term name="editorial-director" form="verb">ritstýrt af</term>
+    <term name="illustrator" form="verb">myndskreytt af</term>
     <term name="interviewer" form="verb">viðtal tók</term>
     <term name="recipient" form="verb">til</term>
     <term name="reviewed-author" form="verb">by</term>
     <term name="translator" form="verb">þýddi</term>
-    <term name="editortranslator" form="verb">ritstjóri og þýðandi</term>
+    <term name="editortranslator" form="verb">ritstýrt og þýtt af</term>
 
     <!-- SHORT VERB ROLE FORMS -->
     <term name="container-author" form="verb-short">eftir</term>
-    <term name="director" form="verb-short">dir.</term>
-    <term name="editor" form="verb-short">ritst.</term>
-    <term name="editorial-director" form="verb-short">ritst.</term>
-    <term name="illustrator" form="verb-short">illus.</term>
+    <term name="director" form="verb-short">leikstj.</term>
+    <term name="editor" form="verb-short">ritstj.</term>
+    <term name="editorial-director" form="verb-short">ritstj.</term>
+    <term name="illustrator" form="verb-short">myndskr.</term>
     <term name="translator" form="verb-short">þýð.</term>
-    <term name="editortranslator" form="verb-short">ritst. og þýð.</term>
+    <term name="editortranslator" form="verb-short">ritstj. og þýð.</term>
 
     <!-- LONG MONTH FORMS -->
     <term name="month-01">janúar</term>

@@ -22,7 +22,7 @@
     <term name="anonymous">anonym</term>
     <term name="anonymous" form="short">anon.</term>
     <term name="at">på</term>
-    <term name="available at">available at</term>
+    <term name="available at">tilgængelig hos</term>
     <term name="by">af</term>
     <term name="circa">cirka</term>
     <term name="circa" form="short">ca.</term>
@@ -212,7 +212,7 @@
     </term>
     <term name="illustrator">
       <single>illustrator</single>
-      <multiple>illustrators</multiple>
+      <multiple>illustratorer</multiple>
     </term>
     <term name="translator">
       <single>oversætter</single>
@@ -238,7 +238,7 @@
     </term>
     <term name="illustrator" form="short">
       <single>ill.</single>
-      <multiple>ills.</multiple>
+      <multiple>ill.</multiple>
     </term>
     <term name="translator" form="short">
       <single>overs.</single>
@@ -253,7 +253,7 @@
     <term name="director" form="verb">directed by</term>
     <term name="editor" form="verb">redigeret af</term>
     <term name="editorial-director" form="verb">redigeret af</term>
-    <term name="illustrator" form="verb">illustrated by</term>
+    <term name="illustrator" form="verb">illustreret af</term>
     <term name="interviewer" form="verb">interviewet af</term>
     <term name="recipient" form="verb">modtaget af</term>
     <term name="reviewed-author" form="verb">by</term>
@@ -301,6 +301,6 @@
     <term name="season-01">Forår</term>
     <term name="season-02">Sommer</term>
     <term name="season-03">Efterår</term>
-    <term name="season-04">vinter</term>
+    <term name="season-04">Vinter</term>
   </terms>
 </locale>

@@ -20,7 +20,7 @@
     <term name="and">och</term>
     <term name="and others">och andra</term>
     <term name="anonymous">anonym</term>
-    <term name="anonymous" form="short">anon</term>
+    <term name="anonymous" form="short">anon.</term>
     <term name="at">vid</term>
     <term name="available at">tillgänglig vid</term>
     <term name="by">av</term>
@@ -31,7 +31,7 @@
       <single>upplaga</single>
       <multiple>upplagor</multiple>
     </term>
-    <term name="edition" form="short">uppl</term>
+    <term name="edition" form="short">uppl.</term>
     <term name="et-al">m.fl.</term>
     <term name="forthcoming">kommande</term>
     <term name="from">från</term>
@@ -41,8 +41,8 @@
     <term name="internet">internet</term>
     <term name="interview">intervju</term>
     <term name="letter">brev</term>
-    <term name="no date">inget datum</term>
-    <term name="no date" form="short">nd</term>
+    <term name="no date">utan årtal</term>
+    <term name="no date" form="short">u.å.</term>
     <term name="online">online</term>
     <term name="presented at">presenterad vid</term>
     <term name="reference">
@@ -51,15 +51,15 @@
     </term>
     <term name="reference" form="short">
       <single>ref.</single>
-      <multiple>refs.</multiple>
+      <multiple>ref.</multiple>
     </term>
     <term name="retrieved">hämtad</term>
     <term name="scale">scale</term>
     <term name="version">version</term>
 
     <!-- ANNO DOMINI; BEFORE CHRIST -->
-    <term name="ad">e. Kr.</term>
-    <term name="bc">f. Kr.</term>
+    <term name="ad">e.Kr.</term>
+    <term name="bc">f.Kr.</term>
 
     <!-- PUNCTUATION -->
     <term name="open-quote">”</term>
@@ -154,30 +154,30 @@
     </term>
     <term name="volume">
       <single>volym</single>
-      <multiple>volumer</multiple>
+      <multiple>volymer</multiple>
     </term>
 
     <!-- SHORT LOCATOR FORMS -->
     <term name="book" form="short">bok</term>
-    <term name="chapter" form="short">kap</term>
-    <term name="column" form="short">kol</term>
-    <term name="figure" form="short">fig</term>
-    <term name="folio" form="short">f</term>
-    <term name="issue" form="short">num</term>
+    <term name="chapter" form="short">kap.</term>
+    <term name="column" form="short">kol.</term>
+    <term name="figure" form="short">fig.</term>
+    <term name="folio" form="short">f.</term>
+    <term name="issue" form="short">nr</term>
     <term name="line" form="short">l.</term>
     <term name="note" form="short">n.</term>
-    <term name="opus" form="short">op</term>
+    <term name="opus" form="short">op.</term>
     <term name="page" form="short">
-      <single>s</single>
-      <multiple>ss</multiple>
+      <single>s.</single>
+      <multiple>s.</multiple>
     </term>
     <term name="number-of-pages" form="short">
-      <single>s</single>
-      <multiple>ss</multiple>
+      <single>s.</single>
+      <multiple>s.</multiple>
     </term>
-    <term name="paragraph" form="short">st</term>
+    <term name="paragraph" form="short">st.</term>
     <term name="part" form="short">del</term>
-    <term name="section" form="short">avs</term>
+    <term name="section" form="short">avs.</term>
     <term name="sub verbo" form="short">
       <single>s.v.</single>
       <multiple>s.vv.</multiple>
@@ -187,8 +187,8 @@
       <multiple>verser</multiple>
     </term>
     <term name="volume" form="short">
-      <single>vol</single>
-      <multiple>vols</multiple>
+      <single>vol.</single>
+      <multiple>vol.</multiple>
     </term>
 
     <!-- SYMBOL LOCATOR FORMS -->
@@ -233,8 +233,8 @@
       <multiple>dirs.</multiple>
     </term>
     <term name="editor" form="short">
-      <single>red</single>
-      <multiple>reds</multiple>
+      <single>red.</single>
+      <multiple>red.</multiple>
     </term>
     <term name="editorial-director" form="short">
       <single>ed.</single>
@@ -242,36 +242,36 @@
     </term>
     <term name="illustrator" form="short">
       <single>ill.</single>
-      <multiple>ills.</multiple>
+      <multiple>ill.</multiple>
     </term>
     <term name="translator" form="short">
-      <single>övers</single>
-      <multiple>övers</multiple>
+      <single>övers.</single>
+      <multiple>övers.</multiple>
     </term>
     <term name="editortranslator" form="short">
-      <single>ed. &amp; tran.</single>
-      <multiple>eds. &amp; trans.</multiple>
+      <single>red. &amp; övers.</single>
+      <multiple>red. &amp; övers.</multiple>
     </term>
 
     <!-- VERB ROLE FORMS -->
     <term name="director" form="verb">directed by</term>
     <term name="editor" form="verb">redigerad av</term>
     <term name="editorial-director" form="verb">edited by</term>
-    <term name="illustrator" form="verb">illustrated by</term>
-    <term name="interviewer" form="verb">intervju av</term>
+    <term name="illustrator" form="verb">illustrerad av</term>
+    <term name="interviewer" form="verb">intervjuad av</term>
     <term name="recipient" form="verb">till</term>
     <term name="reviewed-author" form="verb">by</term>
     <term name="translator" form="verb">översatt av</term>
-    <term name="editortranslator" form="verb">edited &amp; translated by</term>
+    <term name="editortranslator" form="verb">redigerad &amp; översatt av</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">by</term>
+    <term name="container-author" form="verb-short">av</term>
     <term name="director" form="verb-short">dir.</term>
-    <term name="editor" form="verb-short">red</term>
+    <term name="editor" form="verb-short">red.</term>
     <term name="editorial-director" form="verb-short">ed.</term>
     <term name="illustrator" form="verb-short">illus.</term>
-    <term name="translator" form="verb-short">övers</term>
-    <term name="editortranslator" form="verb-short">ed. &amp; trans. by</term>
+    <term name="translator" form="verb-short">övers.</term>
+    <term name="editortranslator" form="verb-short">red. &amp; övers. av</term>
 
     <!-- LONG MONTH FORMS -->
     <term name="month-01">januari</term>
