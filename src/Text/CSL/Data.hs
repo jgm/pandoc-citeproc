@@ -52,7 +52,7 @@ getLocale s = do
   f <- case length s of
              0 -> return "locales/locales-en-US.xml"
              2 -> getDataFileName ("locales/locales-" ++
-                                maybe "en-US" id (lookup s langBase) ++ ".xml")
+                                maybe s id (lookup s langBase) ++ ".xml")
              _ -> getDataFileName ("locales/locales-" ++ take 5 s ++ ".xml")
   exists <- doesFileExist f
   if not exists && length s > 2
