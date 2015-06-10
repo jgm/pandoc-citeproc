@@ -91,7 +91,7 @@ library
     ghc-prof-options: -fprof-auto-exported -rtsopts
     build-depends:    containers, directory, mtl,
                       bytestring, filepath, pandoc-types >= 1.12.3, tagsoup,
-                      aeson >= 0.7 && < 0.9, text, vector,
+                      aeson >= 0.7 && < 0.10, text, vector,
                       xml-conduit >= 1.2 && < 1.4,
                       data-default,
                       setenv >= 0.1 && < 0.2,
