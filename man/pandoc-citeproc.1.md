@@ -87,6 +87,11 @@ the input:
     and if this is not present, it will use its own version of
     `chicago-author-date.csl`.
 
+`link-citations`
+:   If this has a true value, citations in author-date and numerical
+    styles will be hyperlinked to their corresponding bibliography entries.
+    The default is not to add hyperlinks.
+
 `citation-abbreviations`
 :   Path to a CSL abbreviations JSON file. The format
     is described

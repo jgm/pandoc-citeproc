@@ -41,7 +41,8 @@ processCites style refs (Pandoc m1 b1) =
       grps          = query getCitation $ Pandoc m3 b2
       m4            = deleteMeta "nocites-wildcards" m3
       locMap        = locatorMap style
-      result        = citeproc procOpts style refs (setNearNote style $
+      result        = citeproc procOpts{ linkCitations = isLinkCitations m4}
+                        style refs (setNearNote style $
                         map (map (toCslCite locMap)) grps)
       cits_map      = tr' "cits_map" $ M.fromList $ zip grps (citations result)
       biblioList    = map (renderPandoc' style) $ zip (bibliography result) (citationIds result)
@@ -74,6 +75,12 @@ refTitle meta =
 isRefRemove :: Meta -> Bool
 isRefRemove meta =
   case lookupMeta "suppress-bibliography" meta of
+    Just (MetaBool True) -> True
+    _                    -> False
+
+isLinkCitations :: Meta -> Bool
+isLinkCitations meta =
+  case lookupMeta "link-citations" meta of
     Just (MetaBool True) -> True
     _                    -> False
 

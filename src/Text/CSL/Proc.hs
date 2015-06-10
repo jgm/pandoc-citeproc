@@ -35,6 +35,7 @@ import Text.Pandoc.Definition (Inline(Space, Str, Note), Block(Para))
 data ProcOpts
     = ProcOpts
       { bibOpts :: BibOpts
+      , linkCitations :: Bool
       }
     deriving ( Show, Read, Eq )
 
@@ -69,7 +70,10 @@ instance FromJSON BibOpts where
   parseJSON _ = return $ Select [] []
 
 procOpts :: ProcOpts
-procOpts = ProcOpts (Select [] [])
+procOpts = ProcOpts
+      { bibOpts = Select [] []
+      , linkCitations = False
+      }
 
 -- | With a 'Style', a list of 'Reference's and the list of citation
 -- groups (the list of citations with their locator), produce the
@@ -107,7 +111,9 @@ citeproc ops s rs cs
       citsOutput   = map (formatCitLayout s) .
                      tr' "citeproc:collapsed" .
                      collapseCitGroups s .
-                     (if styleClass s == "in-text" then proc addLink else id) .
+                     (if linkCitations ops && styleClass s == "in-text"
+                         then proc addLink
+                         else id) .
                      tr' "citeproc:citG" $
                      citG
       addLink :: (Cite, Output) -> (Cite, Output)

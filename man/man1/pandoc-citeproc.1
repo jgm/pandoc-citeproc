@@ -1,5 +1,5 @@
 .\"t
-.TH "pandoc\-citeproc" "1" "2015-05-08" "0.7" ""
+.TH "pandoc\-citeproc" "1" "2015-06-10" "0.7.1.1" ""
 .SH NAME
 .PP
 pandoc\-citeproc \- filter to resolve citations in a pandoc document.
@@ -150,6 +150,13 @@ If this is left off, pandoc\-citeproc will look for
 \f[C]$HOME/.csl/chicago\-author\-date.csl\f[], and if this is not
 present, it will use its own version of
 \f[C]chicago\-author\-date.csl\f[].
+.RS
+.RE
+.TP
+.B \f[C]link\-citations\f[]
+If this has a true value, citations in author\-date and numerical styles
+will be hyperlinked to their corresponding bibliography entries.
+The default is not to add hyperlinks.
 .RS
 .RE
 .TP
