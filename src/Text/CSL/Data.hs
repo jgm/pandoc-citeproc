@@ -71,7 +71,6 @@ getDefaultCSL =
 langBase :: [(String, String)]
 langBase
     = [("af", "af-ZA")
-      ,("ar", "ar-AR")
       ,("bg", "bg-BG")
       ,("ca", "ca-AD")
       ,("cs", "cs-CZ")
