@@ -32,8 +32,8 @@ references:
   - family: Shakespeare
   issued:
   - year: 1975
-  title: Macbeth [title field of inbook-1]
-  container-title: Collected works [title field of mvbook-1]
+  title: Macbeth \[title field of inbook-1\]
+  container-title: Collected works \[title field of mvbook-1\]
   publisher: Publisher
   publisher-place: Location
   page: 100-200
@@ -48,7 +48,7 @@ references:
   issued:
   - year: 1970
   - year: 1980
-  title: Collected works [title field of mvbook-1]
+  title: Collected works \[title field of mvbook-1\]
   publisher: Publisher
   publisher-place: Location
   number-of-volumes: 4
