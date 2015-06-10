@@ -31,7 +31,7 @@ clean:
 	cabal clean
 
 update:
-	curl 'https://raw2.github.com/citation-style-language/styles/master/chicago-author-date.csl' > chicago-author-date.csl ; \
+	curl 'https://raw.githubusercontent.com/citation-style-language/styles/master/chicago-author-date.csl' > chicago-author-date.csl ; \
 	git clone 'https://github.com/citation-style-language/locales' locales-repo ; \
 	for x in locales-repo/*.xml; do cp $$x locales/; done ; \
 	rm -rf locales-repo; \
