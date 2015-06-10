@@ -1,3 +1,18 @@
+pandoc-citeproc (0.7.2)
+
+  * Added `link-citations` metadata field (#141).  If this has a true value,
+    citations in author-date and numerical styles are linked to their
+    corresponding bibliography entries.  Otherwise not.  (In previous
+    versions of 0.7.x, this linking was the default.  Now it must be
+    enabled explicitly by setting this field.)
+  * Fixed locale lookup with two-letter codes (#140).
+  * Updated locales and chicago-author-date.csl.
+  * Text.CSL.Data: Remove spurious reference to ar-AR.
+  * Updated tests to escape literal `[` and `]` (to match
+    new pandoc markdown writer's behavior).
+  * Fixed `make update` to grab chicago-author-date.csl from correct URL.
+  * Bumped upper bound to allow aeson 0.9.*.
+
 pandoc-citeproc (0.7.1.1)
 
   * Fixed regression in numerical citation collapsing (#131).
