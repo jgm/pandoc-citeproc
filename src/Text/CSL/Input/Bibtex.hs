@@ -913,7 +913,7 @@ itemToReference lang locale bibtex = bib $ do
                 ("english","variant=us")         -> return "american"
                 ("english","variant=usmax")      -> return "american"
                 ("english","variant=uk")         -> return "british"
-                ("english","varant=australian")  -> return "australian"
+                ("english","variant=australian") -> return "australian"
                 ("english","variant=newzealand") -> return "newzealand"
                 (x,_)                            -> return x
   hyphenation <- ((toLocale . map toLower) <$>
