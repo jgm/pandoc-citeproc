@@ -301,7 +301,7 @@ formatName m b f fm ops np n
       -- see src/load.js ROMANESQUE_REGEX in citeproc-js:
       isByzantine c = not (isLetter c) ||
                       c <= '\x5FF' ||
-                      (c >= '\x1f00' && c <= '\x1fff')
+                      (c >= '\x1e00' && c <= '\x1fff')
       shortName = oPan' (unFormatted $ nondropping <+> family) (form "family")
       longName g = if isSorting m
                    then let firstPart = case getOptionVal "demote-non-dropping-particle" ops of
