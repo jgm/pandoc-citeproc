@@ -378,6 +378,7 @@ s  <+> Formatted [] = s
 Formatted xs <+> Formatted ys =
   case lastInline xs of
        "’"  -> Formatted (xs ++ ys)
+       "-"  -> Formatted (xs ++ ys)
        _    -> Formatted (xs ++ [Space] ++ ys)
 
 (<++>) :: [Output] -> [Output] -> [Output]
