@@ -100,7 +100,7 @@ runTest :: FilePath -> IO TestResult
 runTest path = E.handle (handleError path) $ do
   raw <- BL.readFile path
   let testCase = either error id $ eitherDecode raw
-  let procOpts = ProcOpts (testBibopts testCase)
+  let procOpts = ProcOpts (testBibopts testCase) False
   style <- localizeCSL Nothing
            $ (testCsl testCase) { styleAbbrevs = testAbbreviations testCase }
   let refs     = testReferences testCase
