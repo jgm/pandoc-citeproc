@@ -5,5 +5,5 @@ VERSION=$(shell ../dist/build/pandoc-citeproc/pandoc-citeproc --version | head -
 .PHONY: all
 
 all: $(ALL)
-man1/%.1: %.1.md ../dist/build/pandoc-citeproc/pandoc-citeproc
+man1/%.1: %.1.md
 	pandoc $< -o $@ -s -t man -Vfooter="${VERSION}" -Vdate="${DATE}"
