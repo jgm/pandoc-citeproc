@@ -168,13 +168,13 @@ instance FromJSON [RefDate] where
   parseJSON x          = parseJSON x >>= mkRefDate
 
 -- Zotero doesn't properly support date ranges, so a common
--- workaround is 2005_2007; support this as date range:
+-- workaround is 2005_2007 or 2005_; support this as date range:
 handleLiteral :: RefDate -> [RefDate]
 handleLiteral d@(RefDate (Literal "") (Literal "") (Literal "")
                          (Literal "") (Literal xs) b)
   = case splitWhen (=='_') xs of
          [x,y] | all isDigit x && all isDigit y &&
-                 not (null x) && not (null y) ->
+                 not (null x) ->
                  [RefDate (Literal x) mempty mempty mempty mempty b,
                   RefDate (Literal y) mempty mempty mempty mempty b]
          _ -> [d]
