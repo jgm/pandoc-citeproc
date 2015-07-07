@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings, PatternGuards, DeriveDataTypeable,
     ScopedTypeVariables, FlexibleInstances, DeriveGeneric,
-    GeneralizedNewtypeDeriving, CPP #-}
+    GeneralizedNewtypeDeriving, CPP, MultiParamTypeClasses #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Style
@@ -85,7 +85,7 @@ import GHC.Generics (Generic)
 import Data.String
 import Data.Monoid (mempty, Monoid, mappend, mconcat, (<>))
 import Control.Arrow hiding (left, right)
-import Control.Monad (mplus)
+import Control.Monad (liftM, mplus)
 import Control.Applicative hiding (Const)
 import qualified Data.Aeson as Aeson
 import Data.Aeson.Types (Pair)
@@ -217,6 +217,16 @@ instance Monoid Formatted where
   mempty = Formatted []
   mappend = appendWithPunct
   mconcat = foldr mappend mempty
+
+instance Walk.Walkable Inline Formatted where
+  walk f  = Formatted . Walk.walk f . unFormatted
+  walkM f = liftM Formatted . Walk.walkM f . unFormatted
+  query f = Walk.query f . unFormatted
+
+instance Walk.Walkable Formatted Formatted where
+  walk f  = f
+  walkM f = f
+  query f = f
 
 toStr :: String -> [Inline]
 toStr = intercalate [Str "\n"] .
