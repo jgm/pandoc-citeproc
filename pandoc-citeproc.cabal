@@ -150,8 +150,7 @@ executable test-citeproc
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.12.3, pandoc >= 1.13, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
-                  yaml >= 0.8.8.7, containers >= 0.4 && < 0.6,
-                  vector >= 0.10 && < 0.11
+                  yaml >= 0.8.8.7, containers >= 0.4, vector >= 0.10
   default-language: Haskell98
 
 test-suite test-pandoc-citeproc
