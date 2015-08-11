@@ -1,3 +1,15 @@
+pandoc-citeproc (0.7.3)
+
+  * Add Walkable instances for Formatted (Sean Leather).
+  * Allow empty end year in Zotero workaround, e.g. `2005_` (Nick Bart).
+  * man/Makefile - removed unnecessary dependency.
+  * Fixed test-citeproc.hs for change in `ProcOpts`.
+  * Cleaned up Setup.hs. Now takes into account destdir in copying man page.
+  * Don’t add space after particles ending with "-" (Nick Bart).
+  * Names.hs: Add Unicode “Latin Extended Additional” to isByzantine (Nick
+    Bart).
+  * Allow vector 0.11.
+
 pandoc-citeproc (0.7.2)
 
   * Added `link-citations` metadata field (#141).  If this has a true value,
