@@ -62,11 +62,11 @@ references:
   - family: Özkal
     given: Erhan
   issued:
-  - year: 2006
+  - year: '2006'
   title: Effect of immobilization on catalytic characteristics of saturated Pd-N-heterocyclic
     carbenes in Mizoroki-Heck reactions
   container-title: J. Organomet. Chem.
-  page: 3027-3036
-  volume: 691
-  issue: 13
+  page: '3027-3036'
+  volume: '691'
+  issue: '13'
 ...

@@ -51,11 +51,11 @@ references:
   - family: Bochmann
     given: Manfred
   issued:
-  - year: 1999
+  - year: '1999'
   title: Advanced inorganic chemistry
   publisher: Wiley
   publisher-place: Chichester
-  edition: 6
+  edition: '6'
   annote: A book entry with author authors and an edition field. By default, long
     author and editor lists are automatically truncated. This is configurable
   language: en-GB

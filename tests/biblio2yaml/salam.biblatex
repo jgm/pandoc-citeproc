@@ -51,19 +51,19 @@ references:
   - family: Svartholm
     given: Nils
   issued:
-  - year: 1968
+  - year: '1968'
   event-date:
-  - year: 1968
-    month: 5
-    day: 19
-  - year: 1968
-    month: 5
-    day: 25
+  - year: '1968'
+    month: '5'
+    day: '19'
+  - year: '1968'
+    month: '5'
+    day: '25'
   title: Weak and electromagnetic interactions
   container-title: 'Elementary particle theory: Relativistic groups and analyticity.
     Proceedings of the eighth Nobel symposium'
   publisher: Almquist & Wiksell
   publisher-place: Stockholm
   event-place: Aspenäsgarden, Lerum
-  page: 367-377
+  page: '367-377'
 ...

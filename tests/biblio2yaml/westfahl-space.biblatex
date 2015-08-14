@@ -71,14 +71,14 @@ references:
   - family: Westfahl
     given: Gary
   issued:
-  - year: 2000
+  - year: '2000'
   title: 'The true frontier: Confronting and avoiding the realities of space in
     American science fiction films'
   title-short: The true frontier
   container-title: 'Space and beyond: The frontier theme in science fiction'
   publisher: Greenwood
   publisher-place: Westport, Conn.; London
-  page: 55-65
+  page: '55-65'
   annote: A cross-referenced article from a collection. This is an incollection entry
     with a crossref field. Note the subtitle and indextitle fields
   language: en-US
@@ -89,7 +89,7 @@ references:
   - family: Westfahl
     given: Gary
   issued:
-  - year: 2000
+  - year: '2000'
   title: 'Space and beyond: The frontier theme in science fiction'
   title-short: Space and beyond
   publisher: Greenwood

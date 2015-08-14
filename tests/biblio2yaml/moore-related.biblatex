@@ -48,12 +48,12 @@ references:
   - family: Moore
     given: Gordon E.
   issued:
-  - year: 1998
+  - year: '1998'
   title: Cramming more components onto integrated circuits
   container-title: Proceedings of the IEEE
-  page: 82-85
-  volume: 86
-  issue: 1
+  page: '82-85'
+  volume: '86'
+  issue: '1'
   annote: A reprint of Moore’s law. Note the related and relatedtype fields
   language: en-US
 ...

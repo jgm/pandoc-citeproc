@@ -29,14 +29,14 @@ references:
   - family: Bookauthor
     given: Bob
   issued:
-  - year: 2011
+  - year: '2011'
   title: 'Title of the “inbook” Entry: Subtitle. Titleaddon'
   container-title: 'Maintitle: Mainsubtitle. Maintitleaddon'
   volume-title: 'Booktitle: Booksubtitle. Booktitleaddon'
   collection-title: Series
-  collection-number: 3
+  collection-number: '3'
   publisher: Publisher
   publisher-place: Location
-  volume: 4
+  volume: '4'
   language: fr-FR
 ...

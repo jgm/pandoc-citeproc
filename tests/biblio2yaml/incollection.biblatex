@@ -66,15 +66,15 @@ references:
   - family: Seibt
     given: Ferdinand
   issued:
-  - year: 1987
+  - year: '1987'
   title: Die nordischen Länder von der Mitte des 11. Jahrhunderts bis 1448
   title-short: Die nordischen Länder
   container-title: Europa im Hoch- und Spätmittelalter
   collection-title: Handbuch der europäischen Geschichte
-  collection-number: 2
+  collection-number: '2'
   publisher: Klett-Cotta
   publisher-place: Stuttgart
-  page: 884-917
+  page: '884-917'
   annote: An incollection entry with a series and a number. Note the format of the
     printed name and compare the useprefix option in the options field as well as
     vangennep. Also note the indextitle, and indexsorttitle fields
@@ -89,15 +89,15 @@ references:
   - family: O’Meara
     given: Dominic J.
   issued:
-  - year: 1981
+  - year: '1981'
   title: Aristotle’s theory of the intellect and its interpretation by Averroes
   title-short: Aristotle’s theory of the intellect
   container-title: Studies in Aristotle
   collection-title: Studies in philosophy and the history of philosophy
-  collection-number: 9
+  collection-number: '9'
   publisher: The Catholic University of America Press
   publisher-place: Washington, D.C.
-  page: 161-191
+  page: '161-191'
   annote: An incollection entry with a series and number field
   keyword: secondary
   language: en-US
@@ -111,14 +111,14 @@ references:
   - family: Twersky
     given: Isadore
   issued:
-  - year: 1979
+  - year: '1979'
   title: The limitations of human knowledge according to Al-Farabi, <span class="nocase">ibn
     Bajja</span>, and Maimonides
   title-short: Limitations of human knowledge
   container-title: Studies in medieval Jewish history and literature
   publisher: Harvard University Press
   publisher-place: Cambridge, Mass.
-  page: 82-109
+  page: '82-109'
   annote: A typical incollection entry. Note the indextitle field
   keyword: secondary
   language: en-US

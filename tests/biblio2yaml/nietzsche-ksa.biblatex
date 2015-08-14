@@ -66,13 +66,13 @@ references:
   - family: Montinari
     given: Mazzino
   issued:
-  - year: 1988
+  - year: '1988'
   title: 'Sämtliche Werke: Kritische Studienausgabe'
   title-short: Sämtliche Werke
   publisher: Deutscher Taschenbuch-Verlag; Walter de Gruyter
   publisher-place: München; Berlin; New York
-  number-of-volumes: 15
-  edition: 2
+  number-of-volumes: '15'
+  edition: '2'
   annote: The critical edition of Nietzsche’s works. This is a book entry referring
     to a 15-volume work as a whole. Note the volumes field and the format of the publisher
     and location fields in the database file. Also note the sorttitle and sortyear

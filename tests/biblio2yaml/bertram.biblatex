@@ -48,13 +48,13 @@ references:
   - family: Wentworth
     given: Richard
   issued:
-  - year: 1996
+  - year: '1996'
   title: Gromov invariants for holomorphic maps on Riemann surfaces
   title-short: Gromov invariants
   container-title: J. Amer. Math. Soc.
-  page: 529-571
-  volume: 9
-  issue: 2
+  page: '529-571'
+  volume: '9'
+  issue: '2'
   annote: An article entry with a volume and a number field
   language: en-US
 ...

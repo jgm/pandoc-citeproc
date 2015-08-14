@@ -72,14 +72,14 @@ references:
   - family: Nietzsche
     given: Friedrich
   issued:
-  - year: 1988
+  - year: '1988'
   title: 'Sämtliche Werke: Kritische Studienausgabe'
   volume-title: Die Geburt der Tragödie. Unzeitgemäße Betrachtungen I–IV. Nachgelassene
     Schriften 1870–1973
   publisher: Deutscher Taschenbuch-Verlag; Walter de Gruyter
   publisher-place: München; Berlin; New York
-  volume: 1
-  edition: 2
+  volume: '1'
+  edition: '2'
   annote: A single volume from the critical edition of Nietzsche’s works. This book
     entry explicitly refers to the first volume only. Note the title and maintitle
     fields. Also note the sorttitle and sortyear fields. We want this entry to be

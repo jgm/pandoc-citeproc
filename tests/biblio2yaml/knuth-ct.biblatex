@@ -49,12 +49,12 @@ references:
   - family: Knuth
     given: Donald E.
   issued:
-  - year: 1984
-  - year: 1986
+  - year: '1984'
+  - year: '1986'
   title: Computers & typesetting
   publisher: Addison-Wesley
   publisher-place: Reading, Mass.
-  number-of-volumes: 5
+  number-of-volumes: '5'
   annote: A five-volume book cited as a whole. This is a book entry, note the volumes
     field
   language: en-US

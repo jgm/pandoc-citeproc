@@ -85,13 +85,13 @@ references:
   - family: Hünenberger
     given: Philippe H.
   issued:
-  - year: 2006
+  - year: '2006'
   title: 'Computation of methodology-independent ionic solvation free energies from
     molecular simulations: I. The electrostatic potential in molecular liquids'
   title-short: Computation of methodology-independent ionic solvation free energies
     from molecular simulations
   container-title: J. Chem. Phys.
-  volume: 124
+  volume: '124'
   annote: An article entry with an eid and a doi field. Note that the <span style="font-variant:small-caps;">doi</span>
     is transformed into a clickable link if hyperref support has been enabled
   abstract: The computation of ionic solvation free energies from atomistic simulations

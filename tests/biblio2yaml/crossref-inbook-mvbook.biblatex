@@ -31,25 +31,25 @@ references:
   container-author:
   - family: Shakespeare
   issued:
-  - year: 1975
+  - year: '1975'
   title: Macbeth \[title field of inbook-1\]
   container-title: Collected works \[title field of mvbook-1\]
   publisher: Publisher
   publisher-place: Location
-  page: 100-200
-  volume: 3
-  number-of-volumes: 4
-  chapter-number: 7
+  page: '100-200'
+  volume: '3'
+  number-of-volumes: '4'
+  chapter-number: '7'
 
 - id: mvbook-1
   type: book
   author:
   - family: Shakespeare
   issued:
-  - year: 1970
-  - year: 1980
+  - year: '1970'
+  - year: '1980'
   title: Collected works \[title field of mvbook-1\]
   publisher: Publisher
   publisher-place: Location
-  number-of-volumes: 4
+  number-of-volumes: '4'
 ...

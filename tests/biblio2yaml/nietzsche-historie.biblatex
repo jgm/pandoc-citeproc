@@ -74,7 +74,7 @@ references:
   - family: Nietzsche
     given: Friedrich
   issued:
-  - year: 1988
+  - year: '1988'
   title: 'Unzeitgemässe Betrachtungen. Zweites Stück: Vom Nutzen und Nachtheil der
     Historie für das Leben'
   title-short: Vom Nutzen und Nachtheil der Historie
@@ -83,8 +83,8 @@ references:
     Schriften 1870–1973
   publisher: Deutscher Taschenbuch-Verlag; Walter de Gruyter
   publisher-place: München; Berlin; New York
-  page: 243-334
-  volume: 1
+  page: '243-334'
+  volume: '1'
   annote: A single essay from the critical edition of Nietzsche’s works. This inbook
     entry explicitly refers to an essay found in the first volume. Note the title,
     booktitle, and maintitle fields. Also note the sorttitle and sortyear fields.

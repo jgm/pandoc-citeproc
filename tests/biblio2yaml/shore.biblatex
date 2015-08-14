@@ -46,15 +46,15 @@ references:
   - family: Shore
     given: Bradd
   issued:
-  - year: 1991
-    month: 3
+  - year: '1991'
+    month: '3'
   title: 'Twice-born, once conceived: Meaning construction and cultural cognition'
   title-short: Twice-born, once conceived
   container-title: American Anthropologist
   collection-title: new series
-  page: 9-27
-  volume: 93
-  issue: 1
+  page: '9-27'
+  volume: '93'
+  issue: '1'
   annote: An article entry with series, volume, and number fields. Note the format
     of the series which is a localization key
 ...

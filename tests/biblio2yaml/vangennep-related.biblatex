@@ -52,7 +52,7 @@ references:
     given: Arnold
     non-dropping-particle: van
   issued:
-  - year: 1909
+  - year: '1909'
   title: Les rites de passage
   title-short: Rites de passage
   publisher: Nourry

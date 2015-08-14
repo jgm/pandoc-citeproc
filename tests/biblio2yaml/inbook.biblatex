@@ -70,15 +70,15 @@ references:
   - family: Kant
     given: Immanuel
   issued:
-  - year: 1968
+  - year: '1968'
   title: Kritik der praktischen Vernunft
   title-short: Kritik der praktischen Vernunft
   container-title: Kants Werke. Akademie Textausgabe
   volume-title: Kritik der praktischen Vernunft. Kritik der Urtheilskraft
   publisher: Walter de Gruyter
   publisher-place: Berlin
-  page: 1-163
-  volume: 5
+  page: '1-163'
+  volume: '5'
   annote: An edition of Kant’s *Collected Works*, volume five. This is an inbook entry
     which explicitly refers to the *Critique of Practical Reason* only, not to the
     entire fifth volume. Note the author and bookauthor fields in the database file.
@@ -95,14 +95,14 @@ references:
   - family: Kant
     given: Immanuel
   issued:
-  - year: 1968
+  - year: '1968'
   title: Kritik der Urtheilskraft
   container-title: Kants Werke. Akademie Textausgabe
   volume-title: Kritik der praktischen Vernunft. Kritik der Urtheilskraft
   publisher: Walter de Gruyter
   publisher-place: Berlin
-  page: 165-485
-  volume: 5
+  page: '165-485'
+  volume: '5'
   annote: An edition of Kant’s *Collected Works*, volume five. This is an inbook entry
     which explicitly refers to the *Critique of Judgment* only, not to the entire
     fifth volume
@@ -122,7 +122,7 @@ references:
   - family: Nietzsche
     given: Friedrich
   issued:
-  - year: 1988
+  - year: '1988'
   title: 'Unzeitgemässe Betrachtungen. Zweites Stück: Vom Nutzen und Nachtheil der
     Historie für das Leben'
   title-short: Vom Nutzen und Nachtheil der Historie
@@ -131,8 +131,8 @@ references:
     Schriften 1870–1973
   publisher: Deutscher Taschenbuch-Verlag; Walter de Gruyter
   publisher-place: München; Berlin; New York
-  page: 243-334
-  volume: 1
+  page: '243-334'
+  volume: '1'
   annote: A single essay from the critical edition of Nietzsche’s works. This inbook
     entry explicitly refers to an essay found in the first volume. Note the title,
     booktitle, and maintitle fields. Also note the sorttitle and sortyear fields.

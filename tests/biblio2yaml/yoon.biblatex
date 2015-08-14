@@ -50,12 +50,12 @@ references:
   - family: Ahn
     given: Kyo Han
   issued:
-  - year: 2006
+  - year: '2006'
   title: 'Palladium pincer complexes with reduced bond angle strain: Efficient catalysts
     for the Heck reaction'
   title-short: Palladium pincer complexes with reduced bond angle strain
   container-title: Organometallics
-  page: 2409-2411
-  volume: 25
-  issue: 10
+  page: '2409-2411'
+  volume: '25'
+  issue: '10'
 ...

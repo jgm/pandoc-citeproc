@@ -49,15 +49,15 @@ references:
   - family: Isard
     given: M.
   issued:
-  - year: 1995
-    month: 1
-    day: 11
+  - year: '1995'
+    month: '1'
+    day: '11'
   title: Estimateur d’un défaut de fonctionnement d’un modulateur en quadrature et
     étage de modulation l’utilisant
   genre: French patent request
   annote: This is a patent entry for a French patent request with a full date. The
     number is given in the number field. Note the format of the type and date fields
     in the database file. Compare almendro, laufenberg, and sorace
-  number: 9500261
+  number: '9500261'
   language: fr-FR
 ...

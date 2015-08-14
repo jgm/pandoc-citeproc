@@ -54,13 +54,13 @@ references:
   - family: Lauda
     given: Aaron D.
   issued:
-  - year: 2004
+  - year: '2004'
   title: 'Higher-dimensional algebra V: 2-groups'
   title-short: Higher-dimensional algebra V
   container-title: Theory and Applications of Categories
-  page: 423-491
-  version: 3
-  volume: 12
+  page: '423-491'
+  version: '3'
+  volume: '12'
   annote: An article with eprint and eprinttype fields. Note that the arXiv reference
     is transformed into a clickable link if hyperref support has been enabled. Compare
     baez/online, which is the same item given as an online entry

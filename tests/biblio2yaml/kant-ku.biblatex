@@ -60,14 +60,14 @@ references:
   - family: Kant
     given: Immanuel
   issued:
-  - year: 1968
+  - year: '1968'
   title: Kritik der Urtheilskraft
   container-title: Kants Werke. Akademie Textausgabe
   volume-title: Kritik der praktischen Vernunft. Kritik der Urtheilskraft
   publisher: Walter de Gruyter
   publisher-place: Berlin
-  page: 165-485
-  volume: 5
+  page: '165-485'
+  volume: '5'
   annote: An edition of Kant’s *Collected Works*, volume five. This is an inbook entry
     which explicitly refers to the *Critique of Judgment* only, not to the entire
     fifth volume

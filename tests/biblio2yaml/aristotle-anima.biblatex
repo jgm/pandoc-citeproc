@@ -46,7 +46,7 @@ references:
   - family: Hicks
     given: Robert Drew
   issued:
-  - year: 1907
+  - year: '1907'
   title: De anima
   publisher: Cambridge University Press
   publisher-place: Cambridge

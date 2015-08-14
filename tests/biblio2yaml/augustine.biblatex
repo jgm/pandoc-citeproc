@@ -40,7 +40,7 @@ references:
   - family: Augustine
     given: Robert L.
   issued:
-  - year: 1995
+  - year: '1995'
   title: Heterogeneous catalysis for the synthetic chemist
   title-short: Heterogeneous catalysis
   publisher: Marcel Dekker

@@ -54,10 +54,10 @@ references:
   - family: Hoffmann
     given: Stephan D.
   issued:
-  - year: 2006
+  - year: '2006'
   title: A carbocyclic carbene as an efficient catalyst ligand for C–C coupling reactions
   container-title: Angew. Chem. Int. Ed.
-  page: 3859-3862
-  volume: 45
-  issue: 23
+  page: '3859-3862'
+  volume: '45'
+  issue: '23'
 ...

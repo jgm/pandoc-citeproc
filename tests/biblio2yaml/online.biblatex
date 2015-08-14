@@ -32,16 +32,16 @@ references:
   - family: Markey
     given: Nicolas
   issued:
-  - year: 2005
-    month: 10
-    day: 16
+  - year: '2005'
+    month: '10'
+    day: '16'
   accessed:
-  - year: 2006
-    month: 10
-    day: 1
+  - year: '2006'
+    month: '10'
+    day: '1'
   title: 'Tame the BeaST: The B to X of BibTeX'
   title-short: Tame the BeaST
-  version: 1.3
+  version: '1.3'
   annote: An online entry for a tutorial. Note the format of the date field (yyyy-mm-dd)
     in the database file.
   URL: http://tug.ctan.org/tex-archive/info/bibtex/tamethebeast/ttb_en.pdf
@@ -50,11 +50,11 @@ references:
 - id: CTAN
   type: webpage
   issued:
-  - year: 2006
+  - year: '2006'
   accessed:
-  - year: 2006
-    month: 10
-    day: 1
+  - year: '2006'
+    month: '10'
+    day: '1'
   title: 'CTAN: The Comprehensive TeX Archive Network'
   title-short: CTAN
   annote: This is an online entry. The <span style="font-variant:small-caps;">url</span>,

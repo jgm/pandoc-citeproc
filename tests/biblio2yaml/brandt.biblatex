@@ -64,15 +64,15 @@ references:
   - family: Seibt
     given: Ferdinand
   issued:
-  - year: 1987
+  - year: '1987'
   title: Die nordischen Länder von der Mitte des 11. Jahrhunderts bis 1448
   title-short: Die nordischen Länder
   container-title: Europa im Hoch- und Spätmittelalter
   collection-title: Handbuch der europäischen Geschichte
-  collection-number: 2
+  collection-number: '2'
   publisher: Klett-Cotta
   publisher-place: Stuttgart
-  page: 884-917
+  page: '884-917'
   annote: An incollection entry with a series and a number. Note the format of the
     printed name and compare the useprefix option in the options field as well as
     vangennep. Also note the indextitle, and indexsorttitle fields

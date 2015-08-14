@@ -51,12 +51,12 @@ references:
   - family: Gillies
     given: Alexander
   issued:
-  - year: 1933
+  - year: '1933'
   title: Herder and the preparation of Goethe’s idea of world literature
   container-title: Publications of the English Goethe Society
   collection-title: new series
-  page: 46-67
-  volume: 9
+  page: '46-67'
+  volume: '9'
   annote: An article entry with a series and a volume field. Note that format of the
     series field in the database file
   language: en-GB

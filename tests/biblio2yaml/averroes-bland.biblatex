@@ -62,12 +62,12 @@ references:
   - family: Bland
     given: Kalman P.
   issued:
-  - year: 1982
+  - year: '1982'
   title: The epistle on the possibility of conjunction with the active intellect by
     Ibn Rushd with the commentary of Moses Narboni
   title-short: Possibility of conjunction
   collection-title: 'Moreshet: Studies in Jewish history, literature and thought'
-  collection-number: 7
+  collection-number: '7'
   publisher: Jewish Theological Seminary of America
   publisher-place: New York
   annote: A book entry with a series and a number. Note the concatenation of the editor

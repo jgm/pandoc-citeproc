@@ -69,12 +69,12 @@ references:
   - family: Doody
     given: Terrence
   issued:
-  - year: 1974
+  - year: '1974'
   title: Hemingway’s style and Jake’s narration
   container-title: The Journal of Narrative Technique
-  page: 212-225
-  volume: 4
-  issue: 3
+  page: '212-225'
+  volume: '4'
+  issue: '3'
   annote: An article entry cited as an excerpt from a collection entry. Note the format
     of the related and relatedstring fields
   language: en-US
@@ -85,12 +85,12 @@ references:
   - family: Matuz
     given: Roger
   issued:
-  - year: 1990
+  - year: '1990'
   title: Contemporary literary criticism
   publisher: Gale
   publisher-place: Detroit
-  page: 204-208
-  volume: 61
+  page: '204-208'
+  volume: '61'
   annote: A collection entry providing the excerpt information for the doody entry.
     Note the format of the pages field
   language: en-US

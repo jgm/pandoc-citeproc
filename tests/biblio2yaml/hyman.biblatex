@@ -57,15 +57,15 @@ references:
   - family: O’Meara
     given: Dominic J.
   issued:
-  - year: 1981
+  - year: '1981'
   title: Aristotle’s theory of the intellect and its interpretation by Averroes
   title-short: Aristotle’s theory of the intellect
   container-title: Studies in Aristotle
   collection-title: Studies in philosophy and the history of philosophy
-  collection-number: 9
+  collection-number: '9'
   publisher: The Catholic University of America Press
   publisher-place: Washington, D.C.
-  page: 161-191
+  page: '161-191'
   annote: An incollection entry with a series and number field
   keyword: secondary
   language: en-US

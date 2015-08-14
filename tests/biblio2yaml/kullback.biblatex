@@ -38,7 +38,7 @@ references:
   - family: Kullback
     given: Solomon
   issued:
-  - year: 1959
+  - year: '1959'
   title: Information theory and statistics
   publisher: John Wiley & Sons
   publisher-place: New York

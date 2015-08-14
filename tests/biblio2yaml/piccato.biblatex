@@ -42,7 +42,7 @@ references:
   - family: Piccato
     given: Pablo
   issued:
-  - year: 2001
+  - year: '2001'
   title: 'City of suspects: Crime in Mexico City, 1900–1931'
   title-short: City of suspects
   publisher: Duke University Press

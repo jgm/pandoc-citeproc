@@ -65,7 +65,7 @@ references:
   - family: Nozal
     given: Fernando
   issued:
-  - year: 1998
+  - year: '1998'
   title: Elektromagnetisches Signalhorn
   jurisdiction: France; United Kingdom; Germany
   annote: This is a patent entry with a location field. The number is given in the
@@ -82,16 +82,16 @@ references:
   - family: Isard
     given: M.
   issued:
-  - year: 1995
-    month: 1
-    day: 11
+  - year: '1995'
+    month: '1'
+    day: '11'
   title: Estimateur d’un défaut de fonctionnement d’un modulateur en quadrature et
     étage de modulation l’utilisant
   genre: French patent request
   annote: This is a patent entry for a French patent request with a full date. The
     number is given in the number field. Note the format of the type and date fields
     in the database file. Compare almendro, laufenberg, and sorace
-  number: 9500261
+  number: '9500261'
   language: fr-FR
 
 - id: laufenberg
@@ -122,9 +122,9 @@ references:
   - family: Ebner
     given: Norbert
   issued:
-  - year: 2006
-    month: 9
-    day: 13
+  - year: '2006'
+    month: '9'
+    day: '13'
   title: Elektrische Einrichtung und Betriebsverfahren
   genre: European patent
   annote: This is a patent entry with a holder field. Note the format of the type
@@ -134,7 +134,7 @@ references:
     for controlling the generator voltage. The device is equipped with a control zone,
     in which the voltage is controlled and zones, in which the torque is controlled.
     The invention also relates to methods for operating a device of this type.
-  number: 1700367
+  number: '1700367'
   language: de-DE
 
 - id: sorace
@@ -147,13 +147,13 @@ references:
   - family: Vaughn
     given: Steven A.
   issued:
-  - year: 1997
-    month: 9
-    day: 16
+  - year: '1997'
+    month: '9'
+    day: '16'
   title: High-speed digital-to-RF converter
   genre: U.S. patent
   annote: This is a patent entry with a holder field. Note the format of the type
     and date fields in the database file. Compare almendro, laufenberg, and kowalik
-  number: 5668842
+  number: '5668842'
   language: en-US
 ...

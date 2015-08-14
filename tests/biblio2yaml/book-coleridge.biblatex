@@ -36,15 +36,15 @@ references:
   - family: Bate
     given: W. Jackson
   issued:
-  - year: 1983
+  - year: '1983'
   title: The collected works of Samuel Taylor Coleridge
   volume-title: Biographia literaria, or Biographical sketches of my literary life
     and opinions
   collection-title: Bollingen series
-  collection-number: 75
+  collection-number: '75'
   publisher: Routledge and Kegan Paul
   publisher-place: London
-  volume: 7.2
+  volume: '7.2'
   annote: One (partial) volume of a multivolume book. This is a book entry with a
     volume and a part field which explicitly refers to the second (physical) part
     of the seventh (logical) volume. Also note the series and number fields

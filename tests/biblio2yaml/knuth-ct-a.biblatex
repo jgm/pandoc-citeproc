@@ -56,7 +56,7 @@ references:
   - family: Knuth
     given: Donald E.
   issued:
-  - year: 1984
+  - year: '1984'
   title: Computers & typesetting
   volume-title: The TeX book
   publisher: Addison-Wesley

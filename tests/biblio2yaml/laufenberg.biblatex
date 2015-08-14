@@ -85,9 +85,9 @@ references:
   - family: Ebner
     given: Norbert
   issued:
-  - year: 2006
-    month: 9
-    day: 13
+  - year: '2006'
+    month: '9'
+    day: '13'
   title: Elektrische Einrichtung und Betriebsverfahren
   genre: European patent
   annote: This is a patent entry with a holder field. Note the format of the type
@@ -97,6 +97,6 @@ references:
     for controlling the generator voltage. The device is equipped with a control zone,
     in which the voltage is controlled and zones, in which the torque is controlled.
     The invention also relates to methods for operating a device of this type.
-  number: 1700367
+  number: '1700367'
   language: de-DE
 ...

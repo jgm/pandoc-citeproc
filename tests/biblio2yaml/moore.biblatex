@@ -40,11 +40,11 @@ references:
   - family: Moore
     given: Gordon E.
   issued:
-  - year: 1965
+  - year: '1965'
   title: Cramming more components onto integrated circuits
   container-title: Electronics
-  page: 114-117
-  volume: 38
-  issue: 8
+  page: '114-117'
+  volume: '38'
+  issue: '8'
   language: en-US
 ...

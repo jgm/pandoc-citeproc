@@ -48,12 +48,12 @@ references:
   - family: Knuth
     given: Donald E.
   issued:
-  - year: 1986
+  - year: '1986'
   title: Computers & typesetting
   volume-title: Computer modern typefaces
   publisher: Addison-Wesley
   publisher-place: Reading, Mass.
-  volume: E
+  volume: 'E'
   annote: The fifth volume of a five-volume book. Note the sorttitle and sortyear
     fields
   language: en-US
