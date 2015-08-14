@@ -1,3 +1,10 @@
+pandoc-citeproc (0.7.3.1)
+
+  * Moved tests from data-files to extra-source-files.
+  * List biblatex conversion tests in cabal extra-source-files.
+  * Updated tests for changes in yaml library (which now
+    puts quotes arounds strings that could be read as numbers, #158).
+
 pandoc-citeproc (0.7.3)
 
   * Add Walkable instances for Formatted (Sean Leather).
