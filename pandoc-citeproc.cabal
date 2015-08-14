@@ -36,6 +36,7 @@ data-files:         chicago-author-date.csl
                     tests/*.csl
                     tests/biblio.bib
                     tests/biblio2yaml/*.bibtex
+                    tests/biblio2yaml/*.biblatex
                     -- documentation
                     README.md
                     man/man1/pandoc-citeproc.1
