@@ -1,5 +1,5 @@
 name:               pandoc-citeproc
-version:            0.7.3
+version:            0.7.3.1
 cabal-version:      >= 1.12
 synopsis:           Supports using pandoc with citeproc
 
@@ -30,6 +30,11 @@ maintainer:         jgm@berkeley.edu
 build-type:         Custom
 data-files:         chicago-author-date.csl
                     locales/*.xml
+                    -- documentation
+                    README.md
+                    man/man1/pandoc-citeproc.1
+                    changelog
+extra-source-files:
                     -- tests
                     tests/*.in.native
                     tests/*.expected.native
@@ -37,10 +42,6 @@ data-files:         chicago-author-date.csl
                     tests/biblio.bib
                     tests/biblio2yaml/*.bibtex
                     tests/biblio2yaml/*.biblatex
-                    -- documentation
-                    README.md
-                    man/man1/pandoc-citeproc.1
-                    changelog
 
 source-repository head
   type:          git
