@@ -1,0 +1,11 @@
+flags:
+  pandoc-citeproc:
+    bibutils: true
+    embed_data_files: false
+    unicode_collation: false
+    test_citeproc: false
+    debug: false
+packages:
+- '.'
+extra-deps: []
+resolver: lts-3.1
