@@ -11,7 +11,7 @@ import qualified Data.ByteString.Lazy as L
 import System.SetEnv (setEnv)
 import Control.Applicative ((<|>))
 import Data.Aeson
-import Data.Char ( isDigit, isPunctuation, isSpace )
+import Data.Char ( isDigit, isPunctuation, toLower, isSpace )
 import qualified Data.Map as M
 import Text.CSL.Reference hiding (processCites, Value)
 import Text.CSL.Input.Bibutils (readBiblioFile, convertRefs)
@@ -81,8 +81,11 @@ isRefRemove meta =
 isLinkCitations :: Meta -> Bool
 isLinkCitations meta =
   case lookupMeta "link-citations" meta of
-    Just (MetaBool True) -> True
-    _                    -> False
+    Just (MetaBool True)   -> True
+    Just (MetaString s)    -> map toLower s `elem` yesValues
+    Just (MetaInlines ils) -> map toLower (stringify ils) `elem` yesValues
+    _                      -> False
+  where yesValues = ["true", "yes", "on"]
 
 -- if the 'nocite' Meta field contains a citation with id = '*',
 -- create a cite with to all the references.
