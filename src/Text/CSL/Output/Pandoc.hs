@@ -42,6 +42,9 @@ clean' :: Style -> [Inline] -> [Inline]
 clean' _   []  = []
 clean' sty (i:is) =
   case (i:is) of
+      (Link lab1 ('#':r1, "") : Str "\8211" : Link lab2 ('#':r2, "") : rest)
+        | r1 == r2 -> Link (lab1 ++ [Str "\8211"] ++ lab2) ('#':r1, "") :
+                         clean' sty rest
       (Span ("",[],[]) inls : _) -> inls ++ clean' sty is
       (Span ("",["csl-inquote"],kvs) inls : _) ->
          let isOuter = lookup "position" kvs == Just "outer"
