@@ -340,9 +340,9 @@ formatNumber f fm v n
       roman     = foldr (++) [] . reverse . map (uncurry (!!)) . zip romanList .
                   map (readNum . return) . take 4 . reverse
       romanList = [[ "", "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix" ]
-	          ,[ "", "x", "xx", "xxx", "xl", "l", "lx", "lxx", "lxxx", "xc" ]
-	          ,[ "", "c", "cc", "ccc", "cd", "d", "dc", "dcc", "dccc", "cm" ]
-	          ,[ "", "m", "mm", "mmm", "mmmm", "mmmmm"]
+                  ,[ "", "x", "xx", "xxx", "xl", "l", "lx", "lxx", "lxxx", "xc" ]
+                  ,[ "", "c", "cc", "ccc", "cd", "d", "dc", "dcc", "dccc", "cm" ]
+                  ,[ "", "m", "mm", "mmm", "mmmm", "mmmmm"]
                   ]
 
 
