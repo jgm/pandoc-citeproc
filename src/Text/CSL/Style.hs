@@ -814,10 +814,15 @@ nameTransform ag
 nonDroppingPartTransform :: Agent -> Agent
 nonDroppingPartTransform ag
   | nonDroppingPart ag == mempty =
-    case break startWithCapital' (unFormatted $ familyName ag) of
+    case break startWithCapital'
+         (splitStrWhen (\c -> isPunctuation c || isUpper c) $
+          unFormatted $ familyName ag) of
          ([], _)  -> ag
-         (xs, ys) -> ag { nonDroppingPart = Formatted $ trimSpace xs,
+         (xs, ys)
+           | lastInline xs `elem` [" ", "-", "'", "’"] -> ag {
+                          nonDroppingPart = Formatted $ trimSpace xs,
                           familyName = Formatted ys }
+           | otherwise -> ag
   | otherwise = ag
 
 trimSpace :: [Inline] -> [Inline]
