@@ -1,5 +1,5 @@
 .\"t
-.TH "pandoc\-citeproc" "1" "2015-06-10" "0.7.1.1" ""
+.TH "pandoc\-citeproc" "1" "2015-08-29" "0.7.3.1" ""
 .SH NAME
 .PP
 pandoc\-citeproc \- filter to resolve citations in a pandoc document.
@@ -15,9 +15,10 @@ convert mode.
 Run without options, it acts as a filter that takes a JSON\-encoded
 Pandoc document, formats citations and adds a bibliography, and returns
 a JSON\-encoded pandoc document.
-Citations will be resolved, and a bibliography will be appended to the
-end of the document (unless the \f[C]suppress\-bibliography\f[] metadata
-field is set to a true value).
+Citations will be resolved, and a bibliography will be inserted into a
+Div element with id \f[C]references\f[], if one exists, or appended to
+the end of the document (unless the \f[C]suppress\-bibliography\f[]
+metadata field is set to a true value).
 If you wish the bibliography to have a section header, put the section
 header at the end of your document.
 (See the \f[C]pandoc_markdown\f[] (5) man page under "Citations" for
@@ -192,15 +193,15 @@ metadata or the CSL file.
 .TP
 .B \f[C]suppress\-bibliography\f[]
 If this has a true value, the bibliography will be left off.
-Otherwise a bibliography will be added to the end of the document.
+Otherwise a bibliography will be inserted into each Div element with id
+\f[C]references\f[].
+If there is no such Div, one will be created at the end of the document.
 .RS
 .RE
 .TP
 .B \f[C]reference\-section\-title\f[]
 If this has a value, a section header with this title will be added
 before the bibliography.
-Otherwise, the bibliography will simply be added to the end of the
-document.
 If \f[C]reference\-section\-title\f[] is not specified and the document
 ends with a section header, this final header will be treated as the
 bibliography header.

@@ -46,22 +46,39 @@ processCites style refs (Pandoc m1 b1) =
                         map (map (toCslCite locMap)) grps)
       cits_map      = tr' "cits_map" $ M.fromList $ zip grps (citations result)
       biblioList    = map (renderPandoc' style) $ zip (bibliography result) (citationIds result)
-      Pandoc m b3   = bottomUp (mvPunct style) . deNote .
+      Pandoc m bs   = bottomUp (mvPunct style) . deNote .
                         topDown (processCite style cits_map) $ Pandoc m4 b2
-      (bs, lastb)    = case reverse b3 of
-                          (Header lev (id',classes,kvs) ys) : xs ->
-                           (reverse xs, [Header lev (id',classes',kvs) ys])
-                            where classes' = "unnumbered" :
-                                       [c | c <- classes, c /= "unnumbered"]
-                          _                                      -> (b3,  [])
-      refHeader = case refTitle m of
-        Just ils -> lastb ++ [Header 1 ("bibliography", ["unnumbered"], []) ils]
-        _        -> lastb
-      refDiv    = case isRefRemove m of
-        True  -> []
-        False -> [Div ("",["references"],[]) (refHeader ++ biblioList)]
   in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
-               $ bs ++ refDiv
+               $ insertRefs m biblioList bs
+
+-- if document contains a Div with id="references", insert
+-- references as its contents.  Otherwise, insert references
+-- at the end of the document in a Div with id="references"
+insertRefs :: Meta -> [Block] -> [Block] -> [Block]
+insertRefs meta refs bs =
+  if isRefRemove meta
+     then bs
+     else case runState (walkM go bs) False of
+               (bs', True) -> bs'
+               (_, False)  ->
+                  case reverse bs of
+                        (Header lev (id',classes,kvs) ys) : xs ->
+                          reverse xs ++
+                            [Div ("references",[],[])
+                              (Header lev (id',addUnNumbered classes,kvs) ys :
+                               refs)]
+                        _   -> bs ++
+                               [Div ("references",[],[]) (refHeader ++ refs)]
+  where go :: Block -> State Bool Block
+        go (Div attr@("references",_,_) xs) = do
+          put True
+          return $ Div attr (refHeader ++ xs ++ refs)
+        go x = return x
+        addUnNumbered cs = "unnumbered" : [c | c <- cs, c /= "unnumbered"]
+        refHeader = case refTitle meta of
+                     Just ils ->
+                       [Header 1 ("bibliography", ["unnumbered"], []) ils]
+                     _        -> []
 
 refTitle :: Meta -> Maybe [Inline]
 refTitle meta =
