@@ -139,6 +139,7 @@ executable pandoc-citeproc
     build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12.3, aeson,
                       aeson-pretty, yaml, bytestring, syb, attoparsec, text,
                       filepath
+    other-modules:    Paths_pandoc_citeproc
     default-language: Haskell98
 
 executable test-citeproc
