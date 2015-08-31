@@ -218,7 +218,7 @@ evalElement el
                                                  else do
                                                    return $
                                                       [Output [OPan [Link [Str (prefix fm ++ d ++ suffix fm)]
-                                                           ("http://doi.org/" ++ d, "")]]
+                                                           ("https://doi.org/" ++ d, "")]]
                                                         fm{ prefix = "", suffix = "" }]
                              "pmid"        -> getStringVar "pmid" >>= \d ->
                                               if null d
