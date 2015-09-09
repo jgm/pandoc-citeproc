@@ -781,7 +781,7 @@ instance FromJSON Agent where
               v .:? "suffix" .!= mempty <*>
               v .:? "literal" .!= mempty <*>
               v .:? "comma-suffix" .!= False <*>
-              v .:? "parse-names" .!= True)
+              v .:? "parse-names" .!= False)
   parseJSON _ = fail "Could not parse Agent"
 
 instance ToYaml Agent where
@@ -799,8 +799,8 @@ instance ToYaml Agent where
                                                       then "true"
                                                       else "")
                        , "parse-names" &= T.pack (if parseNames ag
-                                                     then ""
-                                                     else "false")
+                                                     then "true"
+                                                     else "")
                        ]
 
 -- See http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#id28
@@ -886,7 +886,7 @@ instance ToJSON Agent where
     , "suffix" .= nameSuffix agent
     , "literal" .= literal agent
     ] ++ ["comma-suffix" .= commaSuffix agent | nameSuffix agent /= mempty]
-      ++ ["parse-names" .= False | not (parseNames agent) ]
+      ++ ["parse-names" .= True | parseNames agent ]
 
 instance FromJSON [Agent] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
