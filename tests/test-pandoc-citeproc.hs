@@ -5,7 +5,6 @@ import System.Exit
 import System.Directory
 import System.FilePath
 import Data.Maybe (fromMaybe)
-import Text.Printf
 import System.IO
 import Data.Monoid (mempty)
 import System.IO.Temp (withSystemTempDirectory)
