@@ -66,10 +66,12 @@ testCase regenerate csl = do
   expectedNative <- readFile $ "tests/" ++ csl ++ ".expected.native"
   let jsonIn = Aeson.encode $ (read indataNative :: Pandoc)
   let expectedDoc = normalize $ read expectedNative
-
+  testProgPath <- getExecutablePath
+  let pandocCiteprocPath = takeDirectory testProgPath </> ".." </>
+        "pandoc-citeproc" </> "pandoc-citeproc"
   (ec, jsonOut, errout) <- pipeProcess
                      (Just [("LANG","en_US.UTF-8"),("HOME",".")])
-                     "dist/build/pandoc-citeproc/pandoc-citeproc"
+                     pandocCiteprocPath
                      [] jsonIn
   if ec == ExitSuccess
      then do
@@ -111,9 +113,12 @@ biblio2yamlTest fp = do
   let (biblines, yamllines) = break (== yamlStart) $ BL.lines raw
   let bib = BL.unlines biblines
   let expected = BL.unlines yamllines
+  testProgPath <- getExecutablePath
+  let pandocCiteprocPath = takeDirectory testProgPath </> ".." </>
+        "pandoc-citeproc" </> "pandoc-citeproc"
   (ec, result, errout) <- pipeProcess
                      (Just [("LANG","en_US.UTF-8"),("HOME",".")])
-                     "dist/build/pandoc-citeproc/pandoc-citeproc"
+                     pandocCiteprocPath
                      ["--bib2yaml", "-f", drop 1 $ takeExtension fp] bib
   if ec == ExitSuccess
      then do
