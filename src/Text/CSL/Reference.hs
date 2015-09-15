@@ -143,7 +143,7 @@ instance ToJSON RefDate where
     , "month" .= month refdate
     , "season" .= season refdate
     , "day" .= day refdate
-    , "other" .= other refdate ] ++
+    , "literal" .= other refdate ] ++
     [ "circa" .= circa refdate | circa refdate ]
 -}
 
@@ -152,7 +152,7 @@ instance ToYaml RefDate where
                       , "month" &= month r
                       , "season" &= season r
                       , "day" &= day r
-                      , "other" &= other r
+                      , "literal" &= other r
                       , "circa" &= T.pack (if circa r then "1" else "")
                       ]
 
