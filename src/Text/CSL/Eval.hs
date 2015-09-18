@@ -30,6 +30,7 @@ import Data.String ( fromString )
 import Text.Pandoc.Definition (Inline(Str, Space, Link))
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc.Shared (stringify)
+import qualified Data.Text as T
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
@@ -212,14 +213,15 @@ evalElement el
                              "locator"     -> getLocVar >>= formatRange fm . snd
                              "url"         -> getStringVar "url" >>= \k ->
                                               if null k then return [] else return [Output [OPan [Link [Str k] (k,"")]] fm]
-                             "doi"         -> getStringVar "doi" >>= \d ->
-                                              if null d
-                                                 then return []
-                                                 else do
-                                                   return $
-                                                      [Output [OPan [Link [Str (prefix fm ++ d ++ suffix fm)]
-                                                           ("http://doi.org/" ++ d, "")]]
-                                                        fm{ prefix = "", suffix = "" }]
+                             "doi"         -> do d <- getStringVar "doi"
+                                                 let (prefixPart, linkPart) = T.breakOn (T.pack "http") (T.pack (prefix fm))
+                                                 let u = if T.null linkPart
+                                                            then "http://doi.org/" ++ d
+                                                            else T.unpack linkPart ++ d
+                                                 if null d
+                                                    then return []
+                                                    else return [Output [OPan [Link [Str u] (u, "")]]
+                                                          fm{ prefix = T.unpack prefixPart, suffix = suffix fm }]
                              "pmid"        -> getStringVar "pmid" >>= \d ->
                                               if null d
                                                  then return []
