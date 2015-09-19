@@ -1,3 +1,37 @@
+pandoc-citeproc (0.7.4)
+
+  * Bibliography Div has id `references`, not class.
+    This changes the previous behavior, in a way that is more
+    consistent with injecting the bibliography into a div with
+    id "references", if one exists.  Some users who rely on the
+    `references` class for CSS styling may need to adjust CSS styles
+    slightly.
+  * Make sure a link with a year range encompasses the whole range.
+    Previously you'd get [LINK 1996]--[LINK 2003], where both
+    links went to the same citation.  Now you get [LINK 1996-2003].
+    (#146)
+  * Fix linking of DOIs (#163).  Now only a part of a prefix that
+    begins a url (`http...`) will be part of the linked text for a DOI.
+    (This part will also be used for the URL, in place of the default
+    `http://doi.org/`, if present.) Other parts of the prefix and suffix
+    will remain outside the linked text.
+  * Use "literal" instead of "other" in producing CSL YAML (#167).
+  * Test suite: better technique to find right executable to test.
+    We now find the test program and locate pandoc-citeproc relative
+    to it.
+  * Change default for parse-names to False.
+  * Add `Paths_pandoc_citeproc` to other-modules.
+  * Allow flexible insertion of bibliography.
+    + If the document contains a Div element with id `references`,
+      the bibliography will be inserted in it (after any other content
+      in the Div).
+    + Otherwise, a Div with id `references` will be created at the
+      end of the document as before.
+  * Fix parsing of particles with hyphens on family names (#130).
+  * Handle `#+LINK_CITATIONS` metadata in org-mode.  The values `true`,
+    `yes`, and `on` are recognized as true values (case-insensitive)
+    (#159).
+
 pandoc-citeproc (0.7.3.1)
 
   * Moved tests from data-files to extra-source-files.
