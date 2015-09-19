@@ -1,11 +1,6 @@
 pandoc-citeproc (0.7.4)
 
-  * Bibliography Div has id `references`, not class.
-    This changes the previous behavior, in a way that is more
-    consistent with injecting the bibliography into a div with
-    id "references", if one exists.  Some users who rely on the
-    `references` class for CSS styling may need to adjust CSS styles
-    slightly.
+  * Bibliography Div has id `references`, in addition to class.
   * Make sure a link with a year range encompasses the whole range.
     Previously you'd get [LINK 1996]--[LINK 2003], where both
     links went to the same citation.  Now you get [LINK 1996-2003].

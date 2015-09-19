@@ -64,11 +64,12 @@ insertRefs meta refs bs =
                   case reverse bs of
                         (Header lev (id',classes,kvs) ys) : xs ->
                           reverse xs ++
-                            [Div ("references",[],[])
+                            [Div ("references",["references"],[])
                               (Header lev (id',addUnNumbered classes,kvs) ys :
                                refs)]
                         _   -> bs ++
-                               [Div ("references",[],[]) (refHeader ++ refs)]
+                               [Div ("references",["references"],[])
+                                  (refHeader ++ refs)]
   where go :: Block -> State Bool Block
         go (Div attr@("references",_,_) xs) = do
           put True
