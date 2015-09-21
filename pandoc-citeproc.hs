@@ -1,8 +1,6 @@
 module Main where
 import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
-import Text.CSL.Style (Formatted(..), Agent(..))
 import Text.CSL.Reference (Reference(refId), Literal(..))
-import Data.Generics ( everywhere, mkT )
 import Data.List (group, sort)
 import Data.Char (chr, toLower)
 import Data.Monoid
