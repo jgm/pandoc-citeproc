@@ -416,12 +416,18 @@ localModifiers s b c
 contribOnly :: Style -> Output -> Output
 contribOnly s o
     | isNumStyle [o]
-    , OCitNum  {} <- o = o
+    , OCitNum n f <- o = Output [ OCitNum n f{
+                                       verticalAlign = "",
+                                       prefix = "",
+                                       suffix = "" } ] emptyFormatting
     | OContrib _ "author"
             _ _ _ <- o = o
     | OContrib _ "authorsub"
             _ _ _ <- o = o
-    | Output ot f <- o = Output (cleanOutput $ map (contribOnly s) ot) f
+    | Output ot f <- o = Output (cleanOutput $ map (contribOnly s) ot)
+                         f{ verticalAlign = "",
+                            prefix = "",
+                            suffix = "" }
     | OStr    x _ <- o
     , "ibid" <- filter (/= '.')
        (map toLower x) = o
