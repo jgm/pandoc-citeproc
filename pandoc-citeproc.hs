@@ -64,8 +64,7 @@ main = do
                  map (unescapeTags . toByteString . (:[]))
             else B8.putStrLn . unescapeUnicode . B.concat . BL.toChunks .
               encodePretty' Config{ confIndent = 2
-                                  , confCompare = compare } .
-              everywhere (mkT compressName)
+                                  , confCompare = compare }
      else toJSONFilter doCites
 
 formatFromExtension :: FilePath -> Maybe BibFormat
@@ -129,33 +128,6 @@ outputYamlBlock contents = do
   putStrLn "---\nreferences:"
   B.putStr contents
   putStrLn "..."
-
--- Compress particles and suffixes into given and last name,
--- as zotero JSON expects.  (We might also want to set parse-names = true.)
-compressName :: Agent -> Agent
-compressName ag = Agent{
-    givenName       = gn
-  , familyName      = fn
-  , droppingPart    = mempty
-  , nonDroppingPart = mempty
-  , literal         = literal ag
-  , nameSuffix      = mempty
-  , commaSuffix     = False
-  , parseNames      = True
-  }
-  where
-  spcat (Formatted []) y = y
-  spcat y (Formatted []) = y
-  spcat x y = x <> Formatted [Space] <> y
-  gnbase = givenName ag ++ [droppingPart ag | droppingPart ag /= mempty]
-  gn = case (gnbase, nameSuffix ag) of
-             ([], _)            -> []
-             (xs, Formatted []) -> xs
-             (xs, ns)           -> init xs ++
-                [last xs <> Formatted [if commaSuffix ag
-                                          then Str ",!"
-                                          else Str ",", Space], ns]
-  fn = spcat (nonDroppingPart ag) (familyName ag)
 
 -- turn
 -- id: ! "\u043F\u0443\u043D\u043A\u04423"
