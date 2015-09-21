@@ -327,7 +327,12 @@ formatCitLayout s (CG co f d cs)
                      formatOutputList . appendOutput formatting . addAffixes f .
                      addDelim d .
                      map (fst &&& localMod >>> uncurry addCiteAffixes)
-      formatting   = unsetAffixes f
+      formatting   = f{ prefix = [], suffix = [],
+                        verticalAlign = if isAuthorInText cs
+                                           then ""
+                                           else verticalAlign f }
+      isAuthorInText [] = False
+      isAuthorInText ((c,_):_) = authorInText c
       localMod     = uncurry $ localModifiers s (not $ null co)
       setAsSupAu h = map $ \(c,o) -> if (citeId c, citeHash c) == h
                                      then (c { authorInText   = False

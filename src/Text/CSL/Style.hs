@@ -59,7 +59,6 @@ module Text.CSL.Style ( readCSLString
                       , emptyFormatting
                       , rmTitleCase
                       , Quote(..)
-                      , unsetAffixes
                       , mergeFM
                       , CSInfo(..)
                       , CSAuthor(..)
@@ -593,9 +592,6 @@ data Quote
 emptyFormatting :: Formatting
 emptyFormatting
     = Formatting [] [] [] [] [] [] [] [] [] [] NoQuote False False False []
-
-unsetAffixes :: Formatting -> Formatting
-unsetAffixes f = f {prefix = [], suffix = []}
 
 mergeFM :: Formatting -> Formatting -> Formatting
 mergeFM (Formatting aa ab ac ad ae af ag ah ai aj ak al am an ahl)
