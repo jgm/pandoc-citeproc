@@ -220,7 +220,7 @@ evalElement el
                                                             else T.unpack linkPart ++ d
                                                  if null d
                                                     then return []
-                                                    else return [Output [OPan [Link [Str u] (u, "")]]
+                                                    else return [Output [OPan [Link [Str (T.unpack linkPart ++ d)] (u, "")]]
                                                           fm{ prefix = T.unpack prefixPart, suffix = suffix fm }]
                              "pmid"        -> getStringVar "pmid" >>= \d ->
                                               if null d
