@@ -113,6 +113,7 @@ library
 
     if flag(embed_data_files)
        default-extensions:    CPP
+       Build-Tools:   hsb2hs >= 0.3.1
        cpp-options:   -DEMBED_DATA_FILES
        other-modules: Text.CSL.Data.Embedded
 
