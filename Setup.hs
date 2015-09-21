@@ -4,13 +4,17 @@ import Distribution.Simple
 import Distribution.Simple.PreProcess
 import Distribution.Simple.InstallDirs (mandir)
 import Distribution.PackageDescription (PackageDescription(..), Executable(..))
-import System.Process ( rawSystem )
+import Distribution.Simple.Program (simpleProgram, Program(..))
+import Data.Version
+import System.Process ( rawSystem, readProcess )
 import System.FilePath ( (</>) )
 import System.Directory ( findExecutable )
 import Distribution.Simple.Utils (info, notice, rawSystemExit, installOrdinaryFiles)
 import Distribution.Simple.Setup
 import Distribution.Simple.LocalBuildInfo
 import Distribution.Verbosity
+import Text.ParserCombinators.ReadP (readP_to_S, skipSpaces, eof)
+import qualified Control.Exception as E
 
 
 main :: IO ()
@@ -18,8 +22,23 @@ main =
   defaultMainWithHooks $ simpleUserHooks {
       -- enable hsb2hs preprocessor for .hsb files
       hookedPreProcessors = [ppBlobSuffixHandler]
+    , hookedPrograms = [(simpleProgram "hsb2hs"){
+                           programFindVersion = findHsb2hsVersion }]
     , postCopy = installManPage
     }
+
+findHsb2hsVersion :: Verbosity -> FilePath -> IO (Maybe Version)
+findHsb2hsVersion verb fp = do
+  let handleExitFailure :: IOError -> IO (Maybe Version)
+      handleExitFailure _ = return Nothing
+  E.handle handleExitFailure $ do
+    outp <- readProcess fp ["--version"] ""
+    case readP_to_S (do v <- parseVersion
+                        skipSpaces
+                        eof
+                        return v) outp of
+         ((v,""):_) -> return (Just v)
+         _          -> return Nothing
 
 installManPage :: Args -> CopyFlags
                -> PackageDescription -> LocalBuildInfo -> IO ()
