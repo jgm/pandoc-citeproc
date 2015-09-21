@@ -804,7 +804,7 @@ nameTransform :: Agent -> Agent
 nameTransform ag
   | parseNames ag = nonDroppingPartTransform .
                     droppingPartTransform .
-                    suffixTransform $ ag
+                    suffixTransform $ ag{ parseNames = False }
   | otherwise = ag
 
 nonDroppingPartTransform :: Agent -> Agent
