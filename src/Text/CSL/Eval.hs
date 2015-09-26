@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards, FlexibleContexts #-}
+{-# LANGUAGE PatternGuards, FlexibleContexts, ScopedTypeVariables #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Eval
@@ -39,7 +39,8 @@ import Text.CSL.Eval.Names
 import Text.CSL.Output.Plain
 import Text.CSL.Reference
 import Text.CSL.Style hiding (Any)
-import Text.CSL.Util ( readNum, last', proc, proc', query, betterThan )
+import Text.CSL.Util ( readNum, last', proc, proc', query, betterThan,
+                       safeRead )
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the
@@ -415,60 +416,50 @@ formatRange fm p = do
                  _          -> map joinRange
   return [flip OLoc fm $ [OStr (process pages) emptyFormatting]]
 
+-- Abbreviated page ranges are expanded to their non-abbreviated form:
+-- 42–45, 321–328, 2787–2816
 expandedRange :: (String, String) -> (String, String)
 expandedRange (sa, []) = (sa,[])
-expandedRange (sa, sb) = (p ++ reverse nA', reverse nB')
-    where
-      (nA,pA) = reverse >>> break isLetter >>> reverse *** reverse $ sa
-      (nB,pB) = reverse >>> break isLetter >>> reverse *** reverse $ sb
-      zipNum x y = zipWith (\a b -> if b == '+' then (a,a) else (a,b))
-                           (reverse x ++ take 10 (repeat '*'))
-                   >>> unzip >>> filter (/= '*') *** filter (/= '*') $
-                   (reverse y ++ repeat '+')
-      checkNum a b = let a' = take (length b) a
-                     in  readNum a' > readNum b
-      (p,(nA',nB'))
-          = case () of
-              _ | pA /= []
-                , checkNum nA nB       -> (,) [] $ (reverse $ pA ++ nA, reverse $ pB ++ nB)
-                | pA /= pB
-                , last' pA == last' pB -> (,) pA $ second (flip (++) (last' pA)) $ zipNum nA nB
-                | pA == pB             -> (,) pA $ second (flip (++) (last' pA)) $ zipNum nA nB
-                | pB == []             -> (,) pA $ second (flip (++) (last' pA)) $ zipNum nA nB
-                | otherwise            -> (,) [] $ (reverse $ pA ++ nA, reverse $ pB ++ nB)
+expandedRange (sa, sb)
+  | length sb < length sa =
+      case (safeRead sa, safeRead sb) of
+           -- check to make sure we have regular numbers
+           (Just (_ :: Int), Just (_ :: Int)) ->
+             (sa, take (length sa - length sb) sa ++ sb)
+           _ -> (sa, sb)
+  | otherwise = (sa, sb)
 
+-- All digits repeated in the second number are left out:
+-- 42–5, 321–8, 2787–816.  The minDigits parameter indicates
+-- a minimum number of digits for the second number; thus, with
+-- minDigits = 2, we have 328-28.
 minimalRange :: Int -> (String, String) -> (String, String)
-minimalRange minDigits (sa, sb)
-    = res
-    where
-      (a,b) = expandedRange (sa, sb)
-      res   = if length a == length b
-              then second (filter (/= '+')) $ unzip $ doit a b
-              else (a,b)
-      doit (x:xs) (y:ys) = if x == y
-                           then (x,'+') : doit xs ys
-                           else zip (x:xs) (y:ys)
-      doit _      _      = []
+minimalRange minDigits ((a:as), (b:bs))
+  | a == b
+  , length as == length bs
+  , length bs >= minDigits =
+                let (_, bs') = minimalRange minDigits (as, bs)
+                in  (a:as, bs')
+minimalRange minDigits (as, bs) = (as, bs)
 
+-- Page ranges are abbreviated according to the Chicago Manual of Style-rules:
+-- First number             Second number    Examples
+-- Less than 100            Use all digits   3–10; 71–72
+-- 100 or multiple of 100   Use all digits   100–104; 600–613; 1100–1123
+-- 101 through 109 (in multiples of 100) Use changed part only  10002-6, 505-17
+-- 110 through 199          Use 2 digits or more  321-25, 415-532
+-- if numbers are 4 digits long or more and 3 digits change, use all digits
+--         1496-1504
 chicagoRange :: (String, String) -> (String, String)
 chicagoRange (sa, sb)
-    = case () of
-        _ | length sa < 3    -> expandedRange (sa, sb)
-          | '0':'0':_ <- sa' -> expandedRange (sa, sb)
-          | _  :'0':_ <- sa' -> minimalRange 1 (sa, sb)
-          | _  :a2:as <- sa'
-          , b1 :b2:bs <- sb'
-          , comp as bs       -> if a2 == b2
-                                then (sa, [b2,b1])
-                                else minimalRange 1 (sa, sb)
-
-          | _:a2:a3:_:[] <- sa'
-          , _:b2:b3:_    <- sb' -> if a3 /= b3 && a2 /= b2
-                                   then expandedRange (sa, sb)
-                                   else minimalRange 1 (sa, sb)
-          | otherwise           -> minimalRange 1 (sa, sb)
-      where
-        sa' = reverse sa
-        sb' = reverse sb
-        comp a b = let b' = takeWhile isDigit b
-                   in take (length b') a == b'
+    = case (safeRead sa :: Maybe Int) of
+          Just n | n < 100 -> expandedRange (sa, sb)
+                 | n `mod` 100 == 0 -> expandedRange (sa, sb)
+                 | n >= 1000 -> let (sa', sb') = minimalRange 1 (sa, sb)
+                                in  if length sb' >= 3
+                                       then expandedRange (sa, sb)
+                                       else (sa', sb')
+                  | n > 100 -> if n `mod` 100 < 10
+                                 then minimalRange 1 (sa, sb)
+                                 else minimalRange 2 (sa, sb)
+          _ -> expandedRange (sa, sb)
