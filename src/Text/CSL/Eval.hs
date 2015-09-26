@@ -440,7 +440,7 @@ minimalRange minDigits ((a:as), (b:bs))
   , length bs >= minDigits =
                 let (_, bs') = minimalRange minDigits (as, bs)
                 in  (a:as, bs')
-minimalRange minDigits (as, bs) = (as, bs)
+minimalRange _ (as, bs) = (as, bs)
 
 -- Page ranges are abbreviated according to the Chicago Manual of Style-rules:
 -- First number             Second number    Examples
