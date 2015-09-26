@@ -5,7 +5,7 @@ module Text.CSL.Pandoc (processCites, processCites') where
 import Text.Pandoc
 import Text.Pandoc.Walk
 import Text.Pandoc.Builder (setMeta, deleteMeta, Inlines, cite)
-import Text.Pandoc.Shared (stringify)
+import Text.Pandoc.Shared (stringify, trim)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
 import System.SetEnv (setEnv)
@@ -346,9 +346,8 @@ pLocator :: LocatorMap -> Parsec [Inline] st (String, String)
 pLocator locMap = try $ do
   optional $ pMatch (== Str ",")
   optional pSpace
-  rawLoc <- many
-     (notFollowedBy pSpace >> notFollowedBy (pWordWithDigits True) >> anyToken)
-  la <- case stringify rawLoc of
+  rawLoc <- many (notFollowedBy (pWordWithDigits True) >> anyToken)
+  la <- case trim (stringify rawLoc) of
                  ""   -> lookAhead (optional pSpace >> pDigit) >> return "page"
                  s    -> maybe mzero return $ parseLocator locMap s
   g <- pWordWithDigits True
