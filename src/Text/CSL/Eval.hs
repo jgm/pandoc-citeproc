@@ -407,16 +407,17 @@ formatRange fm p = do
       joinRange (a, []) = a
       joinRange (a,  b) = a ++ "-" ++ b
 
-      process = case opt of
-                 "expanded" -> checkRange ts . printNumStr . map (joinRange . uncurry expandedRange)
-                 "chicago"  -> checkRange ts . printNumStr . map (joinRange . uncurry chicagoRange )
-                 "minimal"  -> checkRange ts . printNumStr . map (joinRange . uncurry minimalRange )
-                 _          -> checkRange ts . printNumStr . map (joinRange)
+      process = checkRange ts . printNumStr . case opt of
+                 "expanded" -> map (joinRange . expandedRange)
+                 "chicago"  -> map (joinRange . chicagoRange )
+                 "minimal"  -> map (joinRange . minimalRange 1)
+                 "minimal-two"  -> map (joinRange . minimalRange 2)
+                 _          -> map joinRange
   return [flip OLoc fm $ [OStr (process pages) emptyFormatting]]
 
-expandedRange :: String -> String -> (String, String)
-expandedRange sa [] = (sa,[])
-expandedRange sa sb = (p ++ reverse nA', reverse nB')
+expandedRange :: (String, String) -> (String, String)
+expandedRange (sa, []) = (sa,[])
+expandedRange (sa, sb) = (p ++ reverse nA', reverse nB')
     where
       (nA,pA) = reverse >>> break isLetter >>> reverse *** reverse $ sa
       (nB,pB) = reverse >>> break isLetter >>> reverse *** reverse $ sb
@@ -436,11 +437,11 @@ expandedRange sa sb = (p ++ reverse nA', reverse nB')
                 | pB == []             -> (,) pA $ second (flip (++) (last' pA)) $ zipNum nA nB
                 | otherwise            -> (,) [] $ (reverse $ pA ++ nA, reverse $ pB ++ nB)
 
-minimalRange :: String -> String -> (String, String)
-minimalRange sa sb
+minimalRange :: Int -> (String, String) -> (String, String)
+minimalRange minDigits (sa, sb)
     = res
     where
-      (a,b) = expandedRange sa sb
+      (a,b) = expandedRange (sa, sb)
       res   = if length a == length b
               then second (filter (/= '+')) $ unzip $ doit a b
               else (a,b)
@@ -449,23 +450,23 @@ minimalRange sa sb
                            else zip (x:xs) (y:ys)
       doit _      _      = []
 
-chicagoRange :: String -> String -> (String, String)
-chicagoRange sa sb
+chicagoRange :: (String, String) -> (String, String)
+chicagoRange (sa, sb)
     = case () of
-        _ | length sa < 3    -> expandedRange sa sb
-          | '0':'0':_ <- sa' -> expandedRange sa sb
-          | _  :'0':_ <- sa' -> minimalRange  sa sb
+        _ | length sa < 3    -> expandedRange (sa, sb)
+          | '0':'0':_ <- sa' -> expandedRange (sa, sb)
+          | _  :'0':_ <- sa' -> minimalRange 1 (sa, sb)
           | _  :a2:as <- sa'
           , b1 :b2:bs <- sb'
           , comp as bs       -> if a2 == b2
                                 then (sa, [b2,b1])
-                                else minimalRange sa sb
+                                else minimalRange 1 (sa, sb)
 
           | _:a2:a3:_:[] <- sa'
           , _:b2:b3:_    <- sb' -> if a3 /= b3 && a2 /= b2
-                                   then expandedRange sa sb
-                                   else minimalRange  sa sb
-          | otherwise           -> minimalRange sa sb
+                                   then expandedRange (sa, sb)
+                                   else minimalRange 1 (sa, sb)
+          | otherwise           -> minimalRange 1 (sa, sb)
       where
         sa' = reverse sa
         sb' = reverse sb
