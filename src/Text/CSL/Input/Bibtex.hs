@@ -691,7 +691,7 @@ resolveKey' (Lang "pl" "PL") k =
        "newseries"     -> "nowa serja"
        "oldseries"     -> "stara serja"
        _               -> k
-resolveKey' (Lang "pt" _) k =
+resolveKey' (Lang "pt" "PT") k =
     case map toLower k of
        -- "candthesis" -> "" -- missing
        "techreport"    -> "relatório técnico"
@@ -718,9 +718,6 @@ resolveKey' (Lang "pt" _) k =
        "countryus"     -> "Estados Unidos da América"
        "newseries"     -> "nova série"
        "oldseries"     -> "série antiga"
-       _               -> k
-resolveKey' (Lang "pt" "PT") k =
-    case map toLower k of
        -- "inpreparation" -> "" -- missing
        "forthcoming"   -> "a publicar" -- csl
        "inpress"       -> "na imprensa"
@@ -731,6 +728,31 @@ resolveKey' (Lang "pt" "PT") k =
        _               -> k
 resolveKey' (Lang "pt" "BR") k =
     case map toLower k of       
+       -- "candthesis" -> "" -- missing
+       "techreport"    -> "relatório técnico"
+       "resreport"     -> "relatório de pesquisa"
+       "software"      -> "software"
+       "datacd"        -> "CD-ROM"
+       "patent"        -> "patente"
+       "patentde"      -> "patente alemã"
+       "patenteu"      -> "patente européia"
+       "patentfr"      -> "patente francesa"
+       "patentuk"      -> "patente britânica"
+       "patentus"      -> "patente americana"
+       "patreq"        -> "pedido de patente"
+       "patreqde"      -> "pedido de patente alemã"
+       "patreqeu"      -> "pedido de patente européia"
+       "patreqfr"      -> "pedido de patente francesa"
+       "patrequk"      -> "pedido de patente britânica"
+       "patrequs"      -> "pedido de patente americana"
+       "countryde"     -> "Alemanha"
+       "countryeu"     -> "União Europeia"
+       "countryep"     -> "União Europeia"
+       "countryfr"     -> "França"
+       "countryuk"     -> "Reino Unido"
+       "countryus"     -> "Estados Unidos da América"
+       "newseries"     -> "nova série"
+       "oldseries"     -> "série antiga"
        "inpreparation" -> "em preparação"
        "forthcoming"   -> "aceito para publicação"
        "inpress"       -> "no prelo"
