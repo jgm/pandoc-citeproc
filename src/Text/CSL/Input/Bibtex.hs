@@ -64,7 +64,14 @@ parseRawLaTeX lang ('\\':xs) =
    where (command', contents') = break (=='{') xs
          command  = trim command'
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
-         f "mkbibquote" ils = [Quoted DoubleQuote ils]
+         f "mkbibquote"    ils = [Quoted DoubleQuote ils]
+         f "mkbibemph"     ils = [Emph ils]
+         f "mkbibitalic"   ils = [Emph ils] -- TODO: italic/=emph
+         f "mkbibbold"     ils = [Strong ils]
+         f "mkbibparens"   ils = [Str "("] ++ ils ++ [Str ")"] -- TODO: ...
+         f "mkbibbrackets" ils = [Str "["] ++ ils ++ [Str "]"] -- TODO: ...
+         -- ... both should be nestable & should work in year fields
+         f "autocap"    ils = ils  -- TODO: should work in year fields
          f "textnormal" ils = [Span ("",["nodecor"],[]) ils]
          f "bibstring" [Str s] = [Str $ resolveKey' lang s]
          f _            ils = [Span nullAttr ils]
@@ -949,7 +956,7 @@ itemToReference lang locale bibtex = bib $ do
   -- FIXME: add same for editora, editorb, editorc
 
   -- titles
-  let isArticle = et `elem` ["article", "periodical", "suppperiodical"]
+  let isArticle = et `elem` ["article", "periodical", "suppperiodical", "review"]
   let isPeriodical = et == "periodical"
   let isChapterlike = et `elem`
          ["inbook","incollection","inproceedings","inreference","bookinbook"]
