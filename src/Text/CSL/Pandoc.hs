@@ -9,7 +9,7 @@ import Text.Pandoc.Shared (stringify, trim)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
 import System.SetEnv (setEnv)
-import Control.Applicative ((<|>))
+import Control.Applicative ((<|>), (<$>))
 import Data.Aeson
 import Data.Char ( isDigit, isPunctuation, toLower, isSpace )
 import qualified Data.Map as M
@@ -25,11 +25,13 @@ import Text.CSL.Output.Pandoc ( headInline, tailFirstInlineStr, initInline,
 import Text.CSL.Data (getDefaultCSL)
 import Text.Parsec hiding (State, (<|>))
 import Control.Monad
+import qualified Control.Exception as E
 import Data.Monoid (mempty)
 import Control.Monad.State
 import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)
 import Text.CSL.Util (findFile, splitStrWhen, tr')
+import System.IO.Error (isDoesNotExistError)
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -135,7 +137,10 @@ removeNocaseSpans x = [x]
 -- field.
 processCites' :: Pandoc -> IO Pandoc
 processCites' (Pandoc meta blocks) = do
-  csldir <- getAppUserDataDirectory "csl"
+  mbcsldir <- E.catch (Just <$> getAppUserDataDirectory "csl") $ \e ->
+                 if isDoesNotExistError e
+                    then return Nothing
+                    else E.throwIO e
   let inlineRefError s = error $ "Error parsing references: " ++ s
   let inlineRefs = either inlineRefError id
                    $ convertRefs $ lookupMeta "references" meta
@@ -147,11 +152,14 @@ processCites' (Pandoc meta blocks) = do
                _ -> do
                  -- get default CSL: look first in ~/.csl, and take
                  -- from distribution if not found
-                 let f = csldir </> "chicago-author-date.csl"
-                 exists <- doesFileExist f
-                 raw <- if exists
-                           then L.readFile f
-                           else getDefaultCSL
+                 raw <- case mbcsldir of
+                          Just csldir -> do
+                            let f = csldir </> "chicago-author-date.csl"
+                            exists <- doesFileExist f
+                            if exists
+                               then L.readFile f
+                               else getDefaultCSL
+                          Nothing -> getDefaultCSL
                  localizeCSL mbLocale $ parseCSL' raw
   -- set LANG environment from locale; this affects unicode collation
   -- if pandoc-citeproc compiled with unicode_collation flag
@@ -164,7 +172,7 @@ processCites' (Pandoc meta blocks) = do
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
   let skipLeadingSpace = L.dropWhile (\s -> s == 32 || (s >= 9 && s <= 13))
   abbrevs <- maybe (return (Abbreviations M.empty))
-             (\f -> findFile [".", csldir] f >>=
+             (\f -> findFile (maybe ["."] (\g -> [".", g]) mbcsldir) f >>=
                     maybe (error $ "Could not find " ++ f) return >>=
                L.readFile >>=
                either error return . eitherDecode . skipLeadingSpace)
