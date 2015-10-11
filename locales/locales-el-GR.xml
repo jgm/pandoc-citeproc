@@ -27,7 +27,7 @@
     <term name="circa">περίπου</term>
     <term name="circa" form="short">περ.</term>
     <term name="cited">παρατίθεται</term>
-    <term name="edition">
+    <term name="edition" gender="feminine">
       <single>έκδοση</single>
       <multiple>εκδόσεις</multiple>
     </term>
@@ -69,7 +69,9 @@
     <term name="page-range-delimiter">–</term>
 
     <!-- ORDINALS -->
-    <term name="ordinal">ος</term>
+    <term name="ordinal">ο</term>
+    <term name="ordinal-01" gender-form="feminine" match="whole-number">η</term>
+    <term name="ordinal-01" gender-form="masculine" match="whole-number">ος</term>
 
     <!-- LONG ORDINALS -->
     <term name="long-ordinal-01">πρώτος</term>
@@ -253,10 +255,10 @@
     <term name="director" form="verb">διεύθυνση</term>
     <term name="editor" form="verb">επιμέλεια</term>
     <term name="editorial-director" form="verb">διεύθυνση σειράς</term>
-    <term name="illustrator" form="verb">εικονογράφηση by</term>
+    <term name="illustrator" form="verb">εικονογράφηση:</term>
     <term name="interviewer" form="verb">συνέντευξη</term>
     <term name="recipient" form="verb">παραλήπτης</term>
-    <term name="reviewed-author" form="verb">by</term>
+    <term name="reviewed-author" form="verb">συγγραφέας:</term>
     <term name="translator" form="verb">μετάφραση</term>
     <term name="editortranslator" form="verb">μετάφραση και επιμέλεια</term>
 

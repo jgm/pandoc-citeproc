@@ -69,11 +69,11 @@
     <term name="page-range-delimiter">–</term>
 
     <!-- ORDINALS -->
-    <term name="ordinal">e</term>
-    <term name="ordinal-01">a</term>
-    <term name="ordinal-02">a</term>
-    <term name="ordinal-11">e</term>
-    <term name="ordinal-12">e</term>
+    <term name="ordinal">:e</term>
+    <term name="ordinal-01">:a</term>
+    <term name="ordinal-02">:a</term>
+    <term name="ordinal-11">:e</term>
+    <term name="ordinal-12">:e</term>
 
     <!-- LONG ORDINALS -->
     <term name="long-ordinal-01">första</term>
