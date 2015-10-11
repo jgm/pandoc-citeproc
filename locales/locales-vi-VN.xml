@@ -19,19 +19,19 @@
     <term name="accessed">truy cập</term>
     <term name="and">và</term>
     <term name="and others">and others</term>
-    <term name="anonymous">anonymous</term>
-    <term name="anonymous" form="short">anon</term>
-    <term name="at">at</term>
+    <term name="anonymous">vô danh</term>
+    <term name="anonymous" form="short">v.d</term>
+    <term name="at">tại</term>
     <term name="available at">available at</term>
-    <term name="by">by</term>
+    <term name="by">bởi</term>
     <term name="circa">circa</term>
     <term name="circa" form="short">c.</term>
     <term name="cited">cited</term>
     <term name="edition">
-      <single>edition</single>
-      <multiple>editions</multiple>
+      <single>ấn bản</single>
+      <multiple>ấn bản</multiple>
     </term>
-    <term name="edition" form="short">ed</term>
+    <term name="edition" form="short">a.b</term>
     <term name="et-al">và c.s.</term>
     <term name="forthcoming">sắp tới</term>
     <term name="from">từ</term>
@@ -41,10 +41,10 @@
     <term name="internet">internet</term>
     <term name="interview">interview</term>
     <term name="letter">letter</term>
-    <term name="no date">no date</term>
+    <term name="no date">không ngày</term>
     <term name="no date" form="short">không ngày</term>
     <term name="online">online</term>
-    <term name="presented at">presented at the</term>
+    <term name="presented at">được trình bày tại</term>
     <term name="reference">
       <single>reference</single>
       <multiple>references</multiple>
@@ -62,10 +62,10 @@
     <term name="bc">BC</term>
 
     <!-- PUNCTUATION -->
-    <term name="open-quote">«</term>
-    <term name="close-quote">»</term>
-    <term name="open-inner-quote">‹</term>
-    <term name="close-inner-quote">›</term>
+    <term name="open-quote">“</term>
+    <term name="close-quote">”</term>
+    <term name="open-inner-quote">‘</term>
+    <term name="close-inner-quote">’</term>
     <term name="page-range-delimiter">–</term>
 
     <!-- ORDINALS -->
@@ -78,25 +78,25 @@
     <term name="ordinal-13">th</term>
 
     <!-- LONG ORDINALS -->
-    <term name="long-ordinal-01">first</term>
-    <term name="long-ordinal-02">second</term>
-    <term name="long-ordinal-03">third</term>
-    <term name="long-ordinal-04">fourth</term>
-    <term name="long-ordinal-05">fifth</term>
-    <term name="long-ordinal-06">sixth</term>
-    <term name="long-ordinal-07">seventh</term>
-    <term name="long-ordinal-08">eighth</term>
-    <term name="long-ordinal-09">ninth</term>
-    <term name="long-ordinal-10">tenth</term>
+    <term name="long-ordinal-01">thứ nhất</term>
+    <term name="long-ordinal-02">thứ hai</term>
+    <term name="long-ordinal-03">thứ ba</term>
+    <term name="long-ordinal-04">thứ tư</term>
+    <term name="long-ordinal-05">thứ năm</term>
+    <term name="long-ordinal-06">thứ sáu</term>
+    <term name="long-ordinal-07">thứ bảy</term>
+    <term name="long-ordinal-08">thứ tám</term>
+    <term name="long-ordinal-09">thứ chính</term>
+    <term name="long-ordinal-10">thứ mười</term>
 
     <!-- LONG LOCATOR FORMS -->
     <term name="book">
-      <single>book</single>
-      <multiple>books</multiple>
+      <single>sách</single>
+      <multiple>sách</multiple>
     </term>
     <term name="chapter">
-      <single>chapter</single>
-      <multiple>chapters</multiple>
+      <single>chương</single>
+      <multiple>chương</multiple>
     </term>
     <term name="column">
       <single>column</single>
@@ -111,16 +111,16 @@
       <multiple>folios</multiple>
     </term>
     <term name="issue">
-      <single>number</single>
-      <multiple>numbers</multiple>
+      <single>số</single>
+      <multiple>số</multiple>
     </term>
     <term name="line">
       <single>dòng</single>
       <multiple>dòng</multiple>
     </term>
     <term name="note">
-      <single>note</single>
-      <multiple>notes</multiple>
+      <single>ghi chú</single>
+      <multiple>ghi chú</multiple>
     </term>
     <term name="opus">
       <single>opus</single>
@@ -139,8 +139,8 @@
       <multiple>đoạn văn</multiple>
     </term>
     <term name="part">
-      <single>part</single>
-      <multiple>parts</multiple>
+      <single>phần</single>
+      <multiple>phần</multiple>
     </term>
     <term name="section">
       <single>section</single>
@@ -151,23 +151,23 @@
       <multiple>sub verbis</multiple>
     </term>
     <term name="verse">
-      <single>verse</single>
-      <multiple>verses</multiple>
+      <single>câu</single>
+      <multiple>câu</multiple>
     </term>
     <term name="volume">
-      <single>volume</single>
-      <multiple>volumes</multiple>
+      <single>tập</single>
+      <multiple>tập</multiple>
     </term>
 
     <!-- SHORT LOCATOR FORMS -->
-    <term name="book" form="short">bk</term>
-    <term name="chapter" form="short">chap</term>
+    <term name="book" form="short">sách</term>
+    <term name="chapter" form="short">ch</term>
     <term name="column" form="short">col</term>
     <term name="figure" form="short">fig</term>
     <term name="folio" form="short">f</term>
     <term name="issue" form="short">số p.h</term>
-    <term name="line" form="short">l.</term>
-    <term name="note" form="short">n.</term>
+    <term name="line" form="short">d.</term>
+    <term name="note" form="short">gc.</term>
     <term name="opus" form="short">op</term>
     <term name="page" form="short">
       <single>tr</single>
@@ -178,7 +178,7 @@
       <multiple>tr</multiple>
     </term>
     <term name="paragraph" form="short">para</term>
-    <term name="part" form="short">pt</term>
+    <term name="part" form="short">ph</term>
     <term name="section" form="short">sec</term>
     <term name="sub verbo" form="short">
       <single>s.v.</single>
@@ -213,20 +213,20 @@
       <multiple>biên tập viên</multiple>
     </term>
     <term name="editorial-director">
-      <single>editor</single>
-      <multiple>editors</multiple>
+      <single>biên tập viên</single>
+      <multiple>biên tập viên</multiple>
     </term>
     <term name="illustrator">
-      <single>illustrator</single>
-      <multiple>illustrators</multiple>
+      <single>họa sĩ</single>
+      <multiple>họa sĩ</multiple>
     </term>
     <term name="translator">
       <single>biên dịch viên</single>
       <multiple>biên dịch viên</multiple>
     </term>
     <term name="editortranslator">
-      <single>editor &amp; translator</single>
-      <multiple>editors &amp; translators</multiple>
+      <single>biên tập viên &amp; biên dịch viên</single>
+      <multiple>biên tập viên &amp; biên dịch viên</multiple>
     </term>
 
     <!-- SHORT ROLE FORMS -->
@@ -239,41 +239,41 @@
       <multiple>b.t.v</multiple>
     </term>
     <term name="editorial-director" form="short">
-      <single>ed.</single>
-      <multiple>eds.</multiple>
+      <single>b.t.v</single>
+      <multiple>b.t.v</multiple>
     </term>
     <term name="illustrator" form="short">
-      <single>ill.</single>
-      <multiple>ills.</multiple>
+      <single>h.s</single>
+      <multiple>h.s</multiple>
     </term>
     <term name="translator" form="short">
       <single>b.d.v</single>
       <multiple>b.d.v</multiple>
     </term>
     <term name="editortranslator" form="short">
-      <single>ed. &amp; tran.</single>
-      <multiple>eds. &amp; trans.</multiple>
+      <single>b.t.v &amp; b.d.v</single>
+      <multiple>b.t.v &amp; b.d.v</multiple>
     </term>
 
     <!-- VERB ROLE FORMS -->
     <term name="director" form="verb">directed by</term>
     <term name="editor" form="verb">biên tập bởi</term>
-    <term name="editorial-director" form="verb">edited by</term>
+    <term name="editorial-director" form="verb">biên tập bởi</term>
     <term name="illustrator" form="verb">illustrated by</term>
     <term name="interviewer" form="verb">interview by</term>
     <term name="recipient" form="verb">to</term>
-    <term name="reviewed-author" form="verb">by</term>
+    <term name="reviewed-author" form="verb">bởi</term>
     <term name="translator" form="verb">biên dịch bởi</term>
-    <term name="editortranslator" form="verb">edited &amp; translated by</term>
+    <term name="editortranslator" form="verb">biên tập &amp; biên dịch bởi</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">by</term>
+    <term name="container-author" form="verb-short">bởi</term>
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">b.t</term>
-    <term name="editorial-director" form="verb-short">ed.</term>
-    <term name="illustrator" form="verb-short">illus.</term>
+    <term name="editorial-director" form="verb-short">b.t</term>
+    <term name="illustrator" form="verb-short">h.s</term>
     <term name="translator" form="verb-short">b.d</term>
-    <term name="editortranslator" form="verb-short">ed. &amp; trans. by</term>
+    <term name="editortranslator" form="verb-short">b.t &amp; b.d bởi</term>
 
     <!-- LONG MONTH FORMS -->
     <term name="month-01">Tháng Giêng</term>
@@ -304,9 +304,9 @@
     <term name="month-12" form="short">tháng 12</term>
 
     <!-- SEASONS -->
-    <term name="season-01">Spring</term>
-    <term name="season-02">Summer</term>
-    <term name="season-03">Autumn</term>
-    <term name="season-04">Winter</term>
+    <term name="season-01">Mùa Xuân</term>
+    <term name="season-02">Mùa Hè</term>
+    <term name="season-03">Mùa Thu</term>
+    <term name="season-04">Mùa Đông</term>
   </terms>
 </locale>

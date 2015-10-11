@@ -2,7 +2,7 @@
 <locale xmlns="http://purl.org/net/xbiblio/csl" version="1.0" xml:lang="en-GB">
   <info>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
-    <updated>2012-07-04T23:31:02+00:00</updated>
+    <updated>2015-09-21T23:31:02+00:00</updated>
   </info>
   <style-options punctuation-in-quote="false"/>
   <date form="text">
@@ -160,15 +160,42 @@
     </term>
 
     <!-- SHORT LOCATOR FORMS -->
-    <term name="book" form="short">bk.</term>
-    <term name="chapter" form="short">chap.</term>
-    <term name="column" form="short">col.</term>
-    <term name="figure" form="short">fig.</term>
-    <term name="folio" form="short">f.</term>
-    <term name="issue" form="short">no.</term>
-    <term name="line" form="short">l.</term>
-    <term name="note" form="short">n.</term>
-    <term name="opus" form="short">op.</term>
+    <term name="book" form="short">
+      <single>bk.</single>
+      <multiple>bks</multiple>
+    </term>
+    <term name="chapter" form="short">
+      <single>chap.</single>
+      <multiple>chaps</multiple>
+    </term>
+    <term name="column" form="short">
+      <single>col.</single>
+      <multiple>cols</multiple>
+    </term>
+    <term name="figure" form="short">
+      <single>fig.</single>
+      <multiple>figs</multiple>
+    </term>
+    <term name="folio" form="short">
+      <single>fol.</single>
+      <multiple>fols</multiple>
+    </term>
+    <term name="issue" form="short">
+      <single>no.</single>
+      <multiple>nos.</multiple>
+    </term>
+    <term name="line" form="short">
+      <single>l.</single>
+      <multiple>ll.</multiple>
+    </term>
+    <term name="note" form="short">
+      <single>n.</single>
+      <multiple>nn.</multiple>
+    </term>
+    <term name="opus" form="short">
+      <single>op.</single>
+      <multiple>opp.</multiple>
+    </term>
     <term name="page" form="short">
       <single>p.</single>
       <multiple>pp.</multiple>
@@ -177,9 +204,18 @@
       <single>p.</single>
       <multiple>pp.</multiple>
     </term>
-    <term name="paragraph" form="short">para.</term>
-    <term name="part" form="short">pt.</term>
-    <term name="section" form="short">sec.</term>
+    <term name="paragraph" form="short">
+      <single>para.</single>
+      <multiple>paras</multiple>
+    </term>
+    <term name="part" form="short">
+      <single>pt.</single>
+      <multiple>pts</multiple>
+    </term>
+    <term name="section" form="short">
+      <single>sec.</single>
+      <multiple>secs</multiple>
+    </term>
     <term name="sub verbo" form="short">
       <single>s.v.</single>
       <multiple>s.vv.</multiple>
@@ -190,7 +226,7 @@
     </term>
     <term name="volume" form="short">
       <single>vol.</single>
-      <multiple>vols.</multiple>
+      <multiple>vols</multiple>
     </term>
 
     <!-- SYMBOL LOCATOR FORMS -->

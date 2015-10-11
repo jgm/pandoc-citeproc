@@ -12,7 +12,7 @@
   </date>
   <date form="numeric">
     <date-part name="day" suffix="."/>
-    <date-part name="month" suffix="."/>
+    <date-part name="month" form="numeric" suffix="."/>
     <date-part name="year"/>
   </date>
   <terms>
