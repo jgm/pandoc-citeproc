@@ -66,16 +66,15 @@ insertRefs meta refs bs =
                   case reverse bs of
                         (Header lev (id',classes,kvs) ys) : xs ->
                           reverse xs ++
-                            [Div ("references",["references"],[])
-                              (Header lev (id',addUnNumbered classes,kvs) ys :
-                               refs)]
-                        _   -> bs ++
-                               [Div ("references",["references"],[])
-                                  (refHeader ++ refs)]
+                            [Header lev (id',addUnNumbered classes,kvs) ys,
+                             Div ("references",["references"],[]) refs]
+                        _   -> bs ++ refHeader ++
+                                [Div ("references",["references"],[]) refs]
   where go :: Block -> State Bool Block
         go (Div attr@("references",_,_) xs) = do
           put True
-          return $ Div attr (refHeader ++ xs ++ refs)
+          -- refHeader isn't used if you have an explicit references div
+          return $ Div attr (xs ++ refs)
         go x = return x
         addUnNumbered cs = "unnumbered" : [c | c <- cs, c /= "unnumbered"]
         refHeader = case refTitle meta of
