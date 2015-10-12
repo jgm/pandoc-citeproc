@@ -19,19 +19,17 @@ The `pandoc-citeproc` executable has two modes, filter mode and convert mode.
 Run without options, it acts as a filter that takes a JSON-encoded Pandoc
 document, formats citations and adds a bibliography, and returns a JSON-encoded
 pandoc document.  Citations will be resolved, and a bibliography will be
-inserted into a Div element with id `references`, if one exists, or
-appended to the end of the document (unless the `suppress-bibliography`
-metadata field is set to a true value).  If you wish the bibliography to
-have a section header, put the section header at the end of your
-document.  (See the `pandoc_markdown` (5) man page under "Citations"
-for details on how to encode citations in pandoc's markdown.)
+inserted into a Div element with id `refs`. If no such Div
+exists, one will be created and appended to the end of the document
+(unless the `suppress-bibliography` metadata field is set to a
+true value).  If you wish the bibliography to have a section
+header, put the section header at the end of your document.
+(See the `pandoc_markdown` (5) man page under "Citations" for
+details on how to encode citations in pandoc's markdown.)
 
 To process citations with pandoc, call pandoc-citeproc as a filter:
 
     pandoc --filter pandoc-citeproc input.md -s -o output.html
-
-The bibliography will be put into a pandoc `Div` container with
-class `references`.
 
 pandoc-citeproc will look for the following metadata fields in
 the input:
@@ -120,7 +118,7 @@ the input:
 `suppress-bibliography`
 :    If this has a true value, the bibliography will be left off.
      Otherwise a bibliography will be inserted into each
-     Div element with id `references`. If there is no such Div,
+     Div element with id `refs`. If there is no such Div,
      one will be created at the end of the document.
 
 `reference-section-title`

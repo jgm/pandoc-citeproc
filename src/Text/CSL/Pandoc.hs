@@ -53,9 +53,9 @@ processCites style refs (Pandoc m1 b1) =
   in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
                $ insertRefs m biblioList bs
 
--- if document contains a Div with id="references", insert
+-- if document contains a Div with id="refs", insert
 -- references as its contents.  Otherwise, insert references
--- at the end of the document in a Div with id="references"
+-- at the end of the document in a Div with id="refs"
 insertRefs :: Meta -> [Block] -> [Block] -> [Block]
 insertRefs meta refs bs =
   if isRefRemove meta
@@ -67,11 +67,11 @@ insertRefs meta refs bs =
                         (Header lev (id',classes,kvs) ys) : xs ->
                           reverse xs ++
                             [Header lev (id',addUnNumbered classes,kvs) ys,
-                             Div ("references",["references"],[]) refs]
+                             Div ("refs",["references"],[]) refs]
                         _   -> bs ++ refHeader ++
-                                [Div ("references",["references"],[]) refs]
+                                [Div ("refs",["references"],[]) refs]
   where go :: Block -> State Bool Block
-        go (Div attr@("references",_,_) xs) = do
+        go (Div attr@("refs",_,_) xs) = do
           put True
           -- refHeader isn't used if you have an explicit references div
           return $ Div attr (xs ++ refs)
