@@ -84,9 +84,10 @@ the input:
     If the file is not found relative to the working directory,
     pandoc-citeproc will look in the `$HOME/.csl` directory (or
     `C:\Users\USERNAME\AppData\Roaming\csl` in Windows 7).  If this is left
-    off, pandoc-citeproc will look for `$HOME/.csl/chicago-author-date.csl`,
-    and if this is not present, it will use its own version of
-    `chicago-author-date.csl`.
+    off, pandoc-citeproc will look for `$HOME/.pandoc/default.csl`,
+    and if this is not present, it will use
+    `chicago-author-date.csl`, looking first in `$HOME/.csl` and
+    then in its own data files.
 
 `link-citations`
 :   If this has a true value, citations in author-date and numerical
@@ -94,8 +95,10 @@ the input:
     The default is not to add hyperlinks.
 
 `citation-abbreviations`
-:   Path to a CSL abbreviations JSON file. The format
-    is described
+:   Path to a CSL abbreviations JSON file.  If the file is not found
+    relative to the working directory, pandoc-citeproc will look in the
+    `$HOME/.csl` directory (or `C:\Users\USERNAME\AppData\Roaming\csl`
+    in Windows 7).  The format is described
     [here](http://citationstylist.org/2011/10/19/abbreviations-for-zotero-test-release).
     Here is a short example:
 
@@ -128,8 +131,9 @@ the input:
 
 The metadata must contain either `references` or `bibliography` or
 both as a source of references.  `csl` and `citation-abbreviations`
-are optional.  If `csl` is not provided, `chicago-author-date.csl` will be
-used by default.
+are optional.  If `csl` is not provided, a default stylesheet
+will be used (either `~/.pandoc/default.csl` or a version of
+`chicago-author-date.csl`).
 
 ## Convert mode
 

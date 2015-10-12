@@ -141,25 +141,37 @@ processCites' (Pandoc meta blocks) = do
                  if isDoesNotExistError e
                     then return Nothing
                     else E.throwIO e
+  mbpandocdir <- E.catch (Just <$> getAppUserDataDirectory "pandoc") $ \e ->
+                 if isDoesNotExistError e
+                    then return Nothing
+                    else E.throwIO e
   let inlineRefError s = error $ "Error parsing references: " ++ s
   let inlineRefs = either inlineRefError id
                    $ convertRefs $ lookupMeta "references" meta
   let cslfile = (lookupMeta "csl" meta <|> lookupMeta "citation-style" meta)
                 >>= toPath
   let mbLocale = lookupMeta "locale" meta >>= toPath
+  let getDefaultCSL' = case mbcsldir of
+                            Just csldir -> do
+                              let f = csldir </> "chicago-author-date.csl"
+                              exists <- doesFileExist f
+                              if exists
+                                 then L.readFile f
+                                 else getDefaultCSL
+                            Nothing -> getDefaultCSL
   csl <- case cslfile of
                Just f | not (null f) -> readCSLFile mbLocale f
                _ -> do
                  -- get default CSL: look first in ~/.csl, and take
                  -- from distribution if not found
-                 raw <- case mbcsldir of
-                          Just csldir -> do
-                            let f = csldir </> "chicago-author-date.csl"
+                 raw <- case mbpandocdir of
+                          Just pandocdir -> do
+                            let f = pandocdir </> "default.csl"
                             exists <- doesFileExist f
                             if exists
                                then L.readFile f
-                               else getDefaultCSL
-                          Nothing -> getDefaultCSL
+                               else getDefaultCSL'
+                          Nothing -> getDefaultCSL'
                  localizeCSL mbLocale $ parseCSL' raw
   -- set LANG environment from locale; this affects unicode collation
   -- if pandoc-citeproc compiled with unicode_collation flag
