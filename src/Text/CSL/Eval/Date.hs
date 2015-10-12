@@ -205,9 +205,9 @@ longOrdinal ts v s
 
 getOrdinal :: String -> String -> [CslTerm] -> CslTerm
 getOrdinal v s ts
-    = case findTerm' s Long gender ts of
+    = case findTerm' s Long (Just gender) ts of
         Just  x -> x
-        Nothing -> case findTerm' s Long Neuter ts of
+        Nothing -> case findTerm' s Long (Just Neuter) ts of
                      Just  x -> x
                      Nothing -> newTerm
     where
