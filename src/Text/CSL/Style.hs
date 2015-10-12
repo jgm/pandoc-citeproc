@@ -319,17 +319,23 @@ newTerm :: CslTerm
 newTerm = CT [] Long Neuter Neuter [] [] []
 
 findTerm :: String -> Form -> [CslTerm] -> Maybe CslTerm
-findTerm s f ts =
-  -- verb-short falls back to verb
-  case f of
-       VerbShort -> findTerm' s VerbShort Nothing ts `mplus`
-                    findTerm' s Verb Nothing ts
-       _         -> findTerm' s f Nothing ts
+findTerm s f = findTerm'' s f Nothing
 
-findTerm' :: String -> Form -> Maybe Gender -> [CslTerm] -> Maybe CslTerm
-findTerm' s f mbg ts
-    = listToMaybe [ t | t <- ts, cslTerm t == s, termForm t == f,
+findTerm' :: String -> Form -> Gender -> [CslTerm] -> Maybe CslTerm
+findTerm' s f g = findTerm'' s f (Just g)
+
+findTerm'' :: String -> Form -> Maybe Gender -> [CslTerm] -> Maybe CslTerm
+findTerm'' s f mbg ts
+  = listToMaybe [ t | t <- ts, cslTerm t == s, termForm t == f,
                          mbg == Nothing || mbg == Just (termGenderForm t) ]
+  `mplus`
+  -- fallback: http://citationstyles.org/downloads/specification.html#terms
+  case f of
+       VerbShort -> findTerm'' s Verb Nothing ts
+       Symbol    -> findTerm'' s Short Nothing ts
+       Verb      -> findTerm'' s Long Nothing ts
+       Short     -> findTerm'' s Long Nothing ts
+       _         -> Nothing
 
 hasOrdinals :: [Locale] -> Bool
 hasOrdinals = any (any hasOrd . localeTerms)
