@@ -1,5 +1,8 @@
 pandoc-citeproc (0.8)
 
+  * Use `lang` metadata field to specify locale.  `locale` can still
+    be used as before, for backwards compatibility, but `lang` is
+    now preferred.
   * Put the references section header outside the Div, instead
     of inside as before..  This interacts better with pandoc's
     `--section-divs` feature (#176).
