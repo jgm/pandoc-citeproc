@@ -109,11 +109,13 @@ the input:
           }
         }
 
-`locale`
+`lang`
 :    Locale to use in formatting citations.  If this is not set, the
      locale is taken from the `default-locale` attribute of the CSL
      file.  `en-US` is used if a locale is not specified in either the
-     metadata or the CSL file.
+     metadata or the CSL file.  (For backwards compatibility,
+     the field `locale` can be used instead of `lang`, but this
+     `lang` should be used going forward.)
 
 `suppress-bibliography`
 :    If this has a true value, the bibliography will be left off.

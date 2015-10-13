@@ -149,7 +149,8 @@ processCites' (Pandoc meta blocks) = do
                    $ convertRefs $ lookupMeta "references" meta
   let cslfile = (lookupMeta "csl" meta <|> lookupMeta "citation-style" meta)
                 >>= toPath
-  let mbLocale = lookupMeta "locale" meta >>= toPath
+  let mbLocale = (lookupMeta "lang" meta `mplus` lookupMeta "locale" meta)
+                   >>= toPath
   let getDefaultCSL' = case mbcsldir of
                             Just csldir -> do
                               let f = csldir </> "chicago-author-date.csl"
