@@ -82,10 +82,9 @@ where
 import Data.Aeson hiding (Number)
 import GHC.Generics (Generic)
 import Data.String
-import Data.Monoid (mempty, Monoid, mappend, mconcat, (<>))
 import Control.Arrow hiding (left, right)
 import Control.Monad (liftM, mplus)
-import Control.Applicative hiding (Const)
+import Control.Applicative ((<|>))
 import qualified Data.Aeson as Aeson
 import Data.Aeson.Types (Pair)
 import Data.List ( nubBy, isPrefixOf, isInfixOf, intersperse, intercalate )

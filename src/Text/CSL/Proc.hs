@@ -28,7 +28,6 @@ import Text.CSL.Proc.Disamb
 import Text.CSL.Reference
 import Text.CSL.Style
 import Data.Aeson
-import Data.Monoid ((<>))
 import Control.Applicative ((<|>))
 import Text.Pandoc.Definition (Inline(Space, Str, Note), Block(Para))
 

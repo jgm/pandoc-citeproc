@@ -21,9 +21,8 @@ module Text.CSL.Eval
     ) where
 
 import Control.Arrow
-import Control.Applicative ( (<$>) )
 import Control.Monad.State
-import Data.Monoid (mempty, Any(..))
+import Data.Monoid (Any(..))
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
 import Data.String ( fromString )

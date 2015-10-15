@@ -9,7 +9,7 @@ import Text.Pandoc.Shared (stringify, trim)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
 import System.SetEnv (setEnv)
-import Control.Applicative ((<|>), (<$>))
+import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Char ( isDigit, isPunctuation, toLower, isSpace )
 import qualified Data.Map as M
@@ -26,7 +26,6 @@ import Text.CSL.Data (getDefaultCSL)
 import Text.Parsec hiding (State, (<|>))
 import Control.Monad
 import qualified Control.Exception as E
-import Data.Monoid (mempty)
 import Control.Monad.State
 import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)

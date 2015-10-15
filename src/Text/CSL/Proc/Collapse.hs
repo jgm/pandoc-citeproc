@@ -17,7 +17,7 @@
 module Text.CSL.Proc.Collapse where
 
 import Data.Ord (comparing)
-import Data.Monoid (mempty, Any(..))
+import Data.Monoid (Any(..))
 import Control.Arrow ( (&&&), (>>>), second )
 import Data.Char
 import Data.List ( groupBy, sortBy )

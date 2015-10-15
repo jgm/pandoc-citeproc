@@ -16,7 +16,6 @@
 module Text.CSL.Eval.Common where
 
 import Control.Arrow ( (&&&), (>>>) )
-import Control.Applicative ( (<$>) )
 import Control.Monad.State
 import Data.Char ( toLower )
 import Data.List ( elemIndex )

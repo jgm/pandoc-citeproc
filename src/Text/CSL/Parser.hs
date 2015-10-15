@@ -25,7 +25,6 @@ import Data.Text (Text, unpack)
 import Text.CSL.Style hiding (parseNames)
 import Text.CSL.Util (toRead, findFile)
 import System.Directory (getAppUserDataDirectory)
-import Control.Applicative hiding (many, Const)
 import qualified Text.XML as X
 import Data.Default
 import Text.Pandoc.Shared (safeRead)

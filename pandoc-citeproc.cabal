@@ -68,7 +68,7 @@ flag debug
   default:     False
 
 library
-    hs-source-dirs:   src
+    hs-source-dirs:   src, prelude
     exposed-modules:  Text.CSL.Pandoc
                       Text.CSL
                       Text.CSL.Reference
@@ -88,6 +88,7 @@ library
                       Text.CSL.Output.Plain
                       Text.CSL.Data
     other-modules:    Text.CSL.Util
+                      Prelude
                       Paths_pandoc_citeproc
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
     ghc-prof-options: -fprof-auto-exported -rtsopts
@@ -134,19 +135,21 @@ library
 
 executable pandoc-citeproc
     main-is:          pandoc-citeproc.hs
-    hs-source-dirs:   .
+    hs-source-dirs:   ., prelude
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -fprof-auto-exported -rtsopts
     build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12.3, aeson,
                       aeson-pretty, yaml, bytestring, syb, attoparsec, text,
                       filepath
     other-modules:    Paths_pandoc_citeproc
+                      Prelude
     default-language: Haskell98
 
 executable test-citeproc
   Main-Is:        test-citeproc.hs
   Other-Modules:  JSON
-  Hs-Source-Dirs: tests
+                  Prelude
+  Hs-Source-Dirs: tests, prelude
   if flag(test_citeproc)
     Buildable:    True
   else
@@ -161,7 +164,8 @@ test-suite test-pandoc-citeproc
   Type:           exitcode-stdio-1.0
   Main-Is:        test-pandoc-citeproc.hs
   Other-Modules:  JSON
-  Hs-Source-Dirs: tests
+                  Prelude
+  Hs-Source-Dirs: tests, prelude
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.12.3, pandoc >= 1.13, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,

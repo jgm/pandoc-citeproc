@@ -15,13 +15,11 @@
 
 module Text.CSL.Eval.Date where
 
-import Control.Applicative ( (<$>) )
 import Control.Monad.State
 import Data.Char
 import Data.List
 import Data.List.Split
 import Data.Maybe
-import Data.Monoid
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output

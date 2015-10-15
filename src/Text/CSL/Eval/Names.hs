@@ -15,13 +15,11 @@
 
 module Text.CSL.Eval.Names where
 
-import Control.Applicative ( (<$>) )
 import Control.Monad.State
 import Data.Char  ( isLower, isUpper, isLetter )
 import Data.List  ( nub, intersperse )
 import Data.List.Split ( wordsBy )
 import Data.Maybe ( isJust )
-import Data.Monoid
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output

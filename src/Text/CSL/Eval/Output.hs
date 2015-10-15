@@ -21,7 +21,6 @@ import Data.Char (toLower, toUpper)
 import Text.CSL.Util (capitalize, titlecase, unTitlecase, isPunct)
 import Text.Pandoc.Definition
 import Text.Pandoc.Walk (walk)
-import Data.Monoid (mempty, mconcat, (<>))
 import Data.String (fromString)
 import Data.Maybe (mapMaybe)
 

@@ -47,7 +47,6 @@ import Data.Aeson
 import Data.Aeson.Types (Parser)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Control.Applicative ((<$>), (<*>), pure)
 import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation)
 import qualified Data.Traversable
 import Text.Pandoc.Shared (safeRead, stringify)
@@ -55,7 +54,6 @@ import Text.Pandoc.Walk (walk)
 import Text.Pandoc
 import Data.List.Split (wordsBy)
 import Control.Monad.State
-import Data.Monoid (Monoid, mappend, mempty)
 import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
                        everywhere', everything, mkT, mkQ )
 import System.FilePath

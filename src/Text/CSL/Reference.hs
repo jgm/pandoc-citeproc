@@ -45,12 +45,11 @@ import Data.List.Split ( splitWhen )
 import Data.Maybe ( fromMaybe             )
 import Data.Generics hiding (Generic)
 import GHC.Generics (Generic)
-import Data.Monoid
 import Data.Aeson hiding (Value)
 import Data.Aeson.Types (Parser)
 import qualified Data.Yaml.Builder as Y
 import Data.Yaml.Builder (ToYaml(..))
-import Control.Applicative ((<$>), (<*>), (<|>), pure)
+import Control.Applicative ((<|>))
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import Data.Char (toLower, isDigit)

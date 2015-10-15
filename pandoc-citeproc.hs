@@ -3,9 +3,8 @@ import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
 import Text.CSL.Reference (Reference(refId), Literal(..))
 import Data.List (group, sort)
 import Data.Char (chr, toLower)
-import Data.Monoid
 import Data.Yaml.Builder (toByteString)
-import Control.Applicative
+import Control.Applicative ((<|>), many)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Char8 as B8
