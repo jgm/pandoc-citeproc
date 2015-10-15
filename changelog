@@ -1,6 +1,7 @@
 pandoc-citeproc (0.8.0.1)
 
   * Allow aeson 0.10.x (Felix Yan).
+  * Add custom Prelude: -Wall clean on ghc 7.10.
 
 pandoc-citeproc (0.8)
 
