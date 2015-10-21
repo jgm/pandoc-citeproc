@@ -340,7 +340,119 @@ resolveKey lang (Formatted ils) = Formatted (Walk.walk go ils)
   where go (Str s) = Str $ resolveKey' lang s
         go x       = x
 
+-- biblatex localization keys, from files at
+-- http://github.com/plk/biblatex/tree/master/tex/latex/biblatex/lbx
+-- Some keys missing in these were added from csl locale files at
+-- http://github.com/citation-style-language/locales -- labeled "csl"
 resolveKey' :: Lang -> String -> String
+resolveKey' (Lang "ca" "AD") k =
+    case map toLower k of
+       "inpreparation" -> "en preparació"
+       "submitted"     -> "enviat"
+       "forthcoming"   -> "disponible en breu"
+       "inpress"       -> "a impremta"
+       "prepublished"  -> "pre-publicat"
+       "mathesis"      -> "tesi de màster"
+       "phdthesis"     -> "tesi doctoral"
+       "candthesis"    -> "tesi de candidatura"
+       "techreport"    -> "informe tècnic"
+       "resreport"     -> "informe de recerca"
+       "software"      -> "programari"
+       "datacd"        -> "CD de dades"
+       "audiocd"       -> "CD d’àudio"
+       "patent"        -> "patent"
+       "patentde"      -> "patent alemana"
+       "patenteu"      -> "patent europea"
+       "patentfr"      -> "patent francesa"
+       "patentuk"      -> "patent britànica"
+       "patentus"      -> "patent estatunidenca"
+       "patreq"        -> "soŀlicitud de patent"
+       "patreqde"      -> "soŀlicitud de patent alemana"
+       "patreqeu"      -> "soŀlicitud de patent europea"
+       "patreqfr"      -> "soŀlicitud de patent francesa"
+       "patrequk"      -> "soŀlicitud de patent britànica"
+       "patrequs"      -> "soŀlicitud de patent estatunidenca"
+       "countryde"     -> "Alemanya"
+       "countryeu"     -> "Unió Europea"
+       "countryep"     -> "Unió Europea"
+       "countryfr"     -> "França"
+       "countryuk"     -> "Regne Unit"
+       "countryus"     -> "Estats Units d’Amèrica"
+       "newseries"     -> "sèrie nova"
+       "oldseries"     -> "sèrie antiga"
+       _               -> k
+resolveKey' (Lang "da" "DK") k =
+    case map toLower k of
+       -- "inpreparation" -> "" -- missing
+       -- "submitted"     -> "" -- missing
+       "forthcoming"   -> "kommende" -- csl
+       "inpress"       -> "i tryk"   -- csl
+       -- "prepublished"  -> "" -- missing
+       "mathesis"      -> "speciale"
+       "phdthesis"     -> "ph.d.-afhandling"
+       "candthesis"    -> "kandidatafhandling"
+       "techreport"    -> "teknisk rapport"
+       "resreport"     -> "forskningsrapport"
+       "software"      -> "software"
+       "datacd"        -> "data-cd"
+       "audiocd"       -> "lyd-cd"
+       "patent"        -> "patent"
+       "patentde"      -> "tysk patent"
+       "patenteu"      -> "europæisk patent"
+       "patentfr"      -> "fransk patent"
+       "patentuk"      -> "britisk patent"
+       "patentus"      -> "amerikansk patent"
+       "patreq"        -> "ansøgning om patent"
+       "patreqde"      -> "ansøgning om tysk patent"
+       "patreqeu"      -> "ansøgning om europæisk patent"
+       "patreqfr"      -> "ansøgning om fransk patent"
+       "patrequk"      -> "ansøgning om britisk patent"
+       "patrequs"      -> "ansøgning om amerikansk patent"
+       "countryde"     -> "Tyskland"
+       "countryeu"     -> "Europæiske Union"
+       "countryep"     -> "Europæiske Union"
+       "countryfr"     -> "Frankrig"
+       "countryuk"     -> "Storbritanien"
+       "countryus"     -> "USA"
+       "newseries"     -> "ny serie"
+       "oldseries"     -> "gammel serie"
+       _               -> k
+resolveKey' (Lang "de" "DE") k =
+    case map toLower k of
+       "inpreparation" -> "in Vorbereitung"
+       "submitted"     -> "eingereicht"
+       "forthcoming"   -> "im Erscheinen"
+       "inpress"       -> "im Druck"
+       "prepublished"  -> "Vorveröffentlichung"
+       "mathesis"      -> "Magisterarbeit"
+       "phdthesis"     -> "Dissertation"
+       -- "candthesis" -> "" -- missing
+       "techreport"    -> "Technischer Bericht"
+       "resreport"     -> "Forschungsbericht"
+       "software"      -> "Computer-Software"
+       "datacd"        -> "CD-ROM"
+       "audiocd"       -> "Audio-CD"
+       "patent"        -> "Patent"
+       "patentde"      -> "deutsches Patent"
+       "patenteu"      -> "europäisches Patent"
+       "patentfr"      -> "französisches Patent"
+       "patentuk"      -> "britisches Patent"
+       "patentus"      -> "US-Patent"
+       "patreq"        -> "Patentanmeldung"
+       "patreqde"      -> "deutsche Patentanmeldung"
+       "patreqeu"      -> "europäische Patentanmeldung"
+       "patreqfr"      -> "französische Patentanmeldung"
+       "patrequk"      -> "britische Patentanmeldung"
+       "patrequs"      -> "US-Patentanmeldung"
+       "countryde"     -> "Deutschland"
+       "countryeu"     -> "Europäische Union"
+       "countryep"     -> "Europäische Union"
+       "countryfr"     -> "Frankreich"
+       "countryuk"     -> "Großbritannien"
+       "countryus"     -> "USA"
+       "newseries"     -> "neue Folge"
+       "oldseries"     -> "alte Folge"
+       _               -> k
 resolveKey' (Lang "en" "US") k =
   case map toLower k of
        "audiocd"        -> "audio CD"
@@ -389,42 +501,79 @@ resolveKey' (Lang "en" "US") k =
        "techreport"     -> "technical report"
        "volume"         -> "vol."
        _               -> k
-resolveKey' (Lang "de" "DE") k =
+resolveKey' (Lang "es" "ES") k =
     case map toLower k of
-       "inpreparation" -> "in Vorbereitung"
-       "submitted"     -> "eingereicht"
-       "forthcoming"   -> "im Erscheinen"
-       "inpress"       -> "im Druck"
-       "prepublished"  -> "Vorveröffentlichung"
-       "mathesis"      -> "Magisterarbeit"
-       "phdthesis"     -> "Dissertation"
+       -- "inpreparation" -> "" -- missing
+       -- "submitted"     -> "" -- missing
+       "forthcoming"   -> "previsto"    -- csl
+       "inpress"       -> "en imprenta" -- csl
+       -- "prepublished"  -> "" -- missing
+       "mathesis"      -> "Tesis de licenciatura"
+       "phdthesis"     -> "Tesis doctoral"
        -- "candthesis" -> "" -- missing
-       "techreport"    -> "Technischer Bericht"
-       "resreport"     -> "Forschungsbericht"
-       "software"      -> "Computer-Software"
-       "datacd"        -> "CD-ROM"
-       "audiocd"       -> "Audio-CD"
-       "patent"        -> "Patent"
-       "patentde"      -> "deutsches Patent"
-       "patenteu"      -> "europäisches Patent"
-       "patentfr"      -> "französisches Patent"
-       "patentuk"      -> "britisches Patent"
-       "patentus"      -> "US-Patent"
-       "patreq"        -> "Patentanmeldung"
-       "patreqde"      -> "deutsche Patentanmeldung"
-       "patreqeu"      -> "europäische Patentanmeldung"
-       "patreqfr"      -> "französische Patentanmeldung"
-       "patrequk"      -> "britische Patentanmeldung"
-       "patrequs"      -> "US-Patentanmeldung"
-       "countryde"     -> "Deutschland"
-       "countryeu"     -> "Europäische Union"
-       "countryep"     -> "Europäische Union"
-       "countryfr"     -> "Frankreich"
-       "countryuk"     -> "Großbritannien"
-       "countryus"     -> "USA"
-       "newseries"     -> "neue Folge"
-       "oldseries"     -> "alte Folge"
+       "techreport"    -> "informe técnico"
+       -- "resreport"  -> "" -- missing
+       -- "software"   -> "" -- missing
+       -- "datacd"     -> "" -- missing
+       -- "audiocd"    -> "" -- missing
+       "patent"        -> "patente"
+       "patentde"      -> "patente alemana"
+       "patenteu"      -> "patente europea"
+       "patentfr"      -> "patente francesa"
+       "patentuk"      -> "patente británica"
+       "patentus"      -> "patente americana"
+       "patreq"        -> "solicitud de patente"
+       "patreqde"      -> "solicitud de patente alemana"
+       "patreqeu"      -> "solicitud de patente europea"
+       "patreqfr"      -> "solicitud de patente francesa"
+       "patrequk"      -> "solicitud de patente británica"
+       "patrequs"      -> "solicitud de patente americana"
+       "countryde"     -> "Alemania"
+       "countryeu"     -> "Unión Europea"
+       "countryep"     -> "Unión Europea"
+       "countryfr"     -> "Francia"
+       "countryuk"     -> "Reino Unido"
+       "countryus"     -> "Estados Unidos de América"
+       "newseries"     -> "nueva época"
+       "oldseries"     -> "antigua época"
        _               -> k
+resolveKey' (Lang "fi" "FI") k =
+    case map toLower k of
+       -- "inpreparation" -> ""      -- missing
+       -- "submitted"     -> ""      -- missing
+       "forthcoming"   -> "tulossa"  -- csl
+       "inpress"       -> "painossa" -- csl
+       -- "prepublished"  -> ""      -- missing
+       "mathesis"      -> "tutkielma"
+       "phdthesis"     -> "tohtorinväitöskirja"
+       "candthesis"    -> "kandidat"
+       "techreport"    -> "tekninen raportti"
+       "resreport"     -> "tutkimusraportti"
+       "software"      -> "ohjelmisto"
+       "datacd"        -> "data-CD"
+       "audiocd"       -> "ääni-CD"
+       "patent"        -> "patentti"
+       "patentde"      -> "saksalainen patentti"
+       "patenteu"      -> "Euroopan Unionin patentti"
+       "patentfr"      -> "ranskalainen patentti"
+       "patentuk"      -> "englantilainen patentti"
+       "patentus"      -> "yhdysvaltalainen patentti"
+       "patreq"        -> "patenttihakemus"
+       "patreqde"      -> "saksalainen patenttihakemus"
+       "patreqeu"      -> "Euroopan Unionin patenttihakemus"
+       "patreqfr"      -> "ranskalainen patenttihakemus"
+       "patrequk"      -> "englantilainen patenttihakemus"
+       "patrequs"      -> "yhdysvaltalainen patenttihakemus"
+       "countryde"     -> "Saksa"
+       "countryeu"     -> "Euroopan Unioni"
+       "countryep"     -> "Euroopan Unioni"
+       "countryfr"     -> "Ranska"
+       "countryuk"     -> "Iso-Britannia"
+       "countryus"     -> "Yhdysvallat"
+       "newseries"     -> "uusi sarja"
+       "oldseries"     -> "vanha sarja"
+       _               -> k
+
 resolveKey' (Lang "fr" "FR") k =
     case map toLower k of
        "inpreparation" -> "en préparation"
@@ -460,6 +609,216 @@ resolveKey' (Lang "fr" "FR") k =
        "countryus"     -> "États-Unis"
        "newseries"     -> "nouvelle série"
        "oldseries"     -> "ancienne série"
+       _               -> k
+resolveKey' (Lang "it" "IT") k =
+    case map toLower k of
+       -- "inpreparation" -> "" -- missing
+       -- "submitted"     -> "" -- missing
+       "forthcoming"   -> "futuro" -- csl
+       "inpress"       -> "in stampa"
+       -- "prepublished"  -> "" -- missing
+       "mathesis"      -> "tesi di laurea magistrale"
+       "phdthesis"     -> "tesi di dottorato"
+       -- "candthesis" -> "" -- missing
+       "techreport"    -> "rapporto tecnico"
+       "resreport"     -> "rapporto di ricerca"
+       -- "software"   -> "" -- missing
+       -- "datacd"     -> "" -- missing
+       -- "audiocd"    -> "" -- missing
+       "patent"        -> "brevetto"
+       "patentde"      -> "brevetto tedesco"
+       "patenteu"      -> "brevetto europeo"
+       "patentfr"      -> "brevetto francese"
+       "patentuk"      -> "brevetto britannico"
+       "patentus"      -> "brevetto americano"
+       "patreq"        -> "brevetto richiesto"
+       "patreqde"      -> "brevetto tedesco richiesto"
+       "patreqeu"      -> "brevetto europeo richiesto"
+       "patreqfr"      -> "brevetto francese richiesto"
+       "patrequk"      -> "brevetto britannico richiesto"
+       "patrequs"      -> "brevetto U.S.A. richiesto"
+       "countryde"     -> "Germania"
+       "countryeu"     -> "Unione Europea"
+       "countryep"     -> "Unione Europea"
+       "countryfr"     -> "Francia"
+       "countryuk"     -> "Regno Unito"
+       "countryus"     -> "Stati Uniti d’America"
+       "newseries"     -> "nuova serie"
+       "oldseries"     -> "vecchia serie"
+       _               -> k
+resolveKey' (Lang "nl" "NL") k =
+    case map toLower k of
+       "inpreparation" -> "in voorbereiding"
+       "submitted"     -> "ingediend"
+       "forthcoming"   -> "onderweg"
+       "inpress"       -> "in druk"
+       "prepublished"  -> "voorpublicatie"
+       "mathesis"      -> "masterscriptie"
+       "phdthesis"     -> "proefschrift"
+       -- "candthesis" -> "" -- missing
+       "techreport"    -> "technisch rapport"
+       "resreport"     -> "onderzoeksrapport"
+       "software"      -> "computersoftware"
+       "datacd"        -> "cd-rom"
+       "audiocd"       -> "audio-cd"
+       "patent"        -> "patent"
+       "patentde"      -> "Duits patent"
+       "patenteu"      -> "Europees patent"
+       "patentfr"      -> "Frans patent"
+       "patentuk"      -> "Brits patent"
+       "patentus"      -> "Amerikaans patent"
+       "patreq"        -> "patentaanvraag"
+       "patreqde"      -> "Duitse patentaanvraag"
+       "patreqeu"      -> "Europese patentaanvraag"
+       "patreqfr"      -> "Franse patentaanvraag"
+       "patrequk"      -> "Britse patentaanvraag"
+       "patrequs"      -> "Amerikaanse patentaanvraag"
+       "countryde"     -> "Duitsland"
+       "countryeu"     -> "Europese Unie"
+       "countryep"     -> "Europese Unie"
+       "countryfr"     -> "Frankrijk"
+       "countryuk"     -> "Verenigd Koninkrijk"
+       "countryus"     -> "Verenigde Staten van Amerika"
+       "newseries"     -> "nieuwe reeks"
+       "oldseries"     -> "oude reeks"
+       _               -> k
+resolveKey' (Lang "pl" "PL") k =
+    case map toLower k of
+       "inpreparation" -> "przygotowanie"
+       "submitted"     -> "prezentacja"
+       "forthcoming"   -> "przygotowanie"
+       "inpress"       -> "wydrukowane"
+       "prepublished"  -> "przedwydanie"
+       "mathesis"      -> "praca magisterska"
+       "phdthesis"     -> "praca doktorska"
+       "techreport"    -> "sprawozdanie techniczne"
+       "resreport"     -> "sprawozdanie naukowe"
+       "software"      -> "oprogramowanie"
+       "datacd"        -> "CD-ROM"
+       "audiocd"       -> "audio CD"
+       "patent"        -> "patent"
+       "patentde"      -> "patent Niemiec"
+       "patenteu"      -> "patent Europy"
+       "patentfr"      -> "patent Francji"
+       "patentuk"      -> "patent Wielkiej Brytanji"
+       "patentus"      -> "patent USA"
+       "patreq"        -> "podanie na patent"
+       "patreqeu"      -> "podanie na patent Europy"
+       "patrequs"      -> "podanie na patent USA"
+       "countryde"     -> "Niemcy"
+       "countryeu"     -> "Unia Europejska"
+       "countryep"     -> "Unia Europejska"
+       "countryfr"     -> "Francja"
+       "countryuk"     -> "Wielka Brytania"
+       "countryus"     -> "Stany Zjednoczone Ameryki"
+       "newseries"     -> "nowa serja"
+       "oldseries"     -> "stara serja"
+       _               -> k
+resolveKey' (Lang "pt" "PT") k =
+    case map toLower k of
+       -- "candthesis" -> "" -- missing
+       "techreport"    -> "relatório técnico"
+       "resreport"     -> "relatório de pesquisa"
+       "software"      -> "software"
+       "datacd"        -> "CD-ROM"
+       "patent"        -> "patente"
+       "patentde"      -> "patente alemã"
+       "patenteu"      -> "patente européia"
+       "patentfr"      -> "patente francesa"
+       "patentuk"      -> "patente britânica"
+       "patentus"      -> "patente americana"
+       "patreq"        -> "pedido de patente"
+       "patreqde"      -> "pedido de patente alemã"
+       "patreqeu"      -> "pedido de patente européia"
+       "patreqfr"      -> "pedido de patente francesa"
+       "patrequk"      -> "pedido de patente britânica"
+       "patrequs"      -> "pedido de patente americana"
+       "countryde"     -> "Alemanha"
+       "countryeu"     -> "União Europeia"
+       "countryep"     -> "União Europeia"
+       "countryfr"     -> "França"
+       "countryuk"     -> "Reino Unido"
+       "countryus"     -> "Estados Unidos da América"
+       "newseries"     -> "nova série"
+       "oldseries"     -> "série antiga"
+       -- "inpreparation" -> "" -- missing
+       "forthcoming"   -> "a publicar" -- csl
+       "inpress"       -> "na imprensa"
+       -- "prepublished"  -> "" -- missing
+       "mathesis"      -> "tese de mestrado"
+       "phdthesis"     -> "tese de doutoramento"
+       "audiocd"       -> "CD áudio"
+       _               -> k
+resolveKey' (Lang "pt" "BR") k =
+    case map toLower k of       
+       -- "candthesis" -> "" -- missing
+       "techreport"    -> "relatório técnico"
+       "resreport"     -> "relatório de pesquisa"
+       "software"      -> "software"
+       "datacd"        -> "CD-ROM"
+       "patent"        -> "patente"
+       "patentde"      -> "patente alemã"
+       "patenteu"      -> "patente européia"
+       "patentfr"      -> "patente francesa"
+       "patentuk"      -> "patente britânica"
+       "patentus"      -> "patente americana"
+       "patreq"        -> "pedido de patente"
+       "patreqde"      -> "pedido de patente alemã"
+       "patreqeu"      -> "pedido de patente européia"
+       "patreqfr"      -> "pedido de patente francesa"
+       "patrequk"      -> "pedido de patente britânica"
+       "patrequs"      -> "pedido de patente americana"
+       "countryde"     -> "Alemanha"
+       "countryeu"     -> "União Europeia"
+       "countryep"     -> "União Europeia"
+       "countryfr"     -> "França"
+       "countryuk"     -> "Reino Unido"
+       "countryus"     -> "Estados Unidos da América"
+       "newseries"     -> "nova série"
+       "oldseries"     -> "série antiga"
+       "inpreparation" -> "em preparação"
+       "forthcoming"   -> "aceito para publicação"
+       "inpress"       -> "no prelo"
+       "prepublished"  -> "pré-publicado"
+       "mathesis"      -> "dissertação de mestrado"
+       "phdthesis"     -> "tese de doutorado"
+       "audiocd"       -> "CD de áudio"
+       _               -> k
+resolveKey' (Lang "sv" "SE") k =
+    case map toLower k of
+       -- "inpreparation" -> "" -- missing
+       -- "submitted"     -> "" -- missing
+       "forthcoming"   -> "kommande" -- csl
+       "inpress"       -> "i tryck"  -- csl
+       -- "prepublished"  -> "" -- missing
+       "mathesis"      -> "examensarbete"
+       "phdthesis"     -> "doktorsavhandling"
+       "candthesis"    -> "kandidatavhandling"
+       "techreport"    -> "teknisk rapport"
+       "resreport"     -> "forskningsrapport"
+       "software"      -> "datorprogram"
+       "datacd"        -> "data-cd"
+       "audiocd"       -> "ljud-cd"
+       "patent"        -> "patent"
+       "patentde"      -> "tyskt patent"
+       "patenteu"      -> "europeiskt patent"
+       "patentfr"      -> "franskt patent"
+       "patentuk"      -> "brittiskt patent"
+       "patentus"      -> "amerikanskt patent"
+       "patreq"        -> "patentansökan"
+       "patreqde"      -> "ansökan om tyskt patent"
+       "patreqeu"      -> "ansökan om europeiskt patent"
+       "patreqfr"      -> "ansökan om franskt patent"
+       "patrequk"      -> "ansökan om brittiskt patent"
+       "patrequs"      -> "ansökan om amerikanskt patent"
+       "countryde"     -> "Tyskland"
+       "countryeu"     -> "Europeiska unionen"
+       "countryep"     -> "Europeiska unionen"
+       "countryfr"     -> "Frankrike"
+       "countryuk"     -> "Storbritannien"
+       "countryus"     -> "USA"
+       "newseries"     -> "ny följd"
+       "oldseries"     -> "gammal följd"
        _               -> k
 resolveKey' _ k = resolveKey' (Lang "en" "US") k
 
