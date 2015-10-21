@@ -216,7 +216,7 @@ evalElement el
                              "doi"         -> do d <- getStringVar "doi"
                                                  let (prefixPart, linkPart) = T.breakOn (T.pack "http") (T.pack (prefix fm))
                                                  let u = if T.null linkPart
-                                                            then "http://doi.org/" ++ d
+                                                            then "https://doi.org/" ++ d
                                                             else T.unpack linkPart ++ d
                                                  if null d
                                                     then return []
