@@ -130,7 +130,8 @@ formatOutput o =
       _                   -> Formatted []
 
 addFormatting :: Formatting -> Formatted -> Formatted
-addFormatting f = addLink . addSuffix . pref . quote . font . text_case
+addFormatting f =
+  addLink . addSuffix . pref . quote . font . text_case . strip_periods
   where addLink i = case hyperlink f of
                          ""  -> i
                          url -> Formatted [Link (unFormatted i) (url, "")]
@@ -143,6 +144,10 @@ addFormatting f = addLink . addSuffix . pref . quote . font . text_case
           , case lastInline (unFormatted i) of {(c:_) | isPunct c -> True; _ -> False}
                                   = i <> fromString (tail $ suffix f)
           | otherwise             = i <> fromString (suffix f)
+
+        strip_periods (Formatted ils) = Formatted (walk removePeriod ils)
+        removePeriod (Str xs) | stripPeriods f = Str (filter (/='.') xs)
+        removePeriod x        = x
 
         quote (Formatted [])  = Formatted []
         quote (Formatted ils) =
