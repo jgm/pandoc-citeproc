@@ -46,11 +46,13 @@ import Data.Maybe ( fromMaybe             )
 import Data.Generics hiding (Generic)
 import GHC.Generics (Generic)
 import Data.Aeson hiding (Value)
+import qualified Data.Aeson as Aeson
 import Data.Aeson.Types (Parser)
 import qualified Data.Yaml.Builder as Y
 import Data.Yaml.Builder (ToYaml(..))
 import Control.Applicative ((<|>))
 import qualified Data.Text as T
+import Data.Text (Text)
 import qualified Data.Vector as V
 import Data.Char (toLower, isDigit)
 import Text.CSL.Style hiding (Number)
@@ -59,6 +61,9 @@ import Text.CSL.Util (parseString, parseInt, parseBool, safeRead, readNum,
                       (&=), mapping')
 import Text.Pandoc (Inline(Str))
 import Data.String
+import qualified Text.Parsec as P
+import qualified Text.Parsec.String as P
+import qualified Data.HashMap.Strict as H
 
 newtype Literal = Literal { unLiteral :: String }
   deriving ( Show, Read, Eq, Data, Typeable, Monoid, Generic )
@@ -366,7 +371,9 @@ data Reference =
     } deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 instance FromJSON Reference where
-  parseJSON (Object v) = addPageFirst <$> (Reference <$>
+  parseJSON (Object v') = do
+     v <- parseSuppFields v'
+     addPageFirst <$> (Reference <$>
        v .:? "id" .!= "" <*>
        v .:? "type" .!= NoType <*>
        v .:? "author" .!= [] <*>
@@ -452,6 +459,31 @@ instance FromJSON Reference where
                                             takeFirstNum (page ref) }
                                 else ref
   parseJSON _ = fail "Could not parse Reference"
+
+-- Syntax for adding supplementary fields in note variable
+-- {:authority:Superior Court of California}{:section:A}{:original-date:1777}
+-- see http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#supplementary-fields
+parseSuppFields :: Aeson.Object -> Parser Aeson.Object
+parseSuppFields o = do
+  nt <- o .: "note" <|> return ("" :: String)
+  case P.parse noteFields "note" nt of
+       Left err -> fail (show err)
+       Right fs -> return $ foldr (\(k,v) x -> H.insert k v x) o fs
+
+noteFields :: P.Parser [(Text, Aeson.Value)]
+noteFields = do
+  -- TODO - actually parse the fields
+  fs <- P.many noteField
+  rest <- P.getInput
+  return (("note", Aeson.String (T.pack rest)) : fs)
+
+noteField :: P.Parser (Text, Aeson.Value)
+noteField = P.try $ do
+  P.char '{'
+  P.char ':'
+  k <- P.manyTill (P.letter <|> P.char '-') (P.char ':')
+  v <- P.manyTill P.anyChar (P.char '}')
+  return (T.pack k, Aeson.String (T.pack v))
 
 instance ToJSON Reference where
   toJSON ref = object' [
