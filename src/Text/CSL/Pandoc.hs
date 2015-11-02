@@ -5,7 +5,7 @@ module Text.CSL.Pandoc (processCites, processCites') where
 import Text.Pandoc
 import Text.Pandoc.Walk
 import Text.Pandoc.Builder (setMeta, deleteMeta, Inlines, cite)
-import Text.Pandoc.Shared (stringify, trim)
+import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
 import System.SetEnv (setEnv)
@@ -365,11 +365,12 @@ pLocator :: LocatorMap -> Parsec [Inline] st (String, String)
 pLocator locMap = try $ do
   optional $ pMatch (== Str ",")
   optional pSpace
-  -- TODO make this a real parser based on locMap?
-  rawLoc <- many (notFollowedBy (pWordWithDigits True) >> anyToken)
-  la <- case trim (stringify rawLoc) of
-                 ""   -> lookAhead (optional pSpace >> pDigit) >> return "page"
-                 s    -> maybe mzero return $ parseLocator locMap s
+  la <- try (do t <- anyToken
+                per <- option "" (pMatch (== Str ".") >> return ".")
+                case t of
+                     Str xs -> maybe mzero return (M.lookup (xs ++ per) locMap)
+                     _      -> mzero)
+      <|> (lookAhead pDigit >> return "page")
   g <- pWordWithDigits True
   gs <- many (pWordWithDigits False)
   let lo = concat (g:gs)
@@ -415,9 +416,6 @@ isLocatorPunct (Str [c]) = isPunctuation c
 isLocatorPunct _         = False
 
 type LocatorMap = M.Map String String
-
-parseLocator :: LocatorMap -> String -> Maybe String
-parseLocator locMap s = M.lookup s locMap
 
 locatorMap :: Style -> LocatorMap
 locatorMap sty =
