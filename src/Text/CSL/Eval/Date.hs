@@ -99,7 +99,10 @@ formatDate em k tm dp date
       diffDate (RefDate ya ma sa da _ _)
                (RefDate yb mb sb db _ _) = case () of
                                              _ | ya /= yb  -> ["year","month","day"]
-                                               | ma /= mb  -> ["month","day"]
+                                               | ma /= mb  ->
+                                                 if da == mempty && db == mempty
+                                                    then ["month"]
+                                                    else ["month","day"]
                                                | da /= db  -> ["day"]
                                                | sa /= sb  -> ["month"]
                                                | otherwise -> ["year","month","day"]

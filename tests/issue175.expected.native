@@ -1,0 +1,7 @@
+Pandoc (Meta {unMeta = fromList [("references",MetaList [MetaMap (fromList [("author",MetaList [MetaMap (fromList [("family",MetaInlines [Str "Doe"]),("given",MetaInlines [Str "Jane"])])]),("container-title",MetaInlines [Str "A",Space,Str "magazine"]),("id",MetaInlines [Str "item1"]),("issued",MetaList [MetaMap (fromList [("month",MetaString "1"),("year",MetaString "2011")]),MetaMap (fromList [("month",MetaString "2"),("year",MetaString "2011")])]),("page",MetaInlines [Str "33-44"]),("title",MetaInlines [Str "A",Space,Str "title"]),("type",MetaInlines [Str "article-magazine"])])])]})
+[Header 2 ("missing-en-dash-between-months",[],[]) [Str "Missing",Space,Str "en-dash",Space,Str "between",Space,Str "months"]
+,Para [Str "Foo",Space,Cite [Citation {citationId = "item1", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 1}] [Str "(",Str "Doe",Space,Str "2011",Str ")"],Str "."]
+,Header 2 ("expected",[],[]) [Str "Expected"]
+,BlockQuote
+ [Para [Str "Doe,",Space,Str "Jane.",Space,Str "2011.",Space,Str "\8220A",Space,Str "Title.\8221",Space,Emph [Str "A",Space,Str "Magazine"],Str ",",Space,Str "January\8211February."]]
+,Div ("refs",["references"],[]) [Div ("ref-item1",[],[]) [Para [Str "Doe",Str ",",Space,Str "Jane",Str ".",Space,Str "2011",Str ".",Space,Str "\8220",Str "A",Space,Str "Title",Str ".",Str "\8221",Space,Emph [Str "A",Space,Str "Magazine"],Str ",",Space,Str "January",Str "\8211",Str "February",Str "."]]]]
