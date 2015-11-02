@@ -29,7 +29,7 @@ import qualified Control.Exception as E
 import Control.Monad.State
 import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)
-import Text.CSL.Util (findFile, splitStrWhen, tr')
+import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral)
 import System.IO.Error (isDoesNotExistError)
 
 -- | Process a 'Pandoc' document by adding citations formatted
@@ -365,6 +365,7 @@ pLocator :: LocatorMap -> Parsec [Inline] st (String, String)
 pLocator locMap = try $ do
   optional $ pMatch (== Str ",")
   optional pSpace
+  -- TODO make this a real parser based on locMap?
   rawLoc <- many (notFollowedBy (pWordWithDigits True) >> anyToken)
   la <- case trim (stringify rawLoc) of
                  ""   -> lookAhead (optional pSpace >> pDigit) >> return "page"
@@ -374,6 +375,15 @@ pLocator locMap = try $ do
   let lo = concat (g:gs)
   return (la, lo)
 
+pRoman :: Parsec [Inline] st String
+pRoman = try $ do
+  t <- anyToken
+  case t of
+       Str xs -> case parseRomanNumeral xs of
+                      Nothing -> mzero
+                      Just _  -> return xs
+       _      -> mzero
+
 -- we want to capture:  123, 123A, C22, XVII, 33-44, 22-33; 22-11
 pWordWithDigits :: Bool -> Parsec [Inline] st String
 pWordWithDigits isfirst = try $ do
@@ -381,9 +391,13 @@ pWordWithDigits isfirst = try $ do
               then return ""
               else stringify `fmap` pLocatorPunct
   sp <- option "" (pSpace >> return " ")
-  r <- many1 (notFollowedBy pSpace >> notFollowedBy pLocatorPunct >> anyToken)
-  let s = stringify r
-  guard $ any isDigit s || all (`elem` ("IVXLCM" :: String)) s
+  s <-  pRoman <|>
+        try (do ts <- many1 (notFollowedBy pSpace >>
+                             notFollowedBy pLocatorPunct >>
+                             anyToken)
+                let ts' = stringify ts
+                guard (any isDigit ts')
+                return ts')
   return $ punct ++ sp ++ s
 
 pDigit :: Parsec [Inline] st ()

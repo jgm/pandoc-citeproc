@@ -42,6 +42,7 @@ module Text.CSL.Util
   , findFile
   , (&=)
   , mapping'
+  , parseRomanNumeral
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -60,6 +61,8 @@ import System.FilePath
 import System.Directory (doesFileExist)
 import qualified Data.Yaml.Builder as Y
 import Data.Yaml.Builder (ToYaml(..), YamlBuilder)
+import qualified Text.Parsec as P
+
 #ifdef TRACE
 import qualified Debug.Trace
 import Text.Show.Pretty (ppShow)
@@ -381,3 +384,43 @@ x &= y = \acc -> if y == mempty
 
 mapping' :: [[(Text, YamlBuilder)] -> [(Text, YamlBuilder)]] -> YamlBuilder
 mapping' = Y.mapping . foldr ($) []
+
+-- TODO: romanNumeral is defined in Text.Pandoc.Parsing, but it's
+-- not exported there. Eventually we should remove this code duplication
+-- by exporting something from pandoc.
+
+parseRomanNumeral :: String -> Maybe Int
+parseRomanNumeral s = case P.parse (pRomanNumeral <* P.eof) "" s of
+                           Left _  -> Nothing
+                           Right x -> Just x
+
+-- | Parses a roman numeral (uppercase or lowercase), returns number.
+pRomanNumeral :: P.Stream s m Char => P.ParsecT s st m Int
+pRomanNumeral = do
+    let lowercaseRomanDigits = ['i','v','x','l','c','d','m']
+    let uppercaseRomanDigits = ['I','V','X','L','C','D','M']
+    c <- P.lookAhead $ P.oneOf (lowercaseRomanDigits ++ uppercaseRomanDigits)
+    let romanDigits = if isUpper c
+                         then uppercaseRomanDigits
+                         else lowercaseRomanDigits
+    let [one, five, ten, fifty, hundred, fivehundred, thousand] =
+          map P.char romanDigits
+    thousands <- P.many thousand >>= (return . (1000 *) . length)
+    ninehundreds <- P.option 0 $ P.try $ hundred >> thousand >> return 900
+    fivehundreds <- P.many fivehundred >>= (return . (500 *) . length)
+    fourhundreds <- P.option 0 $ P.try $ hundred >> fivehundred >> return 400
+    hundreds <- P.many hundred >>= (return . (100 *) . length)
+    nineties <- P.option 0 $ P.try $ ten >> hundred >> return 90
+    fifties <- P.many fifty >>= (return . (50 *) . length)
+    forties <- P.option 0 $ P.try $ ten >> fifty >> return 40
+    tens <- P.many ten >>= (return . (10 *) . length)
+    nines <- P.option 0 $ P.try $ one >> ten >> return 9
+    fives <- P.many five >>= (return . (5 *) . length)
+    fours <- P.option 0 $ P.try $ one >> five >> return 4
+    ones <- P.many one >>= (return . length)
+    let total = thousands + ninehundreds + fivehundreds + fourhundreds +
+                hundreds + nineties + fifties + forties + tens + nines +
+                fives + fours + ones
+    if total == 0
+       then fail "not a roman numeral"
+       else return total
