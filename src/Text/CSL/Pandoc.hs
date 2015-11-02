@@ -29,7 +29,7 @@ import qualified Control.Exception as E
 import Control.Monad.State
 import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)
-import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral)
+import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim)
 import System.IO.Error (isDoesNotExistError)
 
 -- | Process a 'Pandoc' document by adding citations formatted
@@ -365,11 +365,10 @@ pLocator :: LocatorMap -> Parsec [Inline] st (String, String)
 pLocator locMap = try $ do
   optional $ pMatch (== Str ",")
   optional pSpace
-  la <- try (do t <- anyToken
-                per <- option "" (pMatch (== Str ".") >> return ".")
-                case t of
-                     Str xs -> maybe mzero return (M.lookup (xs ++ per) locMap)
-                     _      -> mzero)
+  la <- try (do ts <- many1 (notFollowedBy (pWordWithDigits True) >> anyToken)
+                case M.lookup (trim (stringify ts)) locMap of
+                       Just l  -> return l
+                       Nothing -> mzero)
       <|> (lookAhead pDigit >> return "page")
   g <- pWordWithDigits True
   gs <- many (pWordWithDigits False)
