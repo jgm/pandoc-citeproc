@@ -48,7 +48,8 @@ import Data.Aeson
 import Data.Aeson.Types (Parser)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation)
+import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation,
+                  isLetter, isAscii)
 import qualified Data.Traversable
 import Text.Pandoc.Shared (safeRead, stringify)
 import Text.Pandoc.Walk (walk)
@@ -214,9 +215,9 @@ titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
   where tc (Str (x:xs)) = do
           st <- get
           return $ case st of
-                        WordBoundary -> if isShortWord (x:xs)
+                        WordBoundary -> if isShortWord (x:xs) ||
+                                             not (isAscii x && isLetter x)
                                            then Str (x:xs)
-                                                -- or? map toLower (x:xs)
                                            else Str (toUpper x : xs)
                         SentenceBoundary -> Str (toUpper x : xs)
                         _ -> Str (x:xs)
