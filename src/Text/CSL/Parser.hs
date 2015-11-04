@@ -219,14 +219,17 @@ parseDate cur = [Date (words variable) form format delim parts partsAttr]
                            _         -> NoFormDate
         format     = getFormatting cur
         delim      = stringAttr "delimiter" cur
-        parts      = cur $/ get "date-part" &| parseDatePart
+        parts      = cur $/ get "date-part" &| (parseDatePart form)
         partsAttr  = stringAttr "date-parts" cur
 
-parseDatePart :: Cursor -> DatePart
-parseDatePart cur =
+parseDatePart :: DateForm -> Cursor -> DatePart
+parseDatePart defaultForm cur =
   DatePart { dpName       = stringAttr "name" cur
            , dpForm       = case stringAttr "form" cur of
-                                  ""  -> "long"
+                                  ""  -> case defaultForm of
+                                              TextDate -> "long"
+                                              NumericDate -> "numeric"
+                                              _ -> "long"
                                   x    -> x
            , dpRangeDelim = case stringAttr "range-delimiter" cur of
                                   ""  -> "-"
