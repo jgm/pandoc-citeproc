@@ -243,8 +243,8 @@ getXrefFields isBibtex baseEntry entries keys = do
        return (k',v)
 
 resolveCrossRef :: Bool -> [Item] -> Item -> Item
-resolveCrossRef isBibtex entries entry = foldl go entry (fields entry)
-  where go entry' (key, val) =
+resolveCrossRef isBibtex entries entry = foldr go entry (fields entry)
+  where go (key, val) entry' =
           if key == "crossref" || key == "xdata"
           then entry'{ fields = fields entry' ++
                                     getXrefFields isBibtex entry entries val }
