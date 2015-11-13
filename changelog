@@ -1,3 +1,25 @@
+pandoc-citeproc (0.8.1)
+
+  * Improved performance in bibtex cross-reference resolution (#190).
+  * Take 'form' for date-part elements from date if not specified (#116).
+    Previously if the 'form' were unspecified in a date-part
+    element, it would go to the default 'long', even if the
+    date as a whole was 'numeric'.
+  * Transform only uppercase ASCII letters in titlecase transform.
+    This helps us pass one more citeproc test case.
+  * Cleaned up locator parsing code.
+  * Allow roman numeral locators (#173.
+  * Fixed missing dash between months in date ranges (#175).
+  * Fixed `strip-periods` (#185).
+  * Parse supplementary fields in CSL JSON "note" fields (#94).
+  * Support more biblatex markup in converting biblatex bibliographies:
+    `mkbibemph`, `mkbibitalic`, `mkbibbold`, `mkbibparens`, `mkbibbrackets`,
+    `autocap` (Nick Bart, #26).  Treat reviews as articles.
+  * Add biblatex keys for additional languages (Nick Bart).
+  * Use HTTPS for DOI resolver (Andrew Dunning).
+  * Add biblatex keys for additional languages (Nick Bart):
+    ca-AD, da-DK, es-ES, fi-FI, it-IT, nl-NL, pl-PL, pt-PT, pt-BR, sv-SE
+
 pandoc-citeproc (0.8.0.1)
 
   * Allow aeson 0.10.x (Felix Yan).
