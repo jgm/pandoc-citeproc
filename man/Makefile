@@ -1,9 +1,9 @@
 ALL=man1/pandoc-citeproc.1
 DATE=$(shell date "+%Y-%m-%d")
-VERSION=$(shell ../dist/build/pandoc-citeproc/pandoc-citeproc --version | head -1 | awk '{print $$2;}')
+VERSION=$(shell stack exec -- pandoc-citeproc --version | head -1 | awk '{print $$2;}')
 
 .PHONY: all
 
 all: $(ALL)
 man1/%.1: %.1.md
-	pandoc $< -o $@ -s -t man -Vfooter="${VERSION}" -Vdate="${DATE}"
+	pandoc $< -o $@ -s -t man -Vfooter="pandoc-citeproc ${VERSION}" -Vdate="${DATE}"
