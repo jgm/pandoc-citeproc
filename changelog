@@ -1,3 +1,7 @@
+pandoc-citeproc (0.8.1.2)
+
+  * Use UTF8 versions of readFile in test program.
+
 pandoc-citeproc (0.8.1.1)
 
   * Use pandoc's UTF8 versions of getContents, putStrLn, etc.
