@@ -11,7 +11,7 @@ full: deps man
 	cabal build
 
 man:
-	make -C man
+	make -C man -B
 
 deps:
 	cabal install --only-dependencies --enable-tests -ftest_citeproc -fembed_data_files
