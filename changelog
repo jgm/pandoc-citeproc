@@ -1,3 +1,8 @@
+pandoc-citeproc (0.8.1.1)
+
+  * Use pandoc's UTF8 versions of getContents, putStrLn, etc.
+    Otherwise we get locale-dependent encodings.
+
 pandoc-citeproc (0.8.1)
 
   * Improved performance in bibtex cross-reference resolution (#190).
