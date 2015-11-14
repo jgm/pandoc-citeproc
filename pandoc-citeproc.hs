@@ -23,6 +23,7 @@ import Paths_pandoc_citeproc (version)
 import Text.CSL.Pandoc (processCites')
 import Text.Pandoc.JSON hiding (Format)
 import Text.Pandoc.Walk
+import qualified Text.Pandoc.UTF8 as UTF8
 
 main :: IO ()
 main = do
@@ -30,13 +31,13 @@ main = do
   let (flags, args, errs) = getOpt Permute options argv
   let header = "Usage: pandoc-citeproc [options] [file..]"
   unless (null errs) $ do
-    hPutStrLn stderr $ usageInfo (unlines $ errs ++ [header]) options
+    UTF8.hPutStrLn stderr $ usageInfo (unlines $ errs ++ [header]) options
     exitWith $ ExitFailure 1
   when (Version `elem` flags) $ do
-    putStrLn $ "pandoc-citeproc " ++ showVersion version
+    UTF8.putStrLn $ "pandoc-citeproc " ++ showVersion version
     exitWith ExitSuccess
   when (Help `elem` flags) $ do
-    putStrLn $ usageInfo header options
+    UTF8.putStrLn $ usageInfo header options
     exitWith ExitSuccess
   if Bib2YAML `elem` flags || Bib2JSON `elem` flags
      then do
@@ -47,12 +48,12 @@ main = do
                          msum (map formatFromExtension args) of
                          Just f   -> return f
                          Nothing  -> do
-                            hPutStrLn stderr $ usageInfo
+                            UTF8.hPutStrLn stderr $ usageInfo
                               ("Unknown format\n" ++ header) options
                             exitWith $ ExitFailure 3
        bibstring <- case args of
-                         []    -> getContents
-                         xs    -> mconcat <$> mapM readFile xs
+                         []    -> UTF8.getContents
+                         xs    -> mconcat <$> mapM UTF8.readFile xs
        readBiblioString bibformat bibstring >>=
          warnDuplicateKeys >>=
          if Bib2YAML `elem` flags
@@ -91,7 +92,7 @@ doCites :: Pandoc -> IO Pandoc
 doCites doc = do
   doc' <- processCites' doc
   let warnings = query findWarnings doc'
-  mapM_ (hPutStrLn stderr) warnings
+  mapM_ (UTF8.hPutStrLn stderr) warnings
   return doc'
 
 findWarnings :: Inline -> [String]
@@ -116,15 +117,15 @@ options =
 
 warnDuplicateKeys :: [Reference] -> IO [Reference]
 warnDuplicateKeys refs = mapM_ warnDup dupKeys >> return refs
-  where warnDup k = hPutStrLn stderr $ "biblio2yaml: duplicate key " ++ k
+  where warnDup k = UTF8.hPutStrLn stderr $ "biblio2yaml: duplicate key " ++ k
         allKeys   = map (unLiteral . refId) refs
         dupKeys   = [x | (x:_:_) <- group (sort allKeys)]
 
 outputYamlBlock :: B.ByteString -> IO ()
 outputYamlBlock contents = do
-  putStrLn "---\nreferences:"
+  UTF8.putStrLn "---\nreferences:"
   B.putStr contents
-  putStrLn "..."
+  UTF8.putStrLn "..."
 
 -- turn
 -- id: ! "\u043F\u0443\u043D\u043A\u04423"

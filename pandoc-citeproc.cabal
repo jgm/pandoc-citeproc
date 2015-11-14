@@ -141,7 +141,7 @@ executable pandoc-citeproc
     ghc-prof-options: -fprof-auto-exported -rtsopts
     build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12.3, aeson,
                       aeson-pretty, yaml, bytestring, syb, attoparsec, text,
-                      filepath
+                      pandoc, filepath
     other-modules:    Paths_pandoc_citeproc
                       Prelude
     default-language: Haskell98
