@@ -61,8 +61,8 @@ data TestResult =
 testCase :: Bool -> String -> IO TestResult
 testCase regenerate csl = do
   hPutStr stderr $ "[" ++ csl ++ ".in.native] "
-  indataNative <- readFile $ "tests/" ++ csl ++ ".in.native"
-  expectedNative <- readFile $ "tests/" ++ csl ++ ".expected.native"
+  indataNative <- UTF8.readFile $ "tests/" ++ csl ++ ".in.native"
+  expectedNative <- UTF8.readFile $ "tests/" ++ csl ++ ".expected.native"
   let jsonIn = Aeson.encode $ (read indataNative :: Pandoc)
   let expectedDoc = normalize $ read expectedNative
   testProgPath <- getExecutablePath
