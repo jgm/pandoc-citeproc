@@ -191,8 +191,8 @@ showDiff expected' result' =
   withSystemTempDirectory "test-pandoc-citeproc-XXX" $ \fp -> do
     let expectedf = fp </> "expected"
     let actualf   = fp </> "actual"
-    writeFile expectedf expected'
-    writeFile actualf result'
+    UTF8.writeFile expectedf expected'
+    UTF8.writeFile actualf result'
     withDirectory fp $ void $ rawSystem "diff" ["-u","expected","actual"]
 
 withDirectory :: FilePath -> IO a -> IO a
@@ -238,7 +238,7 @@ main = do
       putStrLn "Copying existing test-citeproc.log to test-citeproc.log.old"
       copyFile "test-citeproc.log" "test-citeproc.log.old"
     putStrLn "Writing test-citeproc.log."
-    writeFile "test-citeproc.log" summary
+    UTF8.writeFile "test-citeproc.log" summary
   exitWith $ if numfailures == 0
                 then ExitSuccess
                 else ExitFailure $ numfailures + numerrors
