@@ -1,3 +1,8 @@
+pandoc-citeproc (0.8.1.3)
+
+  * test-pandoc-citeproc: Better fix for Windows.  Use UTF8 strings
+    instead of bytestrings; this helps get line endings right in tests.
+
 pandoc-citeproc (0.8.1.2)
 
   * Use UTF8 versions of readFile in test program.
