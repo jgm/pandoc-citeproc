@@ -79,8 +79,7 @@ testCase regenerate csl = do
           then err "PASSED" >> return Passed
           else do
              err $ "FAILED"
-             showDiff (UTF8.fromStringLazy $ writeNative def expectedDoc)
-                      (UTF8.fromStringLazy $ writeNative def outDoc)
+             showDiff (writeNative def expectedDoc) (writeNative def outDoc)
              when regenerate $
                UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
                   writeNative def{ writerStandalone = True } outDoc
@@ -91,13 +90,13 @@ testCase regenerate csl = do
        err $ UTF8.toStringLazy errout
        return Errored
 
-showDiff :: BL.ByteString -> BL.ByteString -> IO ()
-showDiff expected' result' =
+showDiff :: String -> String -> IO ()
+showDiff expected result =
   withSystemTempDirectory "test-pandoc-citeproc-XXX" $ \fp -> do
     let expectedf = fp </> "expected"
     let actualf   = fp </> "actual"
-    BL.writeFile expectedf expected'
-    BL.writeFile actualf result'
+    UTF8.writeFile expectedf expected
+    UTF8.writeFile actualf result
     oldDir <- getCurrentDirectory
     setCurrentDirectory fp
     rawSystem "diff" ["-U1","expected","actual"]
@@ -107,18 +106,20 @@ biblio2yamlTest :: String -> IO TestResult
 biblio2yamlTest fp = do
   hPutStr stderr $ "[biblio2yaml/" ++ fp ++ "] "
   let yamlf = "tests/biblio2yaml/" ++ fp
-  raw <- BL.readFile yamlf
-  let yamlStart = BL.pack "---"
-  let (biblines, yamllines) = break (== yamlStart) $ BL.lines raw
-  let bib = BL.unlines biblines
-  let expected = BL.unlines yamllines
+  raw <- UTF8.readFile yamlf
+  let yamlStart = "---"
+  let (biblines, yamllines) = break (== yamlStart) $ lines raw
+  let bib = unlines biblines
+  let expected = unlines yamllines
   testProgPath <- getExecutablePath
   let pandocCiteprocPath = takeDirectory testProgPath </> ".." </>
         "pandoc-citeproc" </> "pandoc-citeproc"
-  (ec, result, errout) <- pipeProcess
+  (ec, result', errout) <- pipeProcess
                      (Just [("LANG","en_US.UTF-8"),("HOME",".")])
                      pandocCiteprocPath
-                     ["--bib2yaml", "-f", drop 1 $ takeExtension fp] bib
+                     ["--bib2yaml", "-f", drop 1 $ takeExtension fp]
+                     (UTF8.fromStringLazy bib)
+  let result = UTF8.toStringLazy result'
   if ec == ExitSuccess
      then do
        if expected == result
