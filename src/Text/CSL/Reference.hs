@@ -472,13 +472,14 @@ parseSuppFields o = do
 
 noteFields :: P.Parser [(Text, Aeson.Value)]
 noteFields = do
-  -- TODO - actually parse the fields
   fs <- P.many noteField
+  P.spaces
   rest <- P.getInput
   return (("note", Aeson.String (T.pack rest)) : fs)
 
 noteField :: P.Parser (Text, Aeson.Value)
 noteField = P.try $ do
+  P.spaces
   P.char '{'
   P.char ':'
   k <- P.manyTill (P.letter <|> P.char '-') (P.char ':')
