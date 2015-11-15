@@ -1,6 +1,6 @@
 ALL=man1/pandoc-citeproc.1
 DATE=$(shell date "+%Y-%m-%d")
-VERSION=$(shell stack exec -- pandoc-citeproc --version | head -1 | awk '{print $$2;}')
+VERSION=$(shell grep version: ../pandoc-citeproc.cabal | head -1 | awk '{print $$2;}')
 
 .PHONY: all
 
