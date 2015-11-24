@@ -22,6 +22,7 @@ description:        The pandoc-citeproc library exports functions for
                     a YAML format suitable for inclusion in pandoc YAML
                     metadata.
 
+homepage:           https://github.com/jgm/pandoc-citeproc
 category:           Text
 license:            BSD3
 license-file:       LICENSE
