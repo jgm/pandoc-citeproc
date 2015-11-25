@@ -51,12 +51,12 @@ adjustSpans _ x = [x]
 parseRawLaTeX :: Lang -> String -> [Inline]
 parseRawLaTeX lang ('\\':xs) =
 #if MIN_VERSION_pandoc(1,14,0)
-  case readLaTeX def{readerParseRaw = True} contents of
+  case readLaTeX def{readerParseRaw = True, readerSmart = True} contents of
        Right (Pandoc _ [Para ys])  -> f command ys
        Right (Pandoc _ [Plain ys]) -> f command ys
        _                           -> []
 #else
-  case readLaTeX def{readerParseRaw = True} contents of
+  case readLaTeX def{readerParseRaw = True, readerSmart = True} contents of
        Pandoc _ [Para ys]  -> f command ys
        Pandoc _ [Plain ys] -> f command ys
        _                   -> []
@@ -1083,11 +1083,11 @@ optionSet key opts = case lookup key opts of
 latex' :: String -> [Block]
 latex' s =
 #if MIN_VERSION_pandoc(1,14,0)
-  case readLaTeX def{readerParseRaw = True} s of
+  case readLaTeX def{readerParseRaw = True, readerSmart = True} s of
                 Right (Pandoc _ bs) -> bs
                 _                   -> []
 #else
-  case readLaTeX def{readerParseRaw = True} s of
+  case readLaTeX def{readerParseRaw = True, readerSmart = True} s of
                 Pandoc _ bs         -> bs
 #endif
 
