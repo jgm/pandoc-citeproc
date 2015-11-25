@@ -134,7 +134,7 @@ addFormatting f =
   addLink . addSuffix . pref . quote . font . text_case . strip_periods
   where addLink i = case hyperlink f of
                          ""  -> i
-                         url -> Formatted [Link (unFormatted i) (url, "")]
+                         url -> Formatted [Link nullAttr (unFormatted i) (url, "")]
         pref i = case prefix f of
                       "" -> i
                       x  -> fromString x <> i

@@ -26,7 +26,7 @@ import Data.Monoid (Any(..))
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
 import Data.String ( fromString )
-import Text.Pandoc.Definition (Inline(Str, Space, Link))
+import Text.Pandoc.Definition (Inline(Str, Space, Link), nullAttr)
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc.Shared (stringify)
 import qualified Data.Text as T
@@ -212,7 +212,7 @@ evalElement el
                              "page"        -> getStringVar "page" >>= formatRange fm
                              "locator"     -> getLocVar >>= formatRange fm . snd
                              "url"         -> getStringVar "url" >>= \k ->
-                                              if null k then return [] else return [Output [OPan [Link [Str k] (k,"")]] fm]
+                                              if null k then return [] else return [Output [OPan [Link nullAttr [Str k] (k,"")]] fm]
                              "doi"         -> do d <- getStringVar "doi"
                                                  let (prefixPart, linkPart) = T.breakOn (T.pack "http") (T.pack (prefix fm))
                                                  let u = if T.null linkPart
@@ -220,16 +220,16 @@ evalElement el
                                                             else T.unpack linkPart ++ d
                                                  if null d
                                                     then return []
-                                                    else return [Output [OPan [Link [Str (T.unpack linkPart ++ d)] (u, "")]]
+                                                    else return [Output [OPan [Link nullAttr [Str (T.unpack linkPart ++ d)] (u, "")]]
                                                           fm{ prefix = T.unpack prefixPart, suffix = suffix fm }]
                              "pmid"        -> getStringVar "pmid" >>= \d ->
                                               if null d
                                                  then return []
-                                                 else return [Output [OPan [Link [Str d] ("http://www.ncbi.nlm.nih.gov/pubmed/" ++ d, "")]] fm]
+                                                 else return [Output [OPan [Link nullAttr [Str d] ("http://www.ncbi.nlm.nih.gov/pubmed/" ++ d, "")]] fm]
                              "pmcid"       -> getStringVar "pmcid" >>= \d ->
                                               if null d
                                                  then return []
-                                                 else return [Output [OPan [Link [Str d] ("http://www.ncbi.nlm.nih.gov/pmc/articles/" ++ d, "")]] fm]
+                                                 else return [Output [OPan [Link nullAttr [Str d] ("http://www.ncbi.nlm.nih.gov/pmc/articles/" ++ d, "")]] fm]
                              _             -> gets (env >>> options &&& abbrevs) >>= \(opts,as) ->
                                               getVar [] (getFormattedValue opts as f fm s) s >>= \r ->
                                               consumeVariable s >> return r

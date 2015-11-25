@@ -42,9 +42,9 @@ clean' :: Style -> [Inline] -> [Inline]
 clean' _   []  = []
 clean' sty (i:is) =
   case (i:is) of
-      (Link lab1 ('#':r1, "") : Str "\8211" : Link lab2 ('#':r2, "") : rest)
-        | r1 == r2 -> Link (lab1 ++ [Str "\8211"] ++ lab2) ('#':r1, "") :
-                         clean' sty rest
+      (Link a1 lab1 ('#':r1, "") : Str "\8211" : Link a2 lab2 ('#':r2, "") : rest)
+        | r1 == r2, a1 == a2 ->
+           Link a1 (lab1 ++ [Str "\8211"] ++ lab2) ('#':r1, "") : clean' sty rest
       (Span ("",[],[]) inls : _) -> inls ++ clean' sty is
       (Span ("",["csl-inquote"],kvs) inls : _) ->
          let isOuter = lookup "position" kvs == Just "outer"
@@ -133,8 +133,8 @@ flipFlop' st (Span (id',classes,kvs) ils)
                        ["csl-no-emph"      | inEmph st] ++
                        ["csl-no-strong"    | inStrong st] ++
                        ["csl-no-smallcaps" | inSmallCaps st]
-flipFlop' st (Link ils t) =
-  Link (map (flipFlop' st) ils) t
+flipFlop' st (Link attr ils t) =
+  Link attr (map (flipFlop' st) ils) t
 flipFlop' st (Note [Para ils]) =
   Note [Para $ map (flipFlop' st) ils]
 flipFlop' _ il = il

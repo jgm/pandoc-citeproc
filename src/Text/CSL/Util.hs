@@ -267,8 +267,8 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
         go acc (Quoted qt xs)    = (:acc) <$> (Quoted qt <$> caseTransform xform xs)
         go acc (Emph xs)         = (:acc) <$> (Emph <$> caseTransform xform xs)
         go acc (Strong xs)       = (:acc) <$> (Strong <$> caseTransform xform xs)
-        go acc (Link xs t)       = (:acc) <$> (Link <$> caseTransform xform xs <*> pure t)
-        go acc (Image xs t)      = (:acc) <$> (Link <$> caseTransform xform xs <*> pure t)
+        go acc (Link at xs t)       = (:acc) <$> (Link at <$> caseTransform xform xs <*> pure t)
+        go acc (Image at xs t)      = (:acc) <$> (Link at <$> caseTransform xform xs <*> pure t)
         go acc (Span attr xs)    = (:acc) <$> (Span attr <$> caseTransform xform xs)
         go acc x                 = return $ x : acc
 
@@ -336,7 +336,7 @@ initInline (i:[])
     | Quoted q    is <- i = return $ Quoted q    (initInline is)
     | SmallCaps   is <- i = return $ SmallCaps   (initInline is)
     | Strikeout   is <- i = return $ Strikeout   (initInline is)
-    | Link      is t <- i = return $ Link        (initInline is) t
+    | Link   at is t <- i = return $ Link at     (initInline is) t
     | Span at     is <- i = return $ Span at     (initInline is)
     | otherwise           = []
 initInline (i:xs) = i : initInline xs
@@ -365,7 +365,7 @@ mapHeadInline f (i:xs)
     | Quoted q    is <- i = Quoted q    (mapHeadInline f is)   : xs
     | SmallCaps   is <- i = SmallCaps   (mapHeadInline f is)   : xs
     | Strikeout   is <- i = Strikeout   (mapHeadInline f is)   : xs
-    | Link      is t <- i = Link        (mapHeadInline f is) t : xs
+    | Link   at is t <- i = Link at     (mapHeadInline f is) t : xs
     | Span     at is <- i = Span at     (mapHeadInline f is)   : xs
     | otherwise           = i : xs
 
