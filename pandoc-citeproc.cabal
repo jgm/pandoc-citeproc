@@ -94,13 +94,16 @@ library
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
     ghc-prof-options: -fprof-auto-exported -rtsopts
     build-depends:    containers, directory, mtl,
-                      bytestring, filepath, pandoc-types >= 1.12.3, tagsoup,
+                      bytestring, filepath,
+                      pandoc-types >= 1.16 && < 1.17,
+                      pandoc >= 1.16 && < 1.17,
+                      tagsoup,
                       aeson >= 0.7 && < 0.11, text, vector,
                       xml-conduit >= 1.2 && < 1.4,
                       unordered-containers >= 0.2 && < 0.3,
                       data-default,
                       setenv >= 0.1 && < 0.2,
-                      split, yaml >= 0.8.8.7, pandoc >= 1.13
+                      split, yaml >= 0.8.8.7
     if impl(ghc < 7.6)
        build-depends: ghc-prim
 
@@ -140,9 +143,12 @@ executable pandoc-citeproc
     hs-source-dirs:   ., prelude
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -fprof-auto-exported -rtsopts
-    build-depends:    base >= 4, pandoc-citeproc, pandoc-types >= 1.12.3, aeson,
+    build-depends:    base >= 4, pandoc-citeproc,
+                      pandoc-types >= 1.16 && < 1.17,
+                      pandoc >= 1.16 && < 1.17,
+                      aeson,
                       aeson-pretty, yaml, bytestring, syb, attoparsec, text,
-                      pandoc, filepath
+                      filepath
     other-modules:    Paths_pandoc_citeproc
                       Prelude
     default-language: Haskell98
@@ -157,7 +163,9 @@ executable test-citeproc
   else
     Buildable:    False
   build-depends:  base >= 4, aeson, directory, text,
-                  pandoc-types >= 1.12.3, pandoc >= 1.13, filepath,
+                  pandoc-types >= 1.16 && < 1.17,
+                  pandoc >= 1.16 && < 1.17,
+                  filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7, containers >= 0.4, vector >= 0.10
   default-language: Haskell98
@@ -169,7 +177,8 @@ test-suite test-pandoc-citeproc
                   Prelude
   Hs-Source-Dirs: tests, prelude
   build-depends:  base >= 4, aeson, directory, text,
-                  pandoc-types >= 1.12.3, pandoc >= 1.13, filepath,
+                  pandoc-types >= 1.16 && < 1.17,
+                  pandoc >= 1.16 && < 1.17, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7
   default-language: Haskell98
