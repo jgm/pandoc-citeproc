@@ -90,9 +90,11 @@ instance Show Value where
 
 type ReferenceMap = [(String, Value)]
 
-mkRefMap :: Data a => a -> ReferenceMap
-mkRefMap a = zip fields (gmapQ Value a)
-    where fields = map uncamelize . constrFields . toConstr $ a
+mkRefMap :: Reference -> ReferenceMap
+mkRefMap r
+  | refId r == mempty = []
+  | otherwise         = zip fields (gmapQ Value r)
+      where fields = map uncamelize . constrFields . toConstr $ r
 
 fromValue :: Data a => Value -> Maybe a
 fromValue (Value a) = cast a
