@@ -90,10 +90,9 @@ instance Show Value where
 
 type ReferenceMap = [(String, Value)]
 
-mkRefMap :: Reference -> ReferenceMap
-mkRefMap r
-  | refId r == mempty = []
-  | otherwise         = zip fields (gmapQ Value r)
+mkRefMap :: Maybe Reference -> ReferenceMap
+mkRefMap Nothing  = []
+mkRefMap (Just r) = zip fields (gmapQ Value r)
       where fields = map uncamelize . constrFields . toConstr $ r
 
 fromValue :: Data a => Value -> Maybe a
@@ -745,17 +744,13 @@ getReference  r c
         Just i  -> Just $ setPageFirst $ r !! i
         Nothing -> Nothing
 
-processCites :: [Reference] -> [[Cite]] -> [[(Cite, Reference)]]
+processCites :: [Reference] -> [[Cite]] -> [[(Cite, Maybe Reference)]]
 processCites rs cs
     = procGr [[]] cs
     where
       procRef r = case filter ((==) (unLiteral $ refId r) . citeId) $ concat cs of
                     x:_ -> r { firstReferenceNoteNumber = readNum $ citeNoteNumber x}
                     []  -> r
-      getRef  c = case filter ((==) (citeId c) . unLiteral . refId) rs of
-                    x:_ -> procRef $ setPageFirst x
-                    []  -> emptyReference { title =
-                            fromString $ citeId c ++ " not found!" }
 
       procGr _ [] = []
       procGr a (x:xs) = let (a',res) = procCs a x
@@ -770,7 +765,8 @@ processCites rs cs
           where
             go s = let addCite    = init a ++ [last a ++ [c]]
                        (a', rest) = procCs addCite xs
-                   in  (a', (c { citePosition = s}, getRef c) : rest)
+                   in  (a', (c { citePosition = s},
+                             procRef <$> getReference rs c) : rest)
             isElem   = citeId c `elem` map citeId (concat a)
             isIbid   = case reverse (last a) of
                             []    -> case reverse (init a) of

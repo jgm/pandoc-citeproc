@@ -135,7 +135,7 @@ procRefs (Style {biblio = mb, csMacros = ms , styleLocale = l, styleAbbrevs = as
       opts'   b = mergeOptions (bibOptions b) opts
       setCNum   = map (\(x,y) -> x { citationNumber = fromIntegral y }) . flip zip ([1..] :: [Int])
       sort_   b = evalSorting (EvalSorting emptyCite {citePosition = "first"}) l ms (opts' b) (bibSort b) as
-      process b = setCNum . sortItems . map (id &&& sort_ b) $ rs
+      process b = setCNum . sortItems . map (id &&& sort_ b . Just) $ rs
 
 sortItems :: Show a => [(a,[Sorting])] -> [a]
 sortItems [] = []
@@ -176,8 +176,7 @@ procBiblio bos (Style {biblio = mb, csMacros = ms , styleLocale = l,
       render  b   = subsequentAuthorSubstitute b . map (evalBib b) . filterRefs bos $ rs
 
       evalBib :: Bibliography -> Reference -> [Output]
-      evalBib b = evalLayout (bibLayout b) (EvalBiblio emptyCite {citePosition = "first"}) False l ms
-                             (mergeOptions (bibOptions b) opts) as
+      evalBib b = evalLayout (bibLayout b) (EvalBiblio emptyCite {citePosition = "first"}) False l ms (mergeOptions (bibOptions b) opts) as . Just
 
 subsequentAuthorSubstitute :: Bibliography -> [[Output]] -> [[Output]]
 subsequentAuthorSubstitute b = if null subAuthStr then id else chkCreator
@@ -273,7 +272,7 @@ filterRefs bos refs
                         "categories"   -> look "categories"
                         x              -> look x
           where
-            look s = case lookup s (mkRefMap r) of
+            look s = case lookup s (mkRefMap (Just r)) of
                        Just x | Just v' <- (fromValue x :: Maybe RefType  ) -> v == uncamelize (show v')
                               | Just v' <- (fromValue x :: Maybe String   ) -> v  == v'
                               | Just v' <- (fromValue x :: Maybe [String] ) -> v `elem` v'
@@ -284,7 +283,7 @@ filterRefs bos refs
 -- | Given the CSL 'Style' and the list of 'Cite's coupled with their
 -- 'Reference's, generate a 'CitationGroup'. The citations are sorted
 -- according to the 'Style'.
-procGroup :: Style -> [(Cite, Reference)] -> CitationGroup
+procGroup :: Style -> [(Cite, Maybe Reference)] -> CitationGroup
 procGroup (Style {citation = ct, csMacros = ms , styleLocale = l,
                   styleAbbrevs = as, csOptions = opts}) cr
     = CG authIn (layFormat $ citLayout ct) (layDelim $ citLayout ct) (authIn ++ co)

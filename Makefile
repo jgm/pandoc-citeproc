@@ -39,4 +39,9 @@ update:
 	git add chicago-author-date.csl; \
 	git commit -a
 
-.PHONY: quick full prof update clean install test deps man
+stack:
+	cd ../pandoc && \
+	stack install --test --stack-yaml stack.full.yaml ; \
+	cd ../pandoc-citeproc
+
+.PHONY: quick full prof update clean install test deps man stack

@@ -79,7 +79,7 @@ disambCitations s bibs cs groups
       reEval      = let chk = if hasYSuffOpt then filter ((==) [] . citYear) else id
                     in  chk needYSuff
       reEvaluated = if or (query hasIfDis s) && not (null reEval)
-                    then map (uncurry $ reEvaluate s reEval) $ zip refs groups
+                    then zipWith (reEvaluate s reEval) refs groups
                     else groups
 
       withYearS = addNames $
@@ -152,14 +152,17 @@ updateOName n o
 -- | Evaluate again a citation group with the 'EvalState' 'disamb'
 -- field set to 'True' (for matching the @\"disambiguate\"@
 -- condition).
-reEvaluate :: Style -> [CiteData] -> [(Cite, Reference)] -> CitationGroup -> CitationGroup
+reEvaluate :: Style -> [CiteData] -> [(Cite, Maybe Reference)] -> CitationGroup -> CitationGroup
 reEvaluate (Style {citation = ct, csMacros = ms , styleLocale = lo,
                    styleAbbrevs = as}) l cr (CG a f d os)
     = CG a f d . flip concatMap (zip cr os) $
-      \((c,r),out) -> if unLiteral (refId r) `elem` map key l
-                      then return . second (flip Output emptyFormatting) $
-                           (,) c $ evalLayout (citLayout ct) (EvalCite c) True lo ms (citOptions ct) as r
-                      else [out]
+      \((c,mbr),out) ->
+         case mbr of
+              Just r | unLiteral (refId r) `elem` lkeys ->
+                return . second (flip Output emptyFormatting) $
+                      (,) c $ evalLayout (citLayout ct) (EvalCite c) True lo ms (citOptions ct) as mbr
+              _ -> [out]
+        where lkeys = map key l
 
 -- | Check if the 'Style' has any conditional for disambiguation. In
 -- this case the conditional will be try after all other

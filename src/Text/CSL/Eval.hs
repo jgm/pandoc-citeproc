@@ -30,6 +30,7 @@ import Text.Pandoc.Definition (Inline(Str, Space, Link), nullAttr)
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc.Shared (stringify)
 import qualified Data.Text as T
+import Data.Maybe (isNothing)
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
@@ -46,17 +47,14 @@ import Text.CSL.Util ( readNum, last', proc, proc', query, betterThan,
 -- 'Locale', the 'MacroMap', the position of the cite and the
 -- 'Reference'.
 evalLayout :: Layout   -> EvalMode -> Bool -> [Locale] -> [MacroMap]
-           -> [Option] -> Abbreviations -> Reference -> [Output]
-evalLayout (Layout _ _ es) em b l m o a r
+           -> [Option] -> Abbreviations -> Maybe Reference -> [Output]
+evalLayout (Layout _ _ es) em b l m o a mbr
     = cleanOutput evalOut
     where
       evalOut = case evalState job initSt of
-                  [] -> if isSorting em
-                        then []
-                        else [noOutputError]
-                  x | title r == Formatted [Str (citeId cit), Space, Str "not", Space,
-                                   Str "found!"]             -> [noBibDataError $ cit]
-                    | otherwise                              -> suppTC x
+                  x | isNothing mbr -> [noBibDataError cit]
+                    | null x        -> []
+                    | otherwise     -> suppTC x
       locale = case l of
                  [x] -> x
                  _   -> Locale [] [] [] [] []
@@ -65,22 +63,24 @@ evalLayout (Layout _ _ es) em b l m o a r
                  EvalCite    c -> c
                  EvalSorting c -> c
                  EvalBiblio  c -> c
-      initSt = EvalState (mkRefMap r) (Env cit (localeTerms locale) m
+      initSt = EvalState (mkRefMap mbr) (Env cit (localeTerms locale) m
                          (localeDate locale) o [] a) [] em b False [] [] False [] [] []
       suppTC = let getLang = take 2 . map toLower in
-               case (getLang $ localeLang locale, getLang $ unLiteral $ language r) of
-                 (_,  "en") -> id
-                 ("en", []) -> id
-                 _          -> proc' rmTitleCase
+               case (getLang $ localeLang locale,
+                     getLang . unLiteral . language <$> mbr) of
+                 (_,  Just "en") -> id
+                 (_,  Nothing)   -> id
+                 ("en", Just "") -> id
+                 _               -> proc' rmTitleCase
 
 evalSorting :: EvalMode -> [Locale] -> [MacroMap] -> [Option] ->
-               [Sort] -> Abbreviations -> Reference -> [Sorting]
-evalSorting m l ms opts ss as r
+               [Sort] -> Abbreviations -> Maybe Reference -> [Sorting]
+evalSorting m l ms opts ss as mbr
     = map (format . sorting) ss
     where
       render       = renderPlain . formatOutputList
       format (s,e) = applaySort s . render $ uncurry eval e
-      eval     o e = evalLayout (Layout emptyFormatting [] [e]) m False l ms o as r
+      eval     o e = evalLayout (Layout emptyFormatting [] [e]) m False l ms o as mbr
       applaySort c s
           | Ascending {} <- c = Ascending  s
           | otherwise         = Descending s
