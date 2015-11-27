@@ -31,24 +31,28 @@ import System.FilePath
 import System.Directory (doesFileExist, getAppUserDataDirectory)
 import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim)
 import System.IO.Error (isDoesNotExistError)
+import Data.Maybe (fromMaybe)
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
 -- for) at the end of the document.
 processCites :: Style -> [Reference] -> Pandoc -> Pandoc
 processCites style refs (Pandoc m1 b1) =
-  let m2            = setMeta "nocites-wildcards" (mkNociteWildcards refs m1) m1
-      Pandoc m3 b2  = evalState (walkM setHashes $ Pandoc m2 b1) 1
-      grps          = query getCitation $ Pandoc m3 b2
-      m4            = deleteMeta "nocites-wildcards" m3
+  let metanocites   = lookupMeta "nocite" m1
+      nocites       = mkNociteWildcards refs . query getCitation <$> metanocites
+      Pandoc m2 b2  = evalState (walkM setHashes $ Pandoc (deleteMeta "nocite" m1) b1) 1
+      grps          = query getCitation (Pandoc m2 b2) ++ fromMaybe [] nocites
       locMap        = locatorMap style
-      result        = citeproc procOpts{ linkCitations = isLinkCitations m4}
+      result        = citeproc procOpts{ linkCitations = isLinkCitations m2}
                         style refs (setNearNote style $
                         map (map (toCslCite locMap)) grps)
       cits_map      = tr' "cits_map" $ M.fromList $ zip grps (citations result)
       biblioList    = map (renderPandoc' style) $ zip (bibliography result) (citationIds result)
-      Pandoc m bs   = bottomUp (mvPunct style) . deNote .
-                        topDown (processCite style cits_map) $ Pandoc m4 b2
+      Pandoc m3 bs  = bottomUp (mvPunct style) . deNote .
+                        topDown (processCite style cits_map) $ Pandoc m2 b2
+      m             = case metanocites of
+                            Nothing -> m3
+                            Just x  -> setMeta "nocite" x m3
   in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
                $ insertRefs m biblioList bs
 
@@ -107,16 +111,15 @@ isLinkCitations meta =
 
 -- if the 'nocite' Meta field contains a citation with id = '*',
 -- create a cite with to all the references.
-mkNociteWildcards :: [Reference] -> Meta -> Inlines
-mkNociteWildcards refs meta =
-  case lookupMeta "nocite" meta of
-       Nothing      -> mempty
-       Just nocites ->
-         case [c | c <- concat (query getCitation nocites)
+mkNociteWildcards :: [Reference] -> [[Citation]] -> [[Citation]]
+mkNociteWildcards refs nocites =
+  map (\citgrp -> expandStar citgrp) nocites
+  where expandStar cs =
+         case [c | c <- cs
                  , citationId c == "*"] of
-              []    -> mempty
-              (_:_) -> cite allcites mempty
-         where allcites = map (\ref -> Citation{
+              [] -> cs
+              _  -> allcites
+        allcites = map (\ref -> Citation{
                                   citationId = unLiteral (refId ref),
                                   citationPrefix = [],
                                   citationSuffix = [],
