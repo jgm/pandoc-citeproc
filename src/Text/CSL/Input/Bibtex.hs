@@ -50,17 +50,10 @@ adjustSpans _ x = [x]
 
 parseRawLaTeX :: Lang -> String -> [Inline]
 parseRawLaTeX lang ('\\':xs) =
-#if MIN_VERSION_pandoc(1,14,0)
-  case readLaTeX def{readerParseRaw = True, readerSmart = True} contents of
-       Right (Pandoc _ [Para ys])  -> f command ys
-       Right (Pandoc _ [Plain ys]) -> f command ys
-       _                           -> []
-#else
-  case readLaTeX def{readerParseRaw = True, readerSmart = True} contents of
-       Pandoc _ [Para ys]  -> f command ys
-       Pandoc _ [Plain ys] -> f command ys
-       _                   -> []
-#endif
+  case latex' contents of
+       [Para ys]  -> f command ys
+       [Plain ys] -> f command ys
+       _          -> []
    where (command', contents') = break (=='{') xs
          command  = trim command'
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
@@ -1081,7 +1074,7 @@ optionSet key opts = case lookup key opts of
                       _           -> False
 
 latex' :: String -> [Block]
-latex' s =
+latex' s = Walk.walk removeSoftBreak $
 #if MIN_VERSION_pandoc(1,14,0)
   case readLaTeX def{readerParseRaw = True, readerSmart = True} s of
                 Right (Pandoc _ bs) -> bs
@@ -1090,6 +1083,10 @@ latex' s =
   case readLaTeX def{readerParseRaw = True, readerSmart = True} s of
                 Pandoc _ bs         -> bs
 #endif
+
+removeSoftBreak :: Inline -> Inline
+removeSoftBreak SoftBreak = Space
+removeSoftBreak x = x
 
 latex :: String -> Bib Formatted
 latex s = blocksToFormatted $ latex' $ trim s
