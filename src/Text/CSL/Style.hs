@@ -101,7 +101,8 @@ import Data.Yaml.Builder(ToYaml(..))
 import qualified Data.Yaml.Builder as Y
 import Text.Pandoc.Definition hiding (Citation, Cite)
 import Text.Pandoc (readHtml, writeMarkdown,
-                    WriterOptions(..), ReaderOptions(..), bottomUp, def)
+                    WriterOptions(..), ReaderOptions(..), WrapOption(..),
+                    bottomUp, def)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.Builder as B
 import qualified Data.Text as T
@@ -157,13 +158,13 @@ adjustScTags zs =
 
 writeYAMLString :: [Inline] -> String
 writeYAMLString ils =
-  trimr $ writeMarkdown def{writerWrapText = False}
+  trimr $ writeMarkdown def{writerWrapText = WrapNone}
         $ Pandoc nullMeta
           [Plain $ bottomUp (concatMap (adjustCSL False)) ils]
 
 writeCSLString :: [Inline] -> String
 writeCSLString ils =
-  trimr $ writeMarkdown def{writerWrapText = False}
+  trimr $ writeMarkdown def{writerWrapText = WrapNone}
         $ Pandoc nullMeta
           [Plain $ bottomUp (concatMap (adjustCSL True)) ils]
 
