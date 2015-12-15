@@ -781,7 +781,7 @@ emptyAgent = Agent [] mempty mempty mempty mempty mempty False False
 
 instance FromJSON Agent where
   parseJSON (Object v) = nameTransform <$> (Agent <$>
-              (v .: "given" <|> ((map Formatted . wordsBy (== Space) . unFormatted) <$> v .: "given") <|> pure []) <*>
+              (v .: "given" <|> ((map Formatted . wordsBy isSpace . unFormatted) <$> v .: "given") <|> pure []) <*>
               v .:?  "dropping-particle" .!= mempty <*>
               v .:? "non-dropping-particle" .!= mempty <*>
               v .:? "family" .!= mempty <*>
@@ -834,8 +834,11 @@ nonDroppingPartTransform ag
 
 trimSpace :: [Inline] -> [Inline]
 trimSpace = reverse . dropWhile isSpace . reverse . dropWhile isSpace
-  where isSpace Space = True
-        isSpace _     = False
+
+isSpace :: Inline -> Bool
+isSpace Space     = True
+isSpace SoftBreak = True
+isSpace _         = False
 
 droppingPartTransform :: Agent -> Agent
 droppingPartTransform ag

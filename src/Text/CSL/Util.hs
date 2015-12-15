@@ -234,7 +234,7 @@ data CaseTransformState = WordBoundary | SentenceBoundary | NoBoundary
 caseTransform :: (Inline -> State CaseTransformState Inline) -> [Inline]
               -> State CaseTransformState [Inline]
 caseTransform xform = fmap reverse . foldM go [] . splitUpStr
-  where go acc Space        = do
+  where go acc s | s == Space || s == SoftBreak = do
                modify (\st ->
                  case st of
                       SentenceBoundary -> SentenceBoundary
@@ -343,6 +343,7 @@ initInline (i:xs) = i : initInline xs
 
 tailInline :: [Inline] -> [Inline]
 tailInline (Space:xs) = xs
+tailInline (SoftBreak:xs) = xs
 tailInline xs         = removeEmpty $ tailFirstInlineStr xs
   where removeEmpty   = dropWhile (== Str "")
 

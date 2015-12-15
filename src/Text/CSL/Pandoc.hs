@@ -245,9 +245,14 @@ mvPunctInsideQuote (Quoted qt ils) (Str s) | s `elem` [".", ","] =
   [Quoted qt (init ils ++ (mvPunctInsideQuote (last ils) (Str s)))]
 mvPunctInsideQuote il il' = [il, il']
 
+isSpacy :: Inline -> Bool
+isSpacy Space = True
+isSpacy SoftBreak = True
+isSpacy _ = False
+
 mvPunct :: Style -> [Inline] -> [Inline]
-mvPunct _ (Space : Space : xs) = Space : xs
-mvPunct _ (Space : x : ys) | isNote x, startWithPunct ys =
+mvPunct _ (x : Space : xs) | isSpacy x = x : xs
+mvPunct _ (s : x : ys) | isSpacy s, isNote x, startWithPunct ys =
    Str (headInline ys) : x : tailFirstInlineStr ys
 mvPunct _ (Cite cs ils : ys) |
      length ils > 1
@@ -258,8 +263,8 @@ mvPunct _ (Cite cs ils : ys) |
 mvPunct sty (q@(Quoted _ _) : w@(Str _) : x : ys)
   | isNote x, isPunctuationInQuote sty  =
     mvPunctInsideQuote q w ++ (x : ys)
-mvPunct _ (Space : x : ys) | isNote x = x : ys
-mvPunct _ (Space : x@(Cite _ (Superscript _ : _)) : ys) = x : ys
+mvPunct _ (s : x : ys) | isSpacy s, isNote x = x : ys
+mvPunct _ (s : x@(Cite _ (Superscript _ : _)) : ys) | isSpacy s = x : ys
 mvPunct _ xs = xs
 
 endWithPunct :: Bool -> [Inline] -> Bool
@@ -283,15 +288,15 @@ deNote = topDown go
             Cite (c:cs) [Note $ sanitize xs]
         go (Note xs) = Note $ topDown go' xs
         go x = x
-        go' (x : Cite cs [Note [Para xs]] : ys) | x /= Space =
+        go' (x : Cite cs [Note [Para xs]] : ys) | not (isSpacy x) =
              x : Str "," : Space : comb (\zs -> [Cite cs zs]) xs ys
-        go' (x : Note [Para xs] : ys) | x /= Space =
+        go' (x : Note [Para xs] : ys) | not (isSpacy x) =
              x : Str "," : Space : comb id xs ys
         go' (Cite cs [Note [Para xs]] : ys) = comb (\zs -> [Cite cs zs]) xs ys
         go' (Note [Para xs] : ys) = comb id xs ys
         go' xs = xs
-        removeLeadingPunct (Str [c] : Space : xs)
-          | c == ',' || c == '.' || c == ':' = xs
+        removeLeadingPunct (Str [c] : s : xs)
+          | isSpacy s && (c == ',' || c == '.' || c == ':') = xs
         removeLeadingPunct xs = xs
         comb f xs ys =
            let xs' = if startWithPunct ys && endWithPunct True xs
@@ -362,7 +367,7 @@ pMatch condition = try $ do
   return t
 
 pSpace :: Parsec [Inline] st Inline
-pSpace = pMatch (\t -> t == Space || t == Str "\160")
+pSpace = pMatch (\t -> isSpacy t || t == Str "\160")
 
 pLocator :: LocatorMap -> Parsec [Inline] st (String, String)
 pLocator locMap = try $ do
