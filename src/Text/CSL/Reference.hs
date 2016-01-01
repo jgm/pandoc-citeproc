@@ -265,9 +265,13 @@ instance Show RefType where
     show x = map toLower . uncamelize . showConstr . toConstr $ x
 
 instance FromJSON RefType where
-  parseJSON (String t) = safeRead (capitalize . camelize . T.unpack $ t)
-  parseJSON v@(Array _) = fmap (capitalize . camelize . inlinesToString)
-    (parseJSON v) >>= safeRead
+  parseJSON (String t) =
+    (safeRead (capitalize . camelize . T.unpack $ t)) <|>
+    fail ("'" ++ T.unpack t ++ "' is not a valid reference type")
+  parseJSON v@(Array _) =
+    fmap (capitalize . camelize . inlinesToString) (parseJSON v) >>= \t ->
+      (safeRead t <|>
+       fail ("'" ++ t ++ "' is not a valid reference type"))
   parseJSON _ = fail "Could not parse RefType"
 
 instance ToJSON RefType where
