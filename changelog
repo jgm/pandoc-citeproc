@@ -1,3 +1,31 @@
+pandoc-citeproc (0.9)
+
+  * Allow spaces around CSL note fields.  Closes #191.
+  * Add homepage field to .cabal file (Jens Petersen).
+  * Use pandoc 1.16.
+  * Turn on smart quote parsing in reading bib(la)tex.  We didn't
+    need this previously, but now we do thanks to changes in pandoc.
+  * Specialize `mkRefMap` to `Reference`, and return empty map for
+    `emptyReference`.
+  * Improved behavior with missing references (API change, #195, #165).
+    Previously in some cases where a citation id wasn't found
+    in the bibliography, a "reference with no printed form"
+    warning was printed instead of "not found." This change fixes that.
+    It also changes some types in ways that make more sense.
+    `processCites` now produces `[[(Cite, Maybe Reference)]]`
+    instead of `[[(Cite, Reference)]]`, and other types are
+    adjusted accordingly.  For example, `evalLayout` now
+    has a `Maybe Reference` parameter rather than `Reference`.
+  * Added `hackage-docs.sh` to upload haddocks when Hackage can't build them.
+  * Improved handling of `nocite` (#197).  Previously if you had something in
+    `nocite`, then cited it again in the document, pandoc-citeproc would use
+    `ibid`, thinking that the item had already been cited.
+  * Fix for pandoc API change to `writerWrapOptions`.
+  * Allow `SoftBreak` to count as space in some contexts (e.g. splitting).
+  * Fixed path to `chicago-fullnote-bibliography.csl` in test.
+  * Improved error message with illegal 'type' field in YAML
+    bibliographies (#2611).
+
 pandoc-citeproc (0.8.1.3)
 
   * test-pandoc-citeproc: Better fix for Windows.  Use UTF8 strings
