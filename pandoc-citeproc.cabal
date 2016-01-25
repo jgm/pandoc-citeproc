@@ -96,7 +96,7 @@ library
     build-depends:    containers, directory, mtl,
                       bytestring, filepath,
                       pandoc-types >= 1.16 && < 1.17,
-                      pandoc >= 1.16 && < 1.17,
+                      pandoc >= 1.16 && < 1.18,
                       tagsoup,
                       aeson >= 0.7 && < 0.11, text, vector,
                       xml-conduit >= 1.2 && < 1.4,
@@ -145,7 +145,7 @@ executable pandoc-citeproc
     ghc-prof-options: -fprof-auto-exported -rtsopts
     build-depends:    base >= 4, pandoc-citeproc,
                       pandoc-types >= 1.16 && < 1.17,
-                      pandoc >= 1.16 && < 1.17,
+                      pandoc >= 1.16 && < 1.18,
                       aeson,
                       aeson-pretty, yaml, bytestring, syb, attoparsec, text,
                       filepath
@@ -164,7 +164,7 @@ executable test-citeproc
     Buildable:    False
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.16 && < 1.17,
-                  pandoc >= 1.16 && < 1.17,
+                  pandoc >= 1.16 && < 1.18,
                   filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7, containers >= 0.4, vector >= 0.10
@@ -178,7 +178,7 @@ test-suite test-pandoc-citeproc
   Hs-Source-Dirs: tests, prelude
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.16 && < 1.17,
-                  pandoc >= 1.16 && < 1.17, filepath,
+                  pandoc >= 1.16 && < 1.18, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7
   default-language: Haskell98
