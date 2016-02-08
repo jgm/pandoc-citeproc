@@ -204,35 +204,40 @@ evalElement el
                                         , env = (env s)
                                           {names = tail $ names (env s)}}) >> return r
 
-      getVariable f fm s = if isTitleVar s || isTitleShortVar s
-                           then consumeVariable s >> formatTitle s f fm else
-                           case map toLower s of
-                             "year-suffix" -> getStringVar "ref-id" >>= \k  ->
-                                              return . return $ OYearSuf [] k [] fm
-                             "page"        -> getStringVar "page" >>= formatRange fm
-                             "locator"     -> getLocVar >>= formatRange fm . snd
-                             "url"         -> getStringVar "url" >>= \k ->
-                                              if null k then return [] else return [Output [OPan [Link nullAttr [Str k] (k,"")]] fm]
-                             "doi"         -> do d <- getStringVar "doi"
-                                                 let (prefixPart, linkPart) = T.breakOn (T.pack "http") (T.pack (prefix fm))
-                                                 let u = if T.null linkPart
-                                                            then "https://doi.org/" ++ d
-                                                            else T.unpack linkPart ++ d
-                                                 if null d
-                                                    then return []
-                                                    else return [Output [OPan [Link nullAttr [Str (T.unpack linkPart ++ d)] (u, "")]]
-                                                          fm{ prefix = T.unpack prefixPart, suffix = suffix fm }]
-                             "pmid"        -> getStringVar "pmid" >>= \d ->
-                                              if null d
-                                                 then return []
-                                                 else return [Output [OPan [Link nullAttr [Str d] ("http://www.ncbi.nlm.nih.gov/pubmed/" ++ d, "")]] fm]
-                             "pmcid"       -> getStringVar "pmcid" >>= \d ->
-                                              if null d
-                                                 then return []
-                                                 else return [Output [OPan [Link nullAttr [Str d] ("http://www.ncbi.nlm.nih.gov/pmc/articles/" ++ d, "")]] fm]
-                             _             -> gets (env >>> options &&& abbrevs) >>= \(opts,as) ->
-                                              getVar [] (getFormattedValue opts as f fm s) s >>= \r ->
-                                              consumeVariable s >> return r
+      getVariable f fm s
+        | isTitleVar s || isTitleShortVar s =
+             consumeVariable s >> formatTitle s f fm
+        | otherwise =
+             case map toLower s of
+               "year-suffix" -> getStringVar "ref-id" >>= \k  ->
+                                return . return $ OYearSuf [] k [] fm
+               "page"        -> getStringVar "page" >>= formatRange fm
+               "locator"     -> getLocVar >>= formatRange fm . snd
+               "url"         -> getStringVar "url" >>= \k ->
+                                if null k then return [] else return [Output [OPan [Link nullAttr [Str k] (k,"")]] fm]
+               "doi"         -> do d <- getStringVar "doi"
+                                   let (prefixPart, linkPart) = T.breakOn (T.pack "http") (T.pack (prefix fm))
+                                   let u = if T.null linkPart
+                                              then "https://doi.org/" ++ d
+                                              else T.unpack linkPart ++ d
+                                   if null d
+                                      then return []
+                                      else return [Output [OPan [Link nullAttr [Str (T.unpack linkPart ++ d)] (u, "")]]
+                                            fm{ prefix = T.unpack prefixPart, suffix = suffix fm }]
+               "pmid"        -> getStringVar "pmid" >>= \d ->
+                                if null d
+                                   then return []
+                                   else return [Output [OPan [Link nullAttr [Str d] ("http://www.ncbi.nlm.nih.gov/pubmed/" ++ d, "")]] fm]
+               "pmcid"       -> getStringVar "pmcid" >>= \d ->
+                                if null d
+                                   then return []
+                                   else return [Output [OPan [Link nullAttr [Str d] ("http://www.ncbi.nlm.nih.gov/pmc/articles/" ++ d, "")]] fm]
+               _             -> do (opts, as) <- gets (env >>>
+                                                       options &&& abbrevs)
+                                   r <- getVar []
+                                          (getFormattedValue opts as f fm s) s
+                                   consumeVariable s
+                                   return r
 
 evalIfThen :: IfThen -> [IfThen] -> [Element] -> State EvalState [Element]
 evalIfThen (IfThen c' m' el') ei e = whenElse (evalCond m' c') (return el') rest
