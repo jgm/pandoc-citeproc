@@ -232,12 +232,11 @@ evalElement el
                                 if null d
                                    then return []
                                    else return [Output [OPan [Link nullAttr [Str d] ("http://www.ncbi.nlm.nih.gov/pmc/articles/" ++ d, "")]] fm]
-               _             -> do (opts, as) <- gets (env >>>
-                                                       options &&& abbrevs)
-                                   r <- getVar []
-                                          (getFormattedValue opts as f fm s) s
-                                   consumeVariable s
-                                   return r
+               _ -> do (opts, as) <- gets (env >>> options &&& abbrevs)
+                       r <- getVar []
+                              (getFormattedValue opts as f fm s) s
+                       consumeVariable s
+                       return r
 
 evalIfThen :: IfThen -> [IfThen] -> [Element] -> State EvalState [Element]
 evalIfThen (IfThen c' m' el') ei e = whenElse (evalCond m' c') (return el') rest
@@ -291,6 +290,8 @@ getFormattedValue o as f fm s val
                       then []
                       else [Output [OPan $ walk value' ys] fm]
     | Just v <- fromValue val :: Maybe String    = (:[]) . flip OStr fm . maybe v id . getAbbr $ value v
+    | Just v <- fromValue val :: Maybe Literal   = (:[]) . flip OStr fm . maybe (unLiteral v) id . getAbbr $ value $ unLiteral v
+    | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe CNum      = if v == 0 then [] else [OCitNum (unCNum v) fm]
     | Just v <- fromValue val :: Maybe [RefDate] = formatDate (EvalSorting emptyCite) [] [] sortDate v
