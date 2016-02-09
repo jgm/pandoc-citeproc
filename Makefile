@@ -1,3 +1,8 @@
+stack:
+	cd ../pandoc && \
+	stack install --test --stack-yaml stack.full.yaml ; \
+	cd ../pandoc-citeproc
+
 debug: deps
 	cabal configure --enable-tests -ftest_citeproc -fembed_data_files -fdebug --disable-optimization --ghc-options "-pgmPcpphs -optP--cpp"
 	cabal build
@@ -38,10 +43,5 @@ update:
 	git add locales/*.xml; \
 	git add chicago-author-date.csl; \
 	git commit -a
-
-stack:
-	cd ../pandoc && \
-	stack install --test --stack-yaml stack.full.yaml ; \
-	cd ../pandoc-citeproc
 
 .PHONY: quick full prof update clean install test deps man stack
