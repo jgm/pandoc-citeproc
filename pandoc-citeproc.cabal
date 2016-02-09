@@ -98,7 +98,7 @@ library
                       pandoc-types >= 1.16 && < 1.17,
                       pandoc >= 1.16 && < 1.18,
                       tagsoup,
-                      aeson >= 0.7 && < 0.11, text, vector,
+                      aeson >= 0.7 && < 0.12, text, vector,
                       xml-conduit >= 1.2 && < 1.4,
                       unordered-containers >= 0.2 && < 0.3,
                       data-default,
