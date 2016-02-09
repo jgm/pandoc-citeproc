@@ -250,6 +250,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb"></term>
     <term name="director" form="verb">režiral</term>
     <term name="editor" form="verb">uredil</term>
     <term name="editorial-director" form="verb">uredil</term>
@@ -261,7 +262,6 @@
     <term name="editortranslator" form="verb">uredil &amp; prevedel</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short"></term>
     <term name="director" form="verb-short">rež.</term>
     <term name="editor" form="verb-short">ured.</term>
     <term name="editorial-director" form="verb-short">ured.</term>

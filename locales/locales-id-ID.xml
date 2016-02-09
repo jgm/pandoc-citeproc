@@ -256,7 +256,8 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
-    <term name="director" form="verb">directed by</term>
+    <term name="container-author" form="verb">oleh</term>
+    <term name="director" form="verb">diarahkan oleh</term>
     <term name="editor" form="verb">diedit oleh</term>
     <term name="editorial-director" form="verb">diedit oleh</term>
     <term name="illustrator" form="verb">diilustrasi oleh</term>
@@ -267,7 +268,6 @@
     <term name="editortranslator" form="verb">disunting &amp; diterjemahkan oleh</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">oleh</term>
     <term name="director" form="verb-short">dir. oleh</term>
     <term name="editor" form="verb-short">ed. oleh</term>
     <term name="editorial-director" form="verb-short">ed. oleh</term>

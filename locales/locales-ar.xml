@@ -69,7 +69,7 @@
     <term name="page-range-delimiter">–</term>
 
     <!-- ORDINALS -->
-    <term name="ordinal"/>
+    <term name="ordinal"></term>
 
     <!-- LONG ORDINALS -->
     <term name="long-ordinal-01">الاول</term>
@@ -250,6 +250,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb"></term>
     <term name="director" form="verb">directed by</term>
     <term name="editor" form="verb">تحرير</term>
     <term name="editorial-director" form="verb">اعداد</term>
@@ -261,7 +262,6 @@
     <term name="editortranslator" form="verb">اعداد وترجمة</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short"/>
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">تحرير</term>
     <term name="editorial-director" form="verb-short">اشرف على الطبعة</term>

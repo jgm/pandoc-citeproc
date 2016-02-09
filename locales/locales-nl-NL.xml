@@ -272,6 +272,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">door</term>
     <term name="director" form="verb">geregisseerd door</term>
     <term name="editor" form="verb">bewerkt door</term>
     <term name="editorial-director" form="verb">bewerkt door</term>
@@ -283,7 +284,6 @@
     <term name="editortranslator" form="verb">bewerkt &amp; vertaald door</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">door</term>
     <term name="director" form="verb-short">geregisseerd door</term>
     <term name="editor" form="verb-short">bewerkt door</term>
     <term name="editorial-director" form="verb-short">bewerkt door</term>

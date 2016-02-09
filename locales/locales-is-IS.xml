@@ -250,6 +250,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">eftir</term>
     <term name="director" form="verb">leikstýrt af</term>
     <term name="editor" form="verb">ritstýrt af</term>
     <term name="editorial-director" form="verb">ritstýrt af</term>
@@ -261,7 +262,6 @@
     <term name="editortranslator" form="verb">ritstýrt og þýtt af</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">eftir</term>
     <term name="director" form="verb-short">leikstj.</term>
     <term name="editor" form="verb-short">ritstj.</term>
     <term name="editorial-director" form="verb-short">ritstj.</term>

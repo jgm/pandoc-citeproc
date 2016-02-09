@@ -250,6 +250,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">von</term>
     <term name="director" form="verb">Regie von</term>
     <term name="editor" form="verb">herausgegeben von</term>
     <term name="editorial-director" form="verb">herausgegeben von</term>
@@ -261,7 +262,6 @@
     <term name="editortranslator" form="verb">herausgegeben und übersetzt von</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">von</term>
     <term name="director" form="verb-short">Reg.</term>
     <term name="editor" form="verb-short">hg. von</term>
     <term name="editorial-director" form="verb-short">hg. von</term>

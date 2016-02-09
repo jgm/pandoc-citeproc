@@ -250,18 +250,18 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb"></term>
     <term name="director" form="verb">ohjannut</term>
     <term name="editor" form="verb">toimittanut</term>
     <term name="editorial-director" form="verb">toimittanut</term>
     <term name="illustrator" form="verb">kuvittanut</term>
     <term name="interviewer" form="verb">haastatellut</term>
     <term name="recipient" form="verb">vastaanottaja</term>
-    <term name="reviewed-author" form="verb"/>
+    <term name="reviewed-author" form="verb"></term>
     <term name="translator" form="verb">kääntänyt</term>
     <term name="editortranslator" form="verb">toimittanut ja kääntänyt</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short"/>
     <term name="director" form="verb-short">ohj.</term>
     <term name="editor" form="verb-short">toim.</term>
     <term name="editorial-director" form="verb-short">toim.</term>

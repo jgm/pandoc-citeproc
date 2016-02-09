@@ -27,7 +27,7 @@
     <term name="anonymous" form="short">анон.</term>
     <term name="at">на</term>
     <term name="available at">доступно на</term>
-    <term name="by"/>
+    <term name="by"></term>
     <term name="circa">около</term>
     <term name="circa" form="short">ок.</term>
     <term name="cited">цитируется по</term>
@@ -264,18 +264,18 @@
 
     <!-- VERB ROLE FORMS -->
     <!-- В этом и следующем разделе приведены наиболее широко используемые термины (например, "под редакцией" вместо "отредактировано"). Единственным недостатком является то, что разные термины требует разного падежа для последующих фамилий -->
+    <term name="container-author" form="verb"></term>
     <term name="director" form="verb">режиссировано</term>
     <term name="editor" form="verb">под редакцией</term>
     <term name="editorial-director" form="verb">под ответственной редакцией</term>
     <term name="illustrator" form="verb">иллюстрировано</term>
     <term name="interviewer" form="verb">интервью проведено</term>
     <term name="recipient" form="verb">к</term>
-    <term name="reviewed-author" form="verb"/>
+    <term name="reviewed-author" form="verb"></term>
     <term name="translator" form="verb">переведено</term>
     <term name="editortranslator" form="verb">под редакцией и переведено</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short"/>
     <term name="director" form="verb-short">реж.</term>
     <term name="editor" form="verb-short">под ред.</term>
     <term name="editorial-director" form="verb-short">под отв. ред.</term>

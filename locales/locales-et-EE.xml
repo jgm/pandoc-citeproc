@@ -21,9 +21,9 @@
     <term name="and others">ja teised</term>
     <term name="anonymous">anonüümne</term>
     <term name="anonymous" form="short">anon</term>
-    <term name="at"/>
+    <term name="at"></term>
     <term name="available at">available at</term>
-    <term name="by"/>
+    <term name="by"></term>
     <term name="circa">umbes</term>
     <term name="circa" form="short">u</term>
     <term name="cited">tsiteeritud</term>
@@ -34,9 +34,9 @@
     <term name="edition" form="short">tr</term>
     <term name="et-al">et al.</term>
     <term name="forthcoming">ilmumisel</term>
-    <term name="from"/>
+    <term name="from"></term>
     <term name="ibid">ibid.</term>
-    <term name="in"/>
+    <term name="in"></term>
     <term name="in press">trükis</term>
     <term name="internet">internet</term>
     <term name="interview">intervjuu</term>
@@ -250,18 +250,18 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb"></term>
     <term name="director" form="verb">directed by</term>
     <term name="editor" form="verb">toimetanud</term>
     <term name="editorial-director" form="verb">toimetanud</term>
     <term name="illustrator" form="verb">illustrated by</term>
     <term name="interviewer" form="verb">intervjueerinud</term>
-    <term name="recipient" form="verb"/>
+    <term name="recipient" form="verb"></term>
     <term name="reviewed-author" form="verb">by</term>
     <term name="translator" form="verb">tõlkinud</term>
     <term name="editortranslator" form="verb">toimetanud &amp; tõlkinud</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short"/>
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">toim</term>
     <term name="editorial-director" form="verb-short">toim</term>

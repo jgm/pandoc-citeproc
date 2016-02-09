@@ -139,6 +139,7 @@
     <term name="editortranslator" form="short">编译</term>    
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">著</term>
     <term name="director" form="verb">指导</term>
     <term name="editor" form="verb">编辑</term>
     <term name="editorial-director" form="verb">主编</term>
@@ -150,7 +151,6 @@
     <term name="editortranslator" form="verb">编译</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">著</term>
     <term name="director" form="verb-short">导</term>
     <term name="editor" form="verb-short">编</term>
     <term name="editorial-director" form="verb-short">主编</term>

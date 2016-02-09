@@ -264,6 +264,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">por</term>
     <term name="director" form="verb">dirigido por</term>
     <term name="editor" form="verb">editado por</term>
     <term name="editorial-director" form="verb">editorial de</term>
@@ -275,7 +276,6 @@
     <term name="editortranslator" form="verb">editado &amp; traduzido por</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">por</term>
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">ed.</term>
     <term name="editorial-director" form="verb-short">ed.</term>

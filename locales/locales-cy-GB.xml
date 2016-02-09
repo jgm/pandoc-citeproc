@@ -256,6 +256,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">gan</term>
     <term name="director" form="verb">cyfarwyddwyd gan</term>
     <term name="editor" form="verb">golygwyd gan</term>
     <term name="editorial-director" form="verb">cyfarwyddwyd a golygwyd gan</term>
@@ -267,7 +268,6 @@
     <term name="editortranslator" form="verb">golygwyd a chyfieithwyd gan</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">gan</term>
     <term name="director" form="verb-short">cyf. gan</term>
     <term name="editor" form="verb-short">gol. gan</term>
     <term name="editorial-director" form="verb-short">cyf.-gol. gan</term>

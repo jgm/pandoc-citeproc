@@ -250,6 +250,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb"></term>
     <term name="director" form="verb">direktör</term>
     <term name="editor" form="verb">editör</term>
     <term name="editorial-director" form="verb">düzenleyen</term>
@@ -261,7 +262,6 @@
     <term name="editortranslator" form="verb">düzenleyen &amp; çeviren by</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short"/>
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">ed.</term>
     <term name="editorial-director" form="verb-short">ed.</term>

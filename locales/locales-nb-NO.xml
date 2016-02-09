@@ -250,6 +250,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">av</term>
     <term name="director" form="verb">regissert av</term>
     <term name="editor" form="verb">redigert av</term>
     <term name="editorial-director" form="verb">redigert av</term>
@@ -261,7 +262,6 @@
     <term name="editortranslator" form="verb">redigert &amp; oversatt av</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">av</term>
     <term name="director" form="verb-short">regi</term>
     <term name="editor" form="verb-short">red.</term>
     <term name="editorial-director" form="verb-short">red.</term>

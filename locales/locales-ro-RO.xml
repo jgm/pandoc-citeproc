@@ -74,7 +74,7 @@
 
     <!-- ORDINALS -->
     <term name="ordinal">-lea</term>
-    <term name="ordinal-01" match="whole-number"/>
+    <term name="ordinal-01" match="whole-number"></term>
 
     <!-- LONG ORDINALS -->
     <term name="long-ordinal-01">primul</term>
@@ -255,6 +255,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">de</term>
     <term name="director" form="verb">coordonat de</term>
     <term name="editor" form="verb">ediție de</term>
     <term name="editorial-director" form="verb">ediție de</term>
@@ -266,7 +267,6 @@
     <term name="editortranslator" form="verb">ediție &amp; traducere de</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">de</term>
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">ed.</term>
     <term name="editorial-director" form="verb-short">ed.</term>

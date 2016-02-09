@@ -27,10 +27,10 @@
     <term name="and others">un citi</term>
     <term name="anonymous">anonīms</term>
     <term name="anonymous" form="short">anon.</term>
-    <term name="at"/>
+    <term name="at"></term>
     <term name="available at">pieejams</term>
     <term name="bc">p.m.ē.</term>
-    <term name="by"/>
+    <term name="by"></term>
     <term name="circa">apmēram</term>
     <term name="circa" form="short">apm.</term>
     <term name="cited">citēts</term>
@@ -305,6 +305,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb"></term>
     <term name="composer" form="verb">sastādīja</term>
     <term name="director" form="verb">vadīja</term>
     <term name="editor" form="verb">sagatavoja</term>
@@ -316,7 +317,6 @@
     <term name="translator" form="verb">tulkoja</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short"/>
     <term name="director" form="verb-short">sast.</term>
     <term name="editor" form="verb-short">sag.</term>
     <term name="editorial-director" form="verb-short">sag.</term>

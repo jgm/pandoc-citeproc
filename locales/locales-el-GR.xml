@@ -252,6 +252,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">στον συλλ. τόμο</term>
     <term name="director" form="verb">διεύθυνση</term>
     <term name="editor" form="verb">επιμέλεια</term>
     <term name="editorial-director" form="verb">διεύθυνση σειράς</term>
@@ -263,7 +264,6 @@
     <term name="editortranslator" form="verb">μετάφραση και επιμέλεια</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">στον συλλ. τόμο</term>
     <term name="director" form="verb-short">διευθ.</term>
     <term name="editor" form="verb-short">επιμέλ.</term>
     <term name="editorial-director" form="verb-short">δ/νση σειράς</term>

@@ -36,7 +36,7 @@
     <term name="forthcoming">近刊</term>
     <term name="from">から</term>
     <term name="ibid">前掲</term>
-    <term name="in"/>
+    <term name="in"></term>
     <term name="in press">in press</term>
     <term name="internet">internet</term>
     <term name="interview">interview</term>
@@ -256,6 +256,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">by</term>
     <term name="director" form="verb">directed by</term>
     <term name="editor" form="verb">編集者：</term>
     <term name="editorial-director" form="verb">edited by</term>
@@ -267,7 +268,6 @@
     <term name="editortranslator" form="verb">edited &amp; translated by</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">by</term>
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">編集者：</term>
     <term name="editorial-director" form="verb-short">ed.</term>

@@ -148,6 +148,7 @@
 
     <!-- VERB ROLE FORMS -->
     <term name="author" form="verb">著</term>
+    <term name="container-author" form="verb">著</term>
     <term name="director" form="verb">指導</term>
     <term name="editor" form="verb">編輯</term>
     <term name="collection-editor" form="verb">點校</term>
@@ -160,7 +161,6 @@
     <term name="editortranslator" form="verb">編譯</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">著</term>
     <term name="director" form="verb-short">導</term>
     <term name="editor" form="verb-short">編</term>
     <term name="collection-editor" form="verb-short">校</term>

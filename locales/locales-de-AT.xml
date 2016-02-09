@@ -199,20 +199,24 @@
 
     <!-- LONG ROLE FORMS -->
     <term name="director">
-      <single>director</single>
-      <multiple>directors</multiple>
+      <single>Regisseur</single>
+      <multiple>Regisseure</multiple>
     </term>
     <term name="editor">
       <single>Herausgeber</single>
       <multiple>Herausgeber</multiple>
+    </term>
+    <term name="collection-editor">
+      <single>Reihenherausgeber</single>
+      <multiple>Reihenherausgeber</multiple>
     </term>
     <term name="editorial-director">
       <single>Herausgeber</single>
       <multiple>Herausgeber</multiple>
     </term>
     <term name="illustrator">
-      <single>illustrator</single>
-      <multiple>illustrators</multiple>
+      <single>Illustrator</single>
+      <multiple>Illustratoren</multiple>
     </term>
     <term name="translator">
       <single>Übersetzer</single>
@@ -229,6 +233,10 @@
       <multiple>Reg.</multiple>
     </term>
     <term name="editor" form="short">
+      <single>Hrsg.</single>
+      <multiple>Hrsg.</multiple>
+    </term>
+    <term name="collection-editor" form="short">
       <single>Hrsg.</single>
       <multiple>Hrsg.</multiple>
     </term>
@@ -250,10 +258,12 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">von</term>
     <term name="director" form="verb">Regie von</term>
     <term name="editor" form="verb">herausgegeben von</term>
+    <term name="collection-editor" form="verb">herausgegeben von</term>
     <term name="editorial-director" form="verb">herausgegeben von</term>
-    <term name="illustrator" form="verb">illustriert by</term>
+    <term name="illustrator" form="verb">illustriert von</term>
     <term name="interviewer" form="verb">interviewt von</term>
     <term name="recipient" form="verb">an</term>
     <term name="reviewed-author" form="verb">von</term>
@@ -261,9 +271,9 @@
     <term name="editortranslator" form="verb">herausgegeben und übersetzt von</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">von</term>
     <term name="director" form="verb-short">Reg.</term>
     <term name="editor" form="verb-short">hg. von</term>
+    <term name="collection-editor" form="verb-short">hg. von</term>
     <term name="editorial-director" form="verb-short">hg. von</term>
     <term name="illustrator" form="verb-short">illus. von</term>
     <term name="translator" form="verb-short">übers. von</term>

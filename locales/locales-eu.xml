@@ -250,6 +250,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb"></term>
     <term name="director" form="verb">directed by</term>
     <term name="editor" form="verb">-(e)k argitaratua</term>
     <term name="editorial-director" form="verb">-(e)k argitaratua</term>
@@ -261,7 +262,6 @@
     <term name="editortranslator" form="verb">-(e)k argitaratu eta itzulia</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short"/>
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">arg.</term>
     <term name="editorial-director" form="verb-short">arg.</term>

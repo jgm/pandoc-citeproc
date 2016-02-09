@@ -21,7 +21,7 @@
     <term name="and others">és mások</term>
     <term name="anonymous">szerző nélkül</term>
     <term name="anonymous" form="short">sz. n.</term>
-    <term name="at"/>
+    <term name="at"></term>
     <term name="available at">elérhető</term>
     <term name="by">by</term>
     <term name="circa">körülbelül</term>
@@ -254,6 +254,7 @@
     </term>
 
     <!-- VERB ROLE FORMS -->
+    <term name="container-author" form="verb">by</term>
     <term name="director" form="verb">directed by</term>
     <term name="editor" form="verb">szerkesztette</term>
     <term name="editorial-director" form="verb">edited by</term>
@@ -265,7 +266,6 @@
     <term name="editortranslator" form="verb">szerkesztette &amp; fordította</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="container-author" form="verb-short">by</term>
     <term name="director" form="verb-short">ig.</term>
     <term name="editor" form="verb-short">szerk.</term>
     <term name="editorial-director" form="verb-short">ed.</term>
