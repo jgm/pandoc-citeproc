@@ -92,7 +92,7 @@ library
                       Prelude
                       Paths_pandoc_citeproc
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
-    ghc-prof-options: -fprof-auto-exported -rtsopts
+    ghc-prof-options: -fprof-auto-exported
     build-depends:    containers, directory, mtl,
                       bytestring, filepath,
                       pandoc-types >= 1.16 && < 1.17,
