@@ -26,11 +26,10 @@ import Data.Monoid (Any(..))
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
 import Data.String ( fromString )
-import Text.Pandoc.Definition (Inline(Str, Space, Link), nullAttr)
+import Text.Pandoc.Definition (Inline(Str, Link), nullAttr)
 import Text.Pandoc.Walk (walk)
 import Text.Pandoc.Shared (stringify)
 import qualified Data.Text as T
-import Data.Maybe (isNothing)
 
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
