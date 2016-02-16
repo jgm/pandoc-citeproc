@@ -1,0 +1,13 @@
+@video{x1,title={blah}}
+@movie{x2,title={blah}}
+
+---
+references:
+- id: x1
+  type: motion_picture
+  title: Blah
+
+- id: x2
+  type: motion_picture
+  title: Blah
+...

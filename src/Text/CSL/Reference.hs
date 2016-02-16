@@ -256,12 +256,6 @@ data RefType
       deriving ( Read, Eq, Typeable, Data, Generic )
 
 instance Show RefType where
-    -- TODO: clean up this mess. For now, commenting these out makes
-    -- motion pictures work properly again.
-    -- show MotionPicture = "motion_picture"
-    -- show MusicalScore = "musical_score"
-    -- show PersonalCommunication = "personal_communication"
-    -- show LegalCase = "legal_case"
     show x = map toLower . uncamelize . showConstr . toConstr $ x
 
 instance FromJSON RefType where
@@ -275,10 +269,18 @@ instance FromJSON RefType where
   parseJSON _ = fail "Could not parse RefType"
 
 instance ToJSON RefType where
-  toJSON reftype = toJSON (uncamelize $ show reftype)
+  toJSON reftype = toJSON (handleSpecialCases $ show reftype)
 
 instance ToYaml RefType where
-  toYaml r = Y.string (T.pack $ uncamelize $ show r)
+  toYaml r = Y.string (T.pack $ handleSpecialCases $ show r)
+
+-- For some reason, CSL is inconsistent about hyphens and underscores:
+handleSpecialCases :: String -> String
+handleSpecialCases "motion-picture" = "motion_picture"
+handleSpecialCases "musical-score" = "musical_score"
+handleSpecialCases "personal-communication" = "personal_communication"
+handleSpecialCases "legal-case" = "legal_case"
+handleSpecialCases x = x
 
 newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data, Generic )
 
