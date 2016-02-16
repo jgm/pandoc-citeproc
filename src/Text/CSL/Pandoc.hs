@@ -4,7 +4,7 @@ module Text.CSL.Pandoc (processCites, processCites') where
 
 import Text.Pandoc
 import Text.Pandoc.Walk
-import Text.Pandoc.Builder (setMeta, deleteMeta, Inlines, cite)
+import Text.Pandoc.Builder (setMeta, deleteMeta)
 import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
