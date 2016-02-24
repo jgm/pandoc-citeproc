@@ -62,7 +62,7 @@ readBiblioFile f
         _           -> error $ "citeproc: the format of the bibliographic database could not be recognized\n" ++
                               "using the file extension."
 #else
-        _           -> error $ "citeproc: Bibliography format not supported.\n" ++
+        _           -> error $ "citeproc: Bibliography format not supported.\n"
 #endif
 
 data BibFormat
