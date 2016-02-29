@@ -96,7 +96,6 @@ install:
   case "$BUILD" in
     stack)
       stack --no-terminal --install-ghc $ARGS test --only-dependencies --flag "pandoc-citeproc:test_citeproc"
-      stack exec test-citeproc || echo "expected to fail..."
       ;;
     cabal)
       cabal --version
@@ -110,7 +109,8 @@ script:
 - |
   case "$BUILD" in
     stack)
-      stack --no-terminal $ARGS test --haddock --no-haddock-deps
+      stack --no-terminal $ARGS test --haddock --no-haddock-deps --flag "pandoc-citeproc:test_citeproc"
+      stack exec test-citeproc || echo "expected to fail..."
       ;;
     cabal)
       cabal configure --enable-tests --enable-benchmarks -v2 --ghc-options="-O0 -Werror"
