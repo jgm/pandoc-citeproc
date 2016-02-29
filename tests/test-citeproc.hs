@@ -12,6 +12,7 @@ import System.IO.Temp (withSystemTempDirectory)
 import Text.Pandoc.Definition (Inline(Span, Str))
 import Text.Pandoc.Generic
 import Text.Pandoc.Walk
+import qualified Text.Pandoc.UTF8 as UTF8
 import Data.Maybe (mapMaybe)
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -143,7 +144,7 @@ trimEnd = reverse . ('\n':) . dropWhile isSpace . reverse
 -- this is designed to mimic the test suite's output:
 inlinesToString  :: [Inline]  -> String
 inlinesToString ils =
-  writeHtmlString def{ writerWrapText = False }
+  writeHtmlString def{ writerWrapText = WrapNone }
     $ bottomUp (concatMap adjustSpans)
     $ Pandoc nullMeta [Plain ils]
 
