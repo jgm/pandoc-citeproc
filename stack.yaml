@@ -8,4 +8,4 @@ flags:
 packages:
 - '.'
 extra-deps: []
-resolver: lts-3.20
+resolver: lts-5.4
