@@ -75,7 +75,7 @@ before_install:
 - unset CC
 
 # We want to always allow newer versions of packages when building on GHC HEAD
-- CABALARGS=""
+- CABALARGS="-ftest_citeproc"
 - if [ "x$GHCVER" = "xhead" ]; then CABALARGS=--allow-newer; fi
 
 # Download and unpack the stack executable
@@ -100,6 +100,7 @@ install:
     cabal)
       cabal --version
       travis_retry cabal update
+      cabal install hsb2hs
       cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS
       ;;
   esac
@@ -115,6 +116,7 @@ script:
       cabal build
       cabal check || [ "$CABALVER" == "1.16" ]
       cabal test
+      cabal test-citeproc || echo "test-citeproc is expected to fail"
       cabal copy
       # cabal sdist fails on cabal 1.16:
       cabal sdist || [ "$CABALVER" == "1.16" ]
