@@ -1,3 +1,7 @@
+pandoc-citeproc (0.9.1.1)
+
+  * Only changed version number (work around for hackage upload error).
+
 pandoc-citeproc (0.9.1)
 
   * Fixed YAML/CSL reference type for motion_picture, etc. (#214).
