@@ -1,3 +1,18 @@
+pandoc-citeproc (0.9.1)
+
+  * Fixed YAML/CSL reference type for motion_picture, etc. (#214).
+    Several CSL reference types (`motion_picture`, `legal_case`, ...)
+    use an underscore instead of a hyphen, and these had been
+    incorrectly rendered by pandoc when translating to YAML/CSL.
+  * Fixed handling of dimension and other 'literal' variables (#213).
+    This also affects call-number, scale, language.
+  * Fixed test-citeproc.
+  * Fixed travis builds to use stack.
+  * Only use -rtsopts for executable.
+  * Allow aeson 0.11.
+  * Allow compilation with pandoc 1.17.
+  * Updated locales and chicago-author-date.csl.
+
 pandoc-citeproc (0.9)
 
   * Allow spaces around CSL note fields.  Closes #191.
