@@ -158,7 +158,7 @@ inQuotes = do
                       ) (char '"')
 
 fieldName :: BibParser String
-fieldName = (map toLower) <$> many1 (letter <|> digit <|> oneOf "-_")
+fieldName = (map toLower) <$> many1 (letter <|> digit <|> oneOf "-_:")
 
 isBibtexKeyChar :: Char -> Bool
 isBibtexKeyChar c = isAlphaNum c || c `elem` ".:;?!`'()/*@_+=-[]*"
