@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Main where
 import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
 import Text.CSL.Reference (Reference(refId), Literal(..))
@@ -73,6 +74,7 @@ readFormat = go . map toLower
   where go "biblatex" = Just BibLatex
         go "bib"      = Just BibLatex
         go "bibtex"   = Just Bibtex
+#ifdef USE_BIBUTILS
         go "ris"      = Just Ris
         go "endnote"  = Just Endnote
         go "enl"      = Just Endnote
@@ -85,6 +87,7 @@ readFormat = go . map toLower
         go "json"     = Just Json
         go "mods"     = Just Mods
         go "yaml"     = Just Yaml
+#endif
         go _          = Nothing
 
 
