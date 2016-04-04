@@ -13,12 +13,15 @@
 
 module Text.CSL.Data
     ( getLocale
+    , CSLLocaleException(..)
     , getDefaultCSL
     , langBase
     ) where
 
 import System.FilePath ()
+import Data.Typeable
 import qualified Data.ByteString.Lazy as L
+import qualified Control.Exception as E
 #ifdef EMBED_DATA_FILES
 import Data.Maybe (fromMaybe)
 import Text.CSL.Data.Embedded (localeFiles, defaultCSL)
@@ -28,26 +31,36 @@ import Paths_pandoc_citeproc (getDataFileName)
 import System.Directory  (doesFileExist)
 #endif
 
+data CSLLocaleException =
+    CSLLocaleNotFound String
+  | CSLLocaleReadError E.IOException
+  deriving Typeable
+instance Show CSLLocaleException where
+  show (CSLLocaleNotFound s) = "Could not find locale data for " ++ s
+  show (CSLLocaleReadError e) = show e
+instance E.Exception CSLLocaleException
+
+-- | Raises 'CSLLocaleException' on error.
 getLocale :: String -> IO L.ByteString
 getLocale s = do
 #ifdef EMBED_DATA_FILES
-  f <- case length s of
-         0 -> maybe (return S.empty) return
-              $ lookup "locales-en-US.xml" localeFiles
-         2 -> let fn = ("locales-" ++ fromMaybe s (lookup s langBase) ++ ".xml")
-              in case lookup fn localeFiles of
-                   Just x' -> return x'
-                   _       -> error $ "could not find locale data for " ++ s
-         _ -> case lookup ("locales-" ++ take 5 s ++ ".xml") localeFiles of
-                    Just x' -> return x'
-                    _       -> -- try again with 2-letter locale
-                       let s' = take 2 s in
-                       case lookup ("locales-" ++ fromMaybe s'
-                              (lookup s' langBase) ++ ".xml") localeFiles of
-                             Just x'' -> return x''
-                             _        -> error $
-                                         "could not find locale data for " ++ s
-  return $ L.fromChunks [f]
+  let toLazy x = L.fromChunks [x]
+  case length s of
+      0 -> maybe (E.throwIO $ CSLLocaleNotFound "en-US")
+                 (return . toLazy)
+           $ lookup "locales-en-US.xml" localeFiles
+      2 -> let fn = ("locales-" ++ fromMaybe s (lookup s langBase) ++ ".xml")
+           in case lookup fn localeFiles of
+                Just x' -> return $ toLazy x'
+                _       -> E.throwIO $ CSLLocaleNotFound s
+      _ -> case lookup ("locales-" ++ take 5 s ++ ".xml") localeFiles of
+                 Just x' -> return $ toLazy x'
+                 _       -> -- try again with 2-letter locale
+                    let s' = take 2 s in
+                    case lookup ("locales-" ++ fromMaybe s'
+                           (lookup s' langBase) ++ ".xml") localeFiles of
+                          Just x'' -> return $ toLazy x''
+                          _        -> E.throwIO $ CSLLocaleNotFound s
 #else
   f <- case length s of
              0 -> return "locales/locales-en-US.xml"
@@ -57,7 +70,7 @@ getLocale s = do
   exists <- doesFileExist f
   if not exists && length s > 2
      then getLocale $ take 2 s  -- try again with base locale
-     else L.readFile f
+     else E.handle (\e -> E.throwIO (CSLLocaleReadError e)) $ L.readFile f
 #endif
 
 getDefaultCSL :: IO L.ByteString

@@ -38,7 +38,7 @@ import Text.CSL.Data (getLocale)
 parseCSL :: String -> Style
 parseCSL = parseCSL' . fromStringLazy
 
--- | Parse locale.
+-- | Parse locale.  Raises 'CSLLocaleException' on error.
 parseLocale :: String -> IO Locale
 parseLocale locale =
   parseLocaleElement . fromDocument . X.parseLBS_ def <$> getLocale locale
