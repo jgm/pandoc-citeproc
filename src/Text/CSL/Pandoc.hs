@@ -9,6 +9,7 @@ import Text.Pandoc.Shared (stringify)
 import Text.HTML.TagSoup.Entity (lookupEntity)
 import qualified Data.ByteString.Lazy as L
 import System.SetEnv (setEnv)
+import System.Environment (getEnv)
 import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Char ( isDigit, isPunctuation, toLower, isSpace )
@@ -177,9 +178,19 @@ processCites' (Pandoc meta blocks) = do
                  localizeCSL mbLocale $ parseCSL' raw
   -- set LANG environment from locale; this affects unicode collation
   -- if pandoc-citeproc compiled with unicode_collation flag
-  setEnv "LC_ALL" $ case styleLocale csl of
-                        (l:_) -> localeLang l
-                        _     -> "en-US"
+  case styleLocale csl of
+       (l:_) -> do
+         setEnv "LC_ALL" (localeLang l)
+         setEnv "LANG"   (localeLang l)
+       []    -> do
+         envlang <- getEnv "LANG"
+         if null envlang
+            then do
+              -- Note that LANG needs to be set for bibtex conversion:
+              setEnv "LANG" "en-US.UTF-8"
+              setEnv "LC_ALL" "en-US.UTF-8"
+            else do
+              setEnv "LC_ALL" envlang
   bibRefs <- getBibRefs $ maybe (MetaList []) id
                         $ lookupMeta "bibliography" meta
   let refs = inlineRefs ++ bibRefs
