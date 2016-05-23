@@ -152,6 +152,9 @@ executable pandoc-citeproc
     other-modules:    Paths_pandoc_citeproc
                       Prelude
     default-language: Haskell98
+    if flag(bibutils)
+       default-extensions: CPP
+       cpp-options:     -DUSE_BIBUTILS
 
 executable test-citeproc
   Main-Is:        test-citeproc.hs
