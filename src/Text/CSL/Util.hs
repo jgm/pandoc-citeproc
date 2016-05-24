@@ -193,7 +193,7 @@ unTitlecase zs = evalState (caseTransform untc zs) SentenceBoundary
           case (w, st) of
                (y, NoBoundary) -> return y
                (Str (x:xs), WordBoundary) | isUpper x ->
-                 return $ Str (toLower x : xs)
+                 return $ Str (map toLower (x:xs))
                (Str (x:xs), SentenceBoundary) | isLower x ->
                  return $ Str (toUpper x : xs)
                (Span ("",[],[]) xs, _) | hasLowercaseWord xs ->
