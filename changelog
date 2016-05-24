@@ -1,3 +1,15 @@
+pandoc-citeproc (0.9.2)
+
+  * Fix build failure for --flags=-bibutils mode (Sergei Trofimovich).
+    Reported-by Thomas Beutin https://bugs.gentoo.org/516640.
+  * Add missing -DUSE_BIBUTILS to Cabal build (Vaclas Haisman).
+  * Data:  Raise CSLLocaleException if locale not found.
+    Minor API change:  Export CSLLocaleException.
+  * Set LANG as well as LC_ALL before translating bibtex.
+    This ensures that bibtex will use the locale specified
+    in the document, even if the system locale is different.
+  * Allow colons in bibtex field names (#220).
+
 pandoc-citeproc (0.9.1.1)
 
   * Only changed version number (work around for hackage upload error).
