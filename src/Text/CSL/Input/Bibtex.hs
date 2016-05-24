@@ -14,6 +14,7 @@
 module Text.CSL.Input.Bibtex
     ( readBibtexInput
     , readBibtexInputString
+    , readBibtexInputString'
     )
     where
 
@@ -80,23 +81,32 @@ data Item = Item{ identifier :: String
                 , fields     :: [(String, String)]
                 }
 
-readBibtexInput :: Bool -> FilePath -> IO [Reference]
-readBibtexInput isBibtex f = UTF8.readFile f >>= readBibtexInputString isBibtex
-
-readBibtexInputString :: Bool -> String -> IO [Reference]
-readBibtexInputString isBibtex bibstring = do
+getLangFromEnv :: IO Lang
+getLangFromEnv = do
   env <- getEnvironment
-  let lang = case lookup "LANG" env of
+  return $ case lookup "LANG" env of
                   Just x  -> case splitWhen (\c -> c == '.' || c == '_' || c == '-') x of
                                    (w:z:_)            -> Lang w z
                                    [w] | not (null w) -> Lang w mempty
                                    _                  -> Lang "en" "US"
                   Nothing -> Lang "en" "US"
+
+readBibtexInput :: Bool -> FilePath -> IO [Reference]
+readBibtexInput isBibtex f = UTF8.readFile f >>= readBibtexInputString isBibtex
+
+readBibtexInputString :: Bool -> String -> IO [Reference]
+readBibtexInputString isBibtex contents = do
+  lang <- getLangFromEnv
+  locale <- parseLocale (langToLocale lang)
+  return $ readBibtexInputString' isBibtex lang locale contents
+
+-- pure version of readBibtexInputString
+readBibtexInputString' :: Bool -> Lang -> Locale -> String -> [Reference]
+readBibtexInputString' isBibtex lang locale bibstring =
   let items = case runParser (bibEntries <* eof) [] "stdin" bibstring of
                    Left err -> error (show err)
                    Right xs -> resolveCrossRefs isBibtex xs
-  locale <- parseLocale (langToLocale lang)
-  return $ mapMaybe (itemToReference lang locale isBibtex) items
+  in  mapMaybe (itemToReference lang locale isBibtex) items
 
 type BibParser = Parsec [Char] [(String, String)]
 
