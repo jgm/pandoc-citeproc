@@ -1,6 +1,6 @@
 stack:
 	cd ../pandoc && \
-	stack install --test --stack-yaml stack.full.yaml ; \
+	stack install --test --stack-yaml stack.full.yaml --ghc-options '-pgmPcpphs -optP--cpp';\
 	cd ../pandoc-citeproc
 
 debug: deps
