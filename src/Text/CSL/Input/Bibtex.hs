@@ -12,9 +12,9 @@
 -----------------------------------------------------------------------------
 
 module Text.CSL.Input.Bibtex
-    ( readBibtexInput
-    , readBibtexInputString
-    , readBibtexInputString'
+    ( readBibtex
+    , readBibtexString
+    , readBibtexString'
     )
     where
 
@@ -91,18 +91,18 @@ getLangFromEnv = do
                                    _                  -> Lang "en" "US"
                   Nothing -> Lang "en" "US"
 
-readBibtexInput :: Bool -> FilePath -> IO [Reference]
-readBibtexInput isBibtex f = UTF8.readFile f >>= readBibtexInputString isBibtex
+readBibtex :: Bool -> FilePath -> IO [Reference]
+readBibtex isBibtex f = UTF8.readFile f >>= readBibtexString isBibtex
 
-readBibtexInputString :: Bool -> String -> IO [Reference]
-readBibtexInputString isBibtex contents = do
+readBibtexString :: Bool -> String -> IO [Reference]
+readBibtexString isBibtex contents = do
   lang <- getLangFromEnv
   locale <- parseLocale (langToLocale lang)
-  return $ readBibtexInputString' isBibtex lang locale contents
+  return $ readBibtexString' isBibtex lang locale contents
 
--- pure version of readBibtexInputString
-readBibtexInputString' :: Bool -> Lang -> Locale -> String -> [Reference]
-readBibtexInputString' isBibtex lang locale bibstring =
+-- pure version of readBibtexString
+readBibtexString' :: Bool -> Lang -> Locale -> String -> [Reference]
+readBibtexString' isBibtex lang locale bibstring =
   let items = case runParser (bibEntries <* eof) [] "stdin" bibstring of
                    Left err -> error (show err)
                    Right xs -> resolveCrossRefs isBibtex xs
