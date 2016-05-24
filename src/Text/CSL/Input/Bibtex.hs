@@ -919,7 +919,8 @@ fixLeadingDash xs = xs
 getOldDates :: String -> Bib [RefDate]
 getOldDates prefix = do
   year' <- fixLeadingDash <$> getRawField (prefix ++ "year")
-  month' <- (parseMonth <$> getRawField (prefix ++ "month")) <|> return ""
+  month' <- ((parseMonth . map toLower)
+              <$> getRawField (prefix ++ "month")) <|> return ""
   day' <- getRawField (prefix ++ "day") <|> return mempty
   endyear' <- fixLeadingDash <$> getRawField (prefix ++ "endyear") <|> return ""
   endmonth' <- getRawField (prefix ++ "endmonth") <|> return ""
