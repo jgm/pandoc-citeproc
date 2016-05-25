@@ -48,9 +48,9 @@ readBiblioFile f
     = case getExt f of
         ".json"     -> BL.readFile f >>= either error return . eitherDecode
         ".yaml"     -> UTF8.readFile f >>= either error return . readYamlBib
-        ".bib"      -> readBibtex False f
-        ".bibtex"   -> readBibtex True f
-        ".biblatex" -> readBibtex False f
+        ".bib"      -> readBibtex False True f
+        ".bibtex"   -> readBibtex True True f
+        ".biblatex" -> readBibtex False True f
 #ifdef USE_BIBUTILS
         ".mods"     -> readBiblioFile' f mods_in
         ".ris"      -> readBiblioFile' f ris_in
@@ -84,8 +84,8 @@ readBiblioString :: BibFormat -> String -> IO [Reference]
 readBiblioString b s
     | Json      <- b = either error return $ eitherDecode $ UTF8.fromStringLazy s
     | Yaml      <- b = either error return $ readYamlBib s
-    | Bibtex    <- b = readBibtexString True s
-    | BibLatex  <- b = readBibtexString False s
+    | Bibtex    <- b = readBibtexString True True s
+    | BibLatex  <- b = readBibtexString False True s
 #ifdef USE_BIBUTILS
     | Ris       <- b = go ris_in
     | Endnote   <- b = go endnote_in
@@ -107,7 +107,7 @@ readBiblioString b s
 #ifdef USE_BIBUTILS
 readBiblioFile' :: FilePath -> BiblioIn -> IO [Reference]
 readBiblioFile' fin bin
-    | bin == biblatex_in = readBibtex False fin
+    | bin == biblatex_in = readBibtex False True fin
     | otherwise      = E.handle handleBibfileError
                        $ withTempDir "citeproc"
                        $ \tdir -> do
@@ -121,7 +121,7 @@ readBiblioFile' fin bin
                             _ <- bibl_write param bibl tfile
                             bibl_free bibl
                             bibl_freeparams param
-                            refs <- readBibtex True tfile
+                            refs <- readBibtex True False tfile
                             return $! refs
   where handleBibfileError :: E.SomeException -> IO [Reference]
         handleBibfileError e = error $ "Error reading " ++ fin ++ "\n" ++ show e

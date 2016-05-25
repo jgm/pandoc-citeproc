@@ -91,22 +91,23 @@ getLangFromEnv = do
                                    _                  -> Lang "en" "US"
                   Nothing -> Lang "en" "US"
 
-readBibtex :: Bool -> FilePath -> IO [Reference]
-readBibtex isBibtex f = UTF8.readFile f >>= readBibtexString isBibtex
+readBibtex :: Bool -> Bool -> FilePath -> IO [Reference]
+readBibtex isBibtex caseTransform f =
+  UTF8.readFile f >>= readBibtexString isBibtex caseTransform
 
-readBibtexString :: Bool -> String -> IO [Reference]
-readBibtexString isBibtex contents = do
+readBibtexString :: Bool -> Bool -> String -> IO [Reference]
+readBibtexString isBibtex caseTransform contents = do
   lang <- getLangFromEnv
   locale <- parseLocale (langToLocale lang)
-  return $ readBibtexString' isBibtex lang locale contents
+  return $ readBibtexString' isBibtex caseTransform lang locale contents
 
 -- pure version of readBibtexString
-readBibtexString' :: Bool -> Lang -> Locale -> String -> [Reference]
-readBibtexString' isBibtex lang locale bibstring =
+readBibtexString' :: Bool -> Bool -> Lang -> Locale -> String -> [Reference]
+readBibtexString' isBibtex caseTransform lang locale bibstring =
   let items = case runParser (bibEntries <* eof) [] "stdin" bibstring of
                    Left err -> error (show err)
                    Right xs -> resolveCrossRefs isBibtex xs
-  in  mapMaybe (itemToReference lang locale isBibtex) items
+  in  mapMaybe (itemToReference lang locale isBibtex caseTransform) items
 
 type BibParser = Parsec [Char] [(String, String)]
 
@@ -1206,11 +1207,11 @@ ordinalize locale n =
           pad0 s   = s
           terms = localeTerms locale
 
-itemToReference :: Lang -> Locale -> Bool -> Item -> Maybe Reference
-itemToReference lang locale bibtex = bib $ do
+itemToReference :: Lang -> Locale -> Bool -> Bool -> Item -> Maybe Reference
+itemToReference lang locale bibtex caseTransform = bib $ do
   modify $ \st -> st{ localeLanguage = lang,
                       untitlecase = case lang of
-                                         Lang "en" _ -> True
+                                         Lang "en" _ -> caseTransform
                                          _           -> False }
   id' <- asks identifier
   et <- asks entryType
@@ -1334,7 +1335,7 @@ itemToReference lang locale bibtex = bib $ do
   let la = case splitWhen (== '-') hyphenation' of
                       (x:_) -> x
                       []    -> mempty
-  modify $ \s -> s{ untitlecase = la == "en" }
+  modify $ \s -> s{ untitlecase = caseTransform && la == "en" }
 
   title' <- (guard isPeriodical >> getTitle "issuetitle")
             <|> (guard hasMaintitle >> guard (not isChapterlike) >> getTitle "maintitle")
