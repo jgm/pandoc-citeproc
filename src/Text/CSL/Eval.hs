@@ -377,10 +377,10 @@ isNumericString s  = all (\c -> isNumber c || isSpecialChar c) $ words s
 
 isTransNumber, isSpecialChar,isNumber :: String -> Bool
 isTransNumber = all isDigit
-isSpecialChar = all (`elem` "&-,\x2013")
+isSpecialChar = all (`elem` "&-,.\x2013")
 isNumber   cs = case [c | c <- cs
                         , not (isLetter c)
-                        , not (c `elem` "&-,\x2013")] of
+                        , not (c `elem` "&-.,\x2013")] of
                      []  -> False
                      xs  -> all isDigit xs
 
