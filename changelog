@@ -24,6 +24,7 @@ pandoc-citeproc (0.10)
     John MacFarlane) Thus, we should have "Series 2.2", not "Series, 2.2" with
     Chicago author-date style.
   * Fixed capitalization for words following slash (#236, John MacFarlane).
+  * Updated locales.
   * Fix build failure for --flags=-bibutils mode (Sergei Trofimovich).
     Reported-by Thomas Beutin https://bugs.gentoo.org/516640.
   * Add missing -DUSE_BIBUTILS to Cabal build (Vaclav Haisman).
