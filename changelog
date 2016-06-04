@@ -1,14 +1,32 @@
-pandoc-citeproc (0.9.2)
+pandoc-citeproc (0.10)
 
-  * Fix build failure for --flags=-bibutils mode (Sergei Trofimovich).
-    Reported-by Thomas Beutin https://bugs.gentoo.org/516640.
-  * Add missing -DUSE_BIBUTILS to Cabal build (Vaclas Haisman).
-  * Data:  Raise CSLLocaleException if locale not found.
-    Minor API change:  Export CSLLocaleException.
-  * Set LANG as well as LC_ALL before translating bibtex.
+  * Allow colons in bibtex field names (John MacFarlane, #220).
+  * Set LANG as well as LC_ALL before translating bibtex (John MacFarlane).
     This ensures that bibtex will use the locale specified
     in the document, even if the system locale is different.
-  * Allow colons in bibtex field names (#220).
+  * Data:  Raise CSLLocaleException if locale not found (John MacFarlane).
+    Minor API change:  Export CSLLocaleException.
+  * Added DeriveDataTypeable pragma to Data (John MacFarlane).
+  * Bibtex reader: case-insensitive parsing of month names (John MacFarlane).
+  * Bibtex: Export readBibtexInputString', a pure version of
+    readBibtexInputString (John MacFarlane).
+  * Rename readBibtexInput* -> readBibtex* (John MacFarlane, API change).
+  * unTitleCase now lowercases whole word (#234, John MacFarlane).
+    So, for example, unprotected TeV becomes tev, instead of teV.
+    This mimics bibtex's own behavior.
+  * Added caseTransform parameter on readBibtex* functions (#231, John
+    MacFarlane).  When set to false, the bibtex reader doesn't do the
+    'untitlecase' transformation.  This is used in Text.CSL.Input.Bibutils,
+    when using bibtex as an intermediate format for conversion from mods,
+    ris, or other formats.  Otherwise we get the 'untitlecase' transform
+    when it isn't wanted.
+  * Allow numbers with decimal points to count as "numeric." (#208,
+    John MacFarlane) Thus, we should have "Series 2.2", not "Series, 2.2" with
+    Chicago author-date style.
+  * Fixed capitalization for words following slash (#236, John MacFarlane).
+  * Fix build failure for --flags=-bibutils mode (Sergei Trofimovich).
+    Reported-by Thomas Beutin https://bugs.gentoo.org/516640.
+  * Add missing -DUSE_BIBUTILS to Cabal build (Vaclav Haisman).
 
 pandoc-citeproc (0.9.1.1)
 
