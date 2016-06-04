@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <locale xmlns="http://purl.org/net/xbiblio/csl" version="1.0" xml:lang="pt-BR">
   <info>
+    <updated>2016-05-16T00:00:00+03:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
-    <updated>2012-07-04T23:31:02+00:00</updated>
   </info>
-  <style-options punctuation-in-quote="false"/>
+  <style-options punctuation-in-quote="false" limit-day-ordinals-to-day-1="true"/>
   <date form="text">
-    <date-part name="day" suffix=" de "/>
+    <date-part name="day" form="ordinal" suffix=" de "/>
     <date-part name="month" suffix=" de "/>
     <date-part name="year"/>
   </date>
@@ -22,7 +22,7 @@
     <term name="anonymous">anônimo</term>
     <term name="anonymous" form="short">anon</term>
     <term name="at">em</term>
-    <term name="available at">available at</term>
+    <term name="available at">disponível em</term>
     <term name="by">por</term>
     <term name="circa">circa</term>
     <term name="circa" form="short">c.</term>
@@ -54,34 +54,46 @@
       <multiple>refs.</multiple>
     </term>
     <term name="retrieved">recuperado</term>
-    <term name="scale">scale</term>
-    <term name="version">version</term>
+    <term name="scale">escala</term>
+    <term name="version">versão</term>
 
     <!-- ANNO DOMINI; BEFORE CHRIST -->
-    <term name="ad">AD</term>
-    <term name="bc">BC</term>
+    <term name="ad">DC</term>
+    <term name="bc">AC</term>
 
     <!-- PUNCTUATION -->
     <term name="open-quote">“</term>
     <term name="close-quote">”</term>
     <term name="open-inner-quote">‘</term>
     <term name="close-inner-quote">’</term>
-    <term name="page-range-delimiter">–</term>
+    <term name="page-range-delimiter">&#8211;</term>
 
     <!-- ORDINALS -->
     <term name="ordinal">º</term>
+    <term name="ordinal-01" gender-form="feminine" match="whole-number">ª</term>
+    <term name="ordinal-01" gender-form="masculine" match="whole-number">º</term>
 
     <!-- LONG ORDINALS -->
-    <term name="long-ordinal-01">primeiro</term>
-    <term name="long-ordinal-02">segundo</term>
-    <term name="long-ordinal-03">terceiro</term>
-    <term name="long-ordinal-04">quarto</term>
-    <term name="long-ordinal-05">quinto</term>
-    <term name="long-ordinal-06">sexto</term>
-    <term name="long-ordinal-07">sétimo</term>
-    <term name="long-ordinal-08">oitavo</term>
-    <term name="long-ordinal-09">nono</term>
-    <term name="long-ordinal-10">décimo</term>
+    <term name="long-ordinal-01" gender-form="masculine">primeiro</term>
+    <term name="long-ordinal-02" gender-form="masculine">segundo</term>
+    <term name="long-ordinal-03" gender-form="masculine">terceiro</term>
+    <term name="long-ordinal-04" gender-form="masculine">quarto</term>
+    <term name="long-ordinal-05" gender-form="masculine">quinto</term>
+    <term name="long-ordinal-06" gender-form="masculine">sexto</term>
+    <term name="long-ordinal-07" gender-form="masculine">sétimo</term>
+    <term name="long-ordinal-08" gender-form="masculine">oitavo</term>
+    <term name="long-ordinal-09" gender-form="masculine">nono</term>
+    <term name="long-ordinal-10" gender-form="masculine">décimo</term>
+    <term name="long-ordinal-01" gender-form="feminine">primeira</term>
+    <term name="long-ordinal-02" gender-form="feminine">segunda</term>
+    <term name="long-ordinal-03" gender-form="feminine">terceira</term>
+    <term name="long-ordinal-04" gender-form="feminine">quarta</term>
+    <term name="long-ordinal-05" gender-form="feminine">quinta</term>
+    <term name="long-ordinal-06" gender-form="feminine">sexta</term>
+    <term name="long-ordinal-07" gender-form="feminine">sétima</term>
+    <term name="long-ordinal-08" gender-form="feminine">oitava</term>
+    <term name="long-ordinal-09" gender-form="feminine">nona</term>
+    <term name="long-ordinal-10" gender-form="feminine">décima</term>
 
     <!-- LONG LOCATOR FORMS -->
     <term name="book">
@@ -199,8 +211,8 @@
 
     <!-- LONG ROLE FORMS -->
     <term name="director">
-      <single>director</single>
-      <multiple>directors</multiple>
+      <single>diretor</single>
+      <multiple>diretores</multiple>
     </term>
     <term name="editor">
       <single>organizador</single>
@@ -208,11 +220,11 @@
     </term>
     <term name="editorial-director">
       <single>editor</single>
-      <multiple>editors</multiple>
+      <multiple>editores</multiple>
     </term>
     <term name="illustrator">
-      <single>illustrator</single>
-      <multiple>illustrators</multiple>
+      <single>ilustrador</single>
+      <multiple>ilustradores</multiple>
     </term>
     <term name="translator">
       <single>tradutor</single>
@@ -237,8 +249,8 @@
       <multiple>eds.</multiple>
     </term>
     <term name="illustrator" form="short">
-      <single>ill.</single>
-      <multiple>ills.</multiple>
+      <single>il.</single>
+      <multiple>ils.</multiple>
     </term>
     <term name="translator" form="short">
       <single>trad.</single>
@@ -251,21 +263,21 @@
 
     <!-- VERB ROLE FORMS -->
     <term name="container-author" form="verb">por</term>
-    <term name="director" form="verb">directed by</term>
+    <term name="director" form="verb">dirigido por</term>
     <term name="editor" form="verb">organizado por</term>
     <term name="editorial-director" form="verb">editado por</term>
-    <term name="illustrator" form="verb">illustrated by</term>
+    <term name="illustrator" form="verb">ilustrado por</term>
     <term name="interviewer" form="verb">entrevista de</term>
     <term name="recipient" form="verb">para</term>
-    <term name="reviewed-author" form="verb">by</term>
+    <term name="reviewed-author" form="verb">por</term>
     <term name="translator" form="verb">traduzido por</term>
-    <term name="editortranslator" form="verb">editado &amp; traduzido por</term>
+    <term name="editortranslator" form="verb">editado e traduzido por</term>
 
     <!-- SHORT VERB ROLE FORMS -->
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">org.</term>
     <term name="editorial-director" form="verb-short">ed.</term>
-    <term name="illustrator" form="verb-short">illus.</term>
+    <term name="illustrator" form="verb-short">ilus.</term>
     <term name="translator" form="verb-short">trad.</term>
     <term name="editortranslator" form="verb-short">ed. e trad. por</term>
 

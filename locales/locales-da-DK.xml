@@ -16,7 +16,7 @@
     <date-part name="year"/>
   </date>
   <terms>
-    <term name="accessed">åbnet</term>
+    <term name="accessed">set</term>
     <term name="and">og</term>
     <term name="and others">med flere</term>
     <term name="anonymous">anonym</term>
@@ -26,23 +26,23 @@
     <term name="by">af</term>
     <term name="circa">cirka</term>
     <term name="circa" form="short">ca.</term>
-    <term name="cited">citeret</term>
+    <term name="cited">henvist</term>
     <term name="edition">
       <single>udgave</single>
       <multiple>udgaver</multiple>
     </term>
     <term name="edition" form="short">udg.</term>
-    <term name="et-al">et al.</term>
+    <term name="et-al">m.fl.</term>
     <term name="forthcoming">kommende</term>
     <term name="from">fra</term>
     <term name="ibid">ibid.</term>
     <term name="in">i</term>
-    <term name="in press">i tryk</term>
+    <term name="in press">i trykken</term>
     <term name="internet">internet</term>
     <term name="interview">interview</term>
     <term name="letter">brev</term>
-    <term name="no date">ingen dato</term>
-    <term name="no date" form="short">udateret</term>
+    <term name="no date">uden år</term>
+    <term name="no date" form="short">u.å.</term>
     <term name="online">online</term>
     <term name="presented at">præsenteret ved</term>
     <term name="reference">
@@ -54,16 +54,16 @@
       <multiple>refr.</multiple>
     </term>
     <term name="retrieved">hentet</term>
-    <term name="scale">scale</term>
+    <term name="scale">skala</term>
     <term name="version">version</term>
 
     <!-- ANNO DOMINI; BEFORE CHRIST -->
-    <term name="ad">e.Kr</term>
-    <term name="bc">f.Kr</term>
+    <term name="ad">e.v.t.</term>
+    <term name="bc">f.v.t.</term>
 
     <!-- PUNCTUATION -->
-    <term name="open-quote">«</term>
-    <term name="close-quote">»</term>
+    <term name="open-quote">“</term>
+    <term name="close-quote">”</term>
     <term name="open-inner-quote">‘</term>
     <term name="close-inner-quote">’</term>
     <term name="page-range-delimiter">–</term>
@@ -102,7 +102,7 @@
     </term>
     <term name="folio">
       <single>folio</single>
-      <multiple>folier</multiple>
+      <multiple>folio</multiple>
     </term>
     <term name="issue">
       <single>nummer</single>
@@ -118,7 +118,7 @@
     </term>
     <term name="opus">
       <single>opus</single>
-      <multiple>opuser</multiple>
+      <multiple>opus</multiple>
     </term>
     <term name="page">
       <single>side</single>
@@ -137,12 +137,12 @@
       <multiple>dele</multiple>
     </term>
     <term name="section">
-      <single>sektion</single>
-      <multiple>sektionerne</multiple>
+      <single>paragraf</single>
+      <multiple>paragraffer</multiple>
     </term>
     <term name="sub verbo">
-      <single>sub verbo</single>
-      <multiple>sub verbis</multiple>
+      <single>sub voce</single>
+      <multiple>sub voce</multiple>
     </term>
     <term name="verse">
       <single>vers</single>
@@ -173,10 +173,10 @@
     </term>
     <term name="paragraph" form="short">afs.</term>
     <term name="part" form="short">d.</term>
-    <term name="section" form="short">sekt.</term>
+    <term name="section" form="short">par.</term>
     <term name="sub verbo" form="short">
       <single>s.v.</single>
-      <multiple>s.vv.</multiple>
+      <multiple>s.v.</multiple>
     </term>
     <term name="verse" form="short">
       <single>v.</single>
@@ -199,8 +199,8 @@
 
     <!-- LONG ROLE FORMS -->
     <term name="director">
-      <single>director</single>
-      <multiple>directors</multiple>
+      <single>instruktør</single>
+      <multiple>instruktører</multiple>
     </term>
     <term name="editor">
       <single>redaktør</single>
@@ -225,8 +225,8 @@
 
     <!-- SHORT ROLE FORMS -->
     <term name="director" form="short">
-      <single>dir.</single>
-      <multiple>dirs.</multiple>
+      <single>instr.</single>
+      <multiple>instr.</multiple>
     </term>
     <term name="editor" form="short">
       <single>red.</single>
@@ -251,18 +251,18 @@
 
     <!-- VERB ROLE FORMS -->
     <term name="container-author" form="verb">af</term>
-    <term name="director" form="verb">directed by</term>
+    <term name="director" form="verb">instrueret af</term>
     <term name="editor" form="verb">redigeret af</term>
     <term name="editorial-director" form="verb">redigeret af</term>
     <term name="illustrator" form="verb">illustreret af</term>
     <term name="interviewer" form="verb">interviewet af</term>
     <term name="recipient" form="verb">modtaget af</term>
-    <term name="reviewed-author" form="verb">by</term>
+    <term name="reviewed-author" form="verb">af</term>
     <term name="translator" form="verb">oversat af</term>
     <term name="editortranslator" form="verb">redigeret &amp; oversat af</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="director" form="verb-short">dir.</term>
+    <term name="director" form="verb-short">instr.</term>
     <term name="editor" form="verb-short">red.</term>
     <term name="editorial-director" form="verb-short">red.</term>
     <term name="illustrator" form="verb-short">illus.</term>
@@ -270,32 +270,32 @@
     <term name="editortranslator" form="verb-short">red. &amp; overs. af</term>
 
     <!-- LONG MONTH FORMS -->
-    <term name="month-01">Januar</term>
-    <term name="month-02">Februar</term>
-    <term name="month-03">Marts</term>
-    <term name="month-04">April</term>
-    <term name="month-05">Maj</term>
-    <term name="month-06">Juni</term>
-    <term name="month-07">Juli</term>
-    <term name="month-08">August</term>
-    <term name="month-09">September</term>
-    <term name="month-10">Oktober</term>
-    <term name="month-11">November</term>
-    <term name="month-12">December</term>
+    <term name="month-01">januar</term>
+    <term name="month-02">februar</term>
+    <term name="month-03">marts</term>
+    <term name="month-04">april</term>
+    <term name="month-05">maj</term>
+    <term name="month-06">juni</term>
+    <term name="month-07">juli</term>
+    <term name="month-08">august</term>
+    <term name="month-09">september</term>
+    <term name="month-10">oktober</term>
+    <term name="month-11">november</term>
+    <term name="month-12">december</term>
 
     <!-- SHORT MONTH FORMS -->
-    <term name="month-01" form="short">Jan.</term>
-    <term name="month-02" form="short">Feb.</term>
-    <term name="month-03" form="short">Mar.</term>
-    <term name="month-04" form="short">Apr.</term>
-    <term name="month-05" form="short">Maj</term>
-    <term name="month-06" form="short">Jun.</term>
-    <term name="month-07" form="short">Jul.</term>
-    <term name="month-08" form="short">Aug.</term>
-    <term name="month-09" form="short">Sep.</term>
-    <term name="month-10" form="short">Okt.</term>
-    <term name="month-11" form="short">Nov.</term>
-    <term name="month-12" form="short">Dec.</term>
+    <term name="month-01" form="short">jan.</term>
+    <term name="month-02" form="short">feb.</term>
+    <term name="month-03" form="short">mar.</term>
+    <term name="month-04" form="short">apr.</term>
+    <term name="month-05" form="short">maj</term>
+    <term name="month-06" form="short">jun.</term>
+    <term name="month-07" form="short">jul.</term>
+    <term name="month-08" form="short">aug.</term>
+    <term name="month-09" form="short">sep.</term>
+    <term name="month-10" form="short">okt.</term>
+    <term name="month-11" form="short">nov.</term>
+    <term name="month-12" form="short">dec.</term>
 
     <!-- SEASONS -->
     <term name="season-01">Forår</term>
