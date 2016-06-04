@@ -24,6 +24,7 @@ description:        The pandoc-citeproc library exports functions for
 
 homepage:           https://github.com/jgm/pandoc-citeproc
 category:           Text
+tested-with:        GHC == 7.6.3, GHC == 7.8.4, GHC == 7.10.2, GHC == 8.0.1
 license:            BSD3
 license-file:       LICENSE
 author:             John MacFarlane, Andrea Rossato
