@@ -74,6 +74,8 @@ readFormat = go . map toLower
   where go "biblatex" = Just BibLatex
         go "bib"      = Just BibLatex
         go "bibtex"   = Just Bibtex
+        go "json"     = Just Json
+        go "yaml"     = Just Yaml
 #ifdef USE_BIBUTILS
         go "ris"      = Just Ris
         go "endnote"  = Just Endnote
@@ -84,9 +86,7 @@ readFormat = go . map toLower
         go "isi"      = Just Isi
         go "medline"  = Just Medline
         go "copac"    = Just Copac
-        go "json"     = Just Json
         go "mods"     = Just Mods
-        go "yaml"     = Just Yaml
 #endif
         go _          = Nothing
 
