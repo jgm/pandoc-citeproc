@@ -148,7 +148,7 @@ executable pandoc-citeproc
                       pandoc-types >= 1.16 && < 1.17,
                       pandoc >= 1.16 && < 1.18,
                       aeson,
-                      aeson-pretty, yaml, bytestring, syb, attoparsec, text,
+                      aeson-pretty >= 0.8, yaml, bytestring, syb, attoparsec, text,
                       filepath
     other-modules:    Paths_pandoc_citeproc
                       Prelude
