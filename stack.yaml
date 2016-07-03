@@ -7,5 +7,6 @@ flags:
     debug: false
 packages:
 - '.'
-extra-deps: []
-resolver: lts-6.1
+extra-deps:
+- 'aeson-pretty-0.8.1'
+resolver: lts-6.5
