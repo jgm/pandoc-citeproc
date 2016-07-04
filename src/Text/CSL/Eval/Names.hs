@@ -24,7 +24,7 @@ import Data.Maybe ( isJust )
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
 import Text.CSL.Util ( headInline, lastInline, readNum, (<^>), query, toRead,
-                       splitStrWhen )
+                       splitStrWhen, isRange )
 import Text.CSL.Style
 import Text.Pandoc.Definition
 import Text.Pandoc.Shared ( stringify )
@@ -347,7 +347,7 @@ formatLabel :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
 formatLabel f fm p s
     | "locator" <- s = when' (gets (citeLocator . cite . env) >>= return . (/=) []) $ do
                        (l,v) <- getLocVar
-                       form (\fm' -> return . flip OLoc emptyFormatting . output fm') id l ('-' `elem` v || '\x2013' `elem` v)
+                       form (\fm' -> return . flip OLoc emptyFormatting . output fm') id l (isRange v)
     | "page"    <- s = checkPlural
     | "volume"  <- s = checkPlural
     | "ibid"    <- s = format s p
@@ -365,7 +365,7 @@ formatLabel f fm p s
                          ,"reviewed-author", "translator"]
       checkPlural = when' (isVarSet s) $ do
                       v <- getStringVar s
-                      format  s ('-' `elem` v || '\x2013' `elem` v)
+                      format  s (isRange v)
       format      = form output id
       form o g t b = return . o fm =<< g . period <$> getTerm (b && p) f t
       period      = if stripPeriods fm then filter (/= '.') else id

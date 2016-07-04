@@ -39,7 +39,7 @@ import Text.CSL.Output.Plain
 import Text.CSL.Reference
 import Text.CSL.Style hiding (Any)
 import Text.CSL.Util ( readNum, last', proc, proc', query, betterThan,
-                       safeRead )
+                       safeRead, isRange )
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the
@@ -174,9 +174,7 @@ evalElement el
                             case numVars of
                               ["number-of-volumes"] -> not $ any (== "1") nums
                               ["number-of-pages"]   -> not $ any (== "1") nums
-                              _ -> any
-                                   (\x -> '-' `elem` x || '\x2013' `elem` x)
-                                   nums
+                              _ -> any isRange nums
                          pluralizeTerm x = x
                      if null res
                         then return []

@@ -43,6 +43,7 @@ module Text.CSL.Util
   , (&=)
   , mapping'
   , parseRomanNumeral
+  , isRange
   ) where
 import Data.Aeson
 import Data.Aeson.Types (Parser)
@@ -426,3 +427,6 @@ pRomanNumeral = do
     if total == 0
        then fail "not a roman numeral"
        else return total
+
+isRange :: String -> Bool
+isRange s = ',' `elem` s || '-' `elem` s || '\x2013' `elem` s
