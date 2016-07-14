@@ -379,7 +379,7 @@ data Reference =
 
 instance FromJSON Reference where
   parseJSON (Object v') = do
-     v <- parseSuppFields v'
+     v <- parseSuppFields v' <|> return v'
      addPageFirst <$> (Reference <$>
        v .:? "id" .!= "" <*>
        v .:? "type" .!= NoType <*>
@@ -472,7 +472,7 @@ instance FromJSON Reference where
 -- see http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#supplementary-fields
 parseSuppFields :: Aeson.Object -> Parser Aeson.Object
 parseSuppFields o = do
-  nt <- o .: "note" <|> return ("" :: String)
+  nt <- o .: "note"
   case P.parse noteFields "note" nt of
        Left err -> fail (show err)
        Right fs -> return $ foldr (\(k,v) x -> H.insert k v x) o fs
