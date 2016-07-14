@@ -61,6 +61,7 @@ processCites style refs (Pandoc m1 b1) =
 -- references as its contents.  Otherwise, insert references
 -- at the end of the document in a Div with id="refs"
 insertRefs :: Meta -> [Block] -> [Block] -> [Block]
+insertRefs _    []   bs = bs
 insertRefs meta refs bs =
   if isRefRemove meta
      then bs

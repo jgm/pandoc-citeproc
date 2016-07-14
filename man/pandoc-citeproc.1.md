@@ -18,7 +18,8 @@ The `pandoc-citeproc` executable has two modes, filter mode and convert mode.
 
 Run without options, it acts as a filter that takes a JSON-encoded Pandoc
 document, formats citations and adds a bibliography, and returns a JSON-encoded
-pandoc document.  Citations will be resolved, and a bibliography will be
+pandoc document.  Citations will be resolved, and, assuming
+there are bibliography entries, a bibliography will be
 inserted into a Div element with id `refs`. If no such Div
 exists, one will be created and appended to the end of the document
 (unless the `suppress-bibliography` metadata field is set to a
