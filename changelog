@@ -1,3 +1,14 @@
+pandoc-citeproc (0.10.1)
+
+  * pandoc-citeproc: allow .yaml and .json input files, even without the
+    `bibutils` flag, for conversion to JSON and YAML, resp.
+  * Pluralize locator term when comma-separated series of numbers given
+    (#245).
+  * Don't insert bibliography if there are no entries (#249).
+  * Fixed note field with YAMl bibliographies (#224).  Supplementary fields
+    in `note` are parsed only in CSL JSON.
+  * Support latest aeson-pretty (Felix Yan).
+
 pandoc-citeproc (0.10)
 
   * Allow colons in bibtex field names (John MacFarlane, #220).
