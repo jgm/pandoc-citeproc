@@ -827,19 +827,21 @@ resolveKey' (Lang "sv" "SE") k =
 resolveKey' _ k = resolveKey' (Lang "en" "US") k
 
 parseMonth :: String -> String
-parseMonth "jan" = "1"
-parseMonth "feb" = "2"
-parseMonth "mar" = "3"
-parseMonth "apr" = "4"
-parseMonth "may" = "5"
-parseMonth "jun" = "6"
-parseMonth "jul" = "7"
-parseMonth "aug" = "8"
-parseMonth "sep" = "9"
-parseMonth "oct" = "10"
-parseMonth "nov" = "11"
-parseMonth "dec" = "12"
-parseMonth x     = x
+parseMonth s =
+  case map toLower s of
+         "jan" -> "1"
+         "feb" -> "2"
+         "mar" -> "3"
+         "apr" -> "4"
+         "may" -> "5"
+         "jun" -> "6"
+         "jul" -> "7"
+         "aug" -> "8"
+         "sep" -> "9"
+         "oct" -> "10"
+         "nov" -> "11"
+         "dec" -> "12"
+         _     -> s
 
 data BibState = BibState{
            untitlecase     :: Bool
@@ -930,11 +932,11 @@ fixLeadingDash xs = xs
 getOldDates :: String -> Bib [RefDate]
 getOldDates prefix = do
   year' <- fixLeadingDash <$> getRawField (prefix ++ "year")
-  month' <- ((parseMonth . map toLower)
+  month' <- (parseMonth
               <$> getRawField (prefix ++ "month")) <|> return ""
   day' <- getRawField (prefix ++ "day") <|> return mempty
   endyear' <- fixLeadingDash <$> getRawField (prefix ++ "endyear") <|> return ""
-  endmonth' <- getRawField (prefix ++ "endmonth") <|> return ""
+  endmonth' <- (parseMonth <$> getRawField (prefix ++ "endmonth")) <|> return ""
   endday' <- getRawField (prefix ++ "endday") <|> return ""
   let start' = RefDate { year   = Literal $ if isNumber year' then year' else ""
                        , month  = Literal $ month'
