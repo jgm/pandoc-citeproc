@@ -9,4 +9,4 @@ packages:
 - '.'
 extra-deps:
 - 'aeson-pretty-0.8.1'
-resolver: lts-6.5
+resolver: nightly-2016-07-19
