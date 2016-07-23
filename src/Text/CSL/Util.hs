@@ -70,10 +70,11 @@ import qualified Debug.Trace
 import Text.Show.Pretty (ppShow)
 #endif
 
-tr' :: Show a => String -> a -> a
 #ifdef TRACE
+tr' :: Show a => String -> a -> a
 tr' note' x = Debug.Trace.trace ("=== " ++ note' ++ "\n" ++ ppShow x ++ "\n") x
 #else
+tr' :: String -> a -> a
 tr' _ x = x
 #endif
 
