@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings, PatternGuards, DeriveDataTypeable,
     ScopedTypeVariables, FlexibleInstances, DeriveGeneric,
+    OverlappingInstances,
     GeneralizedNewtypeDeriving, CPP, MultiParamTypeClasses #-}
 -----------------------------------------------------------------------------
 -- |
