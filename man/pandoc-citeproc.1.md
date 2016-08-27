@@ -75,7 +75,7 @@ the input:
 
     The contents of fields will be interpreted as markdown when
     appropriate:  so, for example, emphasis and strong emphasis can
-    be used in title fileds. Simple tex math will also be
+    be used in title fields. Simple tex math will also be
     parsed and rendered appropriately.
 
 `csl` or `citation-style`
@@ -99,6 +99,9 @@ the input:
     `$HOME/.csl` directory (or `C:\Users\USERNAME\AppData\Roaming\csl`
     in Windows 7).  The format is described
     [here](http://citationstylist.org/2011/10/19/abbreviations-for-zotero-test-release).
+    Abbreviations are only output if, in the `.csl` file, `form="short"` is set on the 
+    element that renders the variable.
+
     Here is a short example:
 
         { "default": {
