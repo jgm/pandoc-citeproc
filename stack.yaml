@@ -7,6 +7,9 @@ flags:
     debug: false
 packages:
 - '.'
+- '../pandoc'
+- '../pandoc-types'
 extra-deps:
-- 'aeson-pretty-0.8.1'
-resolver: nightly-2016-07-19
+- 'http-client-0.5.0'
+- 'http-client-tls-0.3.0'
+resolver: lts-7.0
