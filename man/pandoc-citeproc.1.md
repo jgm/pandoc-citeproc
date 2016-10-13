@@ -133,6 +133,15 @@ the input:
      is not specified and the document ends with a section header,
      this final header will be treated as the bibliography header.
 
+`notes-after-punctuation`
+:    If true (the default), pandoc will put footnote citations
+     after following punctuation.  For example, if the source
+     contains `blah blah [@jones99].`, the result will look like
+     `blah blah.[^1]`, with the note moved after the period and
+     the space collapsed.  If false, the space will still be
+     collapsed, but the footnote will not be moved after the
+     punctuation.
+
 The metadata must contain either `references` or `bibliography` or
 both as a source of references.  `csl` and `citation-abbreviations`
 are optional.  If `csl` is not provided, a default stylesheet
