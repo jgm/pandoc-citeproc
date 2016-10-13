@@ -1,3 +1,15 @@
+pandoc-citeproc (0.10.1.2)
+
+  * Implemented notes-after-punctuation metadata field (#256).
+    If this is true (the default), citations rendered as footnotes
+    are automatically moved after punctuation.  If it is false,
+    footnote citations remain before punctuation, but space is still
+    collapsed before the notes.
+  * Don't require http-client 0.5.  This mirrors recent changes to pandoc,
+    which allow 0.4.30.x.
+  * Allow pandoc-types 1.17.*.
+  * Allow xml-conduit 1.4.x (Felix Yan).
+
 pandoc-citeproc (0.10.1.1)
 
   * Clarify that abbreviations require `form="short"` (Nick Bart).
