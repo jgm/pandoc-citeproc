@@ -7,6 +7,13 @@ flags:
     debug: false
 packages:
 - '.'
+- location:
+    git: https://github.com/jgm/pandoc-types.git
+    commit: 485eb11e9869fcd4c1ca9bcd68d3ccd384230252
+- location:
+    git: https://github.com/jgm/pandoc.git
+    commit: 6156cdda13ee5f9edbb11a672f6eb78631c3ffc5
 extra-deps:
 - texmath-0.8.6.6
+- doctemplates-0.1.0.2
 resolver: lts-7.2
