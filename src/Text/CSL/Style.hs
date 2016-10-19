@@ -1,7 +1,12 @@
 {-# LANGUAGE OverloadedStrings, PatternGuards, DeriveDataTypeable,
     ScopedTypeVariables, FlexibleInstances, DeriveGeneric,
-    OverlappingInstances,
     GeneralizedNewtypeDeriving, CPP, MultiParamTypeClasses #-}
+#if MIN_VERSION_base(4,8,0)
+#define OVERLAPS {-# OVERLAPPING #-}
+#else
+{-# LANGUAGE OverlappingInstances #-}
+#define OVERLAPS
+#endif
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Style

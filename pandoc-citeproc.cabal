@@ -105,39 +105,35 @@ library
                       data-default,
                       setenv >= 0.1 && < 0.2,
                       split, yaml >= 0.8.8.7
+    default-language: Haskell2010
+    default-extensions: CPP
+
     if impl(ghc < 7.6)
        build-depends: ghc-prim
 
     if flag(debug)
        build-depends:   pretty-show
-       default-extensions: CPP
        cpp-options:     -DTRACE
 
     if flag(bibutils)
        build-depends:   hs-bibutils >= 0.3
-       default-extensions: CPP
        cpp-options:     -DUSE_BIBUTILS
 
     if flag(embed_data_files)
-       default-extensions:    CPP
        Build-Tools:   hsb2hs >= 0.3.1
        cpp-options:   -DEMBED_DATA_FILES
        other-modules: Text.CSL.Data.Embedded
 
     if flag(unicode_collation)
        build-depends: text, text-icu
-       default-extensions:    CPP
        cpp-options:   -DUNICODE_COLLATION
     else
        build-depends: rfc5051
-       default-extensions:    CPP
 
     if impl(ghc >= 6.10)
        build-depends: base >= 4, syb, parsec, old-locale, time
     else
        build-depends: base >= 3 && < 4
-
-    default-language: Haskell98
 
 executable pandoc-citeproc
     main-is:          pandoc-citeproc.hs
@@ -152,7 +148,7 @@ executable pandoc-citeproc
                       filepath
     other-modules:    Paths_pandoc_citeproc
                       Prelude
-    default-language: Haskell98
+    default-language: Haskell2010
     if flag(bibutils)
        default-extensions: CPP
        cpp-options:     -DUSE_BIBUTILS
@@ -172,7 +168,7 @@ executable test-citeproc
                   filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7, containers >= 0.4, vector >= 0.10
-  default-language: Haskell98
+  default-language: Haskell2010
 
 test-suite test-pandoc-citeproc
   Type:           exitcode-stdio-1.0
@@ -185,4 +181,4 @@ test-suite test-pandoc-citeproc
                   pandoc >= 1.16 && < 1.18, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7
-  default-language: Haskell98
+  default-language: Haskell2010

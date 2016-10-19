@@ -1,4 +1,7 @@
 {-# LANGUAGE PatternGuards #-}
+#if MIN_VERSION_base(4,9,0)
+{-# OPTIONS_GHC -fno-warn-redundant-constraints #-}
+#endif
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Eval.Common
