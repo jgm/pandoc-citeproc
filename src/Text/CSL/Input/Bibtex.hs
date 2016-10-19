@@ -20,7 +20,10 @@ module Text.CSL.Input.Bibtex
 
 import Text.Parsec hiding (optional, (<|>), many, State)
 import Control.Applicative
-import Text.Pandoc
+import Text.Pandoc (readLaTeX, ReaderOptions(..))
+import Text.Pandoc.Definition
+import Text.Pandoc.Generic (bottomUp)
+import Data.Default (Default(def))
 import Data.List.Split (splitOn, splitWhen, wordsBy)
 import Data.List (intercalate)
 import Data.Maybe
@@ -754,7 +757,7 @@ resolveKey' (Lang "pt" "PT") k =
        "audiocd"       -> "CD áudio"
        _               -> k
 resolveKey' (Lang "pt" "BR") k =
-    case map toLower k of       
+    case map toLower k of
        -- "candthesis" -> "" -- missing
        "techreport"    -> "relatório técnico"
        "resreport"     -> "relatório de pesquisa"
