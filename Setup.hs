@@ -2,18 +2,13 @@
 
 import Distribution.Simple
 import Distribution.Simple.PreProcess
-import Distribution.Simple.InstallDirs (mandir)
-import Distribution.PackageDescription (PackageDescription(..), Executable(..))
+import Distribution.PackageDescription (PackageDescription(..))
 import Distribution.Simple.Program (simpleProgram, Program(..))
 import Distribution.Simple.Utils ( rawSystemExitCode, findProgramVersion )
-import Data.Version
 import System.Exit
-import System.Directory ( findExecutable )
-import Distribution.Simple.Utils (info, notice, rawSystemExit, installOrdinaryFiles)
+import Distribution.Simple.Utils (info, notice, installOrdinaryFiles)
 import Distribution.Simple.Setup
 import Distribution.Simple.LocalBuildInfo
-import Distribution.Verbosity
-import qualified Control.Exception as E
 
 
 main :: IO ()
