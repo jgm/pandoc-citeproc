@@ -93,7 +93,7 @@ install:
 - |
   case "$BUILD" in
     stack)
-  stack --no-terminal --install-ghc $ARGS test --only-dependencies --fast --flag "pandoc-citeproc:test_citeproc" --flag "aeson:fast" --fast
+  stack --no-terminal --install-ghc $ARGS test --only-dependencies --fast --flag "pandoc-citeproc:test_citeproc" --flag "aeson:fast"
       ;;
     cabal)
       cabal --version
