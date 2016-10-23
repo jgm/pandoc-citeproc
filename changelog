@@ -1,3 +1,11 @@
+pandoc-citeproc (0.10.1.3)
+
+  * Fixed compiler warnings.
+  * Setup.hs - removed unnecessary imports.
+  * Travis improvements.  Run on stack lts-7, not earlier.
+    Disable optimizations for faster build.  Turn on warnings.
+  * Bump pandoc-types to 1.17.0.3 in stack.yaml.
+
 pandoc-citeproc (0.10.1.2)
 
   * Implemented notes-after-punctuation metadata field (#256).
