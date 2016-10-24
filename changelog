@@ -1,3 +1,10 @@
+pandoc-citeproc (0.10.1.4)
+
+  * Use finer grained Pandoc import statements (Albert Krewinkel).
+    A full import of the Pandoc library leads to name collisions with Pandoc
+    v1.18, so only required functions and datatypes are imported.
+  * Remove unused import.
+
 pandoc-citeproc (0.10.1.3)
 
   * Fixed compiler warnings.
