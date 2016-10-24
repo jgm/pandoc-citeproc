@@ -33,7 +33,13 @@ import Text.Pandoc.XML (fromEntities)
 
 renderPandoc :: Style -> Formatted -> [Inline]
 renderPandoc sty
-    = proc (convertQuoted sty) . proc' (clean' sty) . flipFlop . unFormatted
+    = proc (convertQuoted sty) . proc' (clean' sty) . flipFlop .
+      fixBreaks . unFormatted
+
+-- remove leading/trailing LineBreak
+fixBreaks :: [Inline] -> [Inline]
+fixBreaks =
+  dropWhile (== LineBreak) . reverse . dropWhile (== LineBreak) . reverse
 
 renderPandoc' :: Style -> (Formatted, String) -> Block
 renderPandoc' sty (form, citId) = Div ("ref-" ++ citId, [], []) [Para $ renderPandoc sty form]

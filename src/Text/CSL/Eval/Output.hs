@@ -131,7 +131,7 @@ formatOutput o =
 
 addFormatting :: Formatting -> Formatted -> Formatted
 addFormatting f =
-  addLink . addSuffix . pref . quote . font . text_case . strip_periods
+  addDisplay . addLink . addSuffix . pref . quote . font . text_case . strip_periods
   where addLink i = case hyperlink f of
                          ""  -> i
                          url -> Formatted [Link nullAttr (unFormatted i) (url, "")]
@@ -156,6 +156,13 @@ addFormatting f =
                          NativeQuote -> Formatted
                                   [Span ("",["csl-inquote"],[]) ils]
                          _           -> Formatted [Quoted DoubleQuote $ valign ils]
+
+        addDisplay (Formatted []) = Formatted []
+        addDisplay (Formatted ils) =
+                     case display f of
+                          "block"    -> Formatted (LineBreak : ils ++
+                                                       [LineBreak])
+                          _          -> Formatted ils
 
         font (Formatted ils)
           | noDecor f    = Formatted [Span ("",["nodecor"],[]) ils]
