@@ -1,3 +1,7 @@
+pandoc-citeproc (0.10.2)
+
+  * Use linebreaks to simulate display="block" (#85, #261).
+
 pandoc-citeproc (0.10.1.4)
 
   * Use finer grained Pandoc import statements (Albert Krewinkel).
