@@ -1,3 +1,7 @@
+pandoc-citeproc (0.10.2.1)
+
+  * Allow pandoc 1.18.x.
+
 pandoc-citeproc (0.10.2)
 
   * Use linebreaks to simulate display="block" (#85, #261).
