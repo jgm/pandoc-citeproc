@@ -1,5 +1,5 @@
 name:               pandoc-citeproc
-version:            0.10.2
+version:            0.10.2.1
 cabal-version:      >= 1.12
 synopsis:           Supports using pandoc with citeproc
 
@@ -97,7 +97,7 @@ library
     build-depends:    containers, directory, mtl,
                       bytestring, filepath,
                       pandoc-types >= 1.16 && < 1.18,
-                      pandoc >= 1.16 && < 1.18,
+                      pandoc >= 1.16 && < 1.19,
                       tagsoup,
                       aeson >= 0.7 && < 1.1, text, vector,
                       xml-conduit >= 1.2 && < 1.5,
@@ -142,7 +142,7 @@ executable pandoc-citeproc
     ghc-prof-options: -fprof-auto-exported -rtsopts
     build-depends:    base >= 4, pandoc-citeproc,
                       pandoc-types >= 1.16 && < 1.18,
-                      pandoc >= 1.16 && < 1.18,
+                      pandoc >= 1.16 && < 1.19,
                       aeson,
                       aeson-pretty >= 0.8, yaml, bytestring, syb, attoparsec, text,
                       filepath
@@ -164,7 +164,7 @@ executable test-citeproc
     Buildable:    False
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.16 && < 1.18,
-                  pandoc >= 1.16 && < 1.18,
+                  pandoc >= 1.16 && < 1.19,
                   filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7, containers >= 0.4, vector >= 0.10
@@ -178,7 +178,7 @@ test-suite test-pandoc-citeproc
   Hs-Source-Dirs: tests, prelude
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.16 && < 1.18,
-                  pandoc >= 1.16 && < 1.18, filepath,
+                  pandoc >= 1.16 && < 1.19, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7
   default-language: Haskell2010
