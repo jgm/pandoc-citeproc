@@ -1,7 +1,13 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, PatternGuards, OverloadedStrings,
   DeriveDataTypeable, ExistentialQuantification, FlexibleInstances,
   ScopedTypeVariables, GeneralizedNewtypeDeriving, IncoherentInstances,
-  DeriveGeneric #-}
+  DeriveGeneric, CPP #-}
+#if MIN_VERSION_base(4,8,0)
+#define OVERLAPS {-# OVERLAPPING #-}
+#else
+{-# LANGUAGE OverlappingInstances #-}
+#define OVERLAPS
+#endif
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Reference
@@ -161,7 +167,8 @@ instance ToYaml RefDate where
                       , "circa" &= T.pack (if circa r then "1" else "")
                       ]
 
-instance FromJSON [RefDate] where
+instance OVERLAPS
+         FromJSON [RefDate] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
   parseJSON (Object v) = do
     dateParts <- v .:? "date-parts"
@@ -196,7 +203,8 @@ toDatePart refdate =
          (Just y, Nothing, Nothing)  -> [y]
          _                           -> []
 
-instance ToJSON [RefDate] where
+instance OVERLAPS
+         ToJSON [RefDate] where
   toJSON [] = Array V.empty
   toJSON xs = object' $
     case filter (not . null) (map toDatePart xs) of
@@ -204,9 +212,6 @@ instance ToJSON [RefDate] where
          dps -> (["date-parts" .= dps ] ++
                  ["circa" .= (1 :: Int) | or (map circa xs)] ++
                  ["season" .= s | s <- map season xs, s /= mempty])
-
--- instance ToJSON [RefDate]
--- toJSON xs  = Array (V.fromList $ map toJSON xs)
 
 setCirca :: Bool -> RefDate -> RefDate
 setCirca circa' rd = rd{ circa = circa' }

@@ -702,7 +702,8 @@ instance FromJSON Cite where
               v .:? "cite-hash" .!= 0
   parseJSON _ = fail "Could not parse Cite"
 
-instance FromJSON [[Cite]] where
+instance OVERLAPS
+         FromJSON [[Cite]] where
   parseJSON (Array v) = mapM parseJSON $ V.toList v
   parseJSON _ = return []
 
@@ -904,7 +905,8 @@ instance ToJSON Agent where
     ] ++ ["comma-suffix" .= commaSuffix agent | nameSuffix agent /= mempty]
       ++ ["parse-names" .= True | parseNames agent ]
 
-instance FromJSON [Agent] where
+instance OVERLAPS
+         FromJSON [Agent] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
   parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
   parseJSON _ = fail "Could not parse [Agent]"
