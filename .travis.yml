@@ -113,7 +113,7 @@ script:
       stack exec test-citeproc || echo "expected to fail..."
       ;;
     cabal)
-      cabal configure --enable-tests --enable-benchmarks -ffast -v2 --ghc-options="-O0 -Wall -Werror"
+      cabal configure --enable-tests --enable-benchmarks -ffast -v2 --ghc-options="-O0 -Wall -fno-warn-unused-do-bind -Werror"
       cabal build
       cabal check
       cabal test
