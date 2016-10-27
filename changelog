@@ -1,3 +1,7 @@
+pandoc-citeproc (0.10.2.2)
+
+  * Fix overlapping instances with aeson-1.0.2.1 (#263).
+
 pandoc-citeproc (0.10.2.1)
 
   * Allow pandoc 1.18.x.
