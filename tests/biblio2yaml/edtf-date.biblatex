@@ -1,0 +1,75 @@
+@article{item3-3, date={1998/unknown}}
+@article{item3-4, date={1999/open}}
+@article{item3-10, date={2004-04-05T14:34:00}}
+@article{item5-1, date={0000}}
+@article{item5-2, date={-0876}}
+@article{item5-3, date={-0877/-0866}}
+@article{item5-5, date={-0343-02}}
+@article{item5-8, date={1723~}}
+@article{item5-9, date={1723?}}
+@article{item5-10, date={1723?~}}
+@article{item5-11, date={2004-22}}
+@article{item5-12, date={2004-24}}
+
+---
+references:
+- id: item3-3
+  type: article-journal
+  issued:
+  - year: '1998'
+  - {}
+- id: item3-4
+  type: article-journal
+  issued:
+  - year: '1999'
+  - {}
+- id: item3-10
+  type: article-journal
+  issued:
+  - year: '2004'
+    month: '4'
+    day: '5'
+- id: item5-1
+  type: article-journal
+  issued:
+  - year: '-1'
+- id: item5-2
+  type: article-journal
+  issued:
+  - year: '-877'
+- id: item5-3
+  type: article-journal
+  issued:
+  - year: '-878'
+  - year: '-867'
+- id: item5-5
+  type: article-journal
+  issued:
+  - year: '-344'
+    month: '2'
+- id: item5-8
+  type: article-journal
+  issued:
+  - year: 1723
+  - circa: 1
+- id: item5-9
+  type: article-journal
+  issued:
+  - year: 1723
+- id: item5-10
+  type: article-journal
+  issued:
+  - year: 1723
+  - circa: 1
+- id: item5-11
+  type: article-journal
+  issued:
+  - year: '2004'
+    season: '2'
+- id: item5-12
+  type: article-journal
+  issued:
+  - year: '2004'
+    season: '4'
+...
+
