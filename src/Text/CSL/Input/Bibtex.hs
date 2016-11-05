@@ -33,7 +33,8 @@ import Control.Monad.RWS
 import System.Environment (getEnvironment)
 import Text.CSL.Reference
 import Text.CSL.Style (Formatted(..), Locale(..), CslTerm(..), Agent(..))
-import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen)
+import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen,
+                      safeRead)
 import Text.CSL.Parser (parseLocale)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.UTF8 as UTF8
@@ -903,22 +904,53 @@ getDates :: String -> Bib [RefDate]
 getDates f = getRawField f >>= parseDates
 
 parseDates :: Monad m => String-> m [RefDate]
-parseDates = mapM parseDate . splitWhen (== '/')
+parseDates s
+  | '/' `elem` s = mapM parseDate . splitWhen (== '/') $ s
+  -- 199u EDTF format for a range:
+  | 'u' `elem` s = let s1 = map (\c -> if c == 'u' then '0' else c) s
+                       s2 = map (\c -> if c == 'u' then '9' else c) s
+                   in  mapM parseDate [s1, s2]
+  | otherwise    = mapM parseDate [s]
 
 parseDate :: Monad m => String -> m RefDate
+-- EDTF format for year of more than 4 digits, starts with 'y':
+parseDate ('y':xs) = parseDate xs
+parseDate "open" = return RefDate { year = mempty,
+                         month = mempty, season = mempty, day = mempty,
+                         other = mempty, circa = False }
+parseDate "unknown" = return RefDate { year = mempty,
+                         month = mempty, season = mempty, day = mempty,
+                         other = mempty, circa = False }
 parseDate s = do
+  let circa' = '~' `elem` s
   let (year', month', day') =
-        case splitWhen (== '-') s of
-             [y]     -> (y, mempty, mempty)
-             [y,m]   -> (y, m, mempty)
-             [y,m,d] -> (y, m, d)
-             _       -> (mempty, mempty, mempty)
-  return RefDate { year   = Literal $ dropWhile (=='0') year'
-                 , month  = Literal $ dropWhile (=='0') month'
-                 , season = mempty
+        case splitWhen (== '-') $ filter (`notElem` "~?")
+                                -- drop time component:
+                                $ takeWhile (/='T') s of
+             -- initial - is negative year:
+             ["",y]     -> ('-':y, mempty, mempty)
+             ["",y,m]   -> ('-':y, m, mempty)
+             ["",y,m,d] -> ('-':y, m, d)
+             [y]        -> (y, mempty, mempty)
+             [y,m]      -> (y, m, mempty)
+             [y,m,d]    -> (y, m, d)
+             _          -> (mempty, mempty, mempty)
+  let year'' = case safeRead year' of
+                    -- EDTF 0 == CSL JSON -1 (1 BCE)
+                    Just n | n <= 0 -> show (n - 1)
+                    _ -> year'
+  let (season'', month'') = case month' of
+                                 "21" -> ("1","")
+                                 "22" -> ("2","")
+                                 "23" -> ("3","")
+                                 "24" -> ("4","")
+                                 _ -> ("", month')
+  return RefDate { year   = Literal $ dropWhile (=='0') year''
+                 , month  = Literal $ dropWhile (=='0') month''
+                 , season = Literal season''
                  , day    = Literal $ dropWhile (=='0') day'
                  , other  = mempty
-                 , circa  = False
+                 , circa  = circa'
                  }
 
 isNumber :: String -> Bool
