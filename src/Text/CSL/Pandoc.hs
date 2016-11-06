@@ -316,18 +316,20 @@ deNote = topDown go
         go' (Cite cs [Note [Para xs]] : ys) = comb (\zs -> [Cite cs zs]) xs ys
         go' (Note [Para xs] : ys) = comb id xs ys
         go' xs = xs
-        removeLeadingPunct (Str [c] : s : xs)
-          | isSpacy s && (c == ',' || c == '.' || c == ':') = xs
-        removeLeadingPunct xs = xs
-        comb f xs ys =
-           let xs' = if startWithPunct ys && endWithPunct True xs
-                        then initInline $ removeLeadingPunct xs
-                        else removeLeadingPunct xs
-           in f xs' ++ ys
         sanitize :: [Block] -> [Block]
         sanitize [Para xs] =
            [Para $ toCapital xs ++ if endWithPunct False xs then [Space] else []]
         sanitize bs = bs
+
+comb :: ([Inline] -> [Inline]) -> [Inline] -> [Inline] -> [Inline]
+comb f xs ys =
+  let xs' = if startWithPunct ys && endWithPunct True xs
+               then initInline $ removeLeadingPunct xs
+               else removeLeadingPunct xs
+      removeLeadingPunct (Str [c] : s : xs)
+          | isSpacy s && (c == ',' || c == '.' || c == ':') = xs
+      removeLeadingPunct xs = xs
+  in  f xs' ++ ys
 
 -- | Retrieve all citations from a 'Pandoc' docuument. To be used with
 -- 'query'.
