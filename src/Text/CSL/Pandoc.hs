@@ -33,6 +33,7 @@ import System.Directory (doesFileExist, getAppUserDataDirectory)
 import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim)
 import System.IO.Error (isDoesNotExistError)
 import Data.Maybe (fromMaybe)
+import Text.XML (XMLException(..))
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -167,7 +168,9 @@ processCites' (Pandoc meta blocks) = do
                                  else getDefaultCSL
                             Nothing -> getDefaultCSL
   csl <- case cslfile of
-               Just f | not (null f) -> readCSLFile mbLocale f
+               Just f | not (null f) -> E.catch
+                   (readCSLFile mbLocale f) $ \e ->
+                        E.throwIO (InvalidXMLFile f e)
                _ -> do
                  -- get default CSL: look first in ~/.csl, and take
                  -- from distribution if not found
