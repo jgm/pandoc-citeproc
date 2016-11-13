@@ -350,6 +350,7 @@ formatLabel f fm p s
                        form (\fm' -> return . flip OLoc emptyFormatting . output fm') id l (isRange v)
     | "page"    <- s = checkPlural
     | "volume"  <- s = checkPlural
+    | "issue"   <- s = checkPlural
     | "ibid"    <- s = format s p
     | isRole       s = do a <- getAgents' (if s == "editortranslator"
                                               then "editor"
