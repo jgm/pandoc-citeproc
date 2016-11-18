@@ -58,8 +58,8 @@ references:
     given: Isadore
   issued:
   - year: '1979'
-  title: The limitations of human knowledge according to Al-Farabi, <span class="nocase">ibn
-    Bajja</span>, and Maimonides
+  title: The limitations of human knowledge according to Al-Farabi, [ibn Bajja]{.nocase},
+    and Maimonides
   title-short: Limitations of human knowledge
   container-title: Studies in medieval Jewish history and literature
   publisher: Harvard University Press
