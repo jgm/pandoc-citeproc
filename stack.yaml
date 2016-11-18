@@ -9,10 +9,8 @@ packages:
 - '.'
 - location:
     git: https://github.com/jgm/pandoc.git
-    commit: bd71569483e8b471bcd94203e6f7be6b47b65280
+    commit: 31076adf090b8b87f5bab90c8b91f872f81aa2bd
 extra-deps:
-- texmath-0.8.6.6
 - doctemplates-0.1.0.2
 - pandoc-types-1.17.0.4
-- aeson-1.0.2.1
 resolver: lts-7.5
