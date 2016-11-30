@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Main where
 import JSON
 import System.Process
@@ -82,7 +83,11 @@ testCase regenerate csl = do
              showDiff (writeNative def expectedDoc) (writeNative def outDoc)
              when regenerate $
                UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
-                  writeNative def{ writerStandalone = True } outDoc
+#if MIN_VERSION_pandoc(1,19,0)
+                  writeNative def{ writerTemplate = Just "" } outDoc
+#else
+                  writeNative def{ writerStandalone = True }  outDoc
+#endif
              return Failed
      else do
        err "ERROR"
