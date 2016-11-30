@@ -1,3 +1,16 @@
+pandoc-citeproc (0.10.3)
+
+  * Update to work with pandoc 1.19 (including writerStandalone API change).
+  * Updated test case to use bracketed_spans.  Note: this means that tests
+    will fail unless pandoc 1.19 is used.
+  * Fixed pluralization with label for issue (#267).
+  * Factored out `comb` in Text.CSL.Pandoc.
+  * Make it clearer when errors concern CSL parsing (#219).
+    Errors in CSL parsing now point to the CSL file specifically.
+    We convert any error thrown in CSL parsing into an XMLException
+    (from xml-conduit), so the file path will be shown.
+  * Handle EDTF dates in bibtex bibliographies (#240).
+
 pandoc-citeproc (0.10.2.2)
 
   * Fix overlapping instances with aeson-1.0.2.1 (#263).
