@@ -4,7 +4,8 @@ import JSON
 import Text.Printf
 import System.Exit
 import qualified Control.Exception as E
-import Text.Pandoc
+import Text.Pandoc hiding (writeHtmlString)
+import Text.CSL.Compat.Pandoc (writeHtmlString)
 import Data.Char (isSpace, toLower)
 import System.Environment (getArgs)
 import System.Process
@@ -92,13 +93,13 @@ data TestResult =
 testDir :: FilePath
 testDir = "citeproc-test" </> "processor-tests" </> "machines"
 
-handleError :: FilePath -> E.SomeException -> IO TestResult
-handleError path e = do
+handler :: FilePath -> E.SomeException -> IO TestResult
+handler path e = do
   putStrLn $ "[ERROR] " ++ path ++ "\n" ++ show e
   return Errored
 
 runTest :: FilePath -> IO TestResult
-runTest path = E.handle (handleError path) $ do
+runTest path = E.handle (handler path) $ do
   raw <- BL.readFile path
   let testCase = either error id $ eitherDecode raw
   let procOpts = ProcOpts (testBibopts testCase) False

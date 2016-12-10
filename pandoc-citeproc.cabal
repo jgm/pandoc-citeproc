@@ -158,7 +158,7 @@ executable test-citeproc
   Main-Is:        test-citeproc.hs
   Other-Modules:  JSON
                   Prelude
-  Hs-Source-Dirs: tests, prelude
+  Hs-Source-Dirs: tests, prelude, compat
   if flag(test_citeproc)
     Buildable:    True
   else
@@ -170,6 +170,7 @@ executable test-citeproc
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7, containers >= 0.4, vector >= 0.10
   default-language: Haskell2010
+  other-modules:  Text.CSL.Compat.Pandoc
 
 test-suite test-pandoc-citeproc
   Type:           exitcode-stdio-1.0
