@@ -1,7 +1,5 @@
 {-# LANGUAGE CPP #-}
 module Main where
-import JSON
-import System.Process
 import System.Exit
 import System.Directory
 import System.FilePath
@@ -10,19 +8,14 @@ import System.IO
 import Data.Monoid (mempty)
 import System.IO.Temp (withSystemTempDirectory)
 import System.Process (rawSystem)
-import Text.Printf
 import qualified Data.Aeson as Aeson
 import Text.Pandoc.Definition
-import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString.Char8 as B
 import qualified Text.Pandoc.UTF8 as UTF8
 import Text.Pandoc.Shared (normalize)
 import Text.Pandoc.Options (WriterOptions(..))
-import qualified Data.Yaml as Yaml
-import Text.CSL.Compat.Pandoc (writeNative, writeHtmlString, readNative,
-          pipeProcess)
+import Text.CSL.Compat.Pandoc (writeNative, pipeProcess)
 import Text.Pandoc (def)
-import Text.CSL.Pandoc (processCites')
 import Data.List (isSuffixOf)
 import System.Environment
 import Control.Monad (when)
