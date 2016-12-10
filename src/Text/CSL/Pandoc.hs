@@ -326,9 +326,9 @@ comb f xs ys =
   let xs' = if startWithPunct ys && endWithPunct True xs
                then initInline $ removeLeadingPunct xs
                else removeLeadingPunct xs
-      removeLeadingPunct (Str [c] : s : xs)
-          | isSpacy s && (c == ',' || c == '.' || c == ':') = xs
-      removeLeadingPunct xs = xs
+      removeLeadingPunct (Str [c] : s : zs)
+          | isSpacy s && (c == ',' || c == '.' || c == ':') = zs
+      removeLeadingPunct zs = zs
   in  f xs' ++ ys
 
 -- | Retrieve all citations from a 'Pandoc' docuument. To be used with

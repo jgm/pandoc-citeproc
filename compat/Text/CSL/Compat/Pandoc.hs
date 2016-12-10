@@ -26,7 +26,7 @@ import Text.Pandoc.Class (runPure)
 #define WRAPREADER(f) f o = either mempty id . runPure . Pandoc.f o
 #define WRAPWRITER(f) f o = either mempty id . runPure . Pandoc.f o
 #else
-#define WRAPREADER(f) f o -> either mempty id . Pandoc.f o
+#define WRAPREADER(f) f o = either mempty id . Pandoc.f o
 #define WRAPWRITER(f) f = Pandoc.f
 #endif
 
@@ -36,7 +36,12 @@ readHtml, readLaTeX, readMarkdown, readNative ::
 WRAPREADER(readHtml)
 WRAPREADER(readLaTeX)
 WRAPREADER(readMarkdown)
+
+#if MIN_VERSION_pandoc(2,0,0)
 WRAPREADER(readNative)
+#else
+readNative _ = either mempty id . Pandoc.readNative
+#endif
 
 writeMarkdown, writePlain, writeNative, writeHtmlString ::
   WriterOptions -> Pandoc -> String
@@ -50,9 +55,9 @@ pipeProcess :: Maybe [(String, String)] -> FilePath -> [String]
             -> BL.ByteString -> IO (ExitCode,BL.ByteString)
 #if MIN_VERSION_pandoc(2,0,0)
 pipeProcess = Text.Pandoc.Process.pipeProcess
-#elif
+#else
 pipeProcess e f a b = do
   (ec, out, err) <- Text.Pandoc.Process.pipeProcess e f a b
-  BL.hPutStrLn stderr err
+  BL.hPutStr stderr err
   return (ec, out)
 #endif
