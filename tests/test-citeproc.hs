@@ -1,6 +1,5 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
     ScopedTypeVariables #-}
-import JSON
 import Text.Printf
 import System.Exit
 import qualified Control.Exception as E
@@ -11,24 +10,17 @@ import System.Environment (getArgs)
 import System.Process
 import System.IO.Temp (withSystemTempDirectory)
 import Text.Pandoc.Definition (Inline(Span, Str))
-import Text.Pandoc.Generic
-import Text.Pandoc.Walk
 import qualified Text.Pandoc.UTF8 as UTF8
-import Data.Maybe (mapMaybe)
 import Data.Aeson
-import Data.Aeson.Types (Parser)
 import System.FilePath
 import System.Directory
-import Data.List (intercalate, sort, isInfixOf)
+import Data.List (sort, isInfixOf)
 import qualified Data.Vector as V
 import qualified Data.Map as M
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Reference
 import Text.CSL
 import Control.Monad
-import Control.Applicative
 import qualified Data.ByteString.Lazy as BL
 
 data TestCase = TestCase{
@@ -61,7 +53,7 @@ instance FromJSON TestCase where
               v .:? "bibsection" .!= Select [] [] <*>
               v .:? "citations" .!= [] <*>
               v .:? "citation_items" .!= [] <*>
-              v .:  "csl" <*>
+              (parseCSL <$> (v .:  "csl")) <*>
               v .:? "abbreviations" .!= (Abbreviations M.empty) <*>
               v .:  "input" <*>
               v .:  "result"
@@ -102,7 +94,7 @@ runTest :: FilePath -> IO TestResult
 runTest path = E.handle (handler path) $ do
   raw <- BL.readFile path
   let testCase = either error id $ eitherDecode raw
-  let procOpts = ProcOpts (testBibopts testCase) False
+  let procOpts' = ProcOpts (testBibopts testCase) False
   style <- localizeCSL Nothing
            $ (testCsl testCase) { styleAbbrevs = testAbbreviations testCase }
   let refs     = testReferences testCase
@@ -128,7 +120,7 @@ runTest path = E.handle (handler path) $ do
          let result   = assemble mode
               $ map (inlinesToString . renderPandoc style) $
                 (case mode of {CitationMode -> citations; _ -> bibliography})
-                $ citeproc procOpts style refs cites'
+                $ citeproc procOpts' style refs cites'
          if result == expected
             then do
               putStrLn $ "[PASSED] " ++ path ++ "\n"
