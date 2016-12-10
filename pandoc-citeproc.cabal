@@ -150,6 +150,7 @@ executable pandoc-citeproc
     other-modules:    Paths_pandoc_citeproc
                       Prelude
     default-language: Haskell2010
+    ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
     if flag(bibutils)
        default-extensions: CPP
        cpp-options:     -DUSE_BIBUTILS
@@ -169,6 +170,7 @@ executable test-citeproc
                   filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7, containers >= 0.4, vector >= 0.10
+  ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind
   default-language: Haskell2010
   other-modules:  Text.CSL.Compat.Pandoc
 
@@ -183,5 +185,6 @@ test-suite test-pandoc-citeproc
                   pandoc >= 1.16 && < 2.1, filepath,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7
+  ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind
   default-language: Haskell2010
   other-modules:  Text.CSL.Compat.Pandoc
