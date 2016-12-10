@@ -10,7 +10,6 @@ import System.IO.Temp (withSystemTempDirectory)
 import System.Process (rawSystem)
 import qualified Data.Aeson as Aeson
 import Text.Pandoc.Definition
-import qualified Data.ByteString.Char8 as B
 import qualified Text.Pandoc.UTF8 as UTF8
 import Text.Pandoc.Shared (normalize)
 import Text.Pandoc.Options (WriterOptions(..))
