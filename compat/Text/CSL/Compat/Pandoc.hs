@@ -12,7 +12,6 @@ module Text.CSL.Compat.Pandoc (
   readLaTeX,
   pipeProcess ) where
 
-import System.IO (stderr)
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
 import Text.Pandoc (Pandoc, ReaderOptions, WriterOptions)
@@ -20,6 +19,8 @@ import qualified Text.Pandoc as Pandoc
 import qualified Text.Pandoc.Process
 #if MIN_VERSION_pandoc(2,0,0)
 import Text.Pandoc.Class (runPure)
+#elif
+import System.IO (stderr)
 #endif
 
 #if MIN_VERSION_pandoc(2,0,0)
