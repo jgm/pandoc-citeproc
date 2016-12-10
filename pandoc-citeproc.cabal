@@ -90,6 +90,7 @@ library
                       Text.CSL.Output.Plain
                       Text.CSL.Data
     other-modules:    Text.CSL.Util
+                      Text.CSL.Compat.Pandoc
                       Prelude
                       Paths_pandoc_citeproc
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind

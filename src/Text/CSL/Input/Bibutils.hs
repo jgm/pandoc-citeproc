@@ -19,7 +19,8 @@ module Text.CSL.Input.Bibutils
     ) where
 
 import qualified Text.Pandoc.UTF8 as UTF8
-import Text.Pandoc
+import Text.Pandoc hiding (readMarkdown)
+import Text.CSL.Compat.Pandoc (readMarkdown)
 import Data.Char
 import System.FilePath ( takeExtension )
 import Text.CSL.Reference hiding ( Value )
@@ -147,14 +148,8 @@ getExt = takeExtension . map toLower
 
 readYamlBib :: String -> Either String [Reference]
 readYamlBib s =
-#if MIN_VERSION_pandoc(1,14,0)
   case readMarkdown def{readerStandalone = True} s of
-       Right (Pandoc meta _) -> convertRefs (lookupMeta "references" meta)
-       Left e                -> Left (show e)
-#else
-  case readMarkdown def{readerStandalone = True} s of
-       Pandoc meta _ -> convertRefs (lookupMeta "references" meta)
-#endif
+         (Pandoc meta _) -> convertRefs (lookupMeta "references" meta)
 
 convertRefs :: Maybe MetaValue -> Either String [Reference]
 convertRefs Nothing = Right []

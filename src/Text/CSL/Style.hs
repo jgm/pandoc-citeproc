@@ -106,9 +106,9 @@ import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), query,
 import Data.Yaml.Builder(ToYaml(..))
 import qualified Data.Yaml.Builder as Y
 import Text.Pandoc.Definition hiding (Citation, Cite)
-import Text.Pandoc (readHtml, writeMarkdown,
-                    WriterOptions(..), ReaderOptions(..), WrapOption(..),
+import Text.Pandoc (WriterOptions(..), ReaderOptions(..), WrapOption(..),
                     bottomUp, def)
+import Text.CSL.Compat.Pandoc (readHtml, writeMarkdown)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.Builder as B
 import qualified Data.Text as T
@@ -133,16 +133,9 @@ readCSLString s = Walk.walk handleSmallCapsSpans
                 $ case readHtml def{ readerSmart = True
                                    , readerParseRaw = True }
                                 (adjustScTags s) of
-#if MIN_VERSION_pandoc(1,14,0)
-                        Right (Pandoc _ [Plain ils])   -> ils
-                        Right (Pandoc _ [Para  ils])   -> ils
-                        Right (Pandoc _ x)             -> Walk.query (:[]) x
-                        Left  _                        -> []
-#else
                         Pandoc _ [Plain ils]   -> ils
                         Pandoc _ [Para  ils]   -> ils
                         Pandoc _ x             -> Walk.query (:[]) x
-#endif
   -- this is needed for versions of pandoc that don't turn
   -- a span with font-variant:small-caps into a SmallCaps element:
   where handleSmallCapsSpans (Span ("",[],[("style",sty)]) ils)

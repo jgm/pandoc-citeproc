@@ -1,5 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
-{-# LANGUAGE CPP #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Input.Bibtex
@@ -20,7 +20,8 @@ module Text.CSL.Input.Bibtex
 
 import Text.Parsec hiding (optional, (<|>), many, State)
 import Control.Applicative
-import Text.Pandoc (readLaTeX, ReaderOptions(..))
+import Text.Pandoc (ReaderOptions(..))
+import Text.CSL.Compat.Pandoc (readLaTeX)
 import Text.Pandoc.Definition
 import Text.Pandoc.Generic (bottomUp)
 import Data.Default (Default(def))
@@ -937,7 +938,7 @@ parseDate s = do
              _          -> (mempty, mempty, mempty)
   let year'' = case safeRead year' of
                     -- EDTF 0 == CSL JSON -1 (1 BCE)
-                    Just n | n <= 0 -> show (n - 1)
+                    Just (n :: Integer) | n <= 0 -> show (n - 1)
                     _ -> year'
   let (season'', month'') = case month' of
                                  "21" -> ("1","")
@@ -1124,14 +1125,8 @@ optionSet key opts = case lookup key opts of
 
 latex' :: String -> [Block]
 latex' s = Walk.walk removeSoftBreak $
-#if MIN_VERSION_pandoc(1,14,0)
   case readLaTeX def{readerParseRaw = True, readerSmart = True} s of
-                Right (Pandoc _ bs) -> bs
-                _                   -> []
-#else
-  case readLaTeX def{readerParseRaw = True, readerSmart = True} s of
-                Pandoc _ bs         -> bs
-#endif
+                (Pandoc _ bs) -> bs
 
 removeSoftBreak :: Inline -> Inline
 removeSoftBreak SoftBreak = Space
