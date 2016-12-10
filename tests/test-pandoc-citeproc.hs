@@ -17,10 +17,11 @@ import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString.Char8 as B
 import qualified Text.Pandoc.UTF8 as UTF8
 import Text.Pandoc.Shared (normalize)
-import Text.Pandoc.Process (pipeProcess)
 import Text.Pandoc.Options (WriterOptions(..))
 import qualified Data.Yaml as Yaml
-import Text.Pandoc (writeNative, writeHtmlString, readNative, def)
+import Text.CSL.Compat.Pandoc (writeNative, writeHtmlString, readNative,
+          pipeProcess)
+import Text.Pandoc (def)
 import Text.CSL.Pandoc (processCites')
 import Data.List (isSuffixOf)
 import System.Environment
@@ -69,7 +70,7 @@ testCase regenerate csl = do
   testProgPath <- getExecutablePath
   let pandocCiteprocPath = takeDirectory testProgPath </> ".." </>
         "pandoc-citeproc" </> "pandoc-citeproc"
-  (ec, jsonOut, errout) <- pipeProcess
+  (ec, jsonOut) <- pipeProcess
                      (Just [("LANG","en_US.UTF-8"),("HOME",".")])
                      pandocCiteprocPath
                      [] jsonIn
@@ -92,7 +93,6 @@ testCase regenerate csl = do
      else do
        err "ERROR"
        err $ "Error status " ++ show ec
-       err $ UTF8.toStringLazy errout
        return Errored
 
 showDiff :: String -> String -> IO ()
@@ -119,7 +119,7 @@ biblio2yamlTest fp = do
   testProgPath <- getExecutablePath
   let pandocCiteprocPath = takeDirectory testProgPath </> ".." </>
         "pandoc-citeproc" </> "pandoc-citeproc"
-  (ec, result', errout) <- pipeProcess
+  (ec, result') <- pipeProcess
                      (Just [("LANG","en_US.UTF-8"),("HOME",".")])
                      pandocCiteprocPath
                      ["--bib2yaml", "-f", drop 1 $ takeExtension fp]
@@ -136,5 +136,4 @@ biblio2yamlTest fp = do
      else do
        err "ERROR"
        err $ "Error status " ++ show ec
-       err $ UTF8.toStringLazy errout
        return Errored

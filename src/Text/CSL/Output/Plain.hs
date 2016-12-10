@@ -18,7 +18,8 @@ module Text.CSL.Output.Plain
     ) where
 
 import Text.CSL.Style
-import Text.Pandoc
+import Text.CSL.Compat.Pandoc (writePlain)
+import Text.Pandoc (Block(Plain), Pandoc(..), nullMeta, def)
 
 -- | Render the 'Formatted' into a plain text string.
 renderPlain :: Formatted -> String
