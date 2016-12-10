@@ -19,7 +19,7 @@ import qualified Text.Pandoc as Pandoc
 import qualified Text.Pandoc.Process
 #if MIN_VERSION_pandoc(2,0,0)
 import Text.Pandoc.Class (runPure)
-#elif
+#else
 import System.IO (stderr)
 #endif
 
