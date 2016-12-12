@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, ScopedTypeVariables #-}
 -- | Compatibility module to work around differences in the
 -- types of functions between pandoc < 2.0 and pandoc >= 2.0.
 module Text.CSL.Compat.Pandoc (
@@ -10,17 +10,25 @@ module Text.CSL.Compat.Pandoc (
   readHtml,
   readMarkdown,
   readLaTeX,
+  fetchItem,
   pipeProcess ) where
 
+import qualified Control.Exception as E
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
+import Data.ByteString as B
+import Text.Pandoc.MIME (MimeType)
 import Text.Pandoc (Pandoc, ReaderOptions, WriterOptions)
 import qualified Text.Pandoc as Pandoc
 import qualified Text.Pandoc.Process
 #if MIN_VERSION_pandoc(2,0,0)
-import Text.Pandoc.Class (runPure)
+import Text.Pandoc.Error (PandocError)
+import Text.Pandoc.Class (runPure, runIO)
+import qualified Text.Pandoc.Class (fetchItem)
+import Control.Monad.Except (runExceptT, lift)
 #else
 import System.IO (stderr)
+import Text.Pandoc.Shared (fetchItem)
 #endif
 
 #if MIN_VERSION_pandoc(2,0,0)
@@ -61,4 +69,18 @@ pipeProcess e f a b = do
   (ec, out, err) <- Text.Pandoc.Process.pipeProcess e f a b
   BL.hPutStr stderr err
   return (ec, out)
+#endif
+
+fetchItem :: Maybe String
+          -> String
+          -> IO (Either E.SomeException (B.ByteString, Maybe MimeType))
+#if MIN_VERSION_pandoc(2,0,0)
+fetchItem mbd s = do
+  res <- runIO $ runExceptT $ lift $ Text.Pandoc.Class.fetchItem mbd s
+  return $ case res of
+       Left e          -> Left (E.toException e)
+       Right (Left (e :: PandocError))  -> Left (E.toException e)
+       Right (Right r) -> Right r
+#else
+fetchItem = Text.Pandoc.Class.fetchItem
 #endif

@@ -31,7 +31,7 @@ import Text.Pandoc.Shared (safeRead)
 import Text.XML.Cursor
 import Data.Maybe (listToMaybe, fromMaybe)
 import Text.Pandoc.UTF8 (fromStringLazy)
-import Text.Pandoc.Shared (fetchItem)
+import Text.CSL.Compat.Pandoc (fetchItem)
 import Text.CSL.Data (getLocale)
 
 -- | Parse a 'String' into a 'Style' (with default locale).
