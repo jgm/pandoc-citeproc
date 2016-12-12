@@ -11,7 +11,6 @@ import System.Process (rawSystem)
 import qualified Data.Aeson as Aeson
 import Text.Pandoc.Definition
 import qualified Text.Pandoc.UTF8 as UTF8
-import Text.Pandoc.Shared (normalize)
 import Text.Pandoc.Options (WriterOptions(..))
 import Text.CSL.Compat.Pandoc (writeNative, pipeProcess)
 import Text.Pandoc (def)
@@ -58,7 +57,7 @@ testCase regenerate csl = do
   indataNative <- UTF8.readFile $ "tests/" ++ csl ++ ".in.native"
   expectedNative <- UTF8.readFile $ "tests/" ++ csl ++ ".expected.native"
   let jsonIn = Aeson.encode $ (read indataNative :: Pandoc)
-  let expectedDoc = normalize $ read expectedNative
+  let expectedDoc = read expectedNative
   testProgPath <- getExecutablePath
   let pandocCiteprocPath = takeDirectory testProgPath </> ".." </>
         "pandoc-citeproc" </> "pandoc-citeproc"
@@ -68,7 +67,7 @@ testCase regenerate csl = do
                      [] jsonIn
   if ec == ExitSuccess
      then do
-       let outDoc = normalize $ fromMaybe mempty $ Aeson.decode $ jsonOut
+       let outDoc = fromMaybe mempty $ Aeson.decode $ jsonOut
        if outDoc == expectedDoc
           then err "PASSED" >> return Passed
           else do

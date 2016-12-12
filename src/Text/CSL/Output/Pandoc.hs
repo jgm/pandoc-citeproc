@@ -48,6 +48,8 @@ clean' :: Style -> [Inline] -> [Inline]
 clean' _   []  = []
 clean' sty (i:is) =
   case (i:is) of
+      (Str "" : rest) -> clean' sty rest
+      (Str xs : Str ys : rest) -> clean' sty $ Str (xs ++ ys) : rest
       (Link a1 lab1 ('#':r1, "") : Str "\8211" : Link a2 lab2 ('#':r2, "") : rest)
         | r1 == r2, a1 == a2 ->
            Link a1 (lab1 ++ [Str "\8211"] ++ lab2) ('#':r1, "") : clean' sty rest

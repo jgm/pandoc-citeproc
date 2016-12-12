@@ -1,3 +1,5 @@
 Pandoc (Meta {unMeta = fromList [("csl",MetaInlines [Str "tests/chicago-note-bibliography.csl"]),("references",MetaList [MetaMap (fromList [("author",MetaMap (fromList [("family",MetaInlines [Str "Author"]),("given",MetaList [MetaInlines [Str "Ann"]])])),("container-title",MetaInlines [Str "Journal"]),("id",MetaInlines [Str "item1"]),("issued",MetaList [MetaMap (fromList [("year",MetaString "2011")])]),("title",MetaInlines [Str "Title"]),("type",MetaInlines [Str "article-newspaper"])])])]})
-[Para [Str "Foo",Str ".",Cite [Citation {citationId = "item1", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 1}] [Note [Para [Str "Author",Str ",",Space,Str "\8220",Str "Title",Str ".",Str "\8221",Space]]],Str ""]
-,Div ("refs",["references"],[]) [Div ("ref-item1",[],[]) [Para [Str "Author",Str ",",Space,Str "Ann",Str ".",Space,Str "\8220",Str "Title",Str ".",Str "\8221",Space,Emph [Str "Journal"],Str ",",Space,Str "2011",Str "."]]]]
+[Para [Str "Foo",Str ".",Cite [Citation {citationId = "item1", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 1}] [Note [Para [Str "Author,",Space,Str "\8220Title.\8221"]]]]
+,Div ("refs",["references"],[])
+ [Div ("ref-item1",[],[])
+  [Para [Str "Author,",Space,Str "Ann.",Space,Str "\8220Title.\8221",Space,Emph [Str "Journal"],Str ",",Space,Str "2011."]]]]

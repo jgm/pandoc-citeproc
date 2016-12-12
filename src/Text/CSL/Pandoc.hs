@@ -21,7 +21,7 @@ import Text.CSL.Proc
 import Text.CSL.Output.Pandoc (renderPandoc, renderPandoc')
 import qualified Text.CSL.Style as CSL
 import Text.CSL.Parser
-import Text.CSL.Output.Pandoc ( headInline, tailFirstInlineStr, initInline,
+import Text.CSL.Output.Pandoc ( headInline, tailInline, initInline,
                                 toCapital )
 import Text.CSL.Data (getDefaultCSL)
 import Text.Parsec hiding (State, (<|>))
@@ -272,7 +272,7 @@ mvPunct :: Bool -> Style -> [Inline] -> [Inline]
 mvPunct _ _ (x : Space : xs) | isSpacy x = x : xs
 mvPunct moveNotes _ (s : x : ys) | isSpacy s, isNote x, startWithPunct ys =
   if moveNotes
-     then Str (headInline ys) : x : tailFirstInlineStr ys
+     then Str (headInline ys) : x : tailInline ys
      else x : ys
 mvPunct moveNotes _ (Cite cs ils : ys) |
      length ils > 1
@@ -280,7 +280,7 @@ mvPunct moveNotes _ (Cite cs ils : ys) |
    , startWithPunct ys
    , moveNotes
    = Cite cs (init ils ++ [Str (headInline ys) | not (endWithPunct False (init ils))]
-     ++ [last ils]) : tailFirstInlineStr ys
+     ++ [last ils]) : tailInline ys
 mvPunct moveNotes sty (q@(Quoted _ _) : w@(Str _) : x : ys)
   | isNote x, isPunctuationInQuote sty, moveNotes  =
     mvPunctInsideQuote q w ++ (x : ys)
@@ -305,8 +305,8 @@ startWithPunct = and . map (`elem` (".,;:!?" :: String)) . headInline
 
 deNote :: Pandoc -> Pandoc
 deNote = topDown go
-  where go (Cite (c:cs) [Note xs]) =
-            Cite (c:cs) [Note $ sanitize xs]
+  where go (Cite (c:cs) [Note [Para xs]]) =
+            Cite (c:cs) [Note [Para $ toCapital xs]]
         go (Note xs) = Note $ topDown go' xs
         go x = x
         go' (x : Cite cs [Note [Para xs]] : ys) | not (isSpacy x) =
@@ -316,10 +316,6 @@ deNote = topDown go
         go' (Cite cs [Note [Para xs]] : ys) = comb (\zs -> [Cite cs zs]) xs ys
         go' (Note [Para xs] : ys) = comb id xs ys
         go' xs = xs
-        sanitize :: [Block] -> [Block]
-        sanitize [Para xs] =
-           [Para $ toCapital xs ++ if endWithPunct False xs then [Space] else []]
-        sanitize bs = bs
 
 comb :: ([Inline] -> [Inline]) -> [Inline] -> [Inline] -> [Inline]
 comb f xs ys =
