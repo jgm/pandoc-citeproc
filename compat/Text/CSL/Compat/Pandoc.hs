@@ -17,11 +17,11 @@ import qualified Control.Exception as E
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
 import Data.ByteString as B
-import Text.Pandoc.MIME (MimeType)
 import Text.Pandoc (Pandoc, ReaderOptions, WriterOptions)
 import qualified Text.Pandoc as Pandoc
 import qualified Text.Pandoc.Process
 #if MIN_VERSION_pandoc(2,0,0)
+import Text.Pandoc.MIME (MimeType)
 import Text.Pandoc.Error (PandocError)
 import Text.Pandoc.Class (runPure, runIO)
 import qualified Text.Pandoc.Class (fetchItem)
@@ -29,6 +29,8 @@ import Control.Monad.Except (runExceptT, lift)
 #else
 import System.IO (stderr)
 import Text.Pandoc.Shared (fetchItem)
+
+type MimeType = String
 #endif
 
 #if MIN_VERSION_pandoc(2,0,0)
