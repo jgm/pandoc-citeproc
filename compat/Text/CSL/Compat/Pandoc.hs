@@ -84,5 +84,5 @@ fetchItem mbd s = do
        Right (Left (e :: PandocError))  -> Left (E.toException e)
        Right (Right r) -> Right r
 #else
-fetchItem = Text.Pandoc.Class.fetchItem
+fetchItem = Text.Pandoc.Shared.fetchItem
 #endif
