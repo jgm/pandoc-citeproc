@@ -28,7 +28,7 @@ import qualified Text.Pandoc.Class (fetchItem)
 import Control.Monad.Except (runExceptT, lift)
 #else
 import System.IO (stderr)
-import Text.Pandoc.Shared (fetchItem)
+import qualified Text.Pandoc.Shared (fetchItem)
 
 type MimeType = String
 #endif
