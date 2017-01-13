@@ -186,7 +186,10 @@ hasLowercaseWord = any startsWithLowercase . splitStrWhen isPunctuation
         startsWithLowercase _           = False
 
 splitUpStr :: [Inline] -> [Inline]
-splitUpStr = splitStrWhen (\c -> isPunctuation c || c == '\160')
+splitUpStr ils =
+  case reverse (splitStrWhen (\c -> isPunctuation c || c == '\160') ils) of
+       [] -> []
+       (x:xs) -> reverse $ Span ("",["lastword"],[]) [x] : xs
 
 unTitlecase :: [Inline] -> [Inline]
 unTitlecase zs = evalState (caseTransform untc zs) SentenceBoundary
@@ -194,6 +197,8 @@ unTitlecase zs = evalState (caseTransform untc zs) SentenceBoundary
           st <- get
           case (w, st) of
                (y, NoBoundary) -> return y
+               (Str (x:xs), LastWordBoundary) | isUpper x ->
+                 return $ Str (map toLower (x:xs))
                (Str (x:xs), WordBoundary) | isUpper x ->
                  return $ Str (map toLower (x:xs))
                (Str (x:xs), SentenceBoundary) | isLower x ->
@@ -212,16 +217,40 @@ protectCase zs = evalState (caseTransform protect zs) SentenceBoundary
                  _          -> return $ Span ("",["nocase"],[]) xs
         protect x = return x
 
+-- From CSL docs:
+-- "Title case conversion (with text-case set to “title”) for English-language
+-- items is performed by:
+--
+-- For uppercase strings, the first character of each word remains capitalized.
+-- All other letters are lowercased.
+-- For lower or mixed case strings, the first character of each lowercase word
+-- is capitalized. The case of words in mixed or uppercase stays the same.
+-- In both cases, stop words are lowercased, unless they are the first or last
+-- word in the string, or follow a colon. The stop words are “a”, “an”, “and”,
+-- “as”, “at”, “but”, “by”, “down”, “for”, “from”, “in”, “into”, “nor”, “of”,
+-- “on”, “onto”, “or”, “over”, “so”, “the”, “till”, “to”, “up”, “via”, “with”,
+-- and “yet”.
 titlecase :: [Inline] -> [Inline]
 titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
   where tc (Str (x:xs)) = do
           st <- get
           return $ case st of
-                        WordBoundary -> if isShortWord (x:xs) ||
-                                             not (isAscii x && isLetter x)
-                                           then Str (x:xs)
-                                           else Str (toUpper x : xs)
-                        SentenceBoundary -> Str (toUpper x : xs)
+                        LastWordBoundary ->
+                          case (x:xs) of
+                           s | not (isAscii x) -> Str s
+                             | isShortWord s   -> Str s
+                             | isMixedCase s   -> Str s
+                             | otherwise       -> Str (toUpper x:map toLower xs)
+                        WordBoundary ->
+                          case (x:xs) of
+                           s | not (isAscii x) -> Str s
+                             | isShortWord s   -> Str (map toLower s)
+                             | isMixedCase s   -> Str s
+                             | otherwise       -> Str (toUpper x:map toLower xs)
+                        SentenceBoundary ->
+                           if isMixedCase (x:xs)
+                              then Str (x:xs)
+                              else Str (toUpper x : xs)
                         _ -> Str (x:xs)
         tc (Span ("",["nocase"],[]) xs) = return $ Span ("",["nocase"],[]) xs
         tc x = return x
@@ -231,7 +260,13 @@ titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
                       ,"in","into","nor","of","on","onto","or","over","so"
                       ,"the","till","to","up","van","von","via","with","yet"]
 
-data CaseTransformState = WordBoundary | SentenceBoundary | NoBoundary
+isMixedCase :: String -> Bool
+isMixedCase xs = any isUpper xs && any isLower xs
+
+data CaseTransformState = WordBoundary
+                        | LastWordBoundary
+                        | SentenceBoundary
+                        | NoBoundary
 
 caseTransform :: (Inline -> State CaseTransformState Inline) -> [Inline]
               -> State CaseTransformState [Inline]
@@ -261,6 +296,12 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
                res <- xform (Str xs)
                put NoBoundary
                return $ res : acc
+        go acc (Span ("",["lastword"],[]) [x]) = do
+               b <- get
+               case b of
+                    WordBoundary -> put LastWordBoundary
+                    _ -> return ()
+               go acc x
         go acc (Span ("",classes,[]) xs)
           | null classes || classes == ["nocase"] = do
                res <- xform (Span ("",classes,[]) xs)
