@@ -49,8 +49,7 @@ import Data.Aeson
 import Data.Aeson.Types (Parser)
 import Data.Text (Text)
 import qualified Data.Text as T
-import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation,
-                  isLetter, isAscii)
+import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation, isAscii)
 import qualified Data.Traversable
 import Text.Pandoc.Shared (safeRead, stringify)
 import Text.Pandoc.Walk (walk)
