@@ -238,16 +238,18 @@ titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
                           case (x:xs) of
                            s | not (isAscii x) -> Str s
                              | isShortWord s   -> Str s
+                             | all isUpper s   -> Str s
                              | isMixedCase s   -> Str s
                              | otherwise       -> Str (toUpper x:map toLower xs)
                         WordBoundary ->
                           case (x:xs) of
                            s | not (isAscii x) -> Str s
+                             | all isUpper s   -> Str s
                              | isShortWord s   -> Str (map toLower s)
                              | isMixedCase s   -> Str s
                              | otherwise       -> Str (toUpper x:map toLower xs)
                         SentenceBoundary ->
-                           if isMixedCase (x:xs)
+                           if isMixedCase (x:xs) || (all isUpper (x:xs))
                               then Str (x:xs)
                               else Str (toUpper x : xs)
                         _ -> Str (x:xs)
