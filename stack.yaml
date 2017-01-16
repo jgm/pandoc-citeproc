@@ -10,8 +10,10 @@ packages:
 - location:
     git: https://github.com/jgm/pandoc.git
     commit: 3c47e5d448bd346cc91ed6ba42261b8bc8178d04
+  extra-dep: true
 extra-deps:
 - doctemplates-0.1.0.2
 - pandoc-types-1.17.0.4
 - texmath-0.9
-resolver: lts-7.12
+- skylighting-0.1.0.1
+resolver: lts-7.14
