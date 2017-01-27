@@ -119,18 +119,15 @@ formatNames ea del p s as n
 
     | EtAl fm t <- n = do
         o <- gets (options . env)
-        if (getOptionVal "et-al-min" o == [])
-           then return []
-           else do
-             et <- gets etal
-             let i = length as - length et
-                 t' = if null t then "et-al" else t
-             r <- mapM (et_al o False t' fm del) [i .. length as]
-             let (r',r'') = case r of
-                              (x:xs) -> (x, xs)
-                              []     -> ([],[])
-             updateEtal r''
-             return r'
+        et <- gets etal
+        let i = length as - length et
+            t' = if null t then "et-al" else t
+        r <- mapM (et_al o False t' fm del) [i .. length as]
+        let (r',r'') = case r of
+                         (x:xs) -> (x, xs)
+                         []     -> ([],[])
+        updateEtal r''
+        return r'
 
     | otherwise = return []
     where
