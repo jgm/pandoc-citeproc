@@ -1,3 +1,19 @@
+pandoc-citeproc (0.10.4)
+
+  * Fixed 'et al' in certain styles (#274).  The `et al` phrase was
+    not being appended in the bibliography in ieee.csl and some others.
+  * Leave ALLCAPS words alone in titlecase transformation.
+    See #273.  There is some confusion about the citeproc
+    rules here, but this follows citeproc-js behavior.
+  * Improved title case rules to conform better to CSL spec (#273).
+    We now correctly retain case on mixed-case words and don't
+    decapitalize "small words" when they're the last word.
+  * Use readerSmart in parsing yaml bibliographies (#272).
+  * Bumped some dependency version bounds.
+  * Improved .travis.yml.
+  * Added Text.CSL.Compat.Pandoc module to work around version differences.
+    This allows building with the typeclass branch of pandoc.
+
 pandoc-citeproc (0.10.3)
 
   * Update to work with pandoc 1.19 (including writerStandalone API change).
