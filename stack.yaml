@@ -7,13 +7,14 @@ flags:
     debug: false
 packages:
 - '.'
-- location:
-    git: https://github.com/jgm/pandoc.git
-    commit: 3c47e5d448bd346cc91ed6ba42261b8bc8178d04
-  extra-dep: true
+# - location:
+#     git: https://github.com/jgm/pandoc.git
+#     commit: 411434bf130a3116290c7ca54358678e03d0d92b
+#   extra-dep: true
 extra-deps:
+- pandoc-1.19.1
 - doctemplates-0.1.0.2
 - pandoc-types-1.17.0.4
 - texmath-0.9
-- skylighting-0.1.0.1
+# - skylighting-0.1.1.2
 resolver: lts-7.14
