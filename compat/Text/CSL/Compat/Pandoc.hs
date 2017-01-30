@@ -17,7 +17,7 @@ import qualified Control.Exception as E
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
 import Data.ByteString as B
-import Text.Pandoc (Pandoc, ReaderOptions, WriterOptions)
+import Text.Pandoc (Pandoc, ReaderOptions(..), WriterOptions)
 import qualified Text.Pandoc as Pandoc
 import qualified Text.Pandoc.Process
 #if MIN_VERSION_pandoc(2,0,0)
@@ -65,8 +65,7 @@ WRAPWRITER(writeNative)
 writeHtmlString o =
   either mempty id . runPure . Pandoc.writeHtml4String o
 #else
-writeHtmlString o =
-  either mempty id . runPure . Pandoc.writeHtmlString o
+writeHtmlString = Pandoc.writeHtmlString
 #endif
 
 pipeProcess :: Maybe [(String, String)] -> FilePath -> [String]
