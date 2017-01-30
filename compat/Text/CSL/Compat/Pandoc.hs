@@ -62,9 +62,11 @@ WRAPWRITER(writePlain)
 WRAPWRITER(writeNative)
 
 #if MIN_VERSION_pandoc(2,0,0)
-writeHtmlString o = either mempty id . runPure . Pandoc.writeHtml4String o
+writeHtmlString o =
+  either mempty id . runPure . Pandoc.writeHtml4String o
 #else
-WRAPWRITER(writeHtmlString)
+writeHtmlString o =
+  either mempty id . runPure . Pandoc.writeHtmlString o{ readerSmart = True }
 #endif
 
 pipeProcess :: Maybe [(String, String)] -> FilePath -> [String]
