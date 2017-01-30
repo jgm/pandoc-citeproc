@@ -1125,7 +1125,7 @@ optionSet key opts = case lookup key opts of
 
 latex' :: String -> [Block]
 latex' s = Walk.walk removeSoftBreak $
-  case readLaTeX def{readerParseRaw = True, readerSmart = True} s of
+  case readLaTeX def{readerParseRaw = True } s of
                 (Pandoc _ bs) -> bs
 
 removeSoftBreak :: Inline -> Inline

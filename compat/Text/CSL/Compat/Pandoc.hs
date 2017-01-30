@@ -37,7 +37,7 @@ type MimeType = String
 #define WRAPREADER(f) f o = either mempty id . runPure . Pandoc.f o
 #define WRAPWRITER(f) f o = either mempty id . runPure . Pandoc.f o
 #else
-#define WRAPREADER(f) f o = either mempty id . Pandoc.f o
+#define WRAPREADER(f) f o = either mempty id . Pandoc.f o{ readerSmart = True }
 #define WRAPWRITER(f) f = Pandoc.f
 #endif
 
@@ -66,7 +66,7 @@ writeHtmlString o =
   either mempty id . runPure . Pandoc.writeHtml4String o
 #else
 writeHtmlString o =
-  either mempty id . runPure . Pandoc.writeHtmlString o{ readerSmart = True }
+  either mempty id . runPure . Pandoc.writeHtmlString o
 #endif
 
 pipeProcess :: Maybe [(String, String)] -> FilePath -> [String]
