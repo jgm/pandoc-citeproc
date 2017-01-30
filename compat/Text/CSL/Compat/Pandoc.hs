@@ -60,7 +60,12 @@ writeMarkdown, writePlain, writeNative, writeHtmlString ::
 WRAPWRITER(writeMarkdown)
 WRAPWRITER(writePlain)
 WRAPWRITER(writeNative)
+
+#if MIN_VERSION_pandoc(2,0,0)
+writeHtmlString o = either mempty id . runPure . Pandoc.writeHtml4String o
+#else
 WRAPWRITER(writeHtmlString)
+#endif
 
 pipeProcess :: Maybe [(String, String)] -> FilePath -> [String]
             -> BL.ByteString -> IO (ExitCode,BL.ByteString)
