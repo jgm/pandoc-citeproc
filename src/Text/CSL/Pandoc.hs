@@ -369,7 +369,7 @@ toCslCite locMap c
 locatorWords :: LocatorMap -> [Inline] -> (String, String, [Inline])
 locatorWords locMap inp =
   case parse (pLocatorWords locMap) "suffix" $
-         splitStrWhen (\c -> isPunctuation c || isSpace c) inp of
+         splitStrWhen (\c -> isLocatorPunct c || isSpace c) inp of
        Right r   -> r
        Left _    -> ("","",inp)
 
@@ -435,11 +435,13 @@ pDigit = do
       _ -> mzero
 
 pLocatorPunct :: Parsec [Inline] st Inline
-pLocatorPunct = pMatch isLocatorPunct
+pLocatorPunct = pMatch isLocatorPunct'
+  where isLocatorPunct' (Str [c]) = isLocatorPunct c
+        isLocatorPunct' _ = False
 
-isLocatorPunct :: Inline -> Bool
-isLocatorPunct (Str [c]) = isPunctuation c
-isLocatorPunct _         = False
+isLocatorPunct :: Char -> Bool
+isLocatorPunct ':' = False
+isLocatorPunct c   = isPunctuation c
 
 type LocatorMap = M.Map String String
 
