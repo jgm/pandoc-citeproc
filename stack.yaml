@@ -12,7 +12,8 @@ packages:
 #     commit: 411434bf130a3116290c7ca54358678e03d0d92b
 #   extra-dep: true
 extra-deps:
-- pandoc-1.19.1
+- pandoc-1.19.2
+- skylighting-0.1.1.4
 - doctemplates-0.1.0.2
 - pandoc-types-1.17.0.4
 - texmath-0.9
