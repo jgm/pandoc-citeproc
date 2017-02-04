@@ -123,6 +123,8 @@ citeproc ops s rs cs
          OYearSuf y citeid d f{hyperlink = "#ref-" ++ citeid}
       addLink' citeid (OCitNum n f) =
          OCitNum n f{hyperlink = "#ref-" ++ citeid}
+      addLink' citeid (OCitLabel l f) =
+         OCitLabel l f{hyperlink = "#ref-" ++ citeid}
       addLink' _ x = x
 
 -- | Given the CSL 'Style' and the list of 'Reference's sort the list

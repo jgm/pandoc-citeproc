@@ -36,6 +36,7 @@ module Text.CSL.Reference ( Literal(..)
                           , mkRefDate
                           , RefType(..)
                           , CNum(..)
+                          , CLabel(..)
                           , Reference(..)
                           , emptyReference
                           , numericVars
@@ -113,6 +114,7 @@ isValueSet val
     | Just v <- fromValue val :: Maybe [RefDate] = v /= []
     | Just v <- fromValue val :: Maybe Int       = v /= 0
     | Just v <- fromValue val :: Maybe CNum      = v /= 0
+    | Just v <- fromValue val :: Maybe CLabel    = v /= mempty
     | Just _ <- fromValue val :: Maybe Empty     = True
     | otherwise = False
 
@@ -298,6 +300,21 @@ instance ToJSON CNum where
 instance ToYaml CNum where
   toYaml r = Y.string (T.pack $ show $ unCNum r)
 
+newtype CLabel = CLabel { unCLabel :: String } deriving ( Show, Read, Eq, Typeable, Data, Generic )
+
+instance Monoid CLabel where
+    mempty = CLabel mempty
+    mappend (CLabel a) (CLabel b) = CLabel (mappend a b)
+
+instance FromJSON CLabel where
+  parseJSON x = CLabel `fmap` parseString x
+
+instance ToJSON CLabel where
+  toJSON (CLabel s) = toJSON s
+
+instance ToYaml CLabel where
+  toYaml (CLabel s) = toYaml $ T.pack s
+
 -- | The 'Reference' record.
 data Reference =
     Reference
@@ -379,7 +396,7 @@ data Reference =
 
     , citationNumber           :: CNum
     , firstReferenceNoteNumber :: Int
-    , citationLabel            :: Literal
+    , citationLabel            :: CLabel
     } deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 instance FromJSON Reference where
@@ -460,7 +477,7 @@ instance FromJSON Reference where
        v .:? "language" .!= "" <*>
        v .:? "citation-number" .!= CNum 0 <*>
        ((v .: "first-reference-note-number" >>= parseInt) <|> return 0) <*>
-       v .:? "citation-label" .!= "")
+       v .:? "citation-label" .!= mempty)
     where takeFirstNum (Formatted (Str xs : _)) =
             case takeWhile isDigit xs of
                    []   -> mempty
@@ -658,7 +675,9 @@ instance ToYaml Reference where
          then id
          else (("first-reference-note-number" Y..=
                 firstReferenceNoteNumber ref) :)
-    , "citation-label" &= citationLabel ref
+    , if citationLabel ref == mempty
+         then id
+         else (("citation-label" Y..= citationLabel ref) :)
     ]
 
 emptyReference :: Reference
