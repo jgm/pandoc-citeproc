@@ -17,7 +17,7 @@ import qualified Control.Exception as E
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
 import Data.ByteString as B
-import Text.Pandoc (Pandoc, ReaderOptions, WriterOptions)
+import Text.Pandoc (Pandoc, ReaderOptions(..), WriterOptions)
 import qualified Text.Pandoc as Pandoc
 import qualified Text.Pandoc.Process
 #if MIN_VERSION_pandoc(2,0,0)
@@ -37,7 +37,7 @@ type MimeType = String
 #define WRAPREADER(f) f o = either mempty id . runPure . Pandoc.f o
 #define WRAPWRITER(f) f o = either mempty id . runPure . Pandoc.f o
 #else
-#define WRAPREADER(f) f o = either mempty id . Pandoc.f o
+#define WRAPREADER(f) f o = either mempty id . Pandoc.f o{ readerSmart = True }
 #define WRAPWRITER(f) f = Pandoc.f
 #endif
 
@@ -71,7 +71,13 @@ writeMarkdown, writePlain, writeNative, writeHtmlString ::
 WRAPWRITER(writeMarkdown)
 WRAPWRITER(writePlain)
 WRAPWRITER(writeNative)
-WRAPWRITER(writeHtmlString)
+
+#if MIN_VERSION_pandoc(2,0,0)
+writeHtmlString o =
+  either mempty id . runPure . Pandoc.writeHtml4String o
+#else
+writeHtmlString = Pandoc.writeHtmlString
+#endif
 
 pipeProcess :: Maybe [(String, String)] -> FilePath -> [String]
             -> BL.ByteString -> IO (ExitCode,BL.ByteString)

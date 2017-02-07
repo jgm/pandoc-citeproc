@@ -130,8 +130,7 @@ import qualified Data.Vector as V
 
 readCSLString :: String -> [Inline]
 readCSLString s = Walk.walk handleSmallCapsSpans
-                $ case readHtml def{ readerSmart = True
-                                   , readerParseRaw = True }
+                $ case readHtml def{ readerParseRaw = True }
                                 (adjustScTags s) of
                         Pandoc _ [Plain ils]   -> ils
                         Pandoc _ [Para  ils]   -> ils
