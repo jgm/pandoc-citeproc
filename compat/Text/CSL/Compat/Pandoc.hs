@@ -45,8 +45,19 @@ readHtml, readLaTeX, readMarkdown, readNative ::
   ReaderOptions -> String -> Pandoc
 
 WRAPREADER(readHtml)
-WRAPREADER(readLaTeX)
 WRAPREADER(readMarkdown)
+
+#if MIN_VERSION_pandoc(2,0,0)
+readLaTeX o =
+  either mempty id . runPure . readLaTeX o{ readerSmart = True,
+                                            readerExtensions =
+                                              enableExtension Ext_raw_tex
+                                               (readerExtensions o) }
+#else
+readLaTeX o =
+  either mempty id . readLaTeX o{ readerParseRaw = True,
+                                  readerSmart = True }
+#endif
 
 #if MIN_VERSION_pandoc(2,0,0)
 WRAPREADER(readNative)
