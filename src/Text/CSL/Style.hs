@@ -106,8 +106,7 @@ import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), query,
 import Data.Yaml.Builder(ToYaml(..))
 import qualified Data.Yaml.Builder as Y
 import Text.Pandoc.Definition hiding (Citation, Cite)
-import Text.Pandoc (WriterOptions(..), ReaderOptions(..), WrapOption(..),
-                    bottomUp, def)
+import Text.Pandoc (bottomUp)
 import Text.CSL.Compat.Pandoc (readHtml, writeMarkdown)
 import qualified Text.Pandoc.Walk as Walk
 import qualified Text.Pandoc.Builder as B
@@ -130,8 +129,7 @@ import qualified Data.Vector as V
 
 readCSLString :: String -> [Inline]
 readCSLString s = Walk.walk handleSmallCapsSpans
-                $ case readHtml def{ readerParseRaw = True }
-                                (adjustScTags s) of
+                $ case readHtml (adjustScTags s) of
                         Pandoc _ [Plain ils]   -> ils
                         Pandoc _ [Para  ils]   -> ils
                         Pandoc _ x             -> Walk.query (:[]) x
@@ -156,13 +154,13 @@ adjustScTags zs =
 
 writeYAMLString :: [Inline] -> String
 writeYAMLString ils =
-  trimr $ writeMarkdown def{writerWrapText = WrapNone}
+  trimr $ writeMarkdown
         $ Pandoc nullMeta
           [Plain $ bottomUp (concatMap (adjustCSL False)) ils]
 
 writeCSLString :: [Inline] -> String
 writeCSLString ils =
-  trimr $ writeMarkdown def{writerWrapText = WrapNone}
+  trimr $ writeMarkdown
         $ Pandoc nullMeta
           [Plain $ bottomUp (concatMap (adjustCSL True)) ils]
 

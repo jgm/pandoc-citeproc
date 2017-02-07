@@ -11,9 +11,7 @@ import System.Process (rawSystem)
 import qualified Data.Aeson as Aeson
 import Text.Pandoc.Definition
 import qualified Text.Pandoc.UTF8 as UTF8
-import Text.Pandoc.Options (WriterOptions(..))
 import Text.CSL.Compat.Pandoc (writeNative, pipeProcess)
-import Text.Pandoc (def)
 import Data.List (isSuffixOf)
 import System.Environment
 import Control.Monad (when)
@@ -72,13 +70,13 @@ testCase regenerate csl = do
           then err "PASSED" >> return Passed
           else do
              err $ "FAILED"
-             showDiff (writeNative def expectedDoc) (writeNative def outDoc)
+             showDiff (writeNative expectedDoc) (writeNative outDoc)
              when regenerate $
                UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
 #if MIN_VERSION_pandoc(1,19,0)
-                  writeNative def{ writerTemplate = Just "" } outDoc
+                  writeNative outDoc
 #else
-                  writeNative def{ writerStandalone = True }  outDoc
+                  writeNative outDoc
 #endif
              return Failed
      else do

@@ -23,7 +23,6 @@ import Control.Applicative
 import Text.CSL.Compat.Pandoc (readLaTeX)
 import Text.Pandoc.Definition
 import Text.Pandoc.Generic (bottomUp)
-import Data.Default (Default(def))
 import Data.List.Split (splitOn, splitWhen, wordsBy)
 import Data.List (intercalate)
 import Data.Maybe
@@ -1124,7 +1123,7 @@ optionSet key opts = case lookup key opts of
 
 latex' :: String -> [Block]
 latex' s = Walk.walk removeSoftBreak bs
-  where Pandoc _ bs = readLaTeX def s
+  where Pandoc _ bs = readLaTeX s
 
 removeSoftBreak :: Inline -> Inline
 removeSoftBreak SoftBreak = Space

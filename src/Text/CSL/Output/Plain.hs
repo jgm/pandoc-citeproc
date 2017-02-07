@@ -19,9 +19,9 @@ module Text.CSL.Output.Plain
 
 import Text.CSL.Style
 import Text.CSL.Compat.Pandoc (writePlain)
-import Text.Pandoc (Block(Plain), Pandoc(..), nullMeta, def)
+import Text.Pandoc (Block(Plain), Pandoc(..), nullMeta)
 
 -- | Render the 'Formatted' into a plain text string.
 renderPlain :: Formatted -> String
-renderPlain (Formatted ils) = writePlain def $ Pandoc nullMeta [Plain ils]
+renderPlain (Formatted ils) = writePlain $ Pandoc nullMeta [Plain ils]
 

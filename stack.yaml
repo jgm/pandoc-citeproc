@@ -7,12 +7,12 @@ flags:
     debug: false
 packages:
 - '.'
-# - location:
-#     git: https://github.com/jgm/pandoc.git
-#     commit: 411434bf130a3116290c7ca54358678e03d0d92b
-#   extra-dep: true
+- location:
+    git: https://github.com/jgm/pandoc.git
+    commit: e07e83f83177095651b201f489855baafeec49c2
+  extra-dep: true
 extra-deps:
-- pandoc-1.19.2
+# - pandoc-1.19.2
 - skylighting-0.1.1.4
 - doctemplates-0.1.0.2
 - pandoc-types-1.17.0.4

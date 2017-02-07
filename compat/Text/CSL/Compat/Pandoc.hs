@@ -17,7 +17,8 @@ import qualified Control.Exception as E
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
 import Data.ByteString as B
-import Text.Pandoc (Pandoc, ReaderOptions(..), WriterOptions)
+import Text.Pandoc (Pandoc, ReaderOptions(..), def, WrapOption(..),
+        WriterOptions(..))
 import qualified Text.Pandoc as Pandoc
 import qualified Text.Pandoc.Process
 #if MIN_VERSION_pandoc(2,0,0)
@@ -26,6 +27,8 @@ import Text.Pandoc.Error (PandocError)
 import Text.Pandoc.Class (runPure, runIO)
 import qualified Text.Pandoc.Class (fetchItem)
 import Control.Monad.Except (runExceptT, lift)
+import Text.Pandoc.Extensions (extensionsFromList, Extension(..),
+          pandocExtensions, disableExtension)
 #else
 import System.IO (stderr)
 import qualified Text.Pandoc.Shared (fetchItem)
@@ -33,50 +36,53 @@ import qualified Text.Pandoc.Shared (fetchItem)
 type MimeType = String
 #endif
 
-#if MIN_VERSION_pandoc(2,0,0)
-#define WRAPREADER(f) f o = either mempty id . runPure . Pandoc.f o
-#define WRAPWRITER(f) f o = either mempty id . runPure . Pandoc.f o
-#else
-#define WRAPREADER(f) f o = either mempty id . Pandoc.f o{ readerSmart = True }
-#define WRAPWRITER(f) f = Pandoc.f
-#endif
-
-readHtml, readLaTeX, readMarkdown, readNative ::
-  ReaderOptions -> String -> Pandoc
-
-WRAPREADER(readHtml)
-WRAPREADER(readMarkdown)
+readHtml, readLaTeX, readMarkdown, readNative :: String -> Pandoc
+writeMarkdown, writePlain, writeNative, writeHtmlString :: Pandoc -> String
 
 #if MIN_VERSION_pandoc(2,0,0)
-readLaTeX o =
-  either mempty id . runPure . Pandoc.readLaTeX o{ readerExtensions =
-                                                   enableExtension Ext_smart $
-                                                   enableExtension Ext_raw_tex $
-                                                   readerExtensions o }
+readHtml = either mempty id . runPure . Pandoc.readHtml
+   def{ readerExtensions = extensionsFromList [Ext_native_divs,
+                           Ext_native_spans, Ext_raw_html, Ext_smart] }
+
+readMarkdown = either mempty id . runPure . Pandoc.readMarkdown
+   def{ readerExtensions = pandocExtensions, readerStandalone = True }
+
+readLaTeX = either mempty id . runPure . Pandoc.readLaTeX
+   def{ readerExtensions = extensionsFromList [Ext_raw_tex, Ext_smart] }
+
+readNative = either mempty id . runPure . Pandoc.readNative def
+
+writeMarkdown = either mempty id . runPure . Pandoc.writeMarkdown
+   def{ writerExtensions = disableExtension Ext_smart pandocExtensions,
+        writerWrapText = WrapNone }
+
+writePlain = either mempty id . runPure . Pandoc.writePlain def
+
+writeNative = either mempty id . runPure . Pandoc.writeNative def
+
+writeHtmlString = either mempty id . runPure . Pandoc.writeHtml4String
+   def{ writerExtensions = extensionsFromList
+       [Ext_native_divs, Ext_native_spans, Ext_raw_html] }
+
 #else
-readLaTeX o =
-  either mempty id . Pandoc.readLaTeX o{ readerParseRaw = True,
-                                  readerSmart = True }
-#endif
+readHtml = either mempty id . Pandoc.readHtml
+   def{ readerSmart = True, readerParseRaw = True }
 
-#if MIN_VERSION_pandoc(2,0,0)
-WRAPREADER(readNative)
-#else
-readNative _ = either mempty id . Pandoc.readNative
-#endif
+readMarkdown = either mempty id . Pandoc.readMarkdown
+   def{ readerSmart = True, readerStandalone = True}
 
-writeMarkdown, writePlain, writeNative, writeHtmlString ::
-  WriterOptions -> Pandoc -> String
+readLaTeX = either mempty id . Pandoc.readLaTeX
+   def{ readerSmart = True, readerParseRaw = True }
 
-WRAPWRITER(writeMarkdown)
-WRAPWRITER(writePlain)
-WRAPWRITER(writeNative)
+readNative = either mempty id . Pandoc.readNative
 
-#if MIN_VERSION_pandoc(2,0,0)
-writeHtmlString o =
-  either mempty id . runPure . Pandoc.writeHtml4String o
-#else
-writeHtmlString = Pandoc.writeHtmlString
+writeMarkdown = Pandoc.writeMarkdown def{ writerWrapText = WrapNone }
+
+writePlain = Pandoc.writePlain def
+
+writeNative = Pandoc.writeNative def
+
+writeHtmlString = Pandoc.writeHtmlString def
 #endif
 
 pipeProcess :: Maybe [(String, String)] -> FilePath -> [String]
