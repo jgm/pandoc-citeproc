@@ -3,7 +3,8 @@
 import Text.Printf
 import System.Exit
 import qualified Control.Exception as E
-import Text.Pandoc hiding (writeHtmlString)
+import Text.Pandoc (Block(..), Inline(..), Format(..), bottomUp,
+   nullMeta, Pandoc(..))
 import Text.CSL.Compat.Pandoc (writeHtmlString)
 import Data.Char (isSpace, toLower)
 import System.Environment (getArgs)
@@ -137,7 +138,7 @@ trimEnd = reverse . ('\n':) . dropWhile isSpace . reverse
 -- this is designed to mimic the test suite's output:
 inlinesToString  :: [Inline]  -> String
 inlinesToString ils =
-  writeHtmlString def{ writerWrapText = WrapNone }
+  writeHtmlString
     $ bottomUp (concatMap adjustSpans)
     $ Pandoc nullMeta [Plain ils]
 
