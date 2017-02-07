@@ -49,13 +49,13 @@ WRAPREADER(readMarkdown)
 
 #if MIN_VERSION_pandoc(2,0,0)
 readLaTeX o =
-  either mempty id . runPure . readLaTeX o{ readerSmart = True,
-                                            readerExtensions =
-                                              enableExtension Ext_raw_tex
-                                               (readerExtensions o) }
+  either mempty id . runPure . Pandoc.readLaTeX o{ readerExtensions =
+                                                   enableExtension Ext_smart $
+                                                   enableExtension Ext_raw_tex $
+                                                   readerExtensions o }
 #else
 readLaTeX o =
-  either mempty id . readLaTeX o{ readerParseRaw = True,
+  either mempty id . Pandoc.readLaTeX o{ readerParseRaw = True,
                                   readerSmart = True }
 #endif
 

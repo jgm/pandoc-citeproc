@@ -20,7 +20,6 @@ module Text.CSL.Input.Bibtex
 
 import Text.Parsec hiding (optional, (<|>), many, State)
 import Control.Applicative
-import Text.Pandoc (ReaderOptions(..))
 import Text.CSL.Compat.Pandoc (readLaTeX)
 import Text.Pandoc.Definition
 import Text.Pandoc.Generic (bottomUp)
