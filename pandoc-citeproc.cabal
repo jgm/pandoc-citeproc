@@ -126,6 +126,9 @@ library
        Build-Tools:   hsb2hs >= 0.3.1
        cpp-options:   -DEMBED_DATA_FILES
        other-modules: Text.CSL.Data.Embedded
+       if os(darwin)
+          Build-Tools:   cpphs >= 1.19
+          ghc-options:   -pgmP cpphs -optP --cpp
 
     if flag(unicode_collation)
        build-depends: text, text-icu
