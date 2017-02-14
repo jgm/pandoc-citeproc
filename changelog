@@ -1,3 +1,13 @@
+pandoc-citeproc (0.10.4.1)
+
+  * Raise version bounds for xml-conduit.
+  * Use cpphs if embed_data_files on darwin.
+  * Fixed Compat module so it compiles with pandoc 1.9.x and 2.0.
+  * Allow colon to belong to locator numbers (#275).
+    This at least allows 1:22-23 to be interpreted as a page number, though
+    this won't really be useful until we modify the number collapsing code to
+    be sensitive to the colon.
+
 pandoc-citeproc (0.10.4)
 
   * Fixed 'et al' in certain styles (#274).  The `et al` phrase was
