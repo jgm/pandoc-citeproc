@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
-    ScopedTypeVariables #-}
+    ScopedTypeVariables, CPP #-}
+
 import Text.Printf
 import System.Exit
 import qualified Control.Exception as E
@@ -16,7 +17,6 @@ import Data.Aeson
 import System.FilePath
 import System.Directory
 import Data.List (sort, isInfixOf)
-import qualified Data.Vector as V
 import qualified Data.Map as M
 import Text.CSL.Style hiding (Number)
 import Text.CSL.Reference
@@ -72,9 +72,12 @@ instance FromJSON CiteObject where
          x               -> fail $ "Could not parse CiteObject" ++ show x
   parseJSON x = fail $ "Could not parse CiteObject " ++ show x
 
+#if MIN_VERSION_aeson(0,10,0)
+#else
 instance FromJSON [CiteObject] where
   parseJSON (Array v) = mapM parseJSON $ V.toList v
   parseJSON _ = return []
+#endif
 
 data TestResult =
     Passed
