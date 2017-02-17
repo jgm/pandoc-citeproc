@@ -221,6 +221,10 @@ evalElement el
                                       then return []
                                       else return [Output [OPan [Link nullAttr [Str (T.unpack linkPart ++ d)] (u, "")]]
                                             fm{ prefix = T.unpack prefixPart, suffix = suffix fm }]
+               "isbn"        -> getStringVar "isbn" >>= \d ->
+                                if null d
+                                   then return []
+                                   else return [Output [OPan [Link nullAttr [Str d] ("https://worldcat.org/isbn/" ++ d, "")]] fm]
                "pmid"        -> getStringVar "pmid" >>= \d ->
                                 if null d
                                    then return []
