@@ -650,6 +650,7 @@ data Output
     | OLabel   String             Formatting            -- ^ A label used for roles
     | ONum     Int                Formatting            -- ^ A number (used to count contributors)
     | OCitNum  Int                Formatting            -- ^ The citation number
+    | OCitLabel String            Formatting            -- ^ The citation label
     | ODate   [Output]                                  -- ^ A (possibly) ranged date
     | OYear    String    String   Formatting            -- ^ The year and the citeId
     | OYearSuf String    String   [Output]   Formatting -- ^ The year suffix, the citeId and a holder for collision data

@@ -122,6 +122,9 @@ formatOutput o =
       OCitNum  i       f  -> if i == 0
                                 then Formatted [Strong [Str "???"]]
                                 else formatOutput (OStr (show i) f)
+      OCitLabel s      f  -> if s == ""
+                                then Formatted [Strong [Str "???"]]
+                                else formatOutput (OStr s f)
       OName  _ os _    f  -> formatOutput (Output os f)
       OContrib _ _ os _ _ -> formatOutputList os
       OLoc     os      f  -> formatOutput (Output os f)
