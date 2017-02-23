@@ -15,6 +15,9 @@ module Text.CSL.Input.Bibtex
     ( readBibtex
     , readBibtexString
     , readBibtexString'
+    , Lang(..)
+    , langToLocale
+    , getLangFromEnv
     )
     where
 
@@ -84,6 +87,7 @@ data Item = Item{ identifier :: String
                 , fields     :: [(String, String)]
                 }
 
+-- | Get 'Lang' from the environment variable LANG, defaulting to en-US.
 getLangFromEnv :: IO Lang
 getLangFromEnv = do
   env <- getEnvironment
@@ -94,17 +98,23 @@ getLangFromEnv = do
                                    _                  -> Lang "en" "US"
                   Nothing -> Lang "en" "US"
 
+-- | Parse a BibTeX or BibLaTeX file into a list of 'Reference's.
+-- If the first parameter is true, the file will be treated as
+-- BibTeX; otherwse as BibLaTeX.  If the second parameter is
+-- true, an "untitlecase" transformation will be performed.
 readBibtex :: Bool -> Bool -> FilePath -> IO [Reference]
 readBibtex isBibtex caseTransform f =
   UTF8.readFile f >>= readBibtexString isBibtex caseTransform
 
+-- | Like 'readBibtex' but operates on a String rather than a file.
 readBibtexString :: Bool -> Bool -> String -> IO [Reference]
 readBibtexString isBibtex caseTransform contents = do
   lang <- getLangFromEnv
   locale <- parseLocale (langToLocale lang)
   return $ readBibtexString' isBibtex caseTransform lang locale contents
 
--- pure version of readBibtexString
+-- | Pure version of readBibtexString (does not try to get the language
+-- from the environment).
 readBibtexString' :: Bool -> Bool -> Lang -> Locale -> String -> [Reference]
 readBibtexString' isBibtex caseTransform lang locale bibstring =
   let items = case runParser (bibEntries <* eof) [] "stdin" bibstring of
@@ -333,8 +343,10 @@ bookTrans z =
        "indexsorttitle" -> []
        _                -> [z]
 
+-- | A representation of a language and localization.
 data Lang = Lang String String  -- e.g. "en" "US"
 
+-- | Prints a 'Lang' in BCP 47 format.
 langToLocale :: Lang -> String
 langToLocale (Lang x y) = x ++ ('-':y)
 
