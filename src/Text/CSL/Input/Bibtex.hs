@@ -48,7 +48,7 @@ blocksToFormatted bs =
 adjustSpans :: Lang -> Inline -> [Inline]
 adjustSpans _ (Span ("",[],[]) xs) = xs
 adjustSpans lang (RawInline (Format "latex") s)
-  | s == "\\hyphen" = [Str "-"]
+  | s == "\\hyphen" || s == "\\hyphen " = [Str "-"]
   | otherwise = bottomUp (concatMap (adjustSpans lang)) $ parseRawLaTeX lang s
 adjustSpans _ x = [x]
 
