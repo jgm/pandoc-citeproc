@@ -44,6 +44,7 @@ extra-source-files: stack.yaml
                     tests/biblio.bib
                     tests/biblio2yaml/*.bibtex
                     tests/biblio2yaml/*.biblatex
+                    tests/biblio2yaml/pandoc-2/*.biblatex
 
 source-repository head
   type:          git

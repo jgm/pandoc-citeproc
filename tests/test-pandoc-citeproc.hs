@@ -1,8 +1,10 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Main where
 import System.Exit
 import System.Directory
 import System.FilePath
+import qualified Control.Exception as E
 import Data.Maybe (fromMaybe)
 import System.IO
 import Data.Monoid (mempty)
@@ -99,8 +101,16 @@ showDiff expected result =
 biblio2yamlTest :: String -> IO TestResult
 biblio2yamlTest fp = do
   hPutStr stderr $ "[biblio2yaml/" ++ fp ++ "] "
-  let yamlf = "tests/biblio2yaml/" ++ fp
-  raw <- UTF8.readFile yamlf
+  let yamld = "tests/biblio2yaml/"
+#if MIN_VERSION_pandoc(2,0,0)
+  -- in a few cases we need different test output for pandoc >= 2
+  -- because smallcaps render differently, for example.
+  raw <- E.catch (UTF8.readFile (yamld ++ "/pandoc-2/" ++ fp))
+         (\(_ :: E.SomeException) ->
+           (UTF8.readFile (yamld ++ fp)))
+#else
+  raw <- UTF8.readFile (yamld ++ fp)
+#endif
   let yamlStart = "---"
   let (biblines, yamllines) = break (== yamlStart) $ lines raw
   let bib = unlines biblines
