@@ -9,9 +9,10 @@ packages:
 - '.'
 - location:
     git: https://github.com/jgm/pandoc.git
-    commit: 35922ffa324eaba4e853a7c4b5517ddb505723a1
+    commit: 8f90b83feec3ac9474b3f059a0dff43bd6e88f8b
   extra-dep: true
 extra-deps:
 - xml-conduit-1.5.0
-- skylighting-0.3
-resolver: lts-8.2
+- skylighting-0.3.1
+- texmath-0.9.3
+resolver: lts-8.4
