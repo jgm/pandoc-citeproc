@@ -6,13 +6,13 @@
   </info>
   <style-options punctuation-in-quote="true"/>
   <date form="text">
+    <date-part name="day" suffix=" "/>
     <date-part name="month" suffix=" "/>
-    <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
     <date-part name="year"/>
   </date>
   <date form="numeric">
-    <date-part name="month" form="numeric-leading-zeros" suffix="/"/>
     <date-part name="day" form="numeric-leading-zeros" suffix="/"/>
+    <date-part name="month" form="numeric-leading-zeros" suffix="/"/>
     <date-part name="year"/>
   </date>
   <terms>
@@ -22,18 +22,18 @@
     <term name="anonymous">ناشناس</term>
     <term name="anonymous" form="short">ناشناس</term>
     <term name="at">در</term>
-    <term name="available at">available at</term>
+    <term name="available at">قابل دسترس در</term>
     <term name="by">توسط</term>
-    <term name="circa">circa</term>
+    <term name="circa">تقریباً</term>
     <term name="circa" form="short">c.</term>
-    <term name="cited">یادکرد</term>
+    <term name="cited">ارجاع شده</term>
     <term name="edition">
       <single>ویرایش</single>
       <multiple>ویرایش‌های</multiple>
     </term>
     <term name="edition" form="short">ویرایش</term>
-    <term name="et-al">و دیگران</term>
-    <term name="forthcoming">forthcoming</term>
+    <term name="et-al">و همکاران</term>
+    <term name="forthcoming">در دست انتشار</term>
     <term name="from">از</term>
     <term name="ibid">همان</term>
     <term name="in">در</term>
@@ -43,7 +43,7 @@
     <term name="letter">نامه</term>
     <term name="no date">بدون تاریخ</term>
     <term name="no date" form="short">بدون تاریخ</term>
-    <term name="online">برخط</term>
+    <term name="online">آنلاین</term>
     <term name="presented at">ارائه شده در</term>
     <term name="reference">
       <single>مرجع</single>
@@ -55,11 +55,11 @@
     </term>
     <term name="retrieved">retrieved</term>
     <term name="scale">scale</term>
-    <term name="version">version</term>
+    <term name="version">نسخه</term>
 
     <!-- ANNO DOMINI; BEFORE CHRIST -->
-    <term name="ad">AD</term>
-    <term name="bc">BC</term>
+    <term name="ad">بعد از میلاد</term>
+    <term name="bc">قبل از میلاد</term>
 
     <!-- PUNCTUATION -->
     <term name="open-quote">“</term>
@@ -141,8 +141,8 @@
       <multiple>قسمت‌های</multiple>
     </term>
     <term name="sub verbo">
-      <single>sub verbo</single>
-      <multiple>sub verbis</multiple>
+      <single>در ذیلِ واژه</single>
+      <multiple>در ذیلِ واژه‌های</multiple>
     </term>
     <term name="verse">
       <single>بیت</single>
@@ -160,8 +160,8 @@
     <term name="figure" form="short">تصویر</term>
     <term name="folio" form="short">برگ</term>
     <term name="issue" form="short">ش</term>
-    <term name="line" form="short">l.</term>
-    <term name="note" form="short">n.</term>
+    <term name="line" form="short">خط</term>
+    <term name="note" form="short">یادداشت</term>
     <term name="opus" form="short">قطعه</term>
     <term name="page" form="short">
       <single>ص</single>
@@ -203,24 +203,24 @@
       <multiple>directors</multiple>
     </term>
     <term name="editor">
-      <single>ویرایشگر</single>
-      <multiple>ویرایشگران</multiple>
+      <single>ویراستار</single>
+      <multiple>ویراستاران</multiple>
     </term>
     <term name="editorial-director">
-      <single>ویرایشگر</single>
-      <multiple>ویرایشگران</multiple>
+      <single>ویراستار</single>
+      <multiple>ویراستاران</multiple>
     </term>
     <term name="illustrator">
-      <single>illustrator</single>
-      <multiple>illustrators</multiple>
+      <single>طراح گرافیک</single>
+      <multiple>طراحان گرافیک</multiple>
     </term>
     <term name="translator">
       <single>مترجم</single>
       <multiple>مترجمین</multiple>
     </term>
     <term name="editortranslator">
-      <single>ویرایشگر و مترجم</single>
-      <multiple>ویرایشگران و مترجمین</multiple>
+      <single>ویراستار و مترجم</single>
+      <multiple>ویراستاران و مترجمین</multiple>
     </term>
 
     <!-- SHORT ROLE FORMS -->
@@ -229,35 +229,35 @@
       <multiple>dirs.</multiple>
     </term>
     <term name="editor" form="short">
-      <single>ویرایشگر</single>
-      <multiple>ویرایشگران</multiple>
+      <single>ویراستار</single>
+      <multiple>ویراستاران</multiple>
     </term>
     <term name="editorial-director" form="short">
-      <single>ویرایشگر</single>
-      <multiple>ویرایشگران</multiple>
+      <single>ویراستار</single>
+      <multiple>ویراستاران</multiple>
     </term>
     <term name="illustrator" form="short">
-      <single>ill.</single>
-      <multiple>ills.</multiple>
+      <single>تصویرگر</single>
+      <multiple>تصویرگران</multiple>
     </term>
     <term name="translator" form="short">
       <single>مترجم</single>
       <multiple>مترجمین</multiple>
     </term>
     <term name="editortranslator" form="short">
-      <single>ویرایشگر و مترجم</single>
-      <multiple>ویرایشگران و مترجمین</multiple>
+      <single>ویراستار و مترجم</single>
+      <multiple>ویراستاران و مترجمین</multiple>
     </term>
 
     <!-- VERB ROLE FORMS -->
     <term name="container-author" form="verb">توسط</term>
-    <term name="director" form="verb">directed by</term>
-    <term name="editor" form="verb">edited by</term>
+    <term name="director" form="verb">زیر نظر</term>
+    <term name="editor" form="verb">ویراسته‌ی</term>
     <term name="editorial-director" form="verb">ویراسته‌ی</term>
-    <term name="illustrator" form="verb">illustrated by</term>
+    <term name="illustrator" form="verb">طراحی گرافیکی از</term>
     <term name="interviewer" form="verb">مصاحبه توسط</term>
     <term name="recipient" form="verb">به</term>
-    <term name="reviewed-author" form="verb">by</term>
+    <term name="reviewed-author" form="verb">بازبینی توسط</term>
     <term name="translator" form="verb">ترجمه‌ی</term>
     <term name="editortranslator" form="verb">ترجمه و ویراسته‌ی</term>
 
@@ -265,7 +265,7 @@
     <term name="director" form="verb-short">dir.</term>
     <term name="editor" form="verb-short">ویراسته‌ی</term>
     <term name="editorial-director" form="verb-short">ویراسته‌ی</term>
-    <term name="illustrator" form="verb-short">illus.</term>
+    <term name="illustrator" form="verb-short">طراحی از</term>
     <term name="translator" form="verb-short">ترجمه‌ی</term>
     <term name="editortranslator" form="verb-short">ترجمه و ویراسته‌ی</term>
 

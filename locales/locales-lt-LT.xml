@@ -5,18 +5,16 @@
       <name>Valdemaras Klumbys</name>
     </translator>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
-    <updated>2012-07-04T23:31:02+00:00</updated>
+    <updated>2017-01-18T10:31:02+00:00</updated>
   </info>
   <style-options punctuation-in-quote="false"/>
   <date form="text" delimiter=" ">
-
     <!-- "2011 m. lapkričio 1 d." -->
     <date-part name="year" suffix=" m."/>
     <date-part name="month"/>
     <date-part name="day" form="numeric" suffix=" d."/>
   </date>
   <date form="numeric" delimiter="-">
-
     <!-- "2011-11-01" -->
     <date-part name="year"/>
     <date-part name="month" form="numeric-leading-zeros"/>
@@ -29,22 +27,22 @@
     <term name="anonymous">anonimas</term>
     <term name="anonymous" form="short">anon.</term>
     <term name="at"></term>
-    <term name="available at">available at</term>
+    <term name="available at">adresas</term>
     <term name="by"></term>
-    <term name="circa">circa</term>
-    <term name="circa" form="short">ca.</term>
-    <term name="cited">cituojama pagal</term>
-    <term name="edition">
+    <term name="circa">apie</term>
+    <term name="circa" form="short">apie</term>
+    <term name="cited">žiūrėta</term>
+    <term name="edition" gender="masculine">
       <single>leidimas</single>
       <multiple>leidimai</multiple>
     </term>
     <term name="edition" form="short">leid.</term>
-    <term name="et-al">et al.</term>
+    <term name="et-al">ir kt.</term>
     <term name="forthcoming">ruošiamas</term>
     <term name="from"></term>
-    <term name="ibid">ibid.</term>
+    <term name="ibid">ten pat</term>
     <term name="in"></term>
-    <term name="in press">spaudoje</term>
+    <term name="in press">priimta spaudai</term>
     <term name="internet">prieiga per internetą</term>
     <term name="interview">interviu</term>
     <term name="letter">laiškas</term>
@@ -61,8 +59,8 @@
       <multiple>nuor.</multiple>
     </term>
     <term name="retrieved">gauta</term>
-    <term name="scale">scale</term>
-    <term name="version">version</term>
+    <term name="scale">mastelis</term>
+    <term name="version">versija</term>
 
     <!-- ANNO DOMINI; BEFORE CHRIST -->
     <term name="ad">po Kr.</term>
@@ -77,6 +75,12 @@
 
     <!-- ORDINALS -->
     <term name="ordinal">-asis</term>
+    <term name="ordinal" gender-form="masculine">-asis</term>
+    <term name="ordinal" gender-form="feminine">-oji</term>
+    <term name="ordinal-03" gender-form="masculine">-iasis</term>
+    <term name="ordinal-13" gender-form="masculine">-asis</term>
+    <term name="ordinal-03" gender-form="feminine">-ioji</term>
+    <term name="ordinal-13" gender-form="feminine">-oji</term>
 
     <!-- LONG ORDINALS -->
     <term name="long-ordinal-01">pirmasis</term>
@@ -90,6 +94,17 @@
     <term name="long-ordinal-09">devintasis</term>
     <term name="long-ordinal-10">dešimtasis</term>
 
+    <term name="long-ordinal-01" gender-form="feminine">pirmoji</term>
+    <term name="long-ordinal-02" gender-form="feminine">antroji</term>
+    <term name="long-ordinal-03" gender-form="feminine">trečioji</term>
+    <term name="long-ordinal-04" gender-form="feminine">ketvirtoji</term>
+    <term name="long-ordinal-05" gender-form="feminine">penktoji</term>
+    <term name="long-ordinal-06" gender-form="feminine">šeštoji</term>
+    <term name="long-ordinal-07" gender-form="feminine">septintoji</term>
+    <term name="long-ordinal-08" gender-form="feminine">aštuntoji</term>
+    <term name="long-ordinal-09" gender-form="feminine">devintoji</term>
+    <term name="long-ordinal-10" gender-form="feminine">dešimtoji</term>
+    
     <!-- LONG LOCATOR FORMS -->
     <term name="book">
       <single>knyga</single>
@@ -111,7 +126,7 @@
       <single>lapas</single>
       <multiple>lapai</multiple>
     </term>
-    <term name="issue">
+    <term name="issue" gender="masculine">
       <single>numeris</single>
       <multiple>numeriai</multiple>
     </term>
@@ -124,14 +139,14 @@
       <multiple>pastabos</multiple>
     </term>
     <term name="opus">
-      <single>opus</single>
-      <multiple>opera</multiple>
+      <single>kūrinys</single>
+      <multiple>kūriniai</multiple>
     </term>
     <term name="page">
       <single>puslapis</single>
       <multiple>puslapiai</multiple>
     </term>
-    <term name="number-of-pages">
+    <term name="number-of-pages" gender="masculine">
       <single>puslapis</single>
       <multiple>puslapiai</multiple>
     </term>
@@ -155,7 +170,7 @@
       <single>eilėraštis</single>
       <multiple>eilėraščiai</multiple>
     </term>
-    <term name="volume">
+    <term name="volume" gender="masculine">
       <single>tomas</single>
       <multiple>tomai</multiple>
     </term>
@@ -167,9 +182,9 @@
     <term name="figure" form="short">il.</term>
     <term name="folio" form="short">l.</term>
     <term name="issue" form="short">nr.</term>
-    <term name="line" form="short">l.</term>
-    <term name="note" form="short">n.</term>
-    <term name="opus" form="short">op.</term>
+    <term name="line" form="short">eil.</term>
+    <term name="note" form="short">pstb.</term>
+    <term name="opus" form="short">kūr.</term>
     <term name="page" form="short">
       <single>p.</single>
       <multiple>p.</multiple>
@@ -206,8 +221,8 @@
 
     <!-- LONG ROLE FORMS -->
     <term name="director">
-      <single>director</single>
-      <multiple>directors</multiple>
+      <single>vadovas</single>
+      <multiple>vadovai</multiple>
     </term>
     <term name="editor">
       <single>sudarytojas</single>
@@ -218,8 +233,8 @@
       <multiple>atsakingieji redaktoriai</multiple>
     </term>
     <term name="illustrator">
-      <single>illustrator</single>
-      <multiple>illustrators</multiple>
+      <single>iliustratorius</single>
+      <multiple>iliustratoriai</multiple>
     </term>
     <term name="translator">
       <single>vertėjas</single>
@@ -232,8 +247,8 @@
 
     <!-- SHORT ROLE FORMS -->
     <term name="director" form="short">
-      <single>dir.</single>
-      <multiple>dirs.</multiple>
+      <single>vad.</single>
+      <multiple>vad.</multiple>
     </term>
     <term name="editor" form="short">
       <single>sud.</single>
@@ -244,8 +259,8 @@
       <multiple>ats. red.</multiple>
     </term>
     <term name="illustrator" form="short">
-      <single>ill.</single>
-      <multiple>ills.</multiple>
+      <single>iliustr.</single>
+      <multiple>iliustr.</multiple>
     </term>
     <term name="translator" form="short">
       <single>vert.</single>
@@ -258,21 +273,21 @@
 
     <!-- VERB ROLE FORMS -->
     <term name="container-author" form="verb"></term>
-    <term name="director" form="verb">directed by</term>
+    <term name="director" form="verb">vadovavo</term>
     <term name="editor" form="verb">sudarė</term>
     <term name="editorial-director" form="verb">parengė</term>
-    <term name="illustrator" form="verb">illustrated by</term>
+    <term name="illustrator" form="verb">iliustravo</term>
     <term name="interviewer" form="verb">interviu ėmė</term>
     <term name="recipient" form="verb">gavo</term>
-    <term name="reviewed-author" form="verb">by</term>
+    <term name="reviewed-author" form="verb">recenzavo</term>
     <term name="translator" form="verb">vertė</term>
     <term name="editortranslator" form="verb">sudarė ir vertė</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="director" form="verb-short">dir.</term>
+    <term name="director" form="verb-short">vad.</term>
     <term name="editor" form="verb-short">sud.</term>
     <term name="editorial-director" form="verb-short">pareng.</term>
-    <term name="illustrator" form="verb-short">illus.</term>
+    <term name="illustrator" form="verb-short">iliustr.</term>
     <term name="translator" form="verb-short">vert.</term>
     <term name="editortranslator" form="verb-short">sud. ir vert.</term>
 

@@ -58,8 +58,8 @@
     <term name="version">Version</term>
 
     <!-- ANNO DOMINI; BEFORE CHRIST -->
-    <term name="ad">n.&#160;Chr.</term>
-    <term name="bc">v.&#160;Chr.</term>
+    <term name="ad">&#160;n.&#160;Chr.</term>
+    <term name="bc">&#160;v.&#160;Chr.</term>
 
     <!-- PUNCTUATION -->
     <term name="open-quote">«</term>
