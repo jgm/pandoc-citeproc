@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 -- to be processed using hsb2hs
-module Text.CSL.Data.Embedded (localeFiles, defaultCSL, manpage) where
+module Text.CSL.Data.Embedded (localeFiles, defaultCSL, manpage, license) where
 import qualified Data.ByteString.Char8 as S
 
 localeFiles :: [(FilePath, S.ByteString)]
