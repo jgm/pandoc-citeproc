@@ -1,7 +1,5 @@
 stack:
-	cd ../pandoc && \
-	stack install --test --stack-yaml stack.full.yaml --ghc-options '-pgmPcpphs -optP--cpp';\
-	cd ../pandoc-citeproc
+	stack install --test --ghc-options '-pgmPcpphs -optP--cpp'
 
 debug: deps
 	cabal configure --enable-tests -ftest_citeproc -fembed_data_files -fdebug --disable-optimization --ghc-options "-pgmPcpphs -optP--cpp"

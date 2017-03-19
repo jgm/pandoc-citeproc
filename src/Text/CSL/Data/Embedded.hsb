@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 -- to be processed using hsb2hs
-module Text.CSL.Data.Embedded (localeFiles, defaultCSL) where
+module Text.CSL.Data.Embedded (localeFiles, defaultCSL, manpage) where
 import qualified Data.ByteString.Char8 as S
 
 localeFiles :: [(FilePath, S.ByteString)]
@@ -8,3 +8,6 @@ localeFiles = %blobs "locales/"
 
 defaultCSL :: S.ByteString
 defaultCSL = %blob "chicago-author-date.csl"
+
+manpage :: S.ByteString
+manpage = %blob "man/man1/pandoc-citeproc.1"
