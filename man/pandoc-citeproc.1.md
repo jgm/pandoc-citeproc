@@ -167,6 +167,11 @@ This mode supersedes the old `biblio2yaml` program.
 `-h, --help`
 :   Print usage information.
 
+`--man`
+:   Print the man page in groff man format.  To get a plain text
+    version, `pandoc-citeproc --man | groff -mman -Tutf8`.  To
+    `pandoc-citeproc --man | groff -mman -Thtml`.
+
 `-V, --version`
 :   Print version.
 
