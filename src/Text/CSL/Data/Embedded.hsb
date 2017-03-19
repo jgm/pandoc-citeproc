@@ -11,3 +11,6 @@ defaultCSL = %blob "chicago-author-date.csl"
 
 manpage :: S.ByteString
 manpage = %blob "man/man1/pandoc-citeproc.1"
+
+license :: S.ByteString
+license = %blob "LICENSE"

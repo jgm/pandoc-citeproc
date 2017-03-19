@@ -17,6 +17,7 @@ module Text.CSL.Data
     , CSLLocaleException(..)
     , getDefaultCSL
     , getManPage
+    , getLicense
     , langBase
     ) where
 
@@ -26,7 +27,7 @@ import qualified Data.ByteString.Lazy as L
 import qualified Control.Exception as E
 #ifdef EMBED_DATA_FILES
 import Data.Maybe (fromMaybe)
-import Text.CSL.Data.Embedded (localeFiles, defaultCSL, manpage)
+import Text.CSL.Data.Embedded (localeFiles, defaultCSL, manpage, license)
 #else
 import Paths_pandoc_citeproc (getDataFileName)
 import System.Directory  (doesFileExist)
@@ -88,6 +89,14 @@ getManPage =
   return $ L.fromChunks [manpage]
 #else
   getDataFileName "man/man1/pandoc-citeproc.1" >>= L.readFile
+#endif
+
+getLicense :: IO L.ByteString
+getLicense =
+#ifdef EMBED_DATA_FILES
+  return $ L.fromChunks [license]
+#else
+  getDataFileName "LICENSE" >>= L.readFile
 #endif
 
 langBase :: [(String, String)]

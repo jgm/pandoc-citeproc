@@ -34,6 +34,7 @@ data-files:         chicago-author-date.csl
                     locales/*.xml
                     -- documentation
                     README.md
+                    LICENSE
                     man/man1/pandoc-citeproc.1
                     changelog
 extra-source-files: stack.yaml

@@ -164,17 +164,6 @@ This mode supersedes the old `biblio2yaml` program.
 
 # OPTIONS
 
-`-h, --help`
-:   Print usage information.
-
-`--man`
-:   Print the man page in groff man format.  To get a plain text
-    version, `pandoc-citeproc --man | groff -mman -Tutf8`.  To
-    `pandoc-citeproc --man | groff -mman -Thtml`.
-
-`-V, --version`
-:   Print version.
-
 `-y, --bib2yaml`
 :   Convert bibliography to YAML suitable for inclusion in pandoc metadata.
 
@@ -185,6 +174,20 @@ This mode supersedes the old `biblio2yaml` program.
 :   Specify format of bibliography to be converted.  Legal values are
     `biblatex`, `bibtex`, `ris`, `endnote`, `endnotexml`, `isi`,
     `medline`, `copac`, `mods`, and `json`.
+
+`-h, --help`
+:   Print usage information.
+
+`--man`
+:   Print the man page in groff man format.  To get a plain text
+    version, `pandoc-citeproc --man | groff -mman -Tutf8`.  To
+    `pandoc-citeproc --man | groff -mman -Thtml`.
+
+`--license`
+:   Print the license.
+
+`-V, --version`
+:   Print version.
 
 # NOTES
 

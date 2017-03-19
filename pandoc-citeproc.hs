@@ -22,7 +22,7 @@ import System.Exit
 import Data.Version (showVersion)
 import Paths_pandoc_citeproc (version)
 import Text.CSL.Pandoc (processCites')
-import Text.CSL.Data (getManPage)
+import Text.CSL.Data (getManPage, getLicense)
 import Text.Pandoc.JSON hiding (Format)
 import Text.Pandoc.Walk
 import qualified Text.Pandoc.UTF8 as UTF8
@@ -43,6 +43,9 @@ main = do
     exitWith ExitSuccess
   when (Man `elem` flags) $ do
     getManPage >>= BL.putStr
+    exitWith ExitSuccess
+  when (License `elem` flags) $ do
+    getLicense >>= BL.putStr
     exitWith ExitSuccess
   if Bib2YAML `elem` flags || Bib2JSON `elem` flags
      then do
@@ -113,6 +116,7 @@ findWarnings _ = []
 data Option =
       Help
     | Man
+    | License
     | Version
     | Convert
     | Format String
@@ -124,6 +128,7 @@ options :: [OptDescr Option]
 options =
   [ Option ['h'] ["help"] (NoArg Help) "show usage information"
   , Option [] ["man"] (NoArg Man) "print man page to stdout"
+  , Option [] ["license"] (NoArg License) "print license to stdout"
   , Option ['V'] ["version"] (NoArg Version) "show program version"
   , Option ['y'] ["bib2yaml"] (NoArg Bib2YAML) "convert bibliography to YAML"
   , Option ['j'] ["bib2json"] (NoArg Bib2JSON) "convert bibliography to JSON"
