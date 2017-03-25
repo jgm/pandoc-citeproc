@@ -286,7 +286,7 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
                put WordBoundary
                return $ Space : acc
         go acc (Str [c])
-          | c `elem` "-/\2013\2014\160" = do
+          | c `elem` "-/\x2013\x2014\160" = do
                put WordBoundary
                return $ Str [c] : acc
           | isPunctuation c = do
