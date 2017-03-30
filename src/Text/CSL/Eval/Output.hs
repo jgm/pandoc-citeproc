@@ -27,8 +27,8 @@ import Text.Parsec
 
 -- Parse affix or delimiter into Formatted, splitting out
 -- raw components in @{{format}}...{{/format}}@.
-formatAffix :: String -> Formatted
-formatAffix s =
+formatString :: String -> Formatted
+formatString s =
   case parse pAffix s s of
        Left _    -> fromString s
        Right ils -> Formatted ils
@@ -130,9 +130,9 @@ formatOutput o =
       OPan     i          -> Formatted i
       ODel     []         -> Formatted []
       ODel     " "        -> Formatted [Space]
-      ODel     s          -> formatAffix s
+      ODel     s          -> formatString s
       OStr     []      _  -> Formatted []
-      OStr     s       f  -> addFormatting f $ fromString s
+      OStr     s       f  -> addFormatting f $ formatString s
       OErr NoOutput       -> Formatted [Span ("",["citeproc-no-output"],[])
                                      [Strong [Str "???"]]]
       OErr (ReferenceNotFound r)
@@ -140,10 +140,10 @@ formatOutput o =
                                             [("data-reference-id",r)])
                                      [Strong [Str "???"]]]
       OLabel   []      _  -> Formatted []
-      OLabel   s       f  -> formatOutput (OStr s f)
+      OLabel   s       f  -> addFormatting f $ formatString s
       ODate    os         -> formatOutputList os
-      OYear    s _     f  -> formatOutput (OStr s f)
-      OYearSuf s _ _   f  -> formatOutput (OStr s f)
+      OYear    s _     f  -> addFormatting f $ formatString s
+      OYearSuf s _ _   f  -> addFormatting f $ formatString s
       ONum     i       f  -> formatOutput (OStr (show i) f)
       OCitNum  i       f  -> if i == 0
                                 then Formatted [Strong [Str "???"]]
@@ -166,13 +166,13 @@ addFormatting f =
                          url -> Formatted [Link nullAttr (unFormatted i) (url, "")]
         pref i = case prefix f of
                       "" -> i
-                      x  -> formatAffix x <> i
+                      x  -> formatString x <> i
         addSuffix i
           | null (suffix f)       = i
           | case suffix f of {(c:_) | isPunct c -> True; _ -> False}
           , case lastInline (unFormatted i) of {(c:_) | isPunct c -> True; _ -> False}
-                                  = i <> formatAffix (tail $ suffix f)
-          | otherwise             = i <> formatAffix (suffix f)
+                                  = i <> formatString (tail $ suffix f)
+          | otherwise             = i <> formatString (suffix f)
 
         strip_periods (Formatted ils) = Formatted (walk removePeriod ils)
         removePeriod (Str xs) | stripPeriods f = Str (filter (/='.') xs)
