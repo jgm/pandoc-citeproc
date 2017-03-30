@@ -416,11 +416,17 @@ mapHeadInline f (i:xs)
 
 findFile :: [FilePath] -> FilePath -> IO (Maybe FilePath)
 findFile [] _ = return Nothing
-findFile (p:ps) f = do
-  exists <- doesFileExist (p </> f)
-  if exists
-     then return $ Just (p </> f)
-     else findFile ps f
+findFile (p:ps) f
+ | isAbsolute f = do
+     exists <- doesFileExist f
+     if exists
+        then return (Just f)
+        else return Nothing
+ | otherwise = do
+     exists <- doesFileExist (p </> f)
+     if exists
+        then return $ Just (p </> f)
+        else findFile ps f
 
 (&=) :: (ToYaml a, Monoid a, Eq a)
      => Text -> a -> [(Text, YamlBuilder)] -> [(Text, YamlBuilder)]
