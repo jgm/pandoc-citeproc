@@ -23,6 +23,32 @@ import Text.Pandoc.Definition
 import Text.Pandoc.Walk (walk)
 import Data.String (fromString)
 import Data.Maybe (mapMaybe)
+import Text.Parsec
+
+-- Parse affix or delimiter into Formatted, splitting out
+-- raw components in @{{format}}...{{/format}}@.
+formatAffix :: String -> Formatted
+formatAffix s =
+  case parse pAffix s s of
+       Left _    -> fromString s
+       Right ils -> Formatted ils
+
+pAffix :: Parsec String () [Inline]
+pAffix = many (pRaw <|> pString <|> pSpace)
+
+pRaw :: Parsec String () Inline
+pRaw = try $ do
+  string "{{"
+  format <- many1 letter
+  string "}}"
+  contents <- manyTill anyChar (try (string ("{{/" ++ format ++ "}}")))
+  return $ RawInline (Format format) contents
+
+pString :: Parsec String () Inline
+pString = Str <$> (many1 (noneOf " \t\n\r{}") <|> count 1 (oneOf "{}"))
+
+pSpace :: Parsec String () Inline
+pSpace = Space <$ many1 (oneOf " \t\n\r")
 
 output :: Formatting -> String -> [Output]
 output fm s
@@ -104,7 +130,7 @@ formatOutput o =
       OPan     i          -> Formatted i
       ODel     []         -> Formatted []
       ODel     " "        -> Formatted [Space]
-      ODel     s          -> fromString s
+      ODel     s          -> formatAffix s
       OStr     []      _  -> Formatted []
       OStr     s       f  -> addFormatting f $ fromString s
       OErr NoOutput       -> Formatted [Span ("",["citeproc-no-output"],[])
@@ -140,13 +166,13 @@ addFormatting f =
                          url -> Formatted [Link nullAttr (unFormatted i) (url, "")]
         pref i = case prefix f of
                       "" -> i
-                      x  -> fromString x <> i
+                      x  -> formatAffix x <> i
         addSuffix i
           | null (suffix f)       = i
           | case suffix f of {(c:_) | isPunct c -> True; _ -> False}
           , case lastInline (unFormatted i) of {(c:_) | isPunct c -> True; _ -> False}
-                                  = i <> fromString (tail $ suffix f)
-          | otherwise             = i <> fromString (suffix f)
+                                  = i <> formatAffix (tail $ suffix f)
+          | otherwise             = i <> formatAffix (suffix f)
 
         strip_periods (Formatted ils) = Formatted (walk removePeriod ils)
         removePeriod (Str xs) | stripPeriods f = Str (filter (/='.') xs)
