@@ -33,7 +33,6 @@ import System.Directory (getAppUserDataDirectory)
 import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim)
 import System.IO.Error (isDoesNotExistError)
 import Data.Maybe (fromMaybe)
-import Text.XML (XMLException(..))
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -199,6 +198,10 @@ processCites' (Pandoc meta blocks) = do
 
 toPath :: MetaValue -> Maybe String
 toPath (MetaString s) = Just s
+-- take last in a list
+toPath (MetaList xs) = case reverse xs of
+                             []    -> Nothing
+                             (x:_) -> toPath x
 toPath (MetaInlines ils) = Just $ stringify ils
 toPath _ = Nothing
 
