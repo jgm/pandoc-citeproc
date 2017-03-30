@@ -29,7 +29,7 @@ import Control.Monad
 import qualified Control.Exception as E
 import Control.Monad.State
 import System.FilePath
-import System.Directory (doesFileExist, getAppUserDataDirectory)
+import System.Directory (getAppUserDataDirectory)
 import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim)
 import System.IO.Error (isDoesNotExistError)
 import Data.Maybe (fromMaybe)
@@ -159,30 +159,17 @@ processCites' (Pandoc meta blocks) = do
                 >>= toPath
   let mbLocale = (lookupMeta "lang" meta `mplus` lookupMeta "locale" meta)
                    >>= toPath
-  let getDefaultCSL' = case mbcsldir of
-                            Just csldir -> do
-                              let f = csldir </> "chicago-author-date.csl"
-                              exists <- doesFileExist f
-                              if exists
-                                 then L.readFile f
-                                 else getDefaultCSL
-                            Nothing -> getDefaultCSL
+  let tryReadCSLFile Nothing _  = mzero
+      tryReadCSLFile (Just d) f = E.catch (readCSLFile mbLocale (d </> f))
+                                     (\(_ :: E.SomeException) -> mzero)
   csl <- case cslfile of
                Just f | not (null f) -> E.catch
                    (readCSLFile mbLocale f) $ \e ->
                         E.throwIO (InvalidXMLFile f e)
-               _ -> do
-                 -- get default CSL: look first in ~/.csl, and take
-                 -- from distribution if not found
-                 raw <- case mbpandocdir of
-                          Just pandocdir -> do
-                            let f = pandocdir </> "default.csl"
-                            exists <- doesFileExist f
-                            if exists
-                               then L.readFile f
-                               else getDefaultCSL'
-                          Nothing -> getDefaultCSL'
-                 localizeCSL mbLocale $ parseCSL' raw
+               _ ->  tryReadCSLFile mbpandocdir "default.csl"
+                   `mplus` tryReadCSLFile mbcsldir "chicago-author-date.csl"
+                   `mplus` (getDefaultCSL >>=
+                             localizeCSL mbLocale . parseCSL')
   -- set LANG environment from locale; this affects unicode collation
   -- if pandoc-citeproc compiled with unicode_collation flag
   case styleLocale csl of
