@@ -163,9 +163,7 @@ processCites' (Pandoc meta blocks) = do
       tryReadCSLFile (Just d) f = E.catch (readCSLFile mbLocale (d </> f))
                                      (\(_ :: E.SomeException) -> mzero)
   csl <- case cslfile of
-               Just f | not (null f) -> E.catch
-                   (readCSLFile mbLocale f) $ \e ->
-                        E.throwIO (InvalidXMLFile f e)
+               Just f | not (null f) -> readCSLFile mbLocale f
                _ ->  tryReadCSLFile mbpandocdir "default.csl"
                    `mplus` tryReadCSLFile mbcsldir "chicago-author-date.csl"
                    `mplus` (getDefaultCSL >>=
