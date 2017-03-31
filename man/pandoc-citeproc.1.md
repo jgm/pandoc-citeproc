@@ -162,6 +162,21 @@ from the extension.
 
 This mode supersedes the old `biblio2yaml` program.
 
+## Raw content (pandoc-citeproc only)
+
+To include raw content in a prefix, suffix, delimiter, or term,
+surround it with these tags indicating the format:
+
+    {{jats}}&lt;ref&gt;{{/jats}}
+
+Without the tags, the string will be interpreted as a string
+and escaped in the output, rather than being passed through raw.
+
+This feature allows stylesheets to be customized to give
+different output for different output formats.  However,
+stylesheets customized in this way will not be useable
+by other CSL implementations.
+
 # OPTIONS
 
 `-y, --bib2yaml`
