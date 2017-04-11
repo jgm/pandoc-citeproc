@@ -186,9 +186,18 @@ hasLowercaseWord = any startsWithLowercase . splitStrWhen isPunctuation
 
 splitUpStr :: [Inline] -> [Inline]
 splitUpStr ils =
-  case reverse (splitStrWhen (\c -> isPunctuation c || c == '\160') ils) of
-       [] -> []
-       (x:xs) -> reverse $ Span ("",["lastword"],[]) [x] : xs
+  case reverse (combineInternalPeriods
+         (splitStrWhen (\c -> isPunctuation c || c == '\160') ils)) of
+         [] -> []
+         (x:xs) -> reverse $ Span ("",["lastword"],[]) [x] : xs
+
+-- We want to make sure that the periods in www.example.com, for
+-- example, are not interpreted as sentence-ending punctuation.
+combineInternalPeriods :: [Inline] -> [Inline]
+combineInternalPeriods [] = []
+combineInternalPeriods (Str xs:Str ".":Str ys:zs) =
+  combineInternalPeriods $ Str (xs ++ "." ++ ys) : zs
+combineInternalPeriods (x:xs) = x : combineInternalPeriods xs
 
 unTitlecase :: [Inline] -> [Inline]
 unTitlecase zs = evalState (caseTransform untc zs) SentenceBoundary
