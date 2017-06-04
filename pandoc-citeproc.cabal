@@ -128,9 +128,6 @@ library
        build-depends: file-embed >= 0.0 && < 0.1
        cpp-options:   -DEMBED_DATA_FILES
        other-modules: Text.CSL.Data.Embedded
-       if os(darwin)
-          Build-Tools:   cpphs >= 1.19
-          ghc-options:   -pgmP cpphs -optP --cpp
 
     if flag(unicode_collation)
        build-depends: text, text-icu
