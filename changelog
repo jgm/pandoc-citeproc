@@ -1,3 +1,8 @@
+pandoc-citeproc (0.10.5.1)
+
+  * Minor tweaks for clean CI builds.
+  * Require recent yaml for uniform test output.
+
 pandoc-citeproc (0.10.5)
 
   * Use file-embed instead of hsb2hs for embed_data_files flag (#285).
