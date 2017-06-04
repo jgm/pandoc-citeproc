@@ -11,7 +11,6 @@ import Data.Char (isSpace, toLower)
 import System.Environment (getArgs)
 import System.Process
 import System.IO.Temp (withSystemTempDirectory)
-import Text.Pandoc.Definition (Inline(Span, Str))
 import qualified Text.Pandoc.UTF8 as UTF8
 import Data.Aeson
 import System.FilePath
