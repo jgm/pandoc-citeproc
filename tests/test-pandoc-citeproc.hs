@@ -6,10 +6,6 @@ import System.Directory
 import System.FilePath
 import Data.Maybe (fromMaybe)
 import System.IO
-#if MIN_VERSION_base(4,8,0)
-#else
-import Data.Monoid (mempty)
-#endif
 import System.IO.Temp (withSystemTempDirectory)
 import System.Process (rawSystem)
 import qualified Data.Aeson as Aeson
