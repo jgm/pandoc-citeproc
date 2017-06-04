@@ -14,4 +14,4 @@ packages:
 extra-deps:
 - xml-conduit-1.5.0
 - skylighting-0.3.3
-resolver: lts-8.12
+resolver: lts-8.16
