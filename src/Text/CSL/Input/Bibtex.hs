@@ -185,7 +185,7 @@ fieldName :: BibParser String
 fieldName = (map toLower) <$> many1 (letter <|> digit <|> oneOf "-_:+")
 
 isBibtexKeyChar :: Char -> Bool
-isBibtexKeyChar c = isAlphaNum c || c `elem` ".:;?!`'()/*@_+=-[]*"
+isBibtexKeyChar c = isAlphaNum c || c `elem` ".:;?!`'()/*@_+=-[]*&"
 
 bibItem :: BibParser Item
 bibItem = do
