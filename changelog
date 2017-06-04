@@ -1,3 +1,67 @@
+pandoc-citeproc (0.10.5)
+
+  * Use file-embed instead of hsb2hs for embed_data_files flag (#285).
+  * Allow `&` in bibtex keys (#289).  They are discouraged because of
+    problems in tables, but technically they are allowed.
+  * Allow + in bibtex field name (#290).  BibLaTeX now allows things like
+    `author+an` for annotations.  See "Data Annotations" in the bibtex manual.
+    Note that we don't actually parse the annotations, we just don't
+    crash on bibtex files that include them.
+  * caseTransform:  fix corner case where last word has internal periods
+    (#288).  E.g. in `www.example.com`, previously `com` was capitalized
+    as the last word.
+  * If there's a list of csl, locale, or abbrev files, use the last one.
+  * Don't catch exceptions in reading CSL file.  Previously some exceptions
+    were silently caught, leading to unexpected use of the default.
+  * Util.findFile:  return right away if absolute path.
+  * Added mechanism for inserting raw content into delimiters, prefixes, suffixes.
+    So, for example, in your CSL file you can have
+
+        prefix="{{html}}&lt;i&gt;{{/html}}"
+
+    and this will turn into
+
+        RawInline (Format "html") "<i>"
+
+    rather than, as before
+
+        Str "<i>",
+
+    which would get escaped in the output.
+    See jgm/pandoc#3536 for the motivation.
+  * Text.CSL.Pandoc: Simplified code for looking up default CSL.
+  * Fix titlecase bug involving em/en dashes (#284).
+  * Export license from Text.CSL.Data.Embedded.
+  * Added `--license` to CLI and `getLicense` to Text.CSL.Data (API change).
+  * Updated chicago-author-date.csl and locales xml.
+  * Add `getManPage` to Text.CSL.Data and `--man` option to CLI (API change).
+    `pandoc-citeproc --man` now simply spits out the man page in
+    groff format.  For a plain text version, use
+    `pandoc-citeproc --man | groff -mman -Tutf8`.  For an HTML version,
+    `pandoc-citeproc --man | groff -mman -Thtml`.
+  * Updates to be able to compile and test with current pandoc HEAD.
+  * Automatically link ISBN references to Worldcat (#279).
+    This is similar to existing support for DOIs.  Thanks to Eric Marsden.
+  * Text.CSL.Input.Bibtex: export `Lang`, `langToLocale`, `getLangFromEnv`
+    (#281, API change).
+  * Adjusted treatment of `\hyphen` now that pandoc includes trailing space...
+    in RawInline.  See jgm/pandoc#1773 and commit
+    f4a452f89174828fea77614a4b6a067fc4675ba5.
+  * Support citation-label variable (#160, Lukas Atkinson).
+    The `citation-label` was not rendered, even when this label was
+    explicitly set in the bibliography. This is now fixed. Citation labels
+    are modelled after citation numbers. In particular, citation labels can
+    also be hyperlinked.  API changes:
+
+    In `Text.CSL,Reference`: The exported type `CLabel` describes a label
+    name in the CSL variables. This allows us to distinguish labels from
+    ordinary strings. This type is analogous to `CNum`.
+
+    In `Text.CSL.Style`: In `Output` the `OCitLabel` case describes a label
+    in the rendered output. This case is analogous to `OCitNum`.
+  * Allow aeson 1.2.
+  * Fixed overlapping instance problem in test-citeproc w/ recent aeson.
+
 pandoc-citeproc (0.10.4.1)
 
   * Raise version bounds for xml-conduit.
