@@ -4,10 +4,12 @@ module Main where
 import System.Exit
 import System.Directory
 import System.FilePath
-import qualified Control.Exception as E
 import Data.Maybe (fromMaybe)
 import System.IO
+#if MIN_VERSION_base(4,8,0)
+#else
 import Data.Monoid (mempty)
+#endif
 import System.IO.Temp (withSystemTempDirectory)
 import System.Process (rawSystem)
 import qualified Data.Aeson as Aeson
@@ -17,6 +19,9 @@ import Text.CSL.Compat.Pandoc (writeNative, pipeProcess)
 import Data.List (isSuffixOf)
 import System.Environment
 import Control.Monad (when)
+#if MIN_VERSION_pandoc(2,0,0)
+import qualified Control.Exception as E
+#endif
 
 main :: IO ()
 main = do
