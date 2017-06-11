@@ -17,6 +17,7 @@ import qualified Control.Exception as E
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
 import Data.ByteString as B
+import qualified Data.Text as T
 import Text.Pandoc (Pandoc, ReaderOptions(..), def, WrapOption(..),
         WriterOptions(..))
 import qualified Text.Pandoc as Pandoc
@@ -42,25 +43,28 @@ writeMarkdown, writePlain, writeNative, writeHtmlString :: Pandoc -> String
 #if MIN_VERSION_pandoc(2,0,0)
 readHtml = either mempty id . runPure . Pandoc.readHtml
    def{ readerExtensions = extensionsFromList [Ext_native_divs,
-                           Ext_native_spans, Ext_raw_html, Ext_smart] }
+                           Ext_native_spans, Ext_raw_html, Ext_smart] } .
+   T.pack
 
 readMarkdown = either mempty id . runPure . Pandoc.readMarkdown
-   def{ readerExtensions = pandocExtensions, readerStandalone = True }
+   def{ readerExtensions = pandocExtensions, readerStandalone = True } .
+   T.pack
 
 readLaTeX = either mempty id . runPure . Pandoc.readLaTeX
-   def{ readerExtensions = extensionsFromList [Ext_raw_tex, Ext_smart] }
+   def{ readerExtensions = extensionsFromList [Ext_raw_tex, Ext_smart] } .
+   T.pack
 
-readNative = either mempty id . runPure . Pandoc.readNative def
+readNative = either mempty id . runPure . Pandoc.readNative def . T.pack
 
-writeMarkdown = either mempty id . runPure . Pandoc.writeMarkdown
+writeMarkdown = either mempty T.unpack . runPure . Pandoc.writeMarkdown
    def{ writerExtensions = disableExtension Ext_smart pandocExtensions,
         writerWrapText = WrapNone }
 
-writePlain = either mempty id . runPure . Pandoc.writePlain def
+writePlain = either mempty T.unpack . runPure . Pandoc.writePlain def
 
-writeNative = either mempty id . runPure . Pandoc.writeNative def
+writeNative = either mempty T.unpack . runPure . Pandoc.writeNative def
 
-writeHtmlString = either mempty id . runPure . Pandoc.writeHtml4String
+writeHtmlString = either mempty T.unpack . runPure . Pandoc.writeHtml4String
    def{ writerExtensions = extensionsFromList
        [Ext_native_divs, Ext_native_spans, Ext_raw_html] }
 

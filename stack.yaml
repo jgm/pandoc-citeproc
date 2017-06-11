@@ -9,7 +9,7 @@ packages:
 - '.'
 - location:
     git: https://github.com/jgm/pandoc.git
-    commit: 55d679e382954dd458acd6233609851748522d99
+    commit: 49830555fa4a384692ab4ec4e64fdb6c4e7bc78b
   extra-dep: true
 extra-deps:
 - xml-conduit-1.5.0
