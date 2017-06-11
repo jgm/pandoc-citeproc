@@ -509,8 +509,8 @@ noteFields = do
 noteField :: P.Parser (Text, Aeson.Value)
 noteField = P.try $ do
   P.spaces
-  P.char '{'
-  P.char ':'
+  _ <- P.char '{'
+  _ <- P.char ':'
   k <- P.manyTill (P.letter <|> P.char '-') (P.char ':')
   v <- P.manyTill P.anyChar (P.char '}')
   return (T.pack k, Aeson.String (T.pack v))

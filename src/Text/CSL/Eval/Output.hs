@@ -38,9 +38,9 @@ pAffix = many (pRaw <|> pString <|> pSpace)
 
 pRaw :: Parsec String () Inline
 pRaw = try $ do
-  string "{{"
+  _ <- string "{{"
   format <- many1 letter
-  string "}}"
+  _ <- string "}}"
   contents <- manyTill anyChar (try (string ("{{/" ++ format ++ "}}")))
   return $ RawInline (Format format) contents
 

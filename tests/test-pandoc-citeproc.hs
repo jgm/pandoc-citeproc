@@ -96,7 +96,7 @@ showDiff expected result =
     UTF8.writeFile actualf result
     oldDir <- getCurrentDirectory
     setCurrentDirectory fp
-    rawSystem "diff" ["-U1","expected","actual"]
+    _ <- rawSystem "diff" ["-U1","expected","actual"]
     setCurrentDirectory oldDir
 
 biblio2yamlTest :: String -> IO TestResult
