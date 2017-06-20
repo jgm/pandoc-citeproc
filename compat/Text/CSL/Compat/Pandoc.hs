@@ -17,12 +17,12 @@ import qualified Control.Exception as E
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
 import Data.ByteString as B
-import qualified Data.Text as T
 import Text.Pandoc (Pandoc, ReaderOptions(..), def, WrapOption(..),
         WriterOptions(..))
 import qualified Text.Pandoc as Pandoc
 import qualified Text.Pandoc.Process
 #if MIN_VERSION_pandoc(2,0,0)
+import qualified Data.Text as T
 import Text.Pandoc.MIME (MimeType)
 import Text.Pandoc.Error (PandocError)
 import Text.Pandoc.Class (runPure, runIO)
