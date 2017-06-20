@@ -125,8 +125,11 @@ readBibtexString' isBibtex caseTransform lang locale bibstring =
 type BibParser = Parsec [Char] [(String, String)]
 
 bibEntries :: BibParser [Item]
-bibEntries = many (try (skipMany nonEntry >> bibItem)) <* skipMany nonEntry
-  where nonEntry = bibSkip <|> bibComment <|> bibPreamble <|> bibString
+bibEntries = do
+  skipMany nonEntry
+  items <- many (bibItem <* skipMany nonEntry)
+  return items
+ where nonEntry = bibSkip <|> bibComment <|> bibPreamble <|> bibString
 
 bibSkip :: BibParser ()
 bibSkip = skipMany1 (satisfy (/='@'))
@@ -194,7 +197,7 @@ bibItem = do
   spaces
   char '{'
   spaces
-  entid <- many (satisfy isBibtexKeyChar)
+  entid <- many1 (satisfy isBibtexKeyChar)
   spaces
   char ','
   spaces
