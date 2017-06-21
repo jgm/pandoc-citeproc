@@ -12,7 +12,8 @@ import qualified Data.ByteString.Char8 as B8
 import Data.Attoparsec.ByteString.Char8 as Attoparsec
 import qualified Data.Text as T
 import Data.Text.Encoding (encodeUtf8)
-import Data.Aeson.Encode.Pretty (encodePretty', Config(..), Indent(Spaces), NumberFormat(Generic))
+import Data.Aeson.Encode.Pretty (encodePretty', defConfig, Config(..),
+          Indent(Spaces), NumberFormat(Generic))
 import System.Console.GetOpt
 import Control.Monad
 import System.IO
@@ -69,9 +70,9 @@ main = do
                  B8.intercalate (B.singleton 10) .
                  map (unescapeTags . toByteString . (:[]))
             else B8.putStrLn . unescapeUnicode . B.concat . BL.toChunks .
-              encodePretty' Config{ confIndent = Spaces 2
-                                  , confCompare = compare
-                                  , confNumFormat = Generic }
+              encodePretty' defConfig{ confIndent = Spaces 2
+                                     , confCompare = compare
+                                     , confNumFormat = Generic }
      else toJSONFilter doCites
 
 formatFromExtension :: FilePath -> Maybe BibFormat
