@@ -33,6 +33,7 @@ import Data.Maybe (listToMaybe, fromMaybe)
 import Text.Pandoc.UTF8 (fromStringLazy)
 import Text.CSL.Compat.Pandoc (fetchItem)
 import Text.CSL.Data (getLocale)
+import Text.CSL.Exception
 
 -- | Parse a 'String' into a 'Style' (with default locale).
 parseCSL :: String -> Style
@@ -65,7 +66,7 @@ readCSLFile mbLocale src = do
   let parentCur = cur $/ get "info" &/ pickParentCur
   let parent' = concatMap (stringAttr "href") parentCur
   when (parent' == src) $ do
-    error $ "Dependent CSL style " ++ src ++ " specifies itself as parent."
+    E.throwIO $ DependentStyleHasItselfAsParent src
   case parent' of
        ""  -> localizeCSL mbLocale $ parseCSLCursor cur
        y   -> do

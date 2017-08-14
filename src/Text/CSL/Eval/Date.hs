@@ -16,11 +16,14 @@
 module Text.CSL.Eval.Date where
 
 import Control.Monad.State
+import qualified Control.Exception as E
+
 import Data.Char
 import Data.List
 import Data.List.Split
 import Data.Maybe
 
+import Text.CSL.Exception
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
 import Text.CSL.Style
@@ -84,7 +87,7 @@ formatDate em k tm dp date
       addODate xs   = [ODate xs]
       splitDate a b = case split (onSublist $ diff a b dp) dp of
                         [x,y,z] -> (x,y,z)
-                        _       -> error "error in splitting date ranges"
+                        _       -> E.throw ErrorSplittingDate
       doRange   a b = let (x,y,z) = splitDate a b in
                       map (formatDatePart False  a) x ++
                       map (formatDatePart False  a) (init' y) ++

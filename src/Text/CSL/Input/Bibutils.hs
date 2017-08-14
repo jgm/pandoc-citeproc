@@ -23,14 +23,15 @@ import Text.Pandoc hiding (readMarkdown)
 import Text.CSL.Compat.Pandoc (readMarkdown)
 import Data.Char
 import System.FilePath ( takeExtension )
+import Text.CSL.Exception
 import Text.CSL.Reference hiding ( Value )
 import Text.CSL.Input.Bibtex
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Map as M
 import Data.Aeson
+import qualified Control.Exception as E
 
 #ifdef USE_BIBUTILS
-import qualified Control.Exception as E
 import Control.Exception ( bracket, catch )
 import Control.Monad.Trans ( liftIO )
 import System.FilePath ( (</>), (<.>) )
@@ -47,8 +48,10 @@ import Text.Bibutils
 readBiblioFile :: FilePath -> IO [Reference]
 readBiblioFile f
     = case getExt f of
-        ".json"     -> BL.readFile f >>= either error return . eitherDecode
-        ".yaml"     -> UTF8.readFile f >>= either error return . readYamlBib
+        ".json"     -> BL.readFile f >>= either
+                       (E.throwIO . ErrorReadingBibFile f) return . eitherDecode
+        ".yaml"     -> UTF8.readFile f >>= either
+                       (E.throwIO . ErrorReadingBibFile f) return . readYamlBib
         ".bib"      -> readBibtex False True f
         ".bibtex"   -> readBibtex True True f
         ".biblatex" -> readBibtex False True f
@@ -60,10 +63,9 @@ readBiblioFile f
         ".wos"      -> readBiblioFile' f isi_in
         ".medline"  -> readBiblioFile' f medline_in
         ".copac"    -> readBiblioFile' f copac_in
-        _           -> error $ "citeproc: the format of the bibliographic database could not be recognized\n" ++
-                              "using the file extension."
+        _           -> E.throwIO $ ErrorReadingBibFile f "the format of the bibliographic database could not be recognized from the file extension"
 #else
-        _           -> error $ "citeproc: Bibliography format not supported.\n"
+        _           -> E.throwIO $ ErrorReadingBibFile f "bibliography format not supported"
 #endif
 
 data BibFormat
@@ -80,11 +82,14 @@ data BibFormat
     | Copac
     | Mods
 #endif
+    deriving Show
 
 readBiblioString :: BibFormat -> String -> IO [Reference]
 readBiblioString b s
-    | Json      <- b = either error return $ eitherDecode $ UTF8.fromStringLazy s
-    | Yaml      <- b = either error return $ readYamlBib s
+    | Json      <- b = either (E.throwIO . ErrorReadingBib)
+                         return $ eitherDecode $ UTF8.fromStringLazy s
+    | Yaml      <- b = either (E.throwIO . ErrorReadingBib)
+                         return $ readYamlBib s
     | Bibtex    <- b = readBibtexString True True s
     | BibLatex  <- b = readBibtexString False True s
 #ifdef USE_BIBUTILS
@@ -96,7 +101,8 @@ readBiblioString b s
     | Copac     <- b = go copac_in
     | Mods      <- b = go mods_in
 #endif
-    | otherwise      = error "in readBiblioString"
+    | otherwise      = E.throwIO $ ErrorReadingBib $
+                          "unsupported format " ++ show b
 #ifdef USE_BIBUTILS
     where
       go f = withTempDir "citeproc" $ \tdir -> do
@@ -125,7 +131,7 @@ readBiblioFile' fin bin
                             refs <- readBibtex True False tfile
                             return $! refs
   where handleBibfileError :: E.SomeException -> IO [Reference]
-        handleBibfileError e = error $ "Error reading " ++ fin ++ "\n" ++ show e
+        handleBibfileError e = E.throwIO $ ErrorReadingBibFile fin (show e)
 
 -- | Perform a function in a temporary directory and clean up.
 withTempDir :: FilePath -> (FilePath -> IO a) -> IO a

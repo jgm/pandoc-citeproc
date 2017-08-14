@@ -22,6 +22,7 @@ module Text.CSL.Eval
 
 import Control.Arrow
 import Control.Monad.State
+import qualified Control.Exception as E
 import Data.Monoid (Any(..))
 import Data.Char ( toLower, isDigit, isLetter )
 import Data.Maybe
@@ -31,6 +32,7 @@ import Text.Pandoc.Walk (walk)
 import Text.Pandoc.Shared (stringify)
 import qualified Data.Text as T
 
+import Text.CSL.Exception
 import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
 import Text.CSL.Eval.Date
@@ -136,7 +138,7 @@ evalElement el
     | Macro    s   fm       <- el = do
                         ms <- gets (macros . env)
                         case lookup s ms of
-                             Nothing  -> error $ "Macro " ++ show s ++ " not found!"
+                             Nothing  -> E.throw $ MacroNotFound (show s)
                              Just els -> do
                                res <- concat <$> mapM evalElement els
                                if null res

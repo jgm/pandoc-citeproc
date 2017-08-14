@@ -34,7 +34,6 @@ import System.Directory (getAppUserDataDirectory)
 import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim)
 import Text.CSL.Exception
 import System.IO.Error (isDoesNotExistError)
-import System.IO (stderr)
 import Data.Maybe (fromMaybe)
 
 -- | Process a 'Pandoc' document by adding citations formatted
