@@ -9,11 +9,13 @@ packages:
 - '.'
 - location:
     git: https://github.com/jgm/pandoc.git
-    commit: f9309bc46e4bf24b3a1d53663297851394a89a3f
+    commit: 9c577b17b78adeea3bf3b877729897b156c783d6
   extra-dep: true
 extra-deps:
-- xml-conduit-1.5.0
-- hslua-0.5.0
+- hslua-0.7.0
 - skylighting-0.3.3
-- texmath-0.9.4.1
-resolver: lts-8.16
+- cmark-gfm-0.1.1
+- QuickCheck-2.10.0.1
+- tasty-quickcheck-0.9.1
+- haddock-library-1.4.3
+resolver: lts-9.0
