@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, ScopedTypeVariables #-}
 module Main where
 import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
 import Text.CSL.Reference (Reference(refId), Literal(..))
@@ -15,6 +15,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Data.Aeson.Encode.Pretty (encodePretty', defConfig, Config(..),
           Indent(Spaces), NumberFormat(Generic))
 import System.Console.GetOpt
+import Control.Exception as E
 import Control.Monad
 import System.IO
 import System.FilePath (takeExtension)
@@ -73,7 +74,11 @@ main = do
               encodePretty' defConfig{ confIndent = Spaces 2
                                      , confCompare = compare
                                      , confNumFormat = Generic }
-     else toJSONFilter doCites
+     else E.catch (toJSONFilter doCites)
+          (\(e :: SomeException) -> do
+             UTF8.hPutStrLn stderr $
+               "pandoc-citeproc: error running filter.\n" ++ show e
+             exitWith (ExitFailure 1))
 
 formatFromExtension :: FilePath -> Maybe BibFormat
 formatFromExtension = readFormat . dropWhile (=='.') . takeExtension

@@ -1,6 +1,7 @@
 {-# LANGUAGE PatternGuards, OverloadedStrings, FlexibleInstances,
     ScopedTypeVariables, CPP #-}
-module Text.CSL.Pandoc (processCites, processCites') where
+module Text.CSL.Pandoc (processCites, processCites')
+where
 
 import Text.Pandoc
 import Text.Pandoc.Walk
@@ -31,7 +32,9 @@ import Control.Monad.State
 import System.FilePath
 import System.Directory (getAppUserDataDirectory)
 import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim)
+import Text.CSL.Exception
 import System.IO.Error (isDoesNotExistError)
+import System.IO (stderr)
 import Data.Maybe (fromMaybe)
 
 -- | Process a 'Pandoc' document by adding citations formatted
@@ -151,7 +154,7 @@ processCites' (Pandoc meta blocks) = do
                  if isDoesNotExistError e
                     then return Nothing
                     else E.throwIO e
-  let inlineRefError s = error $ "Error parsing references: " ++ s
+  let inlineRefError s = E.throw $ ErrorParsingReferences s
   let inlineRefs = either inlineRefError id
                    $ convertRefs $ lookupMeta "references" meta
   let cslfile = (lookupMeta "csl" meta <|> lookupMeta "citation-style" meta)
@@ -189,7 +192,7 @@ processCites' (Pandoc meta blocks) = do
   let skipLeadingSpace = L.dropWhile (\s -> s == 32 || (s >= 9 && s <= 13))
   abbrevs <- maybe (return (Abbreviations M.empty))
              (\f -> findFile (maybe ["."] (\g -> [".", g]) mbcsldir) f >>=
-                    maybe (error $ "Could not find " ++ f) return >>=
+                    maybe (E.throwIO $ CouldNotFindAbbrevFile f) return >>=
                L.readFile >>=
                either error return . eitherDecode . skipLeadingSpace)
              cslAbbrevFile
@@ -209,7 +212,7 @@ getBibRefs :: MetaValue -> IO [Reference]
 getBibRefs (MetaList xs) = concat `fmap` mapM getBibRefs xs
 getBibRefs (MetaInlines xs) = getBibRefs (MetaString $ stringify xs)
 getBibRefs (MetaString s) = do
-  path <- findFile ["."] s >>= maybe (error $ "Could not find " ++ s) return
+  path <- findFile ["."] s >>= maybe (E.throwIO $ CouldNotFindBibFile s) return
   map unescapeRefId `fmap` readBiblioFile path
 getBibRefs _ = return []
 

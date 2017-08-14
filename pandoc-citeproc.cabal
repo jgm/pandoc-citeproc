@@ -76,6 +76,7 @@ library
     exposed-modules:  Text.CSL.Pandoc
                       Text.CSL
                       Text.CSL.Reference
+                      Text.CSL.Exception
                       Text.CSL.Style
                       Text.CSL.Eval
                       Text.CSL.Eval.Common
