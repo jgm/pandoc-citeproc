@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 
--- to be processed using hsb2hs
-module Text.CSL.Data.Embedded (localeFiles, defaultCSL, manpage, license) where
+module Text.CSL.Data.Embedded (localeFiles, defaultCSL, manpage, license)
+where
 import Data.FileEmbed
 import qualified Data.ByteString.Char8 as S
 
