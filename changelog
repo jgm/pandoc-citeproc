@@ -1,3 +1,16 @@
+pandoc-citeproc (0.11)
+
+  * Add Text.CSL.Exception module exporting CiteprocException [API change].
+  * Throw CiteprocExceptions instead of crashing with 'error'.  This
+    should lead to better error messages in pandoc when pandoc-citeproc fails.
+  * Compat.Pandoc: support for pandoc 2.0 API with Text instead of String.
+  * Text.CSL.Input.Bibtex - revise item parser for better error messages.
+    This should give us better messages when someone uses a bad character
+    in a citation key.
+  * Use defConfig from aeson-pretty.  Otherwise we get an error with newer
+    versions, which added a field to the Config record.
+  * Removed old hsb2hs-specific stuff from Setup.hs.
+
 pandoc-citeproc (0.10.5.1)
 
   * Minor tweaks for clean CI builds.
