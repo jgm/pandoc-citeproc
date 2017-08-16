@@ -1,6 +1,9 @@
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 module Text.CSL.Exception (CiteprocException(..)) where
 import Control.Exception (Exception)
+import Data.Data
+import Data.Typeable
 
 data CiteprocException =
        ErrorParsingReferences String
@@ -11,7 +14,7 @@ data CiteprocException =
      | ErrorSplittingDate
      | MacroNotFound          String
      | DependentStyleHasItselfAsParent String
-     deriving Show
+     deriving (Show, Data, Typeable)
 
 instance Exception CiteprocException
 
