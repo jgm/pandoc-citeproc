@@ -3,7 +3,6 @@
 module Text.CSL.Exception (CiteprocException(..)) where
 import Control.Exception (Exception)
 import Data.Data
-import Data.Typeable
 
 data CiteprocException =
        ErrorParsingReferences String
