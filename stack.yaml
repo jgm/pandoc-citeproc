@@ -9,10 +9,10 @@ packages:
 - '.'
 - location:
     git: https://github.com/jgm/pandoc.git
-    commit: 9c577b17b78adeea3bf3b877729897b156c783d6
+    commit: ae61d5f57dc8094eb40a9e83427db7fb02afcefb
   extra-dep: true
 extra-deps:
-- hslua-0.7.0
+- hslua-0.8.0
 - skylighting-0.3.3
 - cmark-gfm-0.1.1
 - QuickCheck-2.10.0.1
