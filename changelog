@@ -1,3 +1,9 @@
+pandoc-citeproc (0.11.1)
+
+ * Don't produce ??? with empty suppress-author citation (#156).
+ * Added Typeable, Data instances for CiteprocException. This
+   is needed for some older ghc versions.
+
 pandoc-citeproc (0.11)
 
   * Add Text.CSL.Exception module exporting CiteprocException [API change].
