@@ -239,8 +239,11 @@ decodeEntities (x:xs) = x : decodeEntities xs
 processCite :: Style -> M.Map [Citation] Formatted -> Inline -> Inline
 processCite s cs (Cite t _) =
    case M.lookup t cs of
-        Just (Formatted (x:xs)) -> Cite t (renderPandoc s (Formatted (x:xs)))
-        _             -> Strong [Str "???"]  -- TODO raise error instead?
+        Just (Formatted xs)
+          | not (null xs) || all isSuppressAuthor t
+               -> Cite t (renderPandoc s (Formatted xs))
+        _      -> Strong [Str "???"] -- TODO raise error instead?
+    where isSuppressAuthor c = citationMode c == SuppressAuthor
 processCite _ _ x = x
 
 isNote :: Inline -> Bool
