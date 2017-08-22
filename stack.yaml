@@ -9,7 +9,7 @@ packages:
 - '.'
 - location:
     git: https://github.com/jgm/pandoc.git
-    commit: ae61d5f57dc8094eb40a9e83427db7fb02afcefb
+    commit: d70b89c0d9f2636814fc85232b017751a5469f75
   extra-dep: true
 extra-deps:
 - hslua-0.8.0
