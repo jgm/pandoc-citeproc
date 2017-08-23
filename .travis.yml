@@ -99,7 +99,7 @@ install:
   case "$BUILD" in
     stack)
       ulimit -n 4096
-      stack --no-terminal --install-ghc $ARGS test --only-dependencies --fast --flag "pandoc-citeproc:test_citeproc" --flag "pandoc-citeproc:embed_data_files" --flag "aeson:fast"
+      stack --no-terminal --install-ghc $ARGS build --test --only-dependencies --fast --flag "pandoc-citeproc:test_citeproc" --flag "pandoc-citeproc:embed_data_files" --flag "aeson:fast"
       ;;
     cabal)
       cabal --version
