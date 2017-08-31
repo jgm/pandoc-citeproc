@@ -219,8 +219,8 @@
       <multiple>tłumacze</multiple>
     </term>
     <term name="editortranslator">
-      <single>redaktor &amp; tłumacz</single>
-      <multiple>redaktorzy &amp; tłumacze</multiple>
+      <single>redaktor i tłumacz</single>
+      <multiple>redaktorzy i tłumacze</multiple>
     </term>
 
     <!-- SHORT ROLE FORMS -->
@@ -251,10 +251,10 @@
 
     <!-- VERB ROLE FORMS -->
     <term name="container-author" form="verb">przez</term>
-    <term name="director" form="verb">directed by</term>
+    <term name="director" form="verb">reżyserowane przez</term>
     <term name="editor" form="verb">zredagowane przez</term>
     <term name="editorial-director" form="verb">zredagowane przez</term>
-    <term name="illustrator" form="verb">ilustrowane przez by</term>
+    <term name="illustrator" form="verb">ilustrowane przez</term>
     <term name="interviewer" form="verb">przeprowadzony przez</term>
     <term name="recipient" form="verb">dla</term>
     <term name="reviewed-author" form="verb">przez</term>
