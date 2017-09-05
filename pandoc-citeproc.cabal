@@ -71,6 +71,10 @@ flag debug
   description: Turn on debug tracing.
   default:     False
 
+flag static
+  description: Use static linking.
+  default:     False
+
 library
     hs-source-dirs:   src, prelude, compat
     exposed-modules:  Text.CSL.Pandoc
@@ -146,6 +150,8 @@ executable pandoc-citeproc
     hs-source-dirs:   ., prelude
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -fprof-auto-exported -rtsopts
+    if flag(static)
+      ld-options:     -static
     build-depends:    base >= 4, pandoc-citeproc,
                       pandoc-types >= 1.16 && < 1.18,
                       pandoc >= 1.16 && < 2.1,
