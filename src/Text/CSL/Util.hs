@@ -247,18 +247,18 @@ titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
                           case (x:xs) of
                            s | not (isAscii x) -> Str s
                              | isShortWord s   -> Str s
-                             | all isUpper s   -> Str s
+                             | all isUpperOrPunct s   -> Str s
                              | isMixedCase s   -> Str s
                              | otherwise       -> Str (toUpper x:map toLower xs)
                         WordBoundary ->
                           case (x:xs) of
                            s | not (isAscii x) -> Str s
-                             | all isUpper s   -> Str s
+                             | all isUpperOrPunct s   -> Str s
                              | isShortWord s   -> Str (map toLower s)
                              | isMixedCase s   -> Str s
                              | otherwise       -> Str (toUpper x:map toLower xs)
                         SentenceBoundary ->
-                           if isMixedCase (x:xs) || (all isUpper (x:xs))
+                           if isMixedCase (x:xs) || (all isUpperOrPunct (x:xs))
                               then Str (x:xs)
                               else Str (toUpper x : xs)
                         _ -> Str (x:xs)
@@ -272,6 +272,9 @@ titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
 
 isMixedCase :: String -> Bool
 isMixedCase xs = any isUpper xs && any isLower xs
+
+isUpperOrPunct :: Char -> Bool
+isUpperOrPunct c = isUpper c || isPunctuation c
 
 data CaseTransformState = WordBoundary
                         | LastWordBoundary
