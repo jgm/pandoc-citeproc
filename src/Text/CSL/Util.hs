@@ -58,6 +58,7 @@ import Data.List.Split (wordsBy)
 import Control.Monad.State
 import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
                        everywhere', everything, mkT, mkQ )
+import qualified Data.Set as Set
 import System.FilePath
 import System.Directory (doesFileExist)
 import qualified Data.Yaml.Builder as Y
@@ -264,11 +265,14 @@ titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
                         _ -> Str (x:xs)
         tc (Span ("",["nocase"],[]) xs) = return $ Span ("",["nocase"],[]) xs
         tc x = return x
-        isShortWord  s = map toLower s `elem`
-                      ["a","an","and","as","at","but","by","c","ca","d","de"
-                      ,"down","et","for","from"
-                      ,"in","into","nor","of","on","onto","or","over","so"
-                      ,"the","till","to","up","van","von","via","with","yet"]
+        isShortWord  s = map toLower s `Set.member` shortWords
+
+shortWords :: Set.Set String
+shortWords = Set.fromList
+                 ["a","an","and","as","at","but","by","c","ca","d","de"
+                 ,"down","et","for","from"
+                 ,"in","into","nor","of","on","onto","or","over","so"
+                 ,"the","till","to","up","van","von","via","with","yet"]
 
 isMixedCase :: String -> Bool
 isMixedCase xs = any isUpper xs && any isLower xs
