@@ -295,8 +295,8 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
                       _                ->
                           case acc of
                                 (Str [x]:_)
-                                  | x `elem` "?!:"   -> SentenceBoundary
-                                _                    -> WordBoundary)
+                                  | x `elem` ".?!:"   -> SentenceBoundary
+                                _                     -> WordBoundary)
                return $ Space : acc
         go acc LineBreak = do
                put WordBoundary
