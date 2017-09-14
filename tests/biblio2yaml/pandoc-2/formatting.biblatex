@@ -10,6 +10,6 @@
 references:
 - id: item1
   type: article-journal
-  title: 'The title: *Italics*, **bold**, ~subscript~, ^superscript^, [small-caps]{.smallcaps}'
+  title: 'The title: *Italics*, **bold**, ~subscript~, ^superscript^, <span class="smallcaps">small-caps</span>'
   title-short: The title
 ...

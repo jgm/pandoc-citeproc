@@ -79,8 +79,9 @@ references:
   page: '377-395'
   volume: '19'
   issue: '4'
-  annote: An article entry with volume, number, and doi fields. Note that the [doi]{.smallcaps}
-    is transformed into a clickable link if hyperref support has been enabled
+  annote: An article entry with volume, number, and doi fields. Note that the <span
+    class="smallcaps">doi</span> is transformed into a clickable link if hyperref
+    support has been enabled
   abstract: 'Four methods for deriving partial atomic charges from the quantum chemical
     electrostatic potential (CHELP, CHELPG, Merz-Kollman, and RESP) have been compared
     and critically evaluated. It is shown that charges strongly depend on how and

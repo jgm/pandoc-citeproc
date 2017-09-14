@@ -92,7 +92,7 @@ references:
     from molecular simulations
   container-title: J. Chem. Phys.
   volume: '124'
-  annote: An article entry with an eid and a doi field. Note that the [doi]{.smallcaps}
+  annote: An article entry with an eid and a doi field. Note that the <span class="smallcaps">doi</span>
     is transformed into a clickable link if hyperref support has been enabled
   abstract: The computation of ionic solvation free energies from atomistic simulations
     is a surprisingly difficult problem that has found no satisfactory solution for

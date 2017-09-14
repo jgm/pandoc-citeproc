@@ -9,11 +9,12 @@ packages:
 - '.'
 - location:
     git: https://github.com/jgm/pandoc.git
-    commit: d70b89c0d9f2636814fc85232b017751a5469f75
+    commit: 5849b89e52de64a5bbebbc815772ad6bbc883c1d
   extra-dep: true
 extra-deps:
+- texmath-0.9.4.2
 - hslua-0.8.0
-- skylighting-0.3.3
+- skylighting-0.3.4.1
 - cmark-gfm-0.1.1
 - QuickCheck-2.10.0.1
 - tasty-quickcheck-0.9.1

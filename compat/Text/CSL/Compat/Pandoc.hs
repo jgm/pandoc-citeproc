@@ -57,7 +57,9 @@ readLaTeX = either mempty id . runPure . Pandoc.readLaTeX
 readNative = either mempty id . runPure . Pandoc.readNative def . T.pack
 
 writeMarkdown = either mempty T.unpack . runPure . Pandoc.writeMarkdown
-   def{ writerExtensions = disableExtension Ext_smart pandocExtensions,
+   def{ writerExtensions = disableExtension Ext_smart $
+                           disableExtension Ext_bracketed_spans $
+                           pandocExtensions,
         writerWrapText = WrapNone }
 
 writePlain = either mempty T.unpack . runPure . Pandoc.writePlain def
@@ -80,7 +82,12 @@ readLaTeX = either mempty id . Pandoc.readLaTeX
 
 readNative = either mempty id . Pandoc.readNative
 
-writeMarkdown = Pandoc.writeMarkdown def{ writerWrapText = WrapNone }
+writeMarkdown = Pandoc.writeMarkdown def{
+    writerWrapText = WrapNone
+#if MIN_VERSION_pandoc(1,19,0)
+  , writerExtensions = disableExtension Ext_bracketed_spans pandocExtensions
+#endif
+  }
 
 writePlain = Pandoc.writePlain def
 

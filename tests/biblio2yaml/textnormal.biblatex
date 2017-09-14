@@ -6,5 +6,5 @@
 references:
 - id: item1
   type: book
-  title: The title [of this book]{.nodecor}
+  title: The title <span class="nodecor">of this book</span>
 ...
