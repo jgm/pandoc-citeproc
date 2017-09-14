@@ -27,7 +27,7 @@ import Text.CSL.Compat.Pandoc (readLaTeX)
 import Text.Pandoc.Definition
 import Text.Pandoc.Generic (bottomUp)
 import Data.List.Split (splitOn, splitWhen, wordsBy)
-import Data.List (intercalate)
+import Data.List (intercalate, foldl')
 import Data.Maybe
 import Data.Char (toLower, isUpper, toUpper, isDigit, isAlphaNum)
 import Control.Monad
@@ -1223,7 +1223,7 @@ toLocale "latin"      = "la"
 toLocale x            = x
 
 concatWith :: Char -> [Formatted] -> Formatted
-concatWith sep = Formatted . foldl go mempty . map unFormatted
+concatWith sep = Formatted . foldl' go mempty . map unFormatted
   where go :: [Inline] -> [Inline] -> [Inline]
         go accum [] = accum
         go accum s  = case reverse accum of
