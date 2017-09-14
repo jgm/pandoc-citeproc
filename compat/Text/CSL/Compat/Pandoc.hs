@@ -18,7 +18,7 @@ import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
 import Data.ByteString as B
 import Text.Pandoc (Pandoc, ReaderOptions(..), def, WrapOption(..),
-        WriterOptions(..))
+        WriterOptions(..), Extension(..), pandocExtensions)
 import qualified Text.Pandoc as Pandoc
 import qualified Text.Pandoc.Process
 #if MIN_VERSION_pandoc(2,0,0)
@@ -31,6 +31,7 @@ import Control.Monad.Except (runExceptT, lift)
 import Text.Pandoc.Extensions (extensionsFromList, Extension(..),
           pandocExtensions, disableExtension)
 #else
+import Data.Set as Set
 import System.IO (stderr)
 import qualified Text.Pandoc.Shared (fetchItem)
 
@@ -84,8 +85,10 @@ readNative = either mempty id . Pandoc.readNative
 
 writeMarkdown = Pandoc.writeMarkdown def{
     writerWrapText = WrapNone
-#if MIN_VERSION_pandoc(1,19,0)
+#if MIN_VERSION_pandoc(2,0,0)
   , writerExtensions = disableExtension Ext_bracketed_spans pandocExtensions
+#elif MIN_VERSION_pandoc(1,19,0)
+  , writerExtensions = Set.delete Ext_bracketed_spans pandocExtensions
 #endif
   }
 
