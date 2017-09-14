@@ -1,0 +1,7 @@
+Pandoc (Meta {unMeta = fromList [("references",MetaList [MetaMap (fromList [("id",MetaInlines [Str "test"]),("title",MetaInlines [Str "Essays",Space,Str "presented",Space,Str "to",Space,Str "N.R.",Space,Str "Ker",Space,Str "(On",Space,Str "Art)"])]),MetaMap (fromList [("id",MetaInlines [Str "test2"]),("title",MetaInlines [Emph [Str "Test:"],Space,Str "An",Space,Str "experiment:",Space,Str "An",Space,Str "abridgement"])])])]})
+[Para [Cite [Citation {citationId = "test", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 1}] [Str "(",Str "\8220Essays",Space,Str "Presented",Space,Str "to",Space,Str "N.R.",Space,Str "Ker",Space,Str "(on",Space,Str "Art),\8221",Space,Str "n.d.)"],Str ";",Space,Cite [Citation {citationId = "test2", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 2}] [Str "(",Str "\8220",Emph [Str "Test:"],Space,Str "An",Space,Str "Experiment:",Space,Str "An",Space,Str "Abridgement,\8221",Space,Str "n.d.)"]]
+,Div ("refs",["references"],[])
+ [Div ("ref-test",[],[])
+  [Para [Str "\8220",Str "Essays",Space,Str "Presented",Space,Str "to",Space,Str "N.R.",Space,Str "Ker",Space,Str "(on",Space,Str "Art).\8221",Space,Str "n.d."]]
+ ,Div ("ref-test2",[],[])
+  [Para [Str "\8220",Emph [Str "Test:"],Space,Str "An",Space,Str "Experiment:",Space,Str "An",Space,Str "Abridgement.\8221",Space,Str "n.d."]]]]

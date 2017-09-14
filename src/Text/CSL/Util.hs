@@ -292,16 +292,15 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
                modify (\st ->
                  case st of
                       SentenceBoundary -> SentenceBoundary
-                      _                ->
-                          case acc of
-                                (Str [x]:_)
-                                  | x `elem` ".?!:"   -> SentenceBoundary
-                                _                     -> WordBoundary)
+                      _                -> WordBoundary)
                return $ Space : acc
         go acc LineBreak = do
                put WordBoundary
                return $ Space : acc
         go acc (Str [c])
+          | c `elem` ".?!:" = do
+               put SentenceBoundary
+               return $ Str [c] : acc
           | c `elem` "-/\x2013\x2014\160" = do
                put WordBoundary
                return $ Str [c] : acc
