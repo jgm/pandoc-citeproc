@@ -250,14 +250,14 @@ titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
                              | isShortWord s   -> Str s
                              | all isUpperOrPunct s   -> Str s
                              | isMixedCase s   -> Str s
-                             | otherwise       -> Str (toUpper x:map toLower xs)
+                             | otherwise       -> Str (toUpper x:xs)
                         WordBoundary ->
                           case (x:xs) of
                            s | not (isAscii x) -> Str s
                              | all isUpperOrPunct s   -> Str s
                              | isShortWord s   -> Str (map toLower s)
                              | isMixedCase s   -> Str s
-                             | otherwise       -> Str (toUpper x:map toLower xs)
+                             | otherwise       -> Str (toUpper x:xs)
                         SentenceBoundary ->
                            if isMixedCase (x:xs) || (all isUpperOrPunct (x:xs))
                               then Str (x:xs)
