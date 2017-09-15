@@ -178,7 +178,7 @@ executable test-citeproc
   build-depends:  base >= 4, aeson, directory, text, mtl,
                   pandoc-types >= 1.16 && < 1.18,
                   pandoc >= 1.16 && < 2.1,
-                  filepath,
+                  filepath, containers,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7, containers >= 0.4, vector >= 0.10
   ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind
