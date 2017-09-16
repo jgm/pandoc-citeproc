@@ -87,6 +87,7 @@ readNative = either mempty id . Pandoc.readNative
 
 writeMarkdown = Pandoc.writeMarkdown def{
     writerWrapText = WrapNone
+  , writerColumns = 72
 #if MIN_VERSION_pandoc(1,19,0)
   , writerExtensions = Set.delete Ext_bracketed_spans pandocExtensions
 #endif
