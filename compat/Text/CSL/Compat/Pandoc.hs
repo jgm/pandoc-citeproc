@@ -31,8 +31,7 @@ import Text.Pandoc.Error (PandocError)
 import Text.Pandoc.Class (runPure, runIO)
 import qualified Text.Pandoc.Class (fetchItem)
 import Control.Monad.Except (runExceptT, lift)
-import Text.Pandoc.Extensions (extensionsFromList, Extension(..),
-          pandocExtensions, disableExtension)
+import Text.Pandoc.Extensions (extensionsFromList, disableExtension)
 #else
 import Data.Set as Set
 import System.IO (stderr)
