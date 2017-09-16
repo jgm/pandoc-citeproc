@@ -193,7 +193,7 @@ test-suite test-pandoc-citeproc
   Hs-Source-Dirs: tests, prelude, compat
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.16 && < 1.18, mtl,
-                  pandoc >= 1.16 && < 2.1, filepath,
+                  pandoc >= 1.16 && < 2.1, filepath, containers,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7
   ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind
