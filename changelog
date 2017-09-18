@@ -1,3 +1,17 @@
+pandoc-citeproc (0.11.1.1)
+
+  * Added containers to build deps for test-pandoc-citeproc.
+  * Fix titlecase when a colon is inside an emph (#301).
+  * Titlecasing: never lowercase anything except stop words (#301).
+  * Text.CSL.Compat.Pandoc: disable `bracketed_spans` extension.
+    We want to stay compatible with CSL standards, which understand a span
+    tag but not the brackets.
+  * Titlecase transform: start new sentence after ".".  "Foo bar. An essay."
+  * Use set for short words lookup (performance).
+  * Case transform:  recognize mixed upper+punct as all uppercase (#301).
+    This helps with things like "N.R. Kerr".
+  * Add 'static' Cabal flag.
+
 pandoc-citeproc (0.11.1)
 
  * Don't produce ??? with empty suppress-author citation (#156).
