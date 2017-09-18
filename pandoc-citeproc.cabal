@@ -150,8 +150,6 @@ executable pandoc-citeproc
     hs-source-dirs:   ., prelude
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -fprof-auto-exported -rtsopts
-    if flag(static)
-      ld-options:     -static
     build-depends:    base >= 4, pandoc-citeproc,
                       pandoc-types >= 1.16 && < 1.18,
                       pandoc >= 1.16 && < 2.1,
@@ -162,6 +160,9 @@ executable pandoc-citeproc
                       Prelude
     default-language: Haskell2010
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
+    if flag(static)
+      ld-options:     -static -pthread
+      ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind -fPIC
     if flag(bibutils)
        default-extensions: CPP
        cpp-options:     -DUSE_BIBUTILS
