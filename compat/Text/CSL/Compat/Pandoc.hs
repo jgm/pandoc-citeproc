@@ -114,7 +114,7 @@ pipeProcess e f a b = do
 fetchItem :: String
           -> IO (Either E.SomeException (B.ByteString, Maybe MimeType))
 #if MIN_VERSION_pandoc(2,0,0)
-fetchItem mbd s = do
+fetchItem s = do
   res <- runIO $ runExceptT $ lift $ Text.Pandoc.Class.fetchItem s
   return $ case res of
        Left e          -> Left (E.toException e)
