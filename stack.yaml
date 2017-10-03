@@ -9,17 +9,17 @@ packages:
 - '.'
 - location:
     git: https://github.com/jgm/pandoc.git
-    commit: 5849b89e52de64a5bbebbc815772ad6bbc883c1d
+    commit: aad9288f97ed8b662c16764cc2ebc404fead4a11
   extra-dep: true
 extra-deps:
 - texmath-0.9.4.2
 - hslua-0.8.0
-- skylighting-0.3.4.1
+- skylighting-0.4.1
 - cmark-gfm-0.1.1
 - QuickCheck-2.10.0.1
 - tasty-quickcheck-0.9.1
 - haddock-library-1.4.3
-- pandoc-types-1.17.1
+- pandoc-types-1.17.2
 # needed for now:
 - hs-bibutils-5.5
 - rfc5051-0.1.0.3

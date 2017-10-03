@@ -111,16 +111,15 @@ pipeProcess e f a b = do
   return (ec, out)
 #endif
 
-fetchItem :: Maybe String
-          -> String
+fetchItem :: String
           -> IO (Either E.SomeException (B.ByteString, Maybe MimeType))
 #if MIN_VERSION_pandoc(2,0,0)
 fetchItem mbd s = do
-  res <- runIO $ runExceptT $ lift $ Text.Pandoc.Class.fetchItem mbd s
+  res <- runIO $ runExceptT $ lift $ Text.Pandoc.Class.fetchItem s
   return $ case res of
        Left e          -> Left (E.toException e)
        Right (Left (e :: PandocError))  -> Left (E.toException e)
        Right (Right r) -> Right r
 #else
-fetchItem = Text.Pandoc.Shared.fetchItem
+fetchItem = Text.Pandoc.Shared.fetchItem Nothing
 #endif

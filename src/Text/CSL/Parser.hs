@@ -56,7 +56,7 @@ readCSLFile :: Maybe String -> FilePath -> IO Style
 readCSLFile mbLocale src = do
   csldir <- getAppUserDataDirectory "csl"
   mbSrc <- findFile [".", csldir] src
-  fetchRes <- fetchItem Nothing (fromMaybe src mbSrc)
+  fetchRes <- fetchItem (fromMaybe src mbSrc)
   f <- case fetchRes of
             Left err         -> E.throwIO err
             Right (rawbs, _) -> return $ L.fromChunks [rawbs]
