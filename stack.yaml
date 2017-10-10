@@ -11,10 +11,6 @@ packages:
     git: https://github.com/jgm/pandoc.git
     commit: aad9288f97ed8b662c16764cc2ebc404fead4a11
   extra-dep: true
-- location:
-    git: https://github.com/wilx/hs-bibutils.git
-    commit: ccd4e01171e431aad6e5c2f8caa6a56531b46286
-  extra-dep: true
 extra-deps:
 - texmath-0.9.4.2
 - hslua-0.8.0
@@ -25,6 +21,6 @@ extra-deps:
 - haddock-library-1.4.3
 - pandoc-types-1.17.2
 # needed for now:
-# - hs-bibutils-6.2
+- hs-bibutils-6.2.0.1
 - rfc5051-0.1.0.3
 resolver: lts-9.1

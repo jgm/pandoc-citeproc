@@ -126,7 +126,7 @@ library
        cpp-options:     -DTRACE
 
     if flag(bibutils)
-       build-depends:   hs-bibutils >= 0.3
+       build-depends:   hs-bibutils >= 6.2.0.1
        cpp-options:     -DUSE_BIBUTILS
 
     if flag(embed_data_files)
