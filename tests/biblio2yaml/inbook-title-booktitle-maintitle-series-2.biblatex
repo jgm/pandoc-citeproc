@@ -14,7 +14,7 @@
 	Publisher = {Publisher},
 	Series = {Series},
 	Subtitle = {Subtitle},
-	Title = {Title of the "inbook" Entry},
+	Title = {Title of the ``inbook'' Entry},
 	Titleaddon = {Titleaddon},
 	Volume = {4}}
 
