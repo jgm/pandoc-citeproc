@@ -51,6 +51,9 @@ source-repository head
   type:          git
   location:      git://github.com/jgm/pandoc-citeproc.git
 
+custom-setup
+  setup-depends: base, Cabal
+
 flag bibutils
   description: Use Chris Putnam's Bibutils.
   default:     True
