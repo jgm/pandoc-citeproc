@@ -1,3 +1,11 @@
+pandoc-citeproc (0.11.1.2)
+
+  * Fixed quotes in three test cases.  We'd been using straight quotes.
+  * Use latest hs-bibutils.
+  * Update compat for latest pandoc 2.0.
+  * Change type of compat's fetchItem so it doesn't take
+    a datadir argument.
+
 pandoc-citeproc (0.11.1.1)
 
   * Added containers to build deps for test-pandoc-citeproc.
