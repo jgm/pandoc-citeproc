@@ -164,8 +164,7 @@ executable pandoc-citeproc
     default-language: Haskell2010
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
     if flag(static)
-      ld-options:     -static -pthread
-      ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind -fPIC
+       ld-options:     -static
     if flag(bibutils)
        default-extensions: CPP
        cpp-options:     -DUSE_BIBUTILS

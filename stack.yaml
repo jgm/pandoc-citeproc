@@ -5,6 +5,7 @@ flags:
     unicode_collation: false
     test_citeproc: false
     debug: false
+    static: false
 packages:
 - '.'
 - location:
