@@ -8,11 +8,8 @@ flags:
     static: false
 packages:
 - '.'
-- location:
-    git: https://github.com/jgm/pandoc.git
-    commit: 47e2719cc3e18a6216c886b8ab7166f48bfe457f
-  extra-dep: true
 extra-deps:
+- pandoc-2.0.1
 - texmath-0.9.4.2
 - hslua-0.9.2
 - skylighting-0.4.2
