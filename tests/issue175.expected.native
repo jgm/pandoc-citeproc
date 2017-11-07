@@ -6,4 +6,4 @@ Pandoc (Meta {unMeta = fromList [("references",MetaList [MetaMap (fromList [("au
  [Para [Str "Doe,",Space,Str "Jane.",Space,Str "2011.",Space,Str "\8220A",Space,Str "Title.\8221",Space,Emph [Str "A",Space,Str "Magazine"],Str ",",Space,Str "January\8211February."]]
 ,Div ("refs",["references"],[])
  [Div ("ref-item1",[],[])
-  [Para [Str "Doe,",Space,Str "Jane.",Space,Str "2011.",Space,Str "\8220A",Space,Str "Title.\8221",Space,Emph [Str "A",Space,Str "Magazine"],Str ",",Space,Str "January\8211February."]]]]
+  [Para [Str "Doe,",Space,Str "Jane.",Space,Str "2011.",Space,Str "\8220A",Space,Str "Title.\8221",Space,Emph [Str "A",Space,Str "Magazine"],Str ",",Space,Str "January\8211February",Space,Str "2011."]]]]
