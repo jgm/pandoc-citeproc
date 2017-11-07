@@ -22,7 +22,7 @@ import qualified Control.Exception as E
 main :: IO ()
 main = do
   args <- getArgs
-  let regenerate = args == ["--regenerate"]
+  let regenerate = "--accept" `elem` args
   testnames <- fmap (map (dropExtension . takeBaseName) .
                      filter (".in.native" `isSuffixOf`)) $
                getDirectoryContents "tests"
