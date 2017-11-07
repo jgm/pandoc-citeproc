@@ -6,7 +6,7 @@
       <uri>http://twitter.com/rintzezelle</uri>
     </translator>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
-    <updated>2012-07-04T23:31:02+00:00</updated>
+    <updated>2017-04-01T12:00:00+00:00</updated>
   </info>
   <style-options punctuation-in-quote="false"/>
   <date form="text">
@@ -32,10 +32,10 @@
     <term name="circa" form="short">c.</term>
     <term name="cited">geciteerd</term>
     <term name="edition">
-      <single>editie</single>
-      <multiple>edities</multiple>
+      <single>druk</single>
+      <multiple>drukken</multiple>
     </term>
-    <term name="edition" form="short">ed.</term>
+    <term name="edition" form="short">dr.</term>
     <term name="et-al">e.a.</term>
     <term name="forthcoming">in voorbereiding</term>
     <term name="from">van</term>
@@ -274,8 +274,8 @@
     <!-- VERB ROLE FORMS -->
     <term name="container-author" form="verb">door</term>
     <term name="director" form="verb">geregisseerd door</term>
-    <term name="editor" form="verb">bewerkt door</term>
-    <term name="editorial-director" form="verb">bewerkt door</term>
+    <term name="editor" form="verb">onder redactie van</term>
+    <term name="editorial-director" form="verb">onder redactie van</term>
     <term name="illustrator" form="verb">geïllustreerd door</term>
     <term name="interviewer" form="verb">geïnterviewd door</term>
     <term name="recipient" form="verb">ontvangen door</term>
@@ -285,7 +285,7 @@
 
     <!-- SHORT VERB ROLE FORMS -->
     <term name="director" form="verb-short">geregisseerd door</term>
-    <term name="editor" form="verb-short">bewerkt door</term>
+    <term name="editor" form="verb-short">onder redactie van</term>
     <term name="editorial-director" form="verb-short">bewerkt door</term>
     <term name="illustrator" form="verb-short">geïllustreerd door</term>
     <term name="translator" form="verb-short">vertaald door</term>

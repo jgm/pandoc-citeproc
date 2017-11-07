@@ -109,8 +109,8 @@
       <multiple>numery</multiple>
     </term>
     <term name="line">
-      <single>wers</single>
-      <multiple>wersy</multiple>
+      <single>wiersz</single>
+      <multiple>wiersze</multiple>
     </term>
     <term name="note">
       <single>notatka</single>
@@ -165,7 +165,7 @@
     <term name="opus" form="short">op.</term>
     <term name="page" form="short">
       <single>s.</single>
-      <multiple>ss.</multiple>
+      <multiple>s.</multiple>
     </term>
     <term name="number-of-pages" form="short">
       <single>s.</single>
@@ -225,8 +225,8 @@
 
     <!-- SHORT ROLE FORMS -->
     <term name="director" form="short">
-      <single>dyr.</single>
-      <multiple>dyr.</multiple>
+      <single>reż.</single>
+      <multiple>reż.</multiple>
     </term>
     <term name="editor" form="short">
       <single>red.</single>
@@ -251,10 +251,10 @@
 
     <!-- VERB ROLE FORMS -->
     <term name="container-author" form="verb">przez</term>
-    <term name="director" form="verb">directed by</term>
+    <term name="director" form="verb">reżyserowane przez</term>
     <term name="editor" form="verb">zredagowane przez</term>
     <term name="editorial-director" form="verb">zredagowane przez</term>
-    <term name="illustrator" form="verb">ilustrowane przez by</term>
+    <term name="illustrator" form="verb">ilustrowane przez</term>
     <term name="interviewer" form="verb">przeprowadzony przez</term>
     <term name="recipient" form="verb">dla</term>
     <term name="reviewed-author" form="verb">przez</term>
@@ -262,7 +262,7 @@
     <term name="editortranslator" form="verb">zredagowane i przetłumaczone przez</term>
 
     <!-- SHORT VERB ROLE FORMS -->
-    <term name="director" form="verb-short">dir.</term>
+    <term name="director" form="verb-short">reż.</term>
     <term name="editor" form="verb-short">red.</term>
     <term name="editorial-director" form="verb-short">red.</term>
     <term name="illustrator" form="verb-short">il.</term>

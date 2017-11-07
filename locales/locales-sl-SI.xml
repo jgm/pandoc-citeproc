@@ -16,23 +16,23 @@
     <date-part name="year"/>
   </date>
   <terms>
-    <term name="accessed">dostopano</term>
+    <term name="accessed">pridobljeno</term>
     <term name="and">in</term>
     <term name="and others">in drugi</term>
     <term name="anonymous">anonimni</term>
     <term name="anonymous" form="short">anon.</term>
     <term name="at">pri</term>
-    <term name="available at">dostopno</term>
+    <term name="available at">dostopno na</term>
     <term name="by"></term>
-    <term name="circa">circa</term>
-    <term name="circa" form="short">ca.</term>
+    <term name="circa">približno</term>
+    <term name="circa" form="short">prib.</term>
     <term name="cited">citirano</term>
     <term name="edition">
       <single>izdaja</single>
       <multiple>izdaje</multiple>
     </term>
     <term name="edition" form="short">izd.</term>
-    <term name="et-al">idr.</term>
+    <term name="et-al">in dr.</term>
     <term name="forthcoming">pred izidom</term>
     <term name="from">od</term>
     <term name="ibid">isto</term>
@@ -156,7 +156,7 @@
     <!-- SHORT LOCATOR FORMS -->
     <term name="book" form="short">knj.</term>
     <term name="chapter" form="short">pogl.</term>
-    <term name="column" form="short">sto.</term>
+    <term name="column" form="short">stolp.</term>
     <term name="figure" form="short">sl.</term>
     <term name="folio" form="short">fol.</term>
     <term name="issue" form="short">št.</term>
@@ -173,10 +173,10 @@
     </term>
     <term name="paragraph" form="short">odst.</term>
     <term name="part" form="short">del</term>
-    <term name="section" form="short">odsek</term>
+    <term name="section" form="short">ods.</term>
     <term name="sub verbo" form="short">
-      <single>s.v.</single>
-      <multiple>s.v.</multiple>
+      <single>s. v.</single>
+      <multiple>s. v.</multiple>
     </term>
     <term name="verse" form="short">
       <single>v.</single>
@@ -200,7 +200,7 @@
     <!-- LONG ROLE FORMS -->
     <term name="director">
       <single>režiser</single>
-      <multiple>režiser</multiple>
+      <multiple>režiserji</multiple>
     </term>
     <term name="editor">
       <single>urednik</single>
@@ -257,7 +257,7 @@
     <term name="illustrator" form="verb">ilustriral</term>
     <term name="interviewer" form="verb">intervjuval</term>
     <term name="recipient" form="verb">za</term>
-    <term name="reviewed-author" form="verb"></term>
+    <term name="reviewed-author" form="verb">od</term>
     <term name="translator" form="verb">prevedel</term>
     <term name="editortranslator" form="verb">uredil &amp; prevedel</term>
 
