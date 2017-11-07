@@ -138,7 +138,8 @@ bibComment :: BibParser ()
 bibComment = try $ do
   char '@'
   cistring "comment"
-  skipMany (satisfy (/='\n'))
+  spaces
+  void inBraces <|> bibSkip <|> return ()
 
 bibPreamble :: BibParser ()
 bibPreamble = try $ do
@@ -146,7 +147,6 @@ bibPreamble = try $ do
   cistring "preamble"
   spaces
   void inBraces
-  return ()
 
 bibString :: BibParser ()
 bibString = try $ do
