@@ -67,7 +67,7 @@ writeMarkdown = either mempty T.unpack . runPure . Pandoc.writeMarkdown
 
 writePlain = either mempty T.unpack . runPure . Pandoc.writePlain def
 
-writeNative = either mempty T.unpack . runPure . Pandoc.writeNative def
+writeNative = either mempty T.unpack . runPure . Pandoc.writeNative def{ writerTemplate = Just "" }
 
 writeHtmlString = either mempty T.unpack . runPure . Pandoc.writeHtml4String
    def{ writerExtensions = extensionsFromList
@@ -95,7 +95,7 @@ writeMarkdown = Pandoc.writeMarkdown def{
 
 writePlain = Pandoc.writePlain def
 
-writeNative = Pandoc.writeNative def
+writeNative = Pandoc.writeNative def{ writerTemplate = Just "" }
 
 writeHtmlString = Pandoc.writeHtmlString def
 #endif
