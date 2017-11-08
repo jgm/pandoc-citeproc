@@ -14,7 +14,6 @@
 module Text.CSL.Input.Bibtex
     ( readBibtex
     , readBibtexString
-    , readBibtexString'
     , Lang(..)
     , langToLocale
     , getLangFromEnv
@@ -23,7 +22,10 @@ module Text.CSL.Input.Bibtex
 
 import Text.Parsec hiding (optional, (<|>), many, State)
 import Control.Applicative
+import qualified Control.Exception as E
 import Text.CSL.Compat.Pandoc (readLaTeX)
+import Text.CSL.Exception
+         (CiteprocException (ErrorReadingBib, ErrorReadingBibFile))
 import Text.Pandoc.Definition
 import Text.Pandoc.Generic (bottomUp)
 import Data.List.Split (splitOn, splitWhen, wordsBy)
@@ -103,24 +105,24 @@ getLangFromEnv = do
 -- BibTeX; otherwse as BibLaTeX.  If the second parameter is
 -- true, an "untitlecase" transformation will be performed.
 readBibtex :: Bool -> Bool -> FilePath -> IO [Reference]
-readBibtex isBibtex caseTransform f =
-  UTF8.readFile f >>= readBibtexString isBibtex caseTransform
+readBibtex isBibtex caseTransform f = do
+  contents <- UTF8.readFile f
+  E.catch (readBibtexString isBibtex caseTransform contents)
+        (\e -> case e of
+                  ErrorReadingBib es -> E.throwIO $ ErrorReadingBibFile f es
+                  _ -> E.throwIO e)
 
 -- | Like 'readBibtex' but operates on a String rather than a file.
 readBibtexString :: Bool -> Bool -> String -> IO [Reference]
 readBibtexString isBibtex caseTransform contents = do
   lang <- getLangFromEnv
   locale <- parseLocale (langToLocale lang)
-  return $ readBibtexString' isBibtex caseTransform lang locale contents
-
--- | Pure version of readBibtexString (does not try to get the language
--- from the environment).
-readBibtexString' :: Bool -> Bool -> Lang -> Locale -> String -> [Reference]
-readBibtexString' isBibtex caseTransform lang locale bibstring =
-  let items = case runParser (bibEntries <* eof) [] "stdin" bibstring of
-                   Left err -> error (show err)
-                   Right xs -> resolveCrossRefs isBibtex xs
-  in  mapMaybe (itemToReference lang locale isBibtex caseTransform) items
+  case runParser (bibEntries <* eof) [] "stdin" contents of
+                      -- drop 8 to remove "stdin" + space
+          Left err -> E.throwIO $ ErrorReadingBib $ drop 8 $ show err
+          Right xs -> return $ mapMaybe
+            (itemToReference lang locale isBibtex caseTransform)
+            (resolveCrossRefs isBibtex xs)
 
 type BibParser = Parsec [Char] [(String, String)]
 
