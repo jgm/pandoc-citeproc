@@ -337,7 +337,14 @@ formatName m b f fm ops np n
 
 formatTerm :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
 formatTerm f fm p s = do
-  t <- getTerm p f s
+  plural <- if s `elem` ["page", "volume", "issue"]
+               then do
+                 varset <- isVarSet s
+                 if varset
+                    then isRange <$> getStringVar s
+                    else return p
+               else return p
+  t <- getTerm plural f s
   return $ oStr' t fm
 
 formatLabel :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
