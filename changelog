@@ -1,3 +1,8 @@
+pandoc-citeproc (0.12.1)
+
+  * Fixed cases where we got plural instead of singular "issue"
+    or "volume" (#307).
+
 pandoc-citeproc (0.12)
 
   * Text.CSL.Exception: add `renderError`.
