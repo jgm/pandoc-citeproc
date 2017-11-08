@@ -1,3 +1,17 @@
+pandoc-citeproc (0.12)
+
+  * Text.CSL.Exception: add `renderError`.
+  * Text.CSL.Input.Bibtex: remove `readBibtexString'` (pure version).
+    We don't use this.  And we've refactored to raise better errors.
+  * Improved error handling.  Throw a CiteprocException instead of
+    using 'error', and render this nicely.
+  * Update chicago-author-date.csl and locales.
+  * Updated tests for chicago-author-date.csl  and locale changes.
+  * Pandoc compat module:  ensure `writeNative` includes the header.
+  * Use `--accept` instead of `--regenerate` in tests to regenerate test
+    cases.
+  * Bibtex parser: handle comments better (#306).
+
 pandoc-citeproc (0.11.1.3)
 
   * Align static flag with pandoc's.
