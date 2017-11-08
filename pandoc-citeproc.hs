@@ -2,6 +2,7 @@
 module Main where
 import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
 import Text.CSL.Reference (Reference(refId), Literal(..))
+import Text.CSL.Exception
 import Data.List (group, sort)
 import Data.Char (chr, toLower)
 import Data.Yaml.Builder (toByteString)
@@ -75,9 +76,8 @@ main = do
                                      , confCompare = compare
                                      , confNumFormat = Generic }
      else E.catch (toJSONFilter doCites)
-          (\(e :: SomeException) -> do
-             UTF8.hPutStrLn stderr $
-               "pandoc-citeproc: error running filter.\n" ++ show e
+          (\(e :: CiteprocException) -> do
+             UTF8.hPutStrLn stderr $ renderError e
              exitWith (ExitFailure 1))
 
 formatFromExtension :: FilePath -> Maybe BibFormat

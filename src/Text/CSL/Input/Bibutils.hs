@@ -115,22 +115,22 @@ readBiblioString b s
 readBiblioFile' :: FilePath -> BiblioIn -> IO [Reference]
 readBiblioFile' fin bin
     | bin == biblatex_in = readBibtex False True fin
-    | otherwise      = E.handle handleBibfileError
-                       $ withTempDir "citeproc"
+    | otherwise      = withTempDir "citeproc"
                        $ \tdir -> do
                             let tfile = tdir </> "bibutils-tmp"
-                            param <- bibl_initparams bin bibtex_out "hs-bibutils"
-                            bibl  <- bibl_init
-                            unsetBOM        param
-                            setCharsetIn    param bibl_charset_unicode
-                            setCharsetOut   param bibl_charset_unicode
-                            _ <- bibl_read  param bibl fin
-                            _ <- bibl_write param bibl tfile
-                            bibl_free bibl
-                            bibl_freeparams param
+                            E.handle handleBibfileError $ do
+                              param <- bibl_initparams bin bibtex_out "hs-bibutils"
+                              bibl  <- bibl_init
+                              unsetBOM        param
+                              setCharsetIn    param bibl_charset_unicode
+                              setCharsetOut   param bibl_charset_unicode
+                              _ <- bibl_read  param bibl fin
+                              _ <- bibl_write param bibl tfile
+                              bibl_free bibl
+                              bibl_freeparams param
                             refs <- readBibtex True False tfile
                             return $! refs
-  where handleBibfileError :: E.SomeException -> IO [Reference]
+  where handleBibfileError :: E.SomeException -> IO ()
         handleBibfileError e = E.throwIO $ ErrorReadingBibFile fin (show e)
 
 -- | Perform a function in a temporary directory and clean up.
