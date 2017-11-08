@@ -1,9 +1,8 @@
 stack:
 	stack install --test --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall -pgmPcpphs -optP--cpp' --test-arguments='-j4 --hide-successes $(TESTARGS)'
 
-debug: deps
-	cabal configure --enable-tests -ftest_citeproc -fembed_data_files -fdebug --disable-optimization --ghc-options "-pgmPcpphs -optP--cpp"
-	cabal build
+debug:
+	stack install --test --flag 'pandoc-citeproc:debug' --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall -pgmPcpphs -optP--cpp' --test-arguments='-j4 --hide-successes $(TESTARGS)'
 
 quick: deps
 	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization --ghc-options "-pgmPcpphs -optP--cpp"
