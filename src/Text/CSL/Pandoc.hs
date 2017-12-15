@@ -31,7 +31,8 @@ import qualified Control.Exception as E
 import Control.Monad.State
 import System.FilePath
 import System.Directory (getAppUserDataDirectory)
-import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim)
+import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim,
+                      lastInline)
 import Text.CSL.Exception
 import System.IO.Error (isDoesNotExistError)
 import Data.Maybe (fromMaybe)
@@ -262,23 +263,33 @@ isSpacy SoftBreak = True
 isSpacy _ = False
 
 mvPunct :: Bool -> Style -> [Inline] -> [Inline]
-mvPunct _ _ (x : Space : xs) | isSpacy x = x : xs
-mvPunct moveNotes _ (s : x : ys) | isSpacy s, isNote x, startWithPunct ys =
-  if moveNotes
-     then Str (headInline ys) : x : tailInline ys
-     else x : ys
-mvPunct moveNotes _ (Cite cs ils : ys) |
-     length ils > 1
+mvPunct _ _ (x : Space : xs)
+  | isSpacy x = x : xs
+mvPunct moveNotes _ (s : x : ys)
+  | isSpacy s
+  , isNote x
+  , startWithPunct ys
+  = if moveNotes
+       then Str (headInline ys) : x : tailInline ys
+       else x : ys
+mvPunct moveNotes _ (Cite cs ils : ys)
+   | length ils > 1
    , isNote (last ils)
    , startWithPunct ys
    , moveNotes
-   = Cite cs (init ils ++ [Str (headInline ys) | not (endWithPunct False (init ils))]
+   = Cite cs (init ils
+     ++ [Str (headInline ys) | not (endWithPunct False (init ils))]
      ++ [last ils]) : tailInline ys
 mvPunct moveNotes sty (q@(Quoted _ _) : w@(Str _) : x : ys)
-  | isNote x, isPunctuationInQuote sty, moveNotes  =
-    mvPunctInsideQuote q w ++ (x : ys)
+  | isNote x
+  , isPunctuationInQuote sty
+  , moveNotes
+  = mvPunctInsideQuote q w ++ (x : ys)
 mvPunct _ _ (s : x : ys) | isSpacy s, isNote x = x : ys
 mvPunct _ _ (s : x@(Cite _ (Superscript _ : _)) : ys) | isSpacy s = x : ys
+mvPunct _ _ (Cite cs ils : Str "." : ys)
+  | lastInline ils == "."
+  = Cite cs ils : ys
 mvPunct _ _ xs = xs
 
 endWithPunct :: Bool -> [Inline] -> Bool
@@ -287,10 +298,11 @@ endWithPunct onlyFinal xs@(_:_) =
   case reverse (stringify xs) of
        []                       -> True
        -- covers .), .", etc.:
-       (d:c:_) | isPunctuation d && not onlyFinal
-                && isEndPunct c -> True
-       (c:_) | isEndPunct c     -> True
-             | otherwise        -> False
+       (d:c:_) | isPunctuation d
+                 && not onlyFinal
+                 && isEndPunct c -> True
+       (c:_) | isEndPunct c      -> True
+             | otherwise         -> False
   where isEndPunct c = c `elem` (".,;:!?" :: String)
 
 startWithPunct :: [Inline] -> Bool
