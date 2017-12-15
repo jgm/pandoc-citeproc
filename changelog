@@ -1,3 +1,8 @@
+pandoc-citeproc (0.12.1.1)
+
+  * Avoid double punctuation when citation ends with 'et al.' (#262).
+  * Fix collapsing for items that lack an author (#152).
+
 pandoc-citeproc (0.12.1)
 
   * Fixed cases where we got plural instead of singular "issue"
