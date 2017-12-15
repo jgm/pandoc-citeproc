@@ -72,10 +72,11 @@ collapseNumber (CG _ f d os) = mapCitationGroup process $ CG [] f d os
 
 groupCites :: [(Cite, Output)] -> [(Cite, Output)]
 groupCites []     = []
-groupCites (x:xs) = let equal    = filter ((==) (namesOf $ snd x) . namesOf . snd) xs
-                        notequal = filter ((/=) (namesOf $ snd x) . namesOf . snd) xs
+groupCites (x:xs) = let equal    = filter (hasSameNamesAs x) xs
+                        notequal = filter (not . hasSameNamesAs x) xs
                     in  x : equal ++ groupCites notequal
     where
+      hasSameNamesAs w y = namesOf (snd w) == namesOf (snd y)
       contribsQ o
           | OContrib _ _ c _ _ <- o = [c]
           | otherwise               = []
@@ -138,7 +139,9 @@ collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
           | OContrib _ _ c _ _ <- o = [proc' rmHashAndGivenNames c]
           | otherwise               = []
       namesOf = query contribsQ
-      process = doCollapse . groupBy (\a b -> namesOf (snd a) == namesOf (snd b)) . groupCites
+      hasSameNames a b = not (null (namesOf (snd a))) &&
+                         namesOf (snd a) == namesOf (snd b)
+      process = doCollapse . groupBy hasSameNames . groupCites
 
 collapseYearSuf :: Bool -> String -> [(Cite,Output)] -> [Output]
 collapseYearSuf ranged ysd = process
