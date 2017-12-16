@@ -79,7 +79,10 @@ evalSorting :: EvalMode -> [Locale] -> [MacroMap] -> [Option] ->
 evalSorting m l ms opts ss as mbr
     = map (format . sorting) ss
     where
-      render       = renderPlain . formatOutputList
+      render       = renderPlain . formatOutputList . proc removeDelimAndLabel
+      removeDelimAndLabel (OLabel{}) = ONull
+      removeDelimAndLabel (ODel{})   = ONull
+      removeDelimAndLabel x          = x
       format (s,e) = applaySort s . render $ uncurry eval e
       eval     o e = evalLayout (Layout emptyFormatting [] [e]) m False l ms o as mbr
       applaySort c s
