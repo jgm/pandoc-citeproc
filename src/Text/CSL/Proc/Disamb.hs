@@ -50,19 +50,20 @@ disambCitations s bibs cs groups
       -- name data of name duplicates
       nameDupls = getDuplNameData groups
       -- citation data of ambiguous cites
-      duplics   = getDuplCiteData hasNamesOpt hasYSuffOpt groups
+      duplics   = getDuplCiteData giveNameDisamb hasNamesOpt hasYSuffOpt groups
 
       -- check the options set in the style
-      isByCite = let gno = getOptionVal "givenname-disambiguation-rule" (citOptions $ citation s)
-                 in  gno == "by-cite" || gno == []
       disOpts     = getCitDisambOptions s
       hasNamesOpt = "disambiguate-add-names"       `elem` disOpts
       hasGNameOpt = "disambiguate-add-givenname"   `elem` disOpts
       hasYSuffOpt = "disambiguate-add-year-suffix" `elem` disOpts
-      givenNames = if hasGNameOpt
-                   then if isByCite then ByCite else AllNames
-                   else NoGiven
-
+      giveNameDisamb = case getOptionVal "givenname-disambiguation-rule"
+                             (citOptions (citation s)) of
+                        "by-cite" -> ByCite
+                        "all-names" -> AllNames
+                        "primary-name" -> PrimaryName
+                        "primary-name-with-initials" -> PrimaryName
+                        _ -> ByCite -- default as of CSL 1.0
       clean     = if hasGNameOpt then id else proc rmHashAndGivenNames
       withNames = flip map duplics $ same . clean .
                   map (if hasNamesOpt then disambData else return . disambYS)
@@ -71,8 +72,8 @@ disambCitations s bibs cs groups
       needYSuff = filter_        snd  $ zip duplics withNames
 
       newNames :: [CiteData]
-      newNames  = when_ (hasNamesOpt || hasGNameOpt) $ disambAddNames givenNames $ needNames ++
-                  if hasYSuffOpt && givenNames == NoGiven then [] else needYSuff
+      newNames  = when_ (hasNamesOpt || hasGNameOpt) $ disambAddNames giveNameDisamb $ needNames ++
+                  if hasYSuffOpt && giveNameDisamb == NoGiven then [] else needYSuff
 
       newGName :: [NameData]
       newGName  = when_ hasGNameOpt $ concatMap disambAddGivenNames nameDupls
@@ -92,7 +93,7 @@ disambCitations s bibs cs groups
 
       yearSuffs = when_ hasYSuffOpt . generateYearSuffix bibs . concatMap getYearSuffixes $ withYearS
 
-      addNames  = proc (updateContrib givenNames newNames newGName)
+      addNames  = proc (updateContrib giveNameDisamb newNames newGName)
       processed = if hasYSuffOpt
                   then proc (updateYearSuffixes yearSuffs) $ withYearS
                   else withYearS
@@ -106,9 +107,10 @@ mapCitationGroup :: ([Output] -> [Output]) -> CitationGroup ->  CitationGroup
 mapCitationGroup f (CG cs fm d os) = CG cs fm d (zip (map fst os) . f $ map snd os)
 
 data GiveNameDisambiguation
-    = NoGiven
+    = NoGiven  -- TODO this is no longer used?
     | ByCite
     | AllNames
+    | PrimaryName
     deriving (Show, Eq)
 
 disambAddNames :: GiveNameDisambiguation -> [CiteData] -> [CiteData]
@@ -189,29 +191,32 @@ getCitDisambOptions
 -- disambiguation. The second 'Bool' is 'True' when comparing both
 -- year and contributors' names for finding duplicates (when the
 -- year-suffix option is set).
-getDuplCiteData :: Bool -> Bool -> [CitationGroup] -> [[CiteData]]
-getDuplCiteData b1 b2 g
+getDuplCiteData :: GiveNameDisambiguation -> Bool -> Bool -> [CitationGroup] -> [[CiteData]]
+getDuplCiteData giveNameDisamb b1 b2 g
     = groupBy (\x y -> collide x == collide y) . sortBy (comparing collide)
       $ duplicates
     where
       whatToGet  = if b1 then collision else disambYS
-      collide    = proc rmExtras . proc rmHashAndGivenNames . whatToGet
+      collide    = proc (rmExtras giveNameDisamb) . proc rmHashAndGivenNames . whatToGet
       citeData   = nubBy (\a b -> collide a == collide b && key a == key b) $
                    concatMap (mapGroupOutput $ getCiteData) g
       duplicates = [c | c <- citeData , d <- citeData , collides c d]
       collides x y = x /= y && (collide x == collide y)
                             && (not b2 || citYear x == citYear y)
 
-rmExtras :: [Output] -> [Output]
-rmExtras os
-    | Output         x _ : xs <- os = case rmExtras x of
-                                           [] -> rmExtras xs
-                                           ys -> ys ++ rmExtras xs
-    | OContrib _ _ x _ _ : xs <- os = OContrib [] [] x [] [] : rmExtras xs
-    | OYear        y _ f : xs <- os = OYear y [] f : rmExtras xs
-    | ODel             _ : xs <- os = rmExtras xs
-    | OLoc           _ _ : xs <- os = rmExtras xs
-    | x                  : xs <- os = x : rmExtras xs
+rmExtras :: GiveNameDisambiguation -> [Output] -> [Output]
+rmExtras g os
+    | Output         x _ : xs <- os = case rmExtras g x of
+                                           [] -> rmExtras g xs
+                                           ys -> ys ++ rmExtras g xs
+    | OContrib _ _ (y:ys) _ _ : xs <- os
+                                    = if g == PrimaryName
+                                         then OContrib [] [] [y] [] [] : rmExtras g xs
+                                         else OContrib [] [] (y:ys) [] [] : rmExtras g xs
+    | OYear        y _ f : xs <- os = OYear y [] f : rmExtras g xs
+    | ODel             _ : xs <- os = rmExtras g xs
+    | OLoc           _ _ : xs <- os = rmExtras g xs
+    | x                  : xs <- os = x : rmExtras g xs
     | otherwise                     = []
 
 -- | For an evaluated citation get its 'CiteData'. The disambiguated
