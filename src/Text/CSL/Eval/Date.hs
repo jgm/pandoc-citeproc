@@ -51,10 +51,10 @@ evalDate (Date s f fm dl dp dp') = do
       updateS a b = if b /= a && b /= [] then b else a
   case f of
     NoFormDate -> mapM getDateVar s >>= return . outputList fm dl .
-                  concatMap (formatDate em k tm dp . concatMap parseRefDate)
+                  concatMap (formatDate em k tm dp)
     _          -> do Date _ _ lfm ldl ldp _ <- getDate f
                      let go dps = return . outputList (updateFM fm lfm) (if ldl /= [] then ldl else dl) .
-                                  concatMap (formatDate em k tm dps . concatMap parseRefDate)
+                                  concatMap (formatDate em k tm dps)
                          update l x@(DatePart a b c d) =
                              case filter ((==) a . dpName) l of
                                (DatePart _ b' c' d':_) -> DatePart a (updateS  b b')
@@ -218,35 +218,3 @@ getOrdinal v s ts
       gender = if v `elem` numericVars || "month" `isPrefixOf` v
                then maybe Neuter termGender $ findTerm v Long ts
                else Neuter
-
-parseRefDate :: RefDate -> [RefDate]
-parseRefDate r@(RefDate _ _ _ _ (Literal o) c)
-    = if null o then return r
-      else let (a,b) = break (== '-') o
-           in  if null b then return (parseRaw o) else [parseRaw a, parseRaw b]
-    where
-      parseRaw str =
-          case words $ check str of
-            [y']       | and (map isDigit y') -> RefDate (Literal y') mempty mempty mempty (Literal o) c
-            [s',y']    | and (map isDigit y')
-                       , and (map isDigit s') -> RefDate (Literal y') (Literal s') mempty mempty (Literal o) c
-            [s',y']    | s' `elem'` seasons   -> RefDate (Literal y') mempty (Literal $ select s' seasons) mempty (Literal o) False
-            [s',y']    | s' `elem'` months    -> RefDate (Literal y') (Literal $ select s'  months) mempty mempty (Literal o) c
-            [s',d',y'] | and (map isDigit s')
-                       , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate (Literal y') (Literal s') mempty (Literal d') (Literal o) c
-            [s',d',y'] | s' `elem'` months
-                       , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') (Literal o) c
-            [s',d',y'] | s' `elem'` months
-                       , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') (Literal o) c
-            _                                 -> r
-      check []     = []
-      check (x:xs) = if x `elem` ",/-" then ' ' : check xs else x : check xs
-      select     x = show . (+ 1) . fromJust . elemIndex' x
-      elem'      x = elem      (map toLower $ take 3 x)
-      elemIndex' x = elemIndex (map toLower $ take 3 x)
-
-      months   = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
-      seasons  = ["spr","sum","fal","win"]
