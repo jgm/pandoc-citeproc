@@ -271,6 +271,8 @@ instance Show RefType where
     show x = map toLower . uncamelize . showConstr . toConstr $ x
 
 instance FromJSON RefType where
+  -- found in one of the test cases:
+  parseJSON (String "film") = return MotionPicture
   parseJSON (String t) =
     (safeRead (capitalize . camelize . T.unpack $ t)) <|>
     fail ("'" ++ T.unpack t ++ "' is not a valid reference type")
