@@ -777,12 +777,19 @@ data Agent
 emptyAgent :: Agent
 emptyAgent = Agent [] mempty mempty mempty mempty mempty False False
 
+-- CSL JSON uses quotes to protect capitalization
+removeQuoted :: Formatted -> Formatted
+removeQuoted (Formatted ils) = Formatted (go ils)
+  where go [] = []
+        go (Quoted DoubleQuote ils : xs) = ils ++ go xs
+        go (x:xs) = x : go xs
+
 instance FromJSON Agent where
   parseJSON (Object v) = nameTransform <$> (Agent <$>
               (v .: "given" <|> ((map Formatted . wordsBy isSpace . unFormatted) <$> v .: "given") <|> pure []) <*>
               v .:?  "dropping-particle" .!= mempty <*>
               v .:? "non-dropping-particle" .!= mempty <*>
-              v .:? "family" .!= mempty <*>
+              (removeQuoted <$> (v .:? "family" .!= mempty)) <*>
               v .:? "suffix" .!= mempty <*>
               v .:? "literal" .!= mempty <*>
               (v .:? "comma-suffix" >>= mb parseBool) .!= False <*>
