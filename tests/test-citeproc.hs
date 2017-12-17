@@ -13,6 +13,7 @@ import System.Process
 import System.IO.Temp (withSystemTempDirectory)
 import qualified Text.Pandoc.UTF8 as UTF8
 import Data.Aeson
+import Data.Aeson.Types (Parser)
 import System.FilePath
 import System.Directory
 import Data.List (sort, isInfixOf)
@@ -51,12 +52,15 @@ instance FromJSON TestCase where
   parseJSON (Object v) = TestCase <$>
               v .:  "mode" <*>
               v .:? "bibsection" .!= Select [] [] <*>
-              v .:? "citations" .!= [] <*>
+              ((v .: "citations") >>= parseCitations) <*>
               v .:? "citation_items" .!= [] <*>
-              (parseCSL <$> (v .:  "csl")) <*>
+              (parseCSL <$> (v .: "csl")) <*>
               v .:? "abbreviations" .!= (Abbreviations M.empty) <*>
               v .:  "input" <*>
               v .:  "result"
+        where parseCitations :: Data.Aeson.Value -> Parser [CiteObject]
+              parseCitations x@(Array{}) = parseJSON x
+              parseCitations _           = return []
   parseJSON _ = fail "Could not parse test case"
 
 newtype CiteObject =
@@ -210,7 +214,7 @@ main = do
   exists <- doesDirectoryExist testDir
   unless exists $ do
     putStrLn "Downloading test suite"
-    rawSystem "hg" ["clone", "https://bitbucket.org/bdarcus/citeproc-test"]
+    _ <- rawSystem "hg" ["clone", "https://bitbucket.org/bdarcus/citeproc-test"]
     withDirectory "citeproc-test" $
       void $ rawSystem "python" ["processor.py", "--grind"]
 
