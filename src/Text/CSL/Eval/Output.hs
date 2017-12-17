@@ -130,6 +130,7 @@ formatOutput o =
       OPan     i          -> Formatted i
       ODel     []         -> Formatted []
       ODel     " "        -> Formatted [Space]
+      ODel     "\n"       -> Formatted [SoftBreak]
       ODel     s          -> formatString s
       OStr     []      _  -> Formatted []
       OStr     s       f  -> addFormatting f $ formatString s

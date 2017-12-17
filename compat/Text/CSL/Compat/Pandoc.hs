@@ -71,7 +71,8 @@ writeNative = either mempty T.unpack . runPure . Pandoc.writeNative def{ writerT
 
 writeHtmlString = either mempty T.unpack . runPure . Pandoc.writeHtml4String
    def{ writerExtensions = extensionsFromList
-       [Ext_native_divs, Ext_native_spans, Ext_raw_html] }
+       [Ext_native_divs, Ext_native_spans, Ext_raw_html],
+       writerWrapText = WrapPreserve }
 
 #else
 readHtml = either mempty id . Pandoc.readHtml
