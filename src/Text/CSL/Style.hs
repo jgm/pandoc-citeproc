@@ -781,7 +781,7 @@ emptyAgent = Agent [] mempty mempty mempty mempty mempty False False
 removeQuoted :: Formatted -> Formatted
 removeQuoted (Formatted ils) = Formatted (go ils)
   where go [] = []
-        go (Quoted DoubleQuote ils : xs) = ils ++ go xs
+        go (Quoted DoubleQuote ils' : xs) = ils' ++ go xs
         go (x:xs) = x : go xs
 
 instance FromJSON Agent where
