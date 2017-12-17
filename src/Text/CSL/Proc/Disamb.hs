@@ -213,7 +213,9 @@ rmExtras g os
                                     = if g == PrimaryName
                                          then OContrib [] [] [y] [] [] : rmExtras g xs
                                          else OContrib [] [] (y:ys) [] [] : rmExtras g xs
-    | OYear        y _ f : xs <- os = OYear y [] f : rmExtras g xs
+    | OYear{}            : xs <- os = rmExtras g xs
+    | OYearSuf{}         : xs <- os = rmExtras g xs
+    | OLabel{}           : xs <- os = rmExtras g xs
     | ODel             _ : xs <- os = rmExtras g xs
     | OLoc           _ _ : xs <- os = rmExtras g xs
     | x                  : xs <- os = x : rmExtras g xs
