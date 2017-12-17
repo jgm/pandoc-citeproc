@@ -1,5 +1,5 @@
 stack:
-	stack install --test --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall -pgmPcpphs -optP--cpp' --test-arguments='-j4 --hide-successes $(TESTARGS)'
+	stack install --test --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:test_citeproc' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall -pgmPcpphs -optP--cpp' --test-arguments='-j4 --hide-successes $(TESTARGS)'
 
 debug:
 	stack install --test --flag 'pandoc-citeproc:debug' --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall -pgmPcpphs -optP--cpp' --test-arguments='-j4 --hide-successes $(TESTARGS)'
