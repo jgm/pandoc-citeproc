@@ -36,6 +36,7 @@ data TestCase = TestCase{
   } deriving (Show)
 
 data Mode = CitationMode
+          | CitationRTFMode
           | BibliographyMode
           | BibliographyHeaderMode
           | BibliographyNoSortMode
@@ -43,6 +44,7 @@ data Mode = CitationMode
 
 instance FromJSON Mode where
   parseJSON (String "citation")     = return CitationMode
+  parseJSON (String "citation-rtf") = return CitationRTFMode
   parseJSON (String "bibliography") = return BibliographyMode
   parseJSON (String "bibliography-header") = return BibliographyHeaderMode
   parseJSON (String "bibliography-nosort") = return BibliographyNoSortMode
