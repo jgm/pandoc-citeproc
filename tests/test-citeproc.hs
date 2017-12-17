@@ -214,7 +214,7 @@ main = do
   exists <- doesDirectoryExist testDir
   unless exists $ do
     putStrLn "Downloading test suite"
-    _ <- rawSystem "hg" ["clone", "https://bitbucket.org/bdarcus/citeproc-test"]
+    _ <- rawSystem "git" ["clone", "https://github.com/citation-style-language/test-suite.git", "citeproc-test"]
     withDirectory "citeproc-test" $
       void $ rawSystem "python" ["processor.py", "--grind"]
 
