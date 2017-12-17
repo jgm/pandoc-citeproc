@@ -785,8 +785,8 @@ instance FromJSON Agent where
               v .:? "family" .!= mempty <*>
               v .:? "suffix" .!= mempty <*>
               v .:? "literal" .!= mempty <*>
-              v .:? "comma-suffix" .!= False <*>
-              v .:? "parse-names" .!= False)
+              (v .:? "comma-suffix" >>= mb parseBool) .!= False <*>
+              (v .:? "parse-names" >>= mb parseBool) .!= False)
   parseJSON _ = fail "Could not parse Agent"
 
 instance ToYaml Agent where
