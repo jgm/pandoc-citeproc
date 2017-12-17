@@ -61,6 +61,7 @@ disambCitations s bibs cs groups
                              (citOptions (citation s)) of
                         "by-cite" -> ByCite
                         "all-names" -> AllNames
+                        "all-names-with-initials" -> AllNames
                         "primary-name" -> PrimaryName
                         "primary-name-with-initials" -> PrimaryName
                         _ -> ByCite -- default as of CSL 1.0
