@@ -176,9 +176,11 @@ instance OVERLAPS
     dateParts <- v .:? "date-parts"
     circa' <- (v .: "circa" >>= parseBool) <|> pure False
     season' <- (v .: "season") <|> pure mempty
+    raw' <- (v .: "raw") <|> pure mempty
     case dateParts of
          Just (Array xs) -> mapM (fmap (setCirca circa' .
-                                        setSeason season') . parseJSON)
+                                        setSeason season' .
+                                        setOther raw') . parseJSON)
                             $ V.toList xs
          _               -> handleLiteral <$> parseJSON (Object v)
   parseJSON x          = parseJSON x >>= mkRefDate
@@ -222,6 +224,9 @@ setCirca circa' rd = rd{ circa = circa' }
 
 setSeason :: Literal -> RefDate -> RefDate
 setSeason season' rd = rd{ season = season' }
+
+setOther :: Literal -> RefDate -> RefDate
+setOther other' rd = rd{ other = other' }
 
 mkRefDate :: Literal -> Parser [RefDate]
 mkRefDate z@(Literal xs)
