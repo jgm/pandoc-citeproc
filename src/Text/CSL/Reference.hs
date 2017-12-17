@@ -49,7 +49,7 @@ where
 
 import Data.List  ( elemIndex, intercalate )
 import Data.List.Split ( splitWhen )
-import Data.Maybe ( fromMaybe             )
+import Data.Maybe ( fromMaybe, fromJust )
 import Data.Generics hiding (Generic)
 import GHC.Generics (Generic)
 import Data.Aeson hiding (Value)
@@ -173,16 +173,18 @@ instance OVERLAPS
          FromJSON [RefDate] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
   parseJSON (Object v) = do
+    raw' <- v .:? "raw"
     dateParts <- v .:? "date-parts"
     circa' <- (v .: "circa" >>= parseBool) <|> pure False
     season' <- (v .: "season") <|> pure mempty
-    raw' <- (v .: "raw") <|> pure mempty
     case dateParts of
-         Just (Array xs) -> mapM (fmap (setCirca circa' .
-                                        setSeason season' .
-                                        setOther raw') . parseJSON)
-                            $ V.toList xs
-         _               -> handleLiteral <$> parseJSON (Object v)
+         Just (Array xs) | not (V.null xs)
+                          -> mapM (fmap (setCirca circa' .
+                                        setSeason season') . parseJSON)
+                             $ V.toList xs
+         _ -> case raw' of
+                  Nothing -> handleLiteral <$> parseJSON (Object v)
+                  Just r  -> return $ parseRawDate r
   parseJSON x          = parseJSON x >>= mkRefDate
 
 -- Zotero doesn't properly support date ranges, so a common
@@ -224,9 +226,6 @@ setCirca circa' rd = rd{ circa = circa' }
 
 setSeason :: Literal -> RefDate -> RefDate
 setSeason season' rd = rd{ season = season' }
-
-setOther :: Literal -> RefDate -> RefDate
-setOther other' rd = rd{ other = other' }
 
 mkRefDate :: Literal -> Parser [RefDate]
 mkRefDate z@(Literal xs)
@@ -846,3 +845,36 @@ setNearNote s cs
                                   citeNoteNumber x /= "0" &&
                                   readNum (citeNoteNumber c) - readNum (citeNoteNumber x) <= near_note
                            _   -> False
+
+parseRawDate :: String -> [RefDate]
+parseRawDate o =
+  if null b
+     then [parseRaw o]
+     else [parseRaw a, parseRaw b]
+  where (a,b) = break (== '-') o
+        c = False -- circa
+        parseRaw str =
+          case words $ check str of
+            [y']       | and (map isDigit y') -> RefDate (Literal y') mempty mempty mempty (Literal o) c
+            [s',y']    | and (map isDigit y')
+                       , and (map isDigit s') -> RefDate (Literal y') (Literal s') mempty mempty (Literal o) c
+            [s',y']    | s' `elem'` seasons   -> RefDate (Literal y') mempty (Literal $ select s' seasons) mempty (Literal o) False
+            [s',y']    | s' `elem'` months    -> RefDate (Literal y') (Literal $ select s'  months) mempty mempty (Literal o) c
+            [s',d',y'] | and (map isDigit s')
+                       , and (map isDigit y')
+                       , and (map isDigit d') -> RefDate (Literal y') (Literal s') mempty (Literal d') (Literal o) c
+            [s',d',y'] | s' `elem'` months
+                       , and (map isDigit y')
+                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') (Literal o) c
+            [s',d',y'] | s' `elem'` months
+                       , and (map isDigit y')
+                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') (Literal o) c
+            _                                 -> RefDate mempty mempty mempty mempty (Literal o) c
+        check []     = []
+        check (x:xs) = if x `elem` [',','/','-'] then ' ' : check xs else x : check xs
+        select     x = show . (+ 1) . fromJust . elemIndex' x
+        elem'      x = elem      (map toLower $ take 3 x)
+        elemIndex' x = elemIndex (map toLower $ take 3 x)
+
+        months   = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
+        seasons  = ["spr","sum","fal","win"]
