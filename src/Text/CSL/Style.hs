@@ -64,6 +64,7 @@ module Text.CSL.Style ( readCSLString
                       , Formatting(..)
                       , emptyFormatting
                       , rmTitleCase
+                      , rmTitleCase'
                       , Quote(..)
                       , mergeFM
                       , CSInfo(..)
@@ -589,6 +590,13 @@ instance Show Formatting where
 
 rmTitleCase :: Formatting -> Formatting
 rmTitleCase f = f{ textCase = if textCase f == "title" then "" else textCase f  }
+
+rmTitleCase' :: Output -> Output
+rmTitleCase' o =
+  case o of
+       OStr s f    -> OStr s (rmTitleCase f)
+       Output os f -> Output os (rmTitleCase f)
+       _           -> o
 
 data Quote
     = NativeQuote

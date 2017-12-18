@@ -72,7 +72,7 @@ evalLayout (Layout _ _ es) em b l m o a mbr
                  (_,  Just "en") -> id
                  (_,  Nothing)   -> id
                  ("en", Just "") -> id
-                 _               -> proc' rmTitleCase
+                 _               -> proc' rmTitleCase'
 
 evalSorting :: EvalMode -> [Locale] -> [MacroMap] -> [Option] ->
                [Sort] -> Abbreviations -> Maybe Reference -> [Sorting]
