@@ -43,6 +43,7 @@ extra-source-files: stack.yaml
                     tests/*.expected.native
                     tests/*.csl
                     tests/biblio.bib
+                    tests/biblatex-examples.bib
                     tests/biblio2yaml/*.bibtex
                     tests/biblio2yaml/*.biblatex
                     tests/biblio2yaml/pandoc-2/*.biblatex
