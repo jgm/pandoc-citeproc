@@ -49,7 +49,7 @@ where
 
 import Data.List  ( elemIndex, intercalate )
 import Data.List.Split ( splitWhen )
-import Data.Maybe ( fromMaybe, fromJust )
+import Data.Maybe ( fromMaybe, fromJust, isJust )
 import Data.Generics hiding (Generic)
 import GHC.Generics (Generic)
 import Data.Aeson hiding (Value)
@@ -178,7 +178,7 @@ instance OVERLAPS
     circa' <- (v .: "circa" >>= parseBool) <|> pure False
     season' <- (v .: "season") <|> pure mempty
     case dateParts of
-         Just (Array xs) | not (V.null xs)
+         Just (Array xs) | not (isJust raw') && not (V.null xs)
                           -> mapM (fmap (setCirca circa' .
                                         setSeason season') . parseJSON)
                              $ V.toList xs
