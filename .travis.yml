@@ -52,9 +52,9 @@ matrix:
 
   # The Stack builds. We can pass in arbitrary Stack arguments via the ARGS
   # variable, such as using --stack-yaml to point to a different file.
-  - env: BUILD=stack ARGS="--resolver lts-9"
-    compiler: ": #stack 8.0.1"
-    addons: {apt: {packages: [ghc-8.0.1], sources: [hvr-ghc]}}
+  - env: BUILD=stack ARGS="--resolver lts-10"
+    compiler: ": #stack 8.2.1"
+    addons: {apt: {packages: [ghc-8.2.1], sources: [hvr-ghc]}}
 
   # Nightly builds are allowed to fail
   # - env: BUILD=stack ARGS="--resolver nightly"

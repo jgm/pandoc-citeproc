@@ -9,19 +9,5 @@ flags:
 packages:
 - '.'
 extra-deps:
-- pandoc-2.0.5
-- texmath-0.10
-- hslua-0.9.3
-- hslua-module-text-0.1.2.1
-- skylighting-0.5
-- cmark-gfm-0.1.1
-- QuickCheck-2.10.0.1
-- tasty-quickcheck-0.9.1
-- tagsoup-0.14.2
-- doctemplates-0.2.1
-- haddock-library-1.4.3
-- pandoc-types-1.17.3
-# needed for now:
-- hs-bibutils-6.2.0.1
 - rfc5051-0.1.0.3
-resolver: lts-9.14
+resolver: lts-10.0
