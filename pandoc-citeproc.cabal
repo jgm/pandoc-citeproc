@@ -163,7 +163,7 @@ executable pandoc-citeproc
     other-modules:    Paths_pandoc_citeproc
                       Prelude
     default-language: Haskell2010
-    ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
+    ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind -threaded
     if flag(static)
        ld-options:     -static
     if flag(bibutils)
