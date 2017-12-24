@@ -57,6 +57,7 @@ import qualified Data.Aeson as Aeson
 import Data.Aeson.Types (Parser)
 import qualified Data.Yaml.Builder as Y
 import Data.Yaml.Builder (ToYaml(..))
+import Data.Either (lefts, rights)
 import Control.Applicative ((<|>))
 import qualified Data.Text as T
 import Data.Text (Text)
@@ -502,6 +503,8 @@ instance FromJSON Reference where
 
 -- Syntax for adding supplementary fields in note variable
 -- {:authority:Superior Court of California}{:section:A}{:original-date:1777}
+-- or
+-- Foo\nissued: 2016-03-20/2016-07-31\nbar
 -- see http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#supplementary-fields
 parseSuppFields :: Aeson.Object -> Parser Aeson.Object
 parseSuppFields o = do
@@ -512,19 +515,30 @@ parseSuppFields o = do
 
 noteFields :: P.Parser [(Text, Aeson.Value)]
 noteFields = do
-  fs <- P.many noteField
+  fs <- P.many (Right <$> (noteField <|> lineNoteField) <|> Left <$> regText)
   P.spaces
-  rest <- P.getInput
-  return (("note", Aeson.String (T.pack rest)) : fs)
+  let rest = mconcat (lefts fs)
+  return (("note", Aeson.String rest) : rights fs)
 
 noteField :: P.Parser (Text, Aeson.Value)
 noteField = P.try $ do
-  P.spaces
   _ <- P.char '{'
   _ <- P.char ':'
   k <- P.manyTill (P.letter <|> P.char '-') (P.char ':')
+  _ <- P.skipMany (P.char ' ')
   v <- P.manyTill P.anyChar (P.char '}')
   return (T.pack k, Aeson.String (T.pack v))
+
+lineNoteField :: P.Parser (Text, Aeson.Value)
+lineNoteField = P.try $ do
+  _ <- P.char '\n'
+  k <- P.manyTill (P.letter <|> P.char '-') (P.char ':')
+  _ <- P.skipMany (P.char ' ')
+  v <- P.manyTill P.anyChar (P.char '\n' <|> '\n' <$ P.eof)
+  return (T.pack k, Aeson.String (T.pack v))
+
+regText :: P.Parser Text
+regText = (T.pack <$> P.many1 (P.noneOf "\n{")) <|> (T.singleton <$> P.anyChar)
 
 instance ToJSON Reference where
   toJSON ref = object' [
