@@ -879,20 +879,21 @@ isoDate = P.try $ do
   y <- P.many1 P.digit
   _ <- P.char '-'
   m' <- P.many1 P.digit
-  _ <- P.char '-'
-  d <- P.many1 P.digit
   (m,s) <- case safeRead m' of
                    Just (n::Int)
                           | n >= 1 && n <= 12  -> return (show n, "")
                           | n >= 13 && n <= 16 -> return ("", show (n - 12))
                           | n >= 21 && n <= 24 -> return ("", show (n - 20))
                    _ -> fail "Improper month"
+  _ <- P.char '-'
+  d <- P.many1 P.digit
   case safeRead d of
             Just (n::Int) | n >= 1 && n <= 31 -> return ()
             _ -> fail "Improper day"
+  c <- P.option False (True <$ P.char '~')
   return RefDate{ year = Literal y, month = Literal m,
                   season = Literal s, day = Literal d,
-                  other = mempty, circa = False }
+                  other = mempty, circa = c }
 
 rawDateOld :: P.Parser [RefDate]
 rawDateOld = do
@@ -906,7 +907,7 @@ rawDateOld = do
                       Just (n::Int) | n >= 1 && n <= 12 -> return (show n)
                       _ -> fail "Improper month"
            else case elemIndex (map toLower $ take 3 xs) months of
-                     Nothing -> fail "Imporper month"
+                     Nothing -> fail "Improper month"
                      Just n  -> return (show (n+1))
   let pseason = P.try $ do
         xs <- P.many1 P.letter
