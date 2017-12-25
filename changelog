@@ -1,3 +1,68 @@
+pandoc-citeproc (0.12.2)
+
+  * Improved parsing of raw dates.  First we attempt to parse them
+    as ISO dates or date ranges (allowing `~` at the end to indicate
+    "circa").
+
+  * Prefer 'raw' even if it occurs with 'date-parts'.  (In this case
+    'date-parts' is ignored.)
+
+  * Parse 'cheater' variables embedded in 'note' in CSL JSON (#192).
+    Both braced and newline forms are supported.
+
+  * Don't make title-case sensitive to locale for labels (#119).
+
+  * API change: export `rmTitleCase'` from Text.CSL.Style.
+
+  * Improved raw date parsing (#103).
+
+    + We now only parse 'raw' if `date-parts` is empty or missing.
+    + Code for parsing raw dates moved from Text.CSL.Eval.Date to
+      Text.CSL.Reference.
+    + Use `literal` field if we can't parse data.
+
+  * Support `all-names-with-initials` disambiguation.
+
+  * Remove double quotes in parsing CSL family names.
+    CSL uses double quotes simply to protect the case in names.
+
+  * Text.CSL.Proc.Disamb: exclude year, year suffix, label
+    in detecting collisions, unless year-suffix set.
+    This causes us to pass several more citeproc tests.
+
+  * Parse 'raw' field in ref dates in CSL JSON.
+
+  * Accept numerical versions of boolean parse-names in CSL JSON input.
+    This is mainly useful for avoiding errors in test-citeproc.
+
+  * Support 'film' as synonym of 'motion_picture'.
+    I don't see this documented, but a test case in the citeproc
+    test suite depends on it.
+
+  * Support citations-rtf mode in test-citeproc.
+
+  * Preserve soft breaks in HTML output.  This allows us to pass more
+    citeproc test cases.
+
+  * Parse 'season' properly in CSL YAML or JSON dates (#309).
+
+  * Fix "primary-name" name disambiguation (#38).  This also sets the
+    default to "by-cite", since that is now the CSL default.  However,
+    more adjustments are needed, as we now fail some citeproc tests we
+    passed before.
+
+  * test-citeproc improvements:
+
+    + , use new citeproc (git) test suite, not the old hg one.
+    + Build test-citeproc too in default Makefile target.
+    + Handle boolean values for 'citations' in test data.
+
+  * Add tests for issue #87.
+
+  * Added `-threaded` to `ghc-options` (#311).
+
+  * Added biblatex-examples.bib to data files.
+
 pandoc-citeproc (0.12.1.1)
 
   * Avoid double punctuation when citation ends with 'et al.' (#262).

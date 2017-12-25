@@ -1,5 +1,5 @@
 name:               pandoc-citeproc
-version:            0.12.1.1
+version:            0.12.2
 cabal-version:      >= 1.12
 synopsis:           Supports using pandoc with citeproc
 
