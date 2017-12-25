@@ -47,9 +47,10 @@ module Text.CSL.Reference ( Literal(..)
                           )
 where
 
+import Control.Monad ( guard )
 import Data.List  ( elemIndex, intercalate )
 import Data.List.Split ( splitWhen )
-import Data.Maybe ( fromMaybe, isJust )
+import Data.Maybe ( fromMaybe, isJust, isNothing )
 import Data.Generics hiding (Generic)
 import GHC.Generics (Generic)
 import Data.Aeson hiding (Value)
@@ -877,22 +878,21 @@ rawDateISO = do
 isoDate :: P.Parser RefDate
 isoDate = P.try $ do
   y <- P.many1 P.digit
-  _ <- P.char '-'
-  m' <- P.many1 P.digit
-  (m,s) <- case safeRead m' of
+  m' <- P.option Nothing $ Just <$> P.try (P.char '-' >> P.many1 P.digit)
+  (m,s) <- case m' >>= safeRead of
                    Just (n::Int)
                           | n >= 1 && n <= 12  -> return (show n, "")
                           | n >= 13 && n <= 16 -> return ("", show (n - 12))
                           | n >= 21 && n <= 24 -> return ("", show (n - 20))
+                   Nothing | isNothing m' -> return ("", "")
                    _ -> fail "Improper month"
-  _ <- P.char '-'
-  d <- P.many1 P.digit
-  case safeRead d of
-            Just (n::Int) | n >= 1 && n <= 31 -> return ()
-            _ -> fail "Improper day"
+  d <- P.option Nothing $ Just <$> P.try (P.char '-' >> P.many1 P.digit)
+  guard $ isNothing d || case d >>= safeRead of
+                           Just (n::Int) | n >= 1 && n <= 31 -> True
+                           _ -> False
   c <- P.option False (True <$ P.char '~')
   return RefDate{ year = Literal y, month = Literal m,
-                  season = Literal s, day = Literal d,
+                  season = Literal s, day = maybe mempty Literal d,
                   other = mempty, circa = c }
 
 rawDateOld :: P.Parser [RefDate]
