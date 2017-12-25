@@ -49,7 +49,7 @@ where
 
 import Data.List  ( elemIndex, intercalate )
 import Data.List.Split ( splitWhen )
-import Data.Maybe ( fromMaybe, fromJust, isJust )
+import Data.Maybe ( fromMaybe, isJust )
 import Data.Generics hiding (Generic)
 import GHC.Generics (Generic)
 import Data.Aeson hiding (Value)
@@ -186,7 +186,7 @@ instance OVERLAPS
          _ -> case raw' of
                   Nothing -> handleLiteral <$> parseJSON (Object v)
                   Just r  -> return $ parseRawDate r
-  parseJSON x          = parseJSON x >>= mkRefDate
+  parseJSON x  = parseRawDate <$> parseJSON x
 
 -- Zotero doesn't properly support date ranges, so a common
 -- workaround is 2005_2007 or 2005_; support this as date range:
@@ -517,7 +517,7 @@ noteFields :: P.Parser [(Text, Aeson.Value)]
 noteFields = do
   fs <- P.many (Right <$> (noteField <|> lineNoteField) <|> Left <$> regText)
   P.spaces
-  let rest = mconcat (lefts fs)
+  let rest = T.unwords (lefts fs)
   return (("note", Aeson.String rest) : rights fs)
 
 noteField :: P.Parser (Text, Aeson.Value)
@@ -862,33 +862,84 @@ setNearNote s cs
 
 parseRawDate :: String -> [RefDate]
 parseRawDate o =
-  if null b
-     then [parseRaw o]
-     else [parseRaw a, parseRaw b]
-  where (a,b) = break (== '-') o
-        c = False -- circa
-        parseRaw str =
-          case words $ check str of
-            [y']       | and (map isDigit y') -> RefDate (Literal y') mempty mempty mempty mempty c
-            [s',y']    | and (map isDigit y')
-                       , and (map isDigit s') -> RefDate (Literal y') (Literal s') mempty mempty mempty c
-            [s',y']    | s' `elem'` seasons   -> RefDate (Literal y') mempty (Literal $ select s' seasons) mempty mempty False
-            [s',y']    | s' `elem'` months    -> RefDate (Literal y') (Literal $ select s'  months) mempty mempty mempty c
-            [s',d',y'] | and (map isDigit s')
-                       , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate (Literal y') (Literal s') mempty (Literal d') mempty c
-            [s',d',y'] | s' `elem'` months
-                       , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') mempty c
-            [s',d',y'] | s' `elem'` months
-                       , and (map isDigit y')
-                       , and (map isDigit d') -> RefDate (Literal y') (Literal $ select s'  months) mempty (Literal d') mempty c
-            _                                 -> RefDate mempty mempty mempty mempty (Literal o) c
-        check []     = []
-        check (x:xs) = if x `elem` [',','/','-'] then ' ' : check xs else x : check xs
-        select     x = show . (+ 1) . fromJust . elemIndex' x
-        elem'      x = elem      (map toLower $ take 3 x)
-        elemIndex' x = elemIndex (map toLower $ take 3 x)
+  case P.parse rawDate "raw date" o of
+       Left _   -> [RefDate mempty mempty mempty mempty (Literal o) False]
+       Right ds -> ds
 
-        months   = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
-        seasons  = ["spr","sum","fal","win"]
+rawDate :: P.Parser [RefDate]
+rawDate = rawDateISO <|> rawDateOld
+
+rawDateISO :: P.Parser [RefDate]
+rawDateISO = do
+  d1 <- isoDate
+  P.option [d1] (P.char '/' >> (\x -> [d1, x]) <$> isoDate)
+
+isoDate :: P.Parser RefDate
+isoDate = P.try $ do
+  y <- P.many1 P.digit
+  _ <- P.char '-'
+  m' <- P.many1 P.digit
+  _ <- P.char '-'
+  d <- P.many1 P.digit
+  (m,s) <- case safeRead m' of
+                   Just (n::Int)
+                          | n >= 1 && n <= 12  -> return (show n, "")
+                          | n >= 13 && n <= 16 -> return ("", show (n - 12))
+                          | n >= 21 && n <= 24 -> return ("", show (n - 20))
+                   _ -> fail "Improper month"
+  case safeRead d of
+            Just (n::Int) | n >= 1 && n <= 31 -> return ()
+            _ -> fail "Improper day"
+  return RefDate{ year = Literal y, month = Literal m,
+                  season = Literal s, day = Literal d,
+                  other = mempty, circa = False }
+
+rawDateOld :: P.Parser [RefDate]
+rawDateOld = do
+  let months   = ["jan","feb","mar","apr","may","jun","jul","aug",
+                  "sep","oct","nov","dec"]
+  let seasons  = ["spr","sum","fal","win"]
+  let pmonth = P.try $ do
+        xs <- P.many1 P.letter <|> P.many1 P.digit
+        if all isDigit xs
+           then case safeRead xs of
+                      Just (n::Int) | n >= 1 && n <= 12 -> return (show n)
+                      _ -> fail "Improper month"
+           else case elemIndex (map toLower $ take 3 xs) months of
+                     Nothing -> fail "Imporper month"
+                     Just n  -> return (show (n+1))
+  let pseason = P.try $ do
+        xs <- P.many1 P.letter
+        case elemIndex (map toLower $ take 3 xs) seasons of
+             Nothing -> fail "Improper season"
+             Just n  -> return (show (n+1))
+  let pday = P.try $ do
+        xs <- P.many1 P.digit
+        case safeRead xs of
+             Just (n::Int) | n >= 1 && n <= 31 -> return (show n)
+             _ -> fail "Improper day"
+  let pyear = P.many1 P.digit
+  let sep = P.oneOf ['-',' ','/',','] >> P.spaces
+  let rangesep = P.try $ P.spaces >> P.char '-' >> P.spaces
+  let refDate = RefDate mempty mempty mempty mempty mempty False
+  let date = P.choice $ map P.try [
+                 (do s <- pseason
+                     sep
+                     y <- pyear
+                     return refDate{ year = Literal y, season = Literal s })
+               , (do m <- pmonth
+                     sep
+                     d <- pday
+                     sep
+                     y <- pyear
+                     return refDate{ year = Literal y, month = Literal m,
+                                     day = Literal d })
+               , (do m <- pmonth
+                     sep
+                     y <- pyear
+                     return refDate{ year = Literal y, month = Literal m })
+               , (do y <- pyear
+                     return refDate{ year = Literal y })
+               ]
+  d1 <- date
+  P.option [d1] ((\x -> [d1,x]) <$> (rangesep >> date))
