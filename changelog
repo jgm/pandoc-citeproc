@@ -1,3 +1,8 @@
+pandoc-citeproc (0.12.2.1)
+
+  * Handle pseudo-months in CSL date-range (see #103).
+    Month 13 = season 1, 14 = 2, also 21 = 1, 22 = 2, ...
+
 pandoc-citeproc (0.12.2)
 
   * Improved parsing of raw dates.  First we attempt to parse them
@@ -19,7 +24,7 @@ pandoc-citeproc (0.12.2)
     + We now only parse 'raw' if `date-parts` is empty or missing.
     + Code for parsing raw dates moved from Text.CSL.Eval.Date to
       Text.CSL.Reference.
-    + Use `literal` field if we can't parse data.
+    + Use `other` field if we can't parse data.
 
   * Support `all-names-with-initials` disambiguation.
 
