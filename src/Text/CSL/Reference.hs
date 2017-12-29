@@ -888,7 +888,10 @@ rawDateISO = do
 
 isoDate :: P.Parser RefDate
 isoDate = P.try $ do
-  y <- P.many1 P.digit
+  y <- do
+    sign <- P.option "" (P.string "-")
+    rest <- P.count 4 P.digit
+    return $ sign ++ rest
   m' <- P.option Nothing $ Just <$> P.try (P.char '-' >> P.many1 P.digit)
   (m,s) <- case m' >>= safeRead of
                    Just (n::Int)
@@ -931,7 +934,7 @@ rawDateOld = do
              Just (n::Int) | n >= 1 && n <= 31 -> return (show n)
              _ -> fail "Improper day"
   let pyear = P.many1 P.digit
-  let sep = P.oneOf ['-',' ','/',','] >> P.spaces
+  let sep = P.oneOf [' ','/',','] >> P.spaces
   let rangesep = P.try $ P.spaces >> P.char '-' >> P.spaces
   let refDate = RefDate mempty mempty mempty mempty mempty False
   let date = P.choice $ map P.try [
