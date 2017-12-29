@@ -1,5 +1,9 @@
 pandoc-citeproc (0.12.2.1)
 
+  * Allow pandoc 2.1.
+
+pandoc-citeproc (0.12.2.1)
+
   * Handle pseudo-months in CSL date-range (see #103).
     Month 13 = season 1, 14 = 2, also 21 = 1, 22 = 2, ...
 
