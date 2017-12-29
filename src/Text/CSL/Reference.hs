@@ -132,7 +132,7 @@ data RefDate =
             } deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 instance FromJSON RefDate where
-  parseJSON (Array v) =
+  parseJSON (Array v) = handlePseudoMonths <$>
      case fromJSON (Array v) of
           Success [y]     -> RefDate <$> parseJSON y <*>
                     pure "" <*> pure "" <*> pure "" <*> pure "" <*> pure False
@@ -142,6 +142,17 @@ instance FromJSON RefDate where
                     pure "" <*> parseJSON d <*> pure "" <*> pure False
           Error e         -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
+     where handlePseudoMonths r =
+              case unLiteral (month r) of
+                   "13" -> r{ month = mempty, season = Literal "1" }
+                   "14" -> r{ month = mempty, season = Literal "2" }
+                   "15" -> r{ month = mempty, season = Literal "3" }
+                   "16" -> r{ month = mempty, season = Literal "4" }
+                   "21" -> r{ month = mempty, season = Literal "1" }
+                   "22" -> r{ month = mempty, season = Literal "2" }
+                   "23" -> r{ month = mempty, season = Literal "3" }
+                   "24" -> r{ month = mempty, season = Literal "4" }
+                   _    -> r
   parseJSON (Object v) = RefDate <$>
               v .:? "year" .!= "" <*>
               v .:? "month" .!= "" <*>
@@ -178,11 +189,11 @@ instance OVERLAPS
     raw' <- v .:? "raw"
     dateParts <- v .:? "date-parts"
     circa' <- (v .: "circa" >>= parseBool) <|> pure False
-    season' <- (v .: "season") <|> pure mempty
+    season' <- v .:? "season"
     case dateParts of
          Just (Array xs) | not (isJust raw') && not (V.null xs)
                           -> mapM (fmap (setCirca circa' .
-                                        setSeason season') . parseJSON)
+                                     maybe id setSeason season') . parseJSON)
                              $ V.toList xs
          _ -> case raw' of
                   Nothing -> handleLiteral <$> parseJSON (Object v)
