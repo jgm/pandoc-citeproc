@@ -347,13 +347,17 @@ formatNumber f fm v n
       renderNumber  ts x = if isTransNumber x then format ts x else x
 
       format tm = case f of
-                    Ordinal     -> ordinal     tm v
-                    LongOrdinal -> longOrdinal tm v
-                    Roman       -> if readNum n < 6000 then roman else id
-                    _           -> id
+                    Ordinal     -> maybe "" (ordinal     tm v) . safeRead
+                    LongOrdinal -> maybe "" (longOrdinal tm v) . safeRead
+                    Roman       -> maybe ""
+                                   (\x -> if x < 6000 then roman x else show x) .
+                                   safeRead
+                    _           -> maybe "" show . (safeRead :: String -> Maybe Int)
 
+      roman :: Int -> String
       roman     = foldr (++) [] . reverse . map (uncurry (!!)) . zip romanList .
-                  map (readNum . return) . take 4 . reverse
+                  map (readNum . return) . take 4 .
+                  reverse . show
       romanList = [[ "", "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix" ]
                   ,[ "", "x", "xx", "xxx", "xl", "l", "lx", "lxx", "lxxx", "xc" ]
                   ,[ "", "c", "cc", "ccc", "cd", "d", "dc", "dcc", "dccc", "cm" ]

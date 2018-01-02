@@ -26,8 +26,9 @@ import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
 import Text.CSL.Style
 import Text.CSL.Reference
-import Text.CSL.Util ( readNum, toRead, init', last' )
+import Text.CSL.Util ( toRead, init', last' )
 import Text.Pandoc.Definition ( Inline (Str) )
+import Text.Printf (printf)
 
 evalDate :: Element -> State EvalState [Output]
 evalDate (Date s f fm dl dp dp') = do
@@ -97,7 +98,7 @@ formatDate em k tm dp date
                (RefDate yb mb sb db _ _) = case () of
                                              _ | ya /= yb  -> ["year","month","day"]
                                                | ma /= mb  ->
-                                                 if da == mempty && db == mempty
+                                                 if da == Nothing && db == Nothing
                                                     then ["month"]
                                                     else ["month","day"]
                                                | da /= db  -> ["day"]
@@ -109,22 +110,20 @@ formatDate em k tm dp date
                           else Long
                  in maybe [] termPlural $ findTerm t f' tm
 
-      addZero n = if length n == 1 then '0' : n else n
-      addZeros  = reverse . take 5 . flip (++) (repeat '0') . reverse
-      formatDatePart False (RefDate (Literal y) (Literal m)
-        (Literal e) (Literal d) _ _) (DatePart n f _ fm)
-          | "year"  <- n, y /= mempty = return $ OYear (formatYear  f    y) k fm
-          | "month" <- n, m /= mempty = output fm      (formatMonth f fm m)
-          | "day"   <- n, d /= mempty = output fm      (formatDay   f m  d)
-          | "month" <- n, m == mempty
-                        , e /= mempty = output fm $ term f ("season-0" ++ e)
+      formatDatePart False (RefDate y m e d _ _) (DatePart n f _ fm)
+          | "year"  <- n, y /= Nothing = return $ OYear (formatYear  f    y) k fm
+          | "month" <- n, m /= Nothing = output fm      (formatMonth f fm m)
+          | "day"   <- n, d /= Nothing = output fm      (formatDay   f m  d)
+          | "month" <- n, m == Nothing
+                        , e /= Nothing = output fm $
+                                          term f ("season-0" ++ maybe "" show e)
 
-      formatDatePart True (RefDate (Literal y) (Literal m) (Literal e) (Literal d) _ _) (DatePart n f rd fm)
-          | "year"  <- n, y /= mempty = OYear (formatYear  f y) k (fm {suffix = []}) : formatDelim
-          | "month" <- n, m /= mempty = output (fm {suffix = []}) (formatMonth f fm m) ++ formatDelim
-          | "day"   <- n, d /= mempty = output (fm {suffix = []}) (formatDay   f m  d) ++ formatDelim
-          | "month" <- n, m == mempty
-                        , e /= mempty = output (fm {suffix = []}) (term f $ "season-0" ++ e) ++ formatDelim
+      formatDatePart True (RefDate y m e d _ _) (DatePart n f rd fm)
+          | "year"  <- n, y /= Nothing = OYear (formatYear  f y) k (fm {suffix = []}) : formatDelim
+          | "month" <- n, m /= Nothing = output (fm {suffix = []}) (formatMonth f fm m) ++ formatDelim
+          | "day"   <- n, d /= Nothing = output (fm {suffix = []}) (formatDay   f m  d) ++ formatDelim
+          | "month" <- n, m == Nothing
+                        , e /= Nothing = output (fm {suffix = []}) (term f $ "season-0" ++ maybe "" show e) ++ formatDelim
           where
             formatDelim = if rd == "-" then [OPan [Str "\x2013"]] else [OPan [Str rd]]
 
@@ -132,73 +131,73 @@ formatDate em k tm dp date
           | "year"  <- n, o /= mempty = output fm o
           | otherwise                 = []
 
-      formatYear f y
-          | "short" <- f = drop 2 y
+      formatYear _ Nothing = ""
+      formatYear f (Just y)
+          | "short" <- f = printf "%02d" (y `mod` 100)
           | isSorting em
-          , iy < 0       = '-' : addZeros (tail y)
-          | isSorting em = addZeros y
-          | iy < 0       = show (abs iy) ++ term [] "bc"
-          | length y < 4
-          , iy /= 0      = y ++ term [] "ad"
-          | iy == 0      = []
-          | otherwise    = y
-          where
-            iy = readNum y
-      formatMonth f fm m
+          , y < 0        = printf "-%04d" (abs y)
+          | isSorting em = printf "%04d" y
+          | y < 0        = printf "%d" (abs y) ++ term [] "bc"
+          | y < 1000
+          , y > 0        = printf "%d" y ++ term [] "ad"
+          | y == 0       = ""
+          | otherwise    = printf "%d" y
+
+      formatMonth _ _ Nothing = ""
+      formatMonth f fm (Just m)
           | "short"   <- f = getMonth $ period . termPlural
           | "long"    <- f = getMonth termPlural
-          | "numeric" <- f = m
-          | otherwise      = addZero m
+          | "numeric" <- f = printf "%d" m
+          | otherwise      = printf "%02d" m
           where
             period     = if stripPeriods fm then filter (/= '.') else id
-            getMonth g = maybe m g $ findTerm ("month-" ++ addZero m) (read $ toRead f) tm
-      formatDay f m d
-          | "numeric-leading-zeros" <- f = addZero d
-          | "ordinal"               <- f = ordinal tm ("month-" ++ addZero m) d
-          | otherwise                    = d
+            getMonth g = maybe (show m) g $ findTerm ("month-" ++ printf "%02d" m) (read $ toRead f) tm
 
-ordinal :: [CslTerm] -> String -> String -> String
-ordinal _ _ [] = []
+      formatDay _ _ Nothing = ""
+      formatDay f m (Just d)
+          | "numeric-leading-zeros" <- f = printf "%02d" d
+          | "ordinal"               <- f = ordinal tm ("month-" ++ maybe "0" (printf "%02d") m) d
+          | otherwise                    = printf "%d" d
+
+ordinal :: [CslTerm] -> String -> Int -> String
 ordinal ts v s
-    | length s == 1 = let a = termPlural (getWith1 s) in
-                      if  a == [] then setOrd (term []) else s ++ a
-    | length s == 2 = let a = termPlural (getWith2 s)
-                          b = getWith1 [last s] in
+    | s < 10        = let a = termPlural (getWith1 (show s)) in
+                      if  a == [] then setOrd (term []) else show s ++ a
+    | s < 100       = let a = termPlural (getWith2 (show s))
+                          b = getWith1 [last (show s)] in
                       if  a /= []
-                      then s ++ a
+                      then show s ++ a
                       else if termPlural b == [] || (termMatch b /= [] && termMatch b /= "last-digit")
                            then setOrd (term []) else setOrd b
     | otherwise     = let a = getWith2  last2
-                          b = getWith1 [last s] in
+                          b = getWith1 [last (show s)] in
                       if termPlural a /= [] && termMatch a /= "whole-number"
                       then setOrd a
                       else if termPlural b == [] || (termMatch b /= [] && termMatch b /= "last-digit")
                            then setOrd (term []) else setOrd b
     where
-      setOrd   = (++) s . termPlural
+      setOrd   = (++) (show s) . termPlural
       getWith1 = term . (++) "-0"
       getWith2 = term . (++) "-"
-      last2    = reverse . take 2 . reverse $ s
+      last2    = reverse . take 2 . reverse $ show s
       term   t = getOrdinal v ("ordinal" ++ t) ts
 
-longOrdinal :: [CslTerm] -> String -> String -> String
-longOrdinal _ _ [] = []
+longOrdinal :: [CslTerm] -> String -> Int -> String
 longOrdinal ts v s
-    | num > 10 ||
-      num == 0  = ordinal ts v s
-    | otherwise = case last s of
-                    '1' -> term "01"
-                    '2' -> term "02"
-                    '3' -> term "03"
-                    '4' -> term "04"
-                    '5' -> term "05"
-                    '6' -> term "06"
-                    '7' -> term "07"
-                    '8' -> term "08"
-                    '9' -> term "09"
-                    _   -> term "10"
+    | s > 10 ||
+      s == 0  = ordinal ts v s
+    | otherwise = case s `mod` 10 of
+                    1 -> term "01"
+                    2 -> term "02"
+                    3 -> term "03"
+                    4 -> term "04"
+                    5 -> term "05"
+                    6 -> term "06"
+                    7 -> term "07"
+                    8 -> term "08"
+                    9 -> term "09"
+                    _ -> term "10"
     where
-      num    = readNum s
       term t = termPlural $ getOrdinal v ("long-ordinal-" ++ t) ts
 
 getOrdinal :: String -> String -> [CslTerm] -> CslTerm
