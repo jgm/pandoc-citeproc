@@ -1,4 +1,11 @@
-pandoc-citeproc (0.12.2.1)
+pandoc-citeproc (0.12.2.3)
+
+  * Fix month range problems (#312).  Months in a range were being
+    concatenated with no separator with some styles (e.g. apa.csl).
+
+  * Use pseudo-months in CSL JSON output (#103).
+
+pandoc-citeproc (0.12.2.2)
 
   * Allow pandoc 2.1.
 
