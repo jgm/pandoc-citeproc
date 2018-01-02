@@ -47,7 +47,7 @@ module Text.CSL.Reference ( Literal(..)
                           )
 where
 
-import Control.Monad ( guard )
+import Control.Monad ( guard, mplus )
 import Data.List  ( elemIndex, intercalate )
 import Data.List.Split ( splitWhen )
 import Data.Maybe ( fromMaybe, isJust, isNothing )
@@ -216,7 +216,9 @@ handleLiteral d = [d]
 toDatePart :: RefDate -> [Int]
 toDatePart refdate =
     case (safeRead (unLiteral $ year refdate),
-          safeRead (unLiteral $ month refdate),
+          safeRead (unLiteral $ month refdate)
+           `mplus`
+          ((+ 12) <$> safeRead (unLiteral $ season refdate)),
           safeRead (unLiteral $ day refdate)) of
          (Just (y :: Int), Just (m :: Int), Just (d :: Int))
                                      -> [y, m, d]
@@ -231,8 +233,7 @@ instance OVERLAPS
     case filter (not . null) (map toDatePart xs) of
          []  -> ["literal" .= intercalate "; " (map (unLiteral . other) xs)]
          dps -> (["date-parts" .= dps ] ++
-                 ["circa" .= (1 :: Int) | or (map circa xs)] ++
-                 ["season" .= s | s <- map season xs, s /= mempty])
+                 ["circa" .= (1 :: Int) | or (map circa xs)])
 
 setCirca :: Bool -> RefDate -> RefDate
 setCirca circa' rd = rd{ circa = circa' }
