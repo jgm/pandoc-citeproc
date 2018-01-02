@@ -174,13 +174,13 @@ instance ToJSON RefDate where
 -}
 
 instance ToYaml RefDate where
-  toYaml r = Y.mapping [ ("year", maybe Y.null toYaml (year r))
-                       , ("month", maybe Y.null toYaml (month r))
-                       , ("season", maybe Y.null toYaml (season r))
-                       , ("day", maybe Y.null toYaml (day r))
-                       , ("literal", toYaml $ other r)
-                       , ("circa", if circa r then Y.bool True else Y.null)
-                       ]
+  toYaml r = Y.mapping $
+      maybe [] (\x -> [ ("year", toYaml x) ]) (year r) ++
+      maybe [] (\x -> [ ("month", toYaml x) ]) (month r) ++
+      maybe [] (\x -> [ ("season", toYaml x) ]) (season r) ++
+      maybe [] (\x -> [ ("day", toYaml x) ]) (day r) ++
+      [ ("day", toYaml (other r)) | other r /= mempty ] ++
+      [ ("circa", Y.bool True) | circa r ]
 
 instance OVERLAPS
          FromJSON [RefDate] where
