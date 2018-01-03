@@ -1,3 +1,4 @@
+SOURCEFILES?=$(shell find pandoc-citeproc.hs src test -name '*.hs')
 stack:
 	stack install --test --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:test_citeproc' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall' --test-arguments='-j4 --hide-successes $(TESTARGS)'
 
@@ -31,6 +32,12 @@ test:
 
 clean:
 	cabal clean
+
+reformat:
+	for f in $(SOURCEFILES); do echo $$f; stylish-haskell -i $$f ; done
+
+lint:
+	for f in $(SOURCEFILES); do echo $$f; hlint --verbose --refactor --refactor-options='-i -s' $$f; done
 
 update:
 	curl 'https://raw.githubusercontent.com/citation-style-language/styles/master/chicago-author-date.csl' > chicago-author-date.csl ; \
