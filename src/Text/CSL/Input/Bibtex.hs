@@ -42,7 +42,7 @@ import           Text.Pandoc.Definition
 import           Text.Pandoc.Generic    (bottomUp)
 import qualified Text.Pandoc.UTF8       as UTF8
 import qualified Text.Pandoc.Walk       as Walk
-import           Text.Parsec            hiding (State, many, optional, (<|>))
+import Text.Parsec hiding (State, many, (<|>))
 
 blocksToFormatted  :: [Block]  -> Bib Formatted
 blocksToFormatted bs =
@@ -125,13 +125,12 @@ readBibtexString isBibtex caseTransform contents = do
             (itemToReference lang locale isBibtex caseTransform)
             (resolveCrossRefs isBibtex xs)
 
-type BibParser = Parsec [Char] [(String, String)]
+type BibParser = Parsec String [(String, String)]
 
 bibEntries :: BibParser [Item]
 bibEntries = do
   skipMany nonEntry
-  items <- many (bibItem <* skipMany nonEntry)
-  return items
+  many (bibItem <* skipMany nonEntry)
  where nonEntry = bibSkip <|> bibComment <|> bibPreamble <|> bibString
 
 bibSkip :: BibParser ()
@@ -161,7 +160,7 @@ bibString = try $ do
   f <- entField
   spaces
   char '}'
-  updateState $ (f:)
+  updateState (f:)
   return ()
 
 inBraces :: BibParser String
@@ -188,7 +187,7 @@ inQuotes = do
                       ) (char '"')
 
 fieldName :: BibParser String
-fieldName = (map toLower) <$> many1 (letter <|> digit <|> oneOf "-_:+")
+fieldName = map toLower <$> many1 (letter <|> digit <|> oneOf "-_:+")
 
 isBibtexKeyChar :: Char -> Bool
 isBibtexKeyChar c = isAlphaNum c || c `elem` ".:;?!`'()/*@_+=-[]*&"
@@ -204,7 +203,7 @@ bibItem = do
   spaces
   char ','
   spaces
-  entfields <- entField `sepEndBy` (char ',')
+  entfields <- entField `sepEndBy` char ','
   spaces
   char '}'
   return $ Item entid enttype entfields
@@ -217,7 +216,7 @@ entField = try $ do
   char '='
   spaces
   vs <- (expandString <|> inQuotes <|> inBraces <|> rawWord) `sepBy`
-            (try $ spaces >> char '#' >> spaces)
+            try (spaces >> char '#' >> spaces)
   spaces
   return (k, concat vs)
 
@@ -235,7 +234,7 @@ expandString = do
 cistring :: String -> BibParser String
 cistring [] = return []
 cistring (c:cs) = do
-  x <- (char (toLower c) <|> char (toUpper c))
+  x <- char (toLower c) <|> char (toUpper c)
   xs <- cistring cs
   return (x:xs)
 
@@ -908,12 +907,12 @@ getShortTitle requireColon f = do
        Nothing -> notFound f
 
 containsColon :: [Block] -> Bool
-containsColon [Para  xs] = (Str ":") `elem` xs
+containsColon [Para  xs] = Str ":" `elem` xs
 containsColon [Plain xs] = containsColon [Para xs]
 containsColon _          = False
 
 upToColon :: [Block] -> [Block]
-upToColon [Para  xs] = [Para $ takeWhile (/= (Str ":")) xs]
+upToColon [Para  xs] = [Para $ takeWhile (/= Str ":") xs]
 upToColon [Plain xs] = upToColon [Para xs]
 upToColon bs         = bs
 
@@ -991,7 +990,8 @@ getOldDates prefix = do
   endmonth' <- (parseMonth <$> getRawField (prefix ++ "endmonth")) <|> return ""
   endday' <- getRawField (prefix ++ "endday") <|> return ""
   let start' = RefDate { year   = Literal $ if isNumber year' then year' else ""
-                       , month  = Literal $ month'
+                       , month  =
+        Literal month'
                        , season = mempty
                        , day    = Literal day'
                        , other  = Literal $ if isNumber year' then "" else year'
@@ -1000,8 +1000,10 @@ getOldDates prefix = do
   let end' = if null endyear'
                 then []
                 else [RefDate { year   = Literal $ if isNumber endyear' then endyear' else ""
-                              , month  = Literal $ endmonth'
-                              , day    = Literal $ endday'
+                              , month  =
+               Literal endmonth'
+                              , day    =
+               Literal endday'
                               , season = mempty
                               , other  = Literal $ if isNumber endyear' then "" else endyear'
                               , circa  = False
@@ -1050,7 +1052,8 @@ toAuthorList opts [Plain xs] = toAuthorList opts [Para xs]
 toAuthorList _ _ = mzero
 
 toAuthor :: Options -> [Inline] -> Bib Agent
-toAuthor _ [Str "others"] = return $
+toAuthor _ [Str "others"] =
+  return
     Agent { givenName       = []
           , droppingPart    = mempty
           , nonDroppingPart = mempty
@@ -1061,7 +1064,7 @@ toAuthor _ [Str "others"] = return $
           , parseNames      = False
           }
 toAuthor _ [Span ("",[],[]) ils] =
-  return $ -- corporate author
+  return -- corporate author
     Agent { givenName       = []
           , droppingPart    = mempty
           , nonDroppingPart = mempty
@@ -1105,17 +1108,18 @@ toAuthor opts ils = do
   let (von, lastname) =
          if bibtex
             then case span isCapitalized $ reverse vonlast of
-                        ([],(w:ws)) -> (reverse ws, [w])
+                        ([],w:ws) -> (reverse ws, [w])
                         (vs, ws)    -> (reverse ws, reverse vs)
-            else case span (not . isCapitalized) vonlast of
+            else case break isCapitalized vonlast of
                         (vs@(_:_), []) -> (init vs, [last vs])
                         (vs, ws)       -> (vs, ws)
   let prefix = Formatted $ intercalate [Space] von
   let family = Formatted $ intercalate [Space] lastname
   let suffix = Formatted $ intercalate [Space] jr
   let givens = map Formatted first
-  return $
-    Agent { givenName       = givens
+
+  return Agent
+          { givenName       = givens
           , droppingPart    = if useprefix then mempty else prefix
           , nonDroppingPart = if useprefix then prefix else mempty
           , familyName      = family
@@ -1160,7 +1164,7 @@ latexAuthors :: Options -> String -> Bib [Agent]
 latexAuthors opts = toAuthorList opts . latex' . trim
 
 bib :: Bib Reference -> Item -> Maybe Reference
-bib m entry = fmap fst $ evalRWST m entry (BibState True (Lang "en" "US"))
+bib m entry = fst Control.Applicative.<$> evalRWST m entry (BibState True (Lang "en" "US"))
 
 toLocale :: String -> String
 toLocale "english"         = "en-US" -- "en-EN" unavailable in CSL
@@ -1375,7 +1379,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
   let isPeriodical = et == "periodical"
   let isChapterlike = et `elem`
          ["inbook","incollection","inproceedings","inreference","bookinbook"]
-  hasMaintitle <- (True <$ (getRawField "maintitle")) <|> return False
+  hasMaintitle <- (True <$ getRawField "maintitle") <|> return False
   let hyphenation' = if null hyphenation
                      then defaultHyphenation
                      else hyphenation
@@ -1433,7 +1437,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
   shortTitle' <- (guard (not hasMaintitle || isChapterlike) >>
                         getTitle "shorttitle")
                <|> if (subtitle' /= mempty || titleaddon' /= mempty) &&
-                      (not hasMaintitle)
+                      not hasMaintitle
                       then getShortTitle False "title"
                       else getShortTitle True  "title"
                <|> return mempty
@@ -1448,7 +1452,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
                         else getLiteralList' f)
                       <|> return Nothing)
          ["school","institution","organization", "howpublished","publisher"]
-  let publisher' = concatWith ';' [p | Just p <- pubfields]
+  let publisher' = concatWith ';' $ catMaybes pubfields
   origpublisher' <- getField "origpublisher" <|> return mempty
 
 -- places
@@ -1525,7 +1529,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
   keywords' <- getField "keywords" <|> return mempty
   note' <- if et == "periodical"
            then return mempty
-           else (getField "note" <|> return mempty)
+           else getField "note" <|> return mempty
   addendum' <- if bibtex
                then return mempty
                else getField "addendum"

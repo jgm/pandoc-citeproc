@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveDataTypeable         #-}
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE FlexibleInstances          #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE PatternGuards              #-}
@@ -92,9 +92,9 @@ module Text.CSL.Style ( readCSLString
                       )
 where
 
-import           Control.Applicative    ((<|>))
+import           Control.Applicative    ((<|>), (<$>))
 import           Control.Arrow          hiding (left, right)
-import           Control.Monad          (liftM, mplus)
+import           Control.Monad          (mplus)
 import           Data.Aeson             hiding (Number)
 import qualified Data.Aeson             as Aeson
 import           Data.Aeson.Types       (Pair)
@@ -104,7 +104,7 @@ import           Data.List              (intercalate, intersperse, isInfixOf,
                                          isPrefixOf, nubBy)
 import           Data.List.Split        (splitWhen, wordsBy)
 import qualified Data.Map               as M
-import           Data.Maybe             (listToMaybe)
+import           Data.Maybe             (listToMaybe, isNothing)
 import           Data.String
 import qualified Data.Text              as T
 import           Data.Yaml.Builder      (ToYaml (..))
@@ -205,7 +205,7 @@ instance FromJSON Formatted where
   parseJSON v@(Array _) =
    Formatted <$> (parseJSON v
              <|> ((query (:[]) :: [Block] -> [Inline]) <$> parseJSON v))
-  parseJSON v           = fmap (Formatted . readCSLString) $ parseString v
+  parseJSON v           = (Formatted . readCSLString) Control.Applicative.<$> parseString v
 
 instance ToJSON Formatted where
   toJSON = toJSON . writeCSLString . unFormatted
@@ -223,7 +223,7 @@ instance Monoid Formatted where
 
 instance Walk.Walkable Inline Formatted where
   walk f  = Formatted . Walk.walk f . unFormatted
-  walkM f = liftM Formatted . Walk.walkM f . unFormatted
+  walkM f = fmap Formatted . Walk.walkM f . unFormatted
   query f = Walk.query f . unFormatted
 
 instance Walk.Walkable Formatted Formatted where
@@ -248,7 +248,7 @@ toStr = intercalate [Str "\n"] .
 appendWithPunct :: Formatted -> Formatted -> Formatted
 appendWithPunct (Formatted left) (Formatted right) =
   Formatted $
-  case concat [lastleft, firstright] of
+  case lastleft ++ firstright of
        [' ',d] | d `elem` (",.:;" :: String) -> initInline left ++ right
        [c,d] | c `elem` (" ,.:;" :: String), d == c -> left ++ tailInline right
        [c,'.'] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
@@ -331,7 +331,7 @@ findTerm' s f g = findTerm'' s f (Just g)
 findTerm'' :: String -> Form -> Maybe Gender -> [CslTerm] -> Maybe CslTerm
 findTerm'' s f mbg ts
   = listToMaybe [ t | t <- ts, cslTerm t == s, termForm t == f,
-                         mbg == Nothing || mbg == Just (termGenderForm t) ]
+                         isNothing mbg || mbg == Just (termGenderForm t) ]
   `mplus`
   -- fallback: http://citationstyles.org/downloads/specification.html#terms
   case f of
@@ -434,7 +434,7 @@ data Match
 match :: Match -> [Bool] -> Bool
 match All  = and
 match Any  = or
-match None = and . map not
+match None = all not
 
 data DatePart
     = DatePart
@@ -926,3 +926,4 @@ instance OVERLAPS
 
 -- instance ToJSON [Agent] where
 -- toJSON xs  = Array (V.fromList $ map toJSON xs)
+

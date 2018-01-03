@@ -58,7 +58,7 @@ output fm s
     | otherwise   = [OStr s fm]
 
 appendOutput :: Formatting -> [Output] -> [Output]
-appendOutput fm xs = if xs /= [] then [Output xs fm] else []
+appendOutput fm xs = [Output xs fm | xs /= []]
 
 outputList :: Formatting -> Delimiter -> [Output] -> [Output]
 outputList fm d = appendOutput fm . addDelim d . mapMaybe cleanOutput'

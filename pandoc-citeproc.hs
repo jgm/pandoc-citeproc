@@ -44,16 +44,16 @@ main = do
     exitWith $ ExitFailure 1
   when (Version `elem` flags) $ do
     UTF8.putStrLn $ "pandoc-citeproc " ++ showVersion version
-    exitWith ExitSuccess
+    exitSuccess
   when (Help `elem` flags) $ do
     UTF8.putStrLn $ usageInfo header options
-    exitWith ExitSuccess
+    exitSuccess
   when (Man `elem` flags) $ do
     getManPage >>= BL.putStr
-    exitWith ExitSuccess
+    exitSuccess
   when (License `elem` flags) $ do
     getLicense >>= BL.putStr
-    exitWith ExitSuccess
+    exitSuccess
   if Bib2YAML `elem` flags || Bib2JSON `elem` flags
      then do
        let mbformat = case [f | Format f <- flags] of
@@ -195,3 +195,4 @@ uchar = do
 
 regchar :: Attoparsec.Parser B.ByteString
 regchar = B8.singleton <$> anyChar
+

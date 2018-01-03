@@ -82,8 +82,8 @@ evalSorting m l ms opts ss as mbr
     = map (format . sorting) ss
     where
       render       = renderPlain . formatOutputList . proc removeDelimAndLabel
-      removeDelimAndLabel (OLabel{}) = ONull
-      removeDelimAndLabel (ODel{})   = ONull
+      removeDelimAndLabel OLabel{} = ONull
+      removeDelimAndLabel ODel{}   = ONull
       removeDelimAndLabel x          = x
       format (s,e) = applaySort s . render $ uncurry eval e
       eval     o e = evalLayout (Layout emptyFormatting [] [e]) m False l ms o as mbr
@@ -120,9 +120,9 @@ evalElement el
                                        then getLocVar >>= formatRange fm . snd
                                        else formatNumber f fm s =<<
                                             getStringVar s
-    | Variable s f fm d     <- el = return . addDelim d =<< concatMapM (getVariable f fm) s
+    | Variable s f fm d     <- el = addDelim d <$> concatMapM (getVariable f fm) s
     | Group        fm d l   <- el = outputList fm d <$> tryGroup l
-    | Date     _ _ _  _ _ _ <- el = evalDate el
+    | Date{} <- el = evalDate el
     | Label    s f fm _     <- el = formatLabel f fm True s -- FIXME !!
     | Term     s f fm p     <- el = formatTerm  f fm p    s
     | Names    s n fm d sub <- el = modify (\st -> st { contNum = [] }) >>
@@ -153,7 +153,7 @@ evalElement el
     where
       addSpaces strng = (if take 1 strng == " " then (OSpace:) else id) .
                         (if last' strng == " " then (++[OSpace]) else id)
-      substituteWith e = head <$> gets (names . env) >>= \(Names _ ns fm d _) -> do
+      substituteWith e = head <$> gets (names . env) >>= \(Names _ ns fm d _) -> 
                            case e of
                              Names rs [Name NotSet fm'' [] [] []] fm' d' []
                                  -> let nfm = mergeFM fm'' $ mergeFM fm' fm in
@@ -179,8 +179,8 @@ evalElement el
                      nums <- mapM getStringVar numVars
                      let pluralizeTerm (Term s f fm _) = Term s f fm $
                             case numVars of
-                              ["number-of-volumes"] -> not $ any (== "1") nums
-                              ["number-of-pages"]   -> not $ any (== "1") nums
+                              ["number-of-volumes"] -> not $  elem "1" nums
+                              ["number-of-pages"]   -> not $  elem "1" nums
                               _ -> any isRange nums
                          pluralizeTerm x = x
                      if null res
@@ -199,7 +199,7 @@ evalElement el
           | Const {} <- e = True
           | otherwise     = False
 
-      ifEmpty p t e = p >>= \r -> if r == [] then t else return (e r)
+      ifEmpty p t e = p >>= \r -> if null r then t else return (e r)
 
       withNames e n f = modify (\s -> s { authSub = e ++ authSub s
                                         , env = (env s)
@@ -271,14 +271,16 @@ evalIfThen (IfThen c' m' el') ei e = whenElse (evalCond m' c') (return el') rest
                           in  getVar False chk "ref-type"
       chkNumeric      v = do val <- getStringVar v
                              as  <- gets (abbrevs . env)
-                             let val' = if getAbbreviation as v val == [] then val else getAbbreviation as v val
+                             let val' = if null (getAbbreviation as v val)
+                                           then val
+                                           else getAbbreviation as v val
                              return (isNumericString val')
-      chkDate         v = getDateVar v >>= return . not . null . filter circa
+      chkDate         v = not . null . filter circa <$> getDateVar v
       chkPosition     s = if s == "near-note"
                           then gets (nearNote . cite . env)
-                          else gets (citePosition . cite . env) >>= return . compPosition s
-      chkDisambiguate s = gets disamb  >>= return . (==) (formatVariable s) . map toLower . show
-      chkLocator      v = getLocVar    >>= return . (==) v . fst
+                          else compPosition s <$> gets (citePosition . cite . env)
+      chkDisambiguate s = (==) (formatVariable s) . map toLower . show <$> gets disamb
+      chkLocator      v = (==) v . fst <$> getLocVar
       isIbid          s = not (s == "first" || s == "subsequent")
       compPosition a b
           | "first"             <- a = b == "first"
@@ -292,13 +294,13 @@ getFormattedValue o as f fm s val
     | Just v <- fromValue val :: Maybe Formatted =
        if v == mempty
           then []
-          else let ys = maybe (unFormatted v) (unFormatted . fromString)
+          else let ys = unFormatted . maybe v fromString
                         $ getAbbr (stringify $ unFormatted v)
                in  if null ys
                       then []
                       else [Output [OPan $ walk value' ys] fm]
-    | Just v <- fromValue val :: Maybe String    = (:[]) . flip OStr fm . maybe v id . getAbbr $ value v
-    | Just v <- fromValue val :: Maybe Literal   = (:[]) . flip OStr fm . maybe (unLiteral v) id . getAbbr $ value $ unLiteral v
+    | Just v <- fromValue val :: Maybe String    = (:[]) . flip OStr fm . Data.Maybe.fromMaybe v . getAbbr $ value v
+    | Just v <- fromValue val :: Maybe Literal   = (:[]) . flip OStr fm . Data.Maybe.fromMaybe (unLiteral v) . getAbbr $ value $ unLiteral v
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe CNum      = if v == 0 then [] else [OCitNum (unCNum v) fm]
@@ -325,10 +327,10 @@ formatTitle :: String -> Form -> Formatting -> State EvalState [Output]
 formatTitle s f fm
     | Short <- f
     , isTitleVar      s = try (getIt $ s ++ "-short") $ getIt s
-    | isTitleShortVar s = try (getIt s) $ return . (:[]) . flip OStr fm =<< getTitleShort s
+    | isTitleShortVar s = try (getIt s) $ (:[]) . flip OStr fm <$> getTitleShort s
     | otherwise         = getIt s
     where
-      try g h = g >>= \r -> if r == [] then h else return r
+      try g h = g >>= \r -> if null r then h else return r
       getIt x = do
         o <- gets (options . env)
         a <- gets (abbrevs . env)
@@ -338,11 +340,12 @@ formatNumber :: NumericForm -> Formatting -> String -> String -> State EvalState
 formatNumber f fm v n
     = gets (abbrevs . env) >>= \as ->
       if isNumericString (getAbbr as n)
-      then gets (terms . env) >>=
-           return . output fm . flip process (getAbbr as n)
+      then output fm . flip process (getAbbr as n) <$> gets (terms . env)
       else return . output fm . getAbbr as $ n
     where
-      getAbbr       as   = if getAbbreviation as v n == [] then id else getAbbreviation as v
+      getAbbr       as   = if null (getAbbreviation as v n)
+                              then id
+                              else getAbbreviation as v
       checkRange'   ts   = if v == "page" then checkRange ts else id
       process       ts   = checkRange' ts . printNumStr . map (renderNumber ts) .
                            breakNumericString . words
@@ -354,7 +357,7 @@ formatNumber f fm v n
                     Roman       -> if readNum n < 6000 then roman else id
                     _           -> id
 
-      roman     = foldr (++) [] . reverse . map (uncurry (!!)) . zip romanList .
+      roman     = concat . reverse . zipWith (!!) romanList .
                   map (readNum . return) . take 4 . reverse
       romanList = [[ "", "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix" ]
                   ,[ "", "x", "xx", "xxx", "xl", "l", "lx", "lxx", "lxxx", "xc" ]
@@ -371,7 +374,7 @@ checkRange ts (x:xs) = if x == '-' || x == '\x2013'
 
 printNumStr :: [String] -> String
 printNumStr []     = []
-printNumStr (x:[]) = x
+printNumStr [x] = x
 printNumStr (x:"-":y:xs) = x ++ "-"  ++ y ++ printNumStr xs
 printNumStr (x:",":y:xs) = x ++ ", " ++ y ++ printNumStr xs
 printNumStr (x:xs)
@@ -390,7 +393,7 @@ isTransNumber = all isDigit
 isSpecialChar = all (`elem` "&-,.\x2013")
 isNumber   cs = case [c | c <- cs
                         , not (isLetter c)
-                        , not (c `elem` "&-.,\x2013")] of
+                        , notElem c "&-.,\x2013"] of
                      [] -> False
                      xs -> all isDigit xs
 
@@ -413,7 +416,7 @@ formatRange fm p = do
       pages = tupleRange . breakNumericString . words $ p
 
       tupleRange [] = []
-      tupleRange (x:cs:[]  )
+      tupleRange [x, cs]
         | cs `elem` ["-", "--", "\x2013"] = return (x,[])
       tupleRange (x:cs:y:xs)
         | cs `elem` ["-", "--", "\x2013"] = (x, y) : tupleRange xs
@@ -428,7 +431,7 @@ formatRange fm p = do
                  "minimal"     -> map (joinRange . minimalRange 1)
                  "minimal-two" -> map (joinRange . minimalRange 2)
                  _             -> map joinRange
-  return [flip OLoc fm $ [OStr (process pages) emptyFormatting]]
+  return [flip OLoc fm [OStr (process pages) emptyFormatting]]
 
 -- Abbreviated page ranges are expanded to their non-abbreviated form:
 -- 42–45, 321–328, 2787–2816
@@ -448,7 +451,7 @@ expandedRange (sa, sb)
 -- a minimum number of digits for the second number; thus, with
 -- minDigits = 2, we have 328-28.
 minimalRange :: Int -> (String, String) -> (String, String)
-minimalRange minDigits ((a:as), (b:bs))
+minimalRange minDigits (a:as, b:bs)
   | a == b
   , length as == length bs
   , length bs >= minDigits =

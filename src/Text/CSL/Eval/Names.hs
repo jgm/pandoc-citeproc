@@ -56,7 +56,7 @@ evalNames skipEdTrans ns nl d
                   if null res
                     then     return []
                     else let role = if aus == ["author"] then "authorsub" else s
-                         in  return . return . OContrib k role res fb =<< gets etal
+                         in return . OContrib k role res fb <$> gets etal
         r'  <- evalNames skipEdTrans xs nl d
         num <- gets contNum
         return $ if r /= [] && r' /= []
@@ -65,7 +65,7 @@ evalNames skipEdTrans ns nl d
     | otherwise = return []
     where
       agents p s a = concatMapM (formatNames (hasEtAl nl) d p s a) nl
-      delim    ops = if d == [] then getOptionVal "names-delimiter" ops else d
+      delim    ops = if null d then getOptionVal "names-delimiter" ops else d
       resetEtal    = modify (\s -> s { etal = [] })
       count  num x = if hasCount nl && num /= [] -- FIXME!! le zero!!
                      then [OContrib [] [] [ONum (length num) emptyFormatting] [] []]
@@ -82,16 +82,19 @@ formatNames :: Bool -> Delimiter -> String -> String -> [Agent] -> Name -> State
 formatNames ea del p s as n
     | Name f _ ns _ _ <- n, Count <- f = do
         b <- isBib <$> gets mode
-        o <- gets (options . env) >>= return . mergeOptions ns
+        o <- mergeOptions ns <$> gets (options . env)
         modify $ \st -> st { contNum = nub $ (++) (take (snd $ isEtAl b o p as) as) $ contNum st }
         return []
 
     | Name f fm ns d np <- n = do
         b <- isBib <$> gets mode
-        o <- gets (options . env) >>= return . mergeOptions ns
+        o <- mergeOptions ns <$> gets (options . env)
         m <- gets mode
         let odel  = if del /= [] then del else getOptionVal "name-delimiter" o
-            del'  = if d   /= [] then d   else if odel == [] then ", " else odel
+            del'
+              | d   /= [] = d
+              | odel == [] = ", "
+              | otherwise = odel
             (_,i) = isEtAl b o p as
             form  = case f of
                       NotSet -> case getOptionVal "name-form" o of
@@ -101,8 +104,11 @@ formatNames ea del p s as n
             genName x = do etal' <- formatEtAl o ea "et-al" fm del' x
                            if null etal'
                               then do t <- getTerm False Long "and"
-                                      return $ delim t o del' $ format m o form fm np x
-                              else return $ (addDelim del' $ format m o form fm np x) ++ etal'
+                                      return $ delim t o del'
+                                             $ format m o form fm np x
+                              else return $
+                                    addDelim del' (format m o form fm np x)
+                                    ++ etal'
         setLastName o $ formatName m False f fm o np (last as)
         updateEtal =<< mapM genName [1 + i .. length as]
         genName i
@@ -167,7 +173,7 @@ formatNames ea del p s as n
           | "text"   <- getOptionVal "and" os = " " ++ t ++ " "
           | "symbol" <- getOptionVal "and" os = " & "
           | otherwise                          = []
-      andStr' t d os = if andStr t os == [] then d else andStr t os
+      andStr' t d os = if null (andStr t os) then d else andStr t os
 
       formatEtAl o b t fm d i = do
         ln <- gets lastName
@@ -178,8 +184,8 @@ formatNames ea del p s as n
                     | otherwise            -> return []
            else et_al o b t fm d i
       et_al o b t fm d i
-          = when' (gets mode >>= return . not . isSorting) $
-            if (b || length as <= i)
+          = when' ( not . isSorting <$> gets mode) $
+            if b || length as <= i
             then return []
             else do x <- getTerm False Long t
                     when' (return $ x /= []) $
@@ -218,7 +224,7 @@ isEtAl b os p as
       etAlMin' x y = if b then etAlMin x else read $ getOptionVal' x y
       isOptionSet'  s1 s2 = if b
                             then isOptionSet s1 os
-                            else or $ (isOptionSet s1 os) : [(isOptionSet s2 os)]
+                            else or $ isOptionSet s1 os : [isOptionSet s2 os]
       getOptionVal' s1 s2 = if null (getOptionVal s1 os)
                             then getOptionVal s2 os
                             else getOptionVal s1 os
@@ -265,10 +271,9 @@ formatName m b f fm ops np n
                        Nothing
                          | isInit x  -> addIn x [Space] -- default
                        _ -> Space : x ++ [Space]
-      addIn x i = foldr hyphenate []
-                  $ map (\z -> Str (headInline z) : i)
-                  $ wordsBy (== Str "-")
-                  $ splitStrWhen (=='-') x
+      addIn x i = foldr (hyphenate . (\z -> Str (headInline z) : i)) []
+                     $ wordsBy (== Str "-")
+                     $ splitStrWhen (=='-') x
 
       sortSep g s = when_ g $ separator ++ addAffixes (g <+> s) "given" mempty
       separator   = if null (getOptionVal "sort-separator" ops)
@@ -282,7 +287,7 @@ formatName m b f fm ops np n
                         oPan' (unFormatted $ nameSuffix n) fm
       suffNoCom = when_ (nameSuffix n) $ OSpace : oPan' (unFormatted $ nameSuffix n) fm
 
-      onlyGiven = not (givenName n == mempty) && family == mempty
+      onlyGiven = givenName n /= mempty && family == mempty
       given     = if onlyGiven
                      then givenLong
                      else when_ (givenName  n) . Formatted . trimsp . fixsp . concatMap initial $ givenName n
@@ -299,23 +304,23 @@ formatName m b f fm ops np n
                       c <= '\x5FF' ||
                       (c >= '\x1e00' && c <= '\x1fff')
       shortName = oPan' (unFormatted $ nondropping <+> family) (form "family")
-      longName g = if isSorting m
-                   then let firstPart = case getOptionVal "demote-non-dropping-particle" ops of
+      
+      longName g
+        | isSorting m = let firstPart = case getOptionVal "demote-non-dropping-particle" ops of
                                            "never" -> nondropping <+> family  <+> dropping
                                            _       -> family  <+> dropping <+> nondropping
                         in oPan' (unFormatted firstPart) (form "family") <++> oPan' (unFormatted g) (form "given") <> suffCom
-                   else if (b && getOptionVal "name-as-sort-order" ops == "first") ||
-                           getOptionVal "name-as-sort-order" ops == "all"
-                        then let (fam,par) = case getOptionVal "demote-non-dropping-particle" ops of
-                                               "never"     -> (nondropping <+> family, dropping)
-                                               "sort-only" -> (nondropping <+> family, dropping)
-                                               _           -> (family, dropping <+> nondropping)
-                             in oPan' (unFormatted fam) (form "family") <> sortSep g par <> suffCom
-                          else let fam = addAffixes (dropping <+> nondropping <+> family) "family" suff
-                                   gvn = oPan' (unFormatted g) (form "given")
-                               in  if all isByzantine $ stringify $ unFormatted family
-                                   then gvn <++> fam
-                                   else fam <> gvn
+        | (b && getOptionVal "name-as-sort-order" ops == "first") ||
+         getOptionVal "name-as-sort-order" ops == "all" = let (fam,par) = case getOptionVal "demote-non-dropping-particle" ops of
+                                                                            "never"     -> (nondropping <+> family, dropping)
+                                                                            "sort-only" -> (nondropping <+> family, dropping)
+                                                                            _           -> (family, dropping <+> nondropping)
+                                                          in oPan' (unFormatted fam) (form "family") <> sortSep g par <> suffCom
+        | otherwise = let fam = addAffixes (dropping <+> nondropping <+> family) "family" suff
+                          gvn = oPan' (unFormatted g) (form "given")
+                      in  if all isByzantine $ stringify $ unFormatted family
+                          then gvn <++> fam
+                          else fam <> gvn
 
       disWithGiven = getOptionVal "disambiguate-add-givenname" ops == "true"
       initialize   = isJust (lookup "initialize-with" ops) && not onlyGiven
@@ -350,7 +355,7 @@ formatTerm f fm p s = do
 
 formatLabel :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
 formatLabel f fm p s
-    | "locator" <- s = when' (gets (citeLocator . cite . env) >>= return . (/=) []) $ do
+    | "locator" <- s = when' ( (/=) [] <$> gets (citeLocator . cite . env)) $ do
                        (l,v) <- getLocVar
                        form (\fm' -> return . flip OLoc emptyFormatting . output fm') id l (isRange v)
     | "page"    <- s = checkPlural
@@ -373,7 +378,7 @@ formatLabel f fm p s
                       v <- getStringVar s
                       format  s (isRange v)
       format      = form output id
-      form o g t b = return . o fm =<< g . period <$> getTerm (b && p) f t
+      form o g t b = o fm <$> g . period <$> getTerm (b && p) f t
       period      = if stripPeriods fm then filter (/= '.') else id
 
 (<+>) :: Formatted -> Formatted -> Formatted

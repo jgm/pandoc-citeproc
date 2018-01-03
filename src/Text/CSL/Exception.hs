@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE StandaloneDeriving #-}
+
 module Text.CSL.Exception (CiteprocException(..), renderError) where
 import           Control.Exception (Exception)
 import           Data.Data

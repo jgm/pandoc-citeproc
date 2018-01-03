@@ -68,12 +68,12 @@ getLocale s = do
   f <- case length s of
              0 -> return "locales/locales-en-US.xml"
              2 -> getDataFileName ("locales/locales-" ++
-                                maybe s id (lookup s langBase) ++ ".xml")
+                                Data.Maybe.fromMaybe s (lookup s langBase) ++ ".xml")
              _ -> getDataFileName ("locales/locales-" ++ take 5 s ++ ".xml")
   exists <- doesFileExist f
   if not exists && length s > 2
      then getLocale $ take 2 s  -- try again with base locale
-     else E.handle (\e -> E.throwIO (CSLLocaleReadError e)) $ L.readFile f
+     else E.handle (E.throwIO . CSLLocaleReadError) $ L.readFile f
 #endif
 
 getDefaultCSL :: IO L.ByteString
@@ -143,3 +143,4 @@ langBase
       ,("vi", "vi-VN")
       ,("zh", "zh-CN")
       ]
+

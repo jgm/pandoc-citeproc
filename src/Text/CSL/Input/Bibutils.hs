@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP                      #-}
-{-# LANGUAGE ForeignFunctionInterface #-}
+
 {-# LANGUAGE PatternGuards            #-}
 -----------------------------------------------------------------------------
 -- |
@@ -180,3 +180,4 @@ metaValueToJSON (MetaString t)    = toJSON t
 metaValueToJSON (MetaBool b)      = toJSON b
 metaValueToJSON (MetaInlines ils) = toJSON ils
 metaValueToJSON (MetaBlocks bs)   = toJSON bs
+

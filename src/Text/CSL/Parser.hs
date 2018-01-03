@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TupleSections     #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Parser
@@ -66,7 +66,7 @@ readCSLFile mbLocale src = do
   let pickParentCur = get "link" >=> attributeIs (X.Name "rel" Nothing Nothing) "independent-parent"
   let parentCur = cur $/ get "info" &/ pickParentCur
   let parent' = concatMap (stringAttr "href") parentCur
-  when (parent' == src) $ do
+  when (parent' == src) $
     E.throwIO $ DependentStyleHasItselfAsParent src
   case parent' of
        ""  -> localizeCSL mbLocale $ parseCSLCursor cur
@@ -105,7 +105,7 @@ parseCSLCursor cur =
         defaultLocale = case cur $| laxAttribute "default-locale" of
                              (x:_) -> unpack x
                              []    -> "en-US"
-        author = case (cur $// get "info" &/ get "author") of
+        author = case cur $// get "info" &/ get "author" of
                       (x:_) -> CSAuthor (x $/ get "name" &/ string)
                                  (x $/ get "email" &/ string)
                                  (x $/ get "uri"   &/ string)
@@ -130,9 +130,7 @@ string = unpack . T.concat . content
 
 attrWithDefault :: Read a => Text -> a -> Cursor -> a
 attrWithDefault t d cur =
-  case safeRead (toRead $ stringAttr t cur) of
-       Just x  -> x
-       Nothing -> d
+  fromMaybe d $ safeRead (toRead $ stringAttr t cur)
 
 stringAttr :: Text -> Cursor -> String
 stringAttr t cur =
@@ -221,7 +219,7 @@ parseDate cur = [Date (words variable) form format delim parts partsAttr]
                            _         -> NoFormDate
         format     = getFormatting cur
         delim      = stringAttr "delimiter" cur
-        parts      = cur $/ get "date-part" &| (parseDatePart form)
+        parts      = cur $/ get "date-part" &| parseDatePart form
         partsAttr  = stringAttr "date-parts" cur
 
 parseDatePart :: DateForm -> Cursor -> DatePart
@@ -315,9 +313,7 @@ parseText cur =
               then [Macro macro formatting]
               else if not (null variable)
                       then [Variable (words variable) textForm formatting delim]
-                      else if not (null value)
-                           then [Const value formatting]
-                           else []
+                      else [Const value formatting | not (null value)]
 
 parseChoose :: Cursor -> [Element]
 parseChoose cur =

@@ -48,8 +48,8 @@ evalDate (Date s f fm dl dp dp') = do
                                     al am an ahl
       updateS a b = if b /= a && b /= [] then b else a
   case f of
-    NoFormDate -> mapM getDateVar s >>= return . outputList fm dl .
-                  concatMap (formatDate em k tm dp)
+    NoFormDate -> outputList fm dl .
+                  concatMap (formatDate em k tm dp) <$> mapM getDateVar s
     _          -> do Date _ _ lfm ldl ldp _ <- getDate f
                      let go dps = return . outputList (updateFM fm lfm) (if ldl /= [] then ldl else dl) .
                                   concatMap (formatDate em k tm dps)
@@ -170,19 +170,25 @@ ordinal :: [CslTerm] -> String -> String -> String
 ordinal _ _ [] = []
 ordinal ts v s
     | length s == 1 = let a = termPlural (getWith1 s) in
-                      if  a == [] then setOrd (term []) else s ++ a
+                      if null a then setOrd (term []) else s ++ a
     | length s == 2 = let a = termPlural (getWith2 s)
                           b = getWith1 [last s] in
                       if  a /= []
                       then s ++ a
-                      else if termPlural b == [] || (termMatch b /= [] && termMatch b /= "last-digit")
-                           then setOrd (term []) else setOrd b
+                      else if null (termPlural b) ||
+                              (termMatch b /= [] &&
+                               termMatch b /= "last-digit")
+                           then setOrd (term [])
+                           else setOrd b
     | otherwise     = let a = getWith2  last2
                           b = getWith1 [last s] in
                       if termPlural a /= [] && termMatch a /= "whole-number"
                       then setOrd a
-                      else if termPlural b == [] || (termMatch b /= [] && termMatch b /= "last-digit")
-                           then setOrd (term []) else setOrd b
+                      else if null (termPlural b) ||
+                              (termMatch b /= [] &&
+                               termMatch b /= "last-digit")
+                           then setOrd (term [])
+                           else setOrd b
     where
       setOrd   = (++) s . termPlural
       getWith1 = term . (++) "-0"

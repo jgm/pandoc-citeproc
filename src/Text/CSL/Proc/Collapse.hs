@@ -56,7 +56,7 @@ collapseNumber (CG _ f d os) = mapCitationGroup process $ CG [] f d os
       citNums (OCitNum i _) = [i]
       citNums (Output xs _) = concatMap citNums xs
       citNums _             = []
-      numOf  = foldr (\x _ -> x) 0 . citNums
+      numOf  = foldr (const) 0 . citNums
       process xs = if hasLocator xs
                       then xs
                       else flip concatMap (groupConsecWith numOf xs)
@@ -129,7 +129,7 @@ collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
                              uncurry zip . second format . unzip $ a
 
       doCollapse []     = []
-      doCollapse (x:[]) = [collapsYS x]
+      doCollapse [x] = [collapsYS x]
       doCollapse (x:xs) = let (a,b) = collapsYS x
                           in if length x > 1
                              then (a, Output (b : [ODel afterColDel]) emptyFormatting) : doCollapse xs
@@ -166,10 +166,10 @@ collapseYearSuf ranged ysd = process
                  null (citeLocator $ fst b)
 
       getYS []     = []
-      getYS (x:[]) = return $ uncurry addCiteAffixes x
+      getYS [x] = return $ uncurry addCiteAffixes x
       getYS (x:xs) = if ranged
-                     then proc rmOYearSuf (snd x) : addDelim ysd (processYS $ (snd x) : query rmOYear (map snd xs))
-                     else addDelim ysd  $ (snd x) : (processYS $ query rmOYear (map snd xs))
+                     then proc rmOYearSuf (snd x) : addDelim ysd (processYS $ snd x : query rmOYear (map snd xs))
+                     else addDelim ysd  $ snd x : processYS (query rmOYear (map snd xs))
       rmOYearSuf o
           | OYearSuf {} <- o = ONull
           | otherwise        = o
@@ -183,7 +183,7 @@ collapseYearSufRanged = process
       getOYS o
           | OYearSuf s _ _ f <- o = [(if s /= [] then ord (head s) else 0, f)]
           | otherwise             = []
-      sufOf   = foldr (\x _ -> x) (0,emptyFormatting) . query getOYS
+      sufOf   = foldr (const) (0,emptyFormatting) . query getOYS
       newSuf  = map sufOf >>> (map fst >>> groupConsec) &&& map snd >>> uncurry zip
       process xs = flip concatMap (newSuf xs) $
                    \(x,f) -> if length x > 2
@@ -215,7 +215,7 @@ addCiteAffixes c x =
 isNumStyle :: [Output] -> Bool
 isNumStyle = getAny . query ocitnum
     where
-      ocitnum (OCitNum {}) = Any True
+      ocitnum OCitNum {} = Any True
       ocitnum _            = Any False
 
 -- | Group consecutive integers:
@@ -227,7 +227,7 @@ groupConsec = groupConsecWith id
 groupConsecWith ::  (a -> Int) -> [a] -> [[a]]
 groupConsecWith f = foldr go [] . sortBy (comparing f)
   where go x []     = [[x]]
-        go x ((y:ys):gs) = if (f x + 1) == (f y)
-                              then ((x:y:ys):gs)
-                              else ([x]:(y:ys):gs)
+        go x ((y:ys):gs) = if (f x + 1) == f y
+                              then (x:y:ys):gs
+                              else [x]:(y:ys):gs
         go _ ([]:_) = error "groupConsec: head of list is empty"

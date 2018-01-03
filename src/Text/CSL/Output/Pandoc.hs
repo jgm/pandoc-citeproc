@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable #-}
+
 {-# LANGUAGE PatternGuards      #-}
 -----------------------------------------------------------------------------
 -- |
@@ -49,7 +49,7 @@ renderPandoc' sty (form, citId) = Div ("ref-" ++ citId, [], []) [Para $ renderPa
 clean' :: Style -> [Inline] -> [Inline]
 clean' _   []  = []
 clean' sty (i:is) =
-  case (i:is) of
+  case i:is of
       (Str "" : rest) -> clean' sty rest
       (Str xs : Str ys : rest) -> clean' sty $ Str (xs ++ ys) : rest
       (Link a1 lab1 ('#':r1, "") : Str "\8211" : Link a2 lab2 ('#':r2, "") : rest)

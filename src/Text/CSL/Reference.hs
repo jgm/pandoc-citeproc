@@ -64,7 +64,7 @@ import           Data.Generics       hiding (Generic)
 import qualified Data.HashMap.Strict as H
 import           Data.List           (elemIndex, intercalate)
 import           Data.List.Split     (splitWhen)
-import           Data.Maybe          (fromMaybe, isJust, isNothing)
+import           Data.Maybe          (fromMaybe, isNothing)
 import           Data.String
 import           Data.Text           (Text)
 import qualified Data.Text           as T
@@ -198,7 +198,7 @@ instance OVERLAPS
     circa' <- (v .: "circa" >>= parseBool) <|> pure False
     season' <- v .:? "season"
     case dateParts of
-         Just (Array xs) | not (isJust raw') && not (V.null xs)
+         Just (Array xs) | isNothing raw' && not (V.null xs)
                           -> mapM (fmap (setCirca circa' .
                                      maybe id setSeason season') . parseJSON)
                              $ V.toList xs
@@ -239,8 +239,8 @@ instance OVERLAPS
   toJSON xs = object' $
     case filter (not . null) (map toDatePart xs) of
          []  -> ["literal" .= intercalate "; " (map (unLiteral . other) xs)]
-         dps -> (["date-parts" .= dps ] ++
-                 ["circa" .= (1 :: Int) | or (map circa xs)])
+         dps -> ["date-parts" .= dps ] ++
+                 ["circa" .= (1 :: Int) | or (map circa xs)]
 
 setCirca :: Bool -> RefDate -> RefDate
 setCirca circa' rd = rd{ circa = circa' }
@@ -299,12 +299,12 @@ instance FromJSON RefType where
   -- found in one of the test cases:
   parseJSON (String "film") = return MotionPicture
   parseJSON (String t) =
-    (safeRead (capitalize . camelize . T.unpack $ t)) <|>
+    safeRead (capitalize . camelize . T.unpack $ t) <|>
     fail ("'" ++ T.unpack t ++ "' is not a valid reference type")
   parseJSON v@(Array _) =
     fmap (capitalize . camelize . inlinesToString) (parseJSON v) >>= \t ->
-      (safeRead t <|>
-       fail ("'" ++ t ++ "' is not a valid reference type"))
+      safeRead t <|>
+       fail ("'" ++ t ++ "' is not a valid reference type")
   parseJSON _ = fail "Could not parse RefType"
 
 instance ToJSON RefType where
@@ -865,7 +865,7 @@ setNearNote s cs
     = procGr [] cs
     where
       near_note   = let nn = fromMaybe [] . lookup "near-note-distance" . citOptions . citation $ s
-                    in  if nn == [] then 5 else readNum nn
+                    in  if null nn then 5 else readNum nn
       procGr _ [] = []
       procGr a (x:xs) = let (a',res) = procCs a x
                         in res : procGr a' xs
@@ -946,23 +946,24 @@ rawDateOld = do
   let rangesep = P.try $ P.spaces >> P.char '-' >> P.spaces
   let refDate = RefDate mempty mempty mempty mempty mempty False
   let date = P.choice $ map P.try [
-                 (do s <- pseason
-                     sep
-                     y <- pyear
-                     return refDate{ year = Literal y, season = Literal s })
-               , (do m <- pmonth
-                     sep
-                     d <- pday
-                     sep
-                     y <- pyear
-                     return refDate{ year = Literal y, month = Literal m,
-                                     day = Literal d })
-               , (do m <- pmonth
-                     sep
-                     y <- pyear
-                     return refDate{ year = Literal y, month = Literal m })
-               , (do y <- pyear
-                     return refDate{ year = Literal y })
+                 do s <- pseason
+                    sep
+                    y <- pyear
+                    return refDate{ year = Literal y, season = Literal s }
+               , do m <- pmonth
+                    sep
+                    d <- pday
+                    sep
+                    y <- pyear
+                    return refDate{ year = Literal y, month = Literal m,
+                                    day = Literal d }
+               , do m <- pmonth
+                    sep
+                    y <- pyear
+                    return refDate{ year = Literal y, month = Literal m }
+               , do y <- pyear
+                    return refDate{ year = Literal y }
                ]
   d1 <- date
   P.option [d1] ((\x -> [d1,x]) <$> (rangesep >> date))
+
