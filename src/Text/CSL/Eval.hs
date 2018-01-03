@@ -1,4 +1,6 @@
-{-# LANGUAGE PatternGuards, FlexibleContexts, ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE PatternGuards       #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Eval
@@ -20,28 +22,28 @@ module Text.CSL.Eval
     , module Text.CSL.Eval.Output
     ) where
 
-import Control.Arrow
-import Control.Monad.State
-import qualified Control.Exception as E
-import Data.Monoid (Any(..))
-import Data.Char ( toLower, isDigit, isLetter )
-import Data.Maybe
-import Data.String ( fromString )
-import Text.Pandoc.Definition (Inline(Str, Link), nullAttr)
-import Text.Pandoc.Walk (walk)
-import Text.Pandoc.Shared (stringify)
-import qualified Data.Text as T
+import           Control.Arrow
+import qualified Control.Exception      as E
+import           Control.Monad.State
+import           Data.Char              (isDigit, isLetter, toLower)
+import           Data.Maybe
+import           Data.Monoid            (Any (..))
+import           Data.String            (fromString)
+import qualified Data.Text              as T
+import           Text.Pandoc.Definition (Inline (Link, Str), nullAttr)
+import           Text.Pandoc.Shared     (stringify)
+import           Text.Pandoc.Walk       (walk)
 
-import Text.CSL.Exception
-import Text.CSL.Eval.Common
-import Text.CSL.Eval.Output
-import Text.CSL.Eval.Date
-import Text.CSL.Eval.Names
-import Text.CSL.Output.Plain
-import Text.CSL.Reference
-import Text.CSL.Style hiding (Any)
-import Text.CSL.Util ( readNum, last', proc, proc', query, betterThan,
-                       safeRead, isRange )
+import           Text.CSL.Eval.Common
+import           Text.CSL.Eval.Date
+import           Text.CSL.Eval.Names
+import           Text.CSL.Eval.Output
+import           Text.CSL.Exception
+import           Text.CSL.Output.Plain
+import           Text.CSL.Reference
+import           Text.CSL.Style         hiding (Any)
+import           Text.CSL.Util          (betterThan, isRange, last', proc,
+                                         proc', query, readNum, safeRead)
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the
@@ -311,8 +313,8 @@ getFormattedValue o as f fm s val
       value' x       = x
       getAbbr v = if f == Short
                   then case getAbbreviation as s v of
-                             []   -> Nothing
-                             y    -> Just y
+                             [] -> Nothing
+                             y  -> Just y
                   else Nothing
       nameOpts = ("name-as-sort-order","all") : o
       sortDate = [ DatePart "year"  "numeric-leading-zeros" "" emptyFormatting
@@ -389,8 +391,8 @@ isSpecialChar = all (`elem` "&-,.\x2013")
 isNumber   cs = case [c | c <- cs
                         , not (isLetter c)
                         , not (c `elem` "&-.,\x2013")] of
-                     []  -> False
-                     xs  -> all isDigit xs
+                     [] -> False
+                     xs -> all isDigit xs
 
 breakNumericString :: [String] -> [String]
 breakNumericString [] = []
@@ -421,11 +423,11 @@ formatRange fm p = do
       joinRange (a,  b) = a ++ "-" ++ b
 
       process = checkRange ts . printNumStr . case opt of
-                 "expanded" -> map (joinRange . expandedRange)
-                 "chicago"  -> map (joinRange . chicagoRange )
-                 "minimal"  -> map (joinRange . minimalRange 1)
-                 "minimal-two"  -> map (joinRange . minimalRange 2)
-                 _          -> map joinRange
+                 "expanded"    -> map (joinRange . expandedRange)
+                 "chicago"     -> map (joinRange . chicagoRange )
+                 "minimal"     -> map (joinRange . minimalRange 1)
+                 "minimal-two" -> map (joinRange . minimalRange 2)
+                 _             -> map joinRange
   return [flip OLoc fm $ [OStr (process pages) emptyFormatting]]
 
 -- Abbreviated page ranges are expanded to their non-abbreviated form:

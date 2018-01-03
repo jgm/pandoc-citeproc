@@ -16,16 +16,16 @@
 
 module Text.CSL.Proc.Collapse where
 
-import Data.Ord (comparing)
-import Data.Monoid (Any(..))
-import Control.Arrow ( (&&&), (>>>), second )
-import Data.Char
-import Data.List ( groupBy, sortBy )
-import Text.CSL.Util ( query, proc, proc', betterThan )
-import Text.CSL.Eval
-import Text.CSL.Proc.Disamb
-import Text.CSL.Style hiding (Any)
-import Text.Pandoc.Definition ( Inline (Str) )
+import           Control.Arrow          (second, (&&&), (>>>))
+import           Data.Char
+import           Data.List              (groupBy, sortBy)
+import           Data.Monoid            (Any (..))
+import           Data.Ord               (comparing)
+import           Text.CSL.Eval
+import           Text.CSL.Proc.Disamb
+import           Text.CSL.Style         hiding (Any)
+import           Text.CSL.Util          (betterThan, proc, proc', query)
+import           Text.Pandoc.Definition (Inline (Str))
 
 -- | Collapse citations according to the style options.
 collapseCitGroups :: Style -> [CitationGroup] -> [CitationGroup]

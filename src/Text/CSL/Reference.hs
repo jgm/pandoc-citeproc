@@ -1,11 +1,17 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, PatternGuards, OverloadedStrings,
-  DeriveDataTypeable, ExistentialQuantification, FlexibleInstances,
-  ScopedTypeVariables, GeneralizedNewtypeDeriving, IncoherentInstances,
-  DeriveGeneric, CPP #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DeriveDataTypeable         #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE ExistentialQuantification  #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE IncoherentInstances        #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE PatternGuards              #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
 #if MIN_VERSION_base(4,8,0)
 #define OVERLAPS {-# OVERLAPPING #-}
 #else
-{-# LANGUAGE OverlappingInstances #-}
+{-# LANGUAGE OverlappingInstances       #-}
 #define OVERLAPS
 #endif
 -----------------------------------------------------------------------------
@@ -47,32 +53,33 @@ module Text.CSL.Reference ( Literal(..)
                           )
 where
 
-import Control.Monad ( guard, mplus )
-import Data.List  ( elemIndex, intercalate )
-import Data.List.Split ( splitWhen )
-import Data.Maybe ( fromMaybe, isJust, isNothing )
-import Data.Generics hiding (Generic)
-import GHC.Generics (Generic)
-import Data.Aeson hiding (Value)
-import qualified Data.Aeson as Aeson
-import Data.Aeson.Types (Parser)
-import qualified Data.Yaml.Builder as Y
-import Data.Yaml.Builder (ToYaml(..))
-import Data.Either (lefts, rights)
-import Control.Applicative ((<|>))
-import qualified Data.Text as T
-import Data.Text (Text)
-import qualified Data.Vector as V
-import Data.Char (toLower, isDigit)
-import Text.CSL.Style hiding (Number)
-import Text.CSL.Util (parseString, parseInt, parseBool, safeRead, readNum,
-                      inlinesToString, capitalize, camelize, uncamelize,
-                      (&=), mapping')
-import Text.Pandoc (Inline(Str))
-import Data.String
-import qualified Text.Parsec as P
-import qualified Text.Parsec.String as P
+import           Control.Applicative ((<|>))
+import           Control.Monad       (guard, mplus)
+import           Data.Aeson          hiding (Value)
+import qualified Data.Aeson          as Aeson
+import           Data.Aeson.Types    (Parser)
+import           Data.Char           (isDigit, toLower)
+import           Data.Either         (lefts, rights)
+import           Data.Generics       hiding (Generic)
 import qualified Data.HashMap.Strict as H
+import           Data.List           (elemIndex, intercalate)
+import           Data.List.Split     (splitWhen)
+import           Data.Maybe          (fromMaybe, isJust, isNothing)
+import           Data.String
+import           Data.Text           (Text)
+import qualified Data.Text           as T
+import qualified Data.Vector         as V
+import           Data.Yaml.Builder   (ToYaml (..))
+import qualified Data.Yaml.Builder   as Y
+import           GHC.Generics        (Generic)
+import           Text.CSL.Style      hiding (Number)
+import           Text.CSL.Util       (camelize, capitalize, inlinesToString,
+                                      mapping', parseBool, parseInt,
+                                      parseString, readNum, safeRead,
+                                      uncamelize, (&=))
+import           Text.Pandoc         (Inline (Str))
+import qualified Text.Parsec         as P
+import qualified Text.Parsec.String  as P
 
 newtype Literal = Literal { unLiteral :: String }
   deriving ( Show, Read, Eq, Data, Typeable, Monoid, Generic )
@@ -308,11 +315,11 @@ instance ToYaml RefType where
 
 -- For some reason, CSL is inconsistent about hyphens and underscores:
 handleSpecialCases :: String -> String
-handleSpecialCases "motion-picture" = "motion_picture"
-handleSpecialCases "musical-score" = "musical_score"
+handleSpecialCases "motion-picture"         = "motion_picture"
+handleSpecialCases "musical-score"          = "musical_score"
 handleSpecialCases "personal-communication" = "personal_communication"
-handleSpecialCases "legal-case" = "legal_case"
-handleSpecialCases x = x
+handleSpecialCases "legal-case"             = "legal_case"
+handleSpecialCases x                        = x
 
 newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data, Generic )
 
@@ -343,81 +350,81 @@ instance ToYaml CLabel where
 -- | The 'Reference' record.
 data Reference =
     Reference
-    { refId               :: Literal
-    , refType             :: RefType
+    { refId                    :: Literal
+    , refType                  :: RefType
 
-    , author              :: [Agent]
-    , editor              :: [Agent]
-    , translator          :: [Agent]
-    , recipient           :: [Agent]
-    , interviewer         :: [Agent]
-    , composer            :: [Agent]
-    , director            :: [Agent]
-    , illustrator         :: [Agent]
-    , originalAuthor      :: [Agent]
-    , containerAuthor     :: [Agent]
-    , collectionEditor    :: [Agent]
-    , editorialDirector   :: [Agent]
-    , reviewedAuthor      :: [Agent]
+    , author                   :: [Agent]
+    , editor                   :: [Agent]
+    , translator               :: [Agent]
+    , recipient                :: [Agent]
+    , interviewer              :: [Agent]
+    , composer                 :: [Agent]
+    , director                 :: [Agent]
+    , illustrator              :: [Agent]
+    , originalAuthor           :: [Agent]
+    , containerAuthor          :: [Agent]
+    , collectionEditor         :: [Agent]
+    , editorialDirector        :: [Agent]
+    , reviewedAuthor           :: [Agent]
 
-    , issued              :: [RefDate]
-    , eventDate           :: [RefDate]
-    , accessed            :: [RefDate]
-    , container           :: [RefDate]
-    , originalDate        :: [RefDate]
-    , submitted           :: [RefDate]
+    , issued                   :: [RefDate]
+    , eventDate                :: [RefDate]
+    , accessed                 :: [RefDate]
+    , container                :: [RefDate]
+    , originalDate             :: [RefDate]
+    , submitted                :: [RefDate]
 
-    , title               :: Formatted
-    , titleShort          :: Formatted
-    , reviewedTitle       :: Formatted
-    , containerTitle      :: Formatted
-    , volumeTitle         :: Formatted
-    , collectionTitle     :: Formatted
-    , containerTitleShort :: Formatted
-    , collectionNumber    :: Formatted --Int
-    , originalTitle       :: Formatted
-    , publisher           :: Formatted
-    , originalPublisher   :: Formatted
-    , publisherPlace      :: Formatted
-    , originalPublisherPlace :: Formatted
-    , authority           :: Formatted
-    , jurisdiction        :: Formatted
-    , archive             :: Formatted
-    , archivePlace        :: Formatted
-    , archiveLocation     :: Formatted
-    , event               :: Formatted
-    , eventPlace          :: Formatted
-    , page                :: Formatted
-    , pageFirst           :: Formatted
-    , numberOfPages       :: Formatted
-    , version             :: Formatted
-    , volume              :: Formatted
-    , numberOfVolumes     :: Formatted --Int
-    , issue               :: Formatted
-    , chapterNumber       :: Formatted
-    , medium              :: Formatted
-    , status              :: Formatted
-    , edition             :: Formatted
-    , section             :: Formatted
-    , source              :: Formatted
-    , genre               :: Formatted
-    , note                :: Formatted
-    , annote              :: Formatted
-    , abstract            :: Formatted
-    , keyword             :: Formatted
-    , number              :: Formatted
-    , references          :: Formatted
-    , url                 :: Literal
-    , doi                 :: Literal
-    , isbn                :: Literal
-    , issn                :: Literal
-    , pmcid               :: Literal
-    , pmid                :: Literal
-    , callNumber          :: Literal
-    , dimensions          :: Literal
-    , scale               :: Literal
-    , categories          :: [Literal]
-    , language            :: Literal
+    , title                    :: Formatted
+    , titleShort               :: Formatted
+    , reviewedTitle            :: Formatted
+    , containerTitle           :: Formatted
+    , volumeTitle              :: Formatted
+    , collectionTitle          :: Formatted
+    , containerTitleShort      :: Formatted
+    , collectionNumber         :: Formatted --Int
+    , originalTitle            :: Formatted
+    , publisher                :: Formatted
+    , originalPublisher        :: Formatted
+    , publisherPlace           :: Formatted
+    , originalPublisherPlace   :: Formatted
+    , authority                :: Formatted
+    , jurisdiction             :: Formatted
+    , archive                  :: Formatted
+    , archivePlace             :: Formatted
+    , archiveLocation          :: Formatted
+    , event                    :: Formatted
+    , eventPlace               :: Formatted
+    , page                     :: Formatted
+    , pageFirst                :: Formatted
+    , numberOfPages            :: Formatted
+    , version                  :: Formatted
+    , volume                   :: Formatted
+    , numberOfVolumes          :: Formatted --Int
+    , issue                    :: Formatted
+    , chapterNumber            :: Formatted
+    , medium                   :: Formatted
+    , status                   :: Formatted
+    , edition                  :: Formatted
+    , section                  :: Formatted
+    , source                   :: Formatted
+    , genre                    :: Formatted
+    , note                     :: Formatted
+    , annote                   :: Formatted
+    , abstract                 :: Formatted
+    , keyword                  :: Formatted
+    , number                   :: Formatted
+    , references               :: Formatted
+    , url                      :: Literal
+    , doi                      :: Literal
+    , isbn                     :: Literal
+    , issn                     :: Literal
+    , pmcid                    :: Literal
+    , pmid                     :: Literal
+    , callNumber               :: Literal
+    , dimensions               :: Literal
+    , scale                    :: Literal
+    , categories               :: [Literal]
+    , language                 :: Literal
 
     , citationNumber           :: CNum
     , firstReferenceNoteNumber :: Int
@@ -505,8 +512,8 @@ instance FromJSON Reference where
        v .:? "citation-label" .!= mempty)
     where takeFirstNum (Formatted (Str xs : _)) =
             case takeWhile isDigit xs of
-                   []   -> mempty
-                   ds   -> Formatted [Str ds]
+                   [] -> mempty
+                   ds -> Formatted [Str ds]
           takeFirstNum x = x
           addPageFirst ref = if pageFirst ref == mempty && page ref /= mempty
                                 then ref{ pageFirst =
@@ -904,7 +911,7 @@ isoDate = P.try $ do
   d <- P.option Nothing $ Just <$> P.try (P.char '-' >> P.many1 P.digit)
   guard $ isNothing d || case d >>= safeRead of
                            Just (n::Int) | n >= 1 && n <= 31 -> True
-                           _ -> False
+                           _             -> False
   c <- P.option False (True <$ P.char '~')
   return RefDate{ year = Literal y, month = Literal m,
                   season = Literal s, day = maybe mempty Literal d,
@@ -920,7 +927,7 @@ rawDateOld = do
         if all isDigit xs
            then case safeRead xs of
                       Just (n::Int) | n >= 1 && n <= 12 -> return (show n)
-                      _ -> fail "Improper month"
+                      _             -> fail "Improper month"
            else case elemIndex (map toLower $ take 3 xs) months of
                      Nothing -> fail "Improper month"
                      Just n  -> return (show (n+1))
@@ -933,7 +940,7 @@ rawDateOld = do
         xs <- P.many1 P.digit
         case safeRead xs of
              Just (n::Int) | n >= 1 && n <= 31 -> return (show n)
-             _ -> fail "Improper day"
+             _             -> fail "Improper day"
   let pyear = P.many1 P.digit
   let sep = P.oneOf [' ','/',','] >> P.spaces
   let rangesep = P.try $ P.spaces >> P.char '-' >> P.spaces

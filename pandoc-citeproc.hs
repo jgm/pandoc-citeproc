@@ -1,34 +1,38 @@
-{-# LANGUAGE CPP, ScopedTypeVariables #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Main where
-import Text.CSL.Input.Bibutils (readBiblioString, BibFormat(..))
-import Text.CSL.Reference (Reference(refId), Literal(..))
-import Text.CSL.Exception
-import Data.List (group, sort)
-import Data.Char (chr, toLower)
-import Data.Yaml.Builder (toByteString)
-import Control.Applicative ((<|>), many)
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.ByteString.Char8 as B8
-import Data.Attoparsec.ByteString.Char8 as Attoparsec
-import qualified Data.Text as T
-import Data.Text.Encoding (encodeUtf8)
-import Data.Aeson.Encode.Pretty (encodePretty', defConfig, Config(..),
-          Indent(Spaces), NumberFormat(Generic))
-import System.Console.GetOpt
-import Control.Exception as E
-import Control.Monad
-import System.IO
-import System.FilePath (takeExtension)
-import System.Environment (getArgs)
-import System.Exit
-import Data.Version (showVersion)
-import Paths_pandoc_citeproc (version)
-import Text.CSL.Pandoc (processCites')
-import Text.CSL.Data (getManPage, getLicense)
-import Text.Pandoc.JSON hiding (Format)
-import Text.Pandoc.Walk
-import qualified Text.Pandoc.UTF8 as UTF8
+import           Control.Applicative              (many, (<|>))
+import           Control.Exception                as E
+import           Control.Monad
+import           Data.Aeson.Encode.Pretty         (Config (..), Indent (Spaces),
+                                                   NumberFormat (Generic),
+                                                   defConfig, encodePretty')
+import           Data.Attoparsec.ByteString.Char8 as Attoparsec
+import qualified Data.ByteString                  as B
+import qualified Data.ByteString.Char8            as B8
+import qualified Data.ByteString.Lazy             as BL
+import           Data.Char                        (chr, toLower)
+import           Data.List                        (group, sort)
+import qualified Data.Text                        as T
+import           Data.Text.Encoding               (encodeUtf8)
+import           Data.Version                     (showVersion)
+import           Data.Yaml.Builder                (toByteString)
+import           Paths_pandoc_citeproc            (version)
+import           System.Console.GetOpt
+import           System.Environment               (getArgs)
+import           System.Exit
+import           System.FilePath                  (takeExtension)
+import           System.IO
+import           Text.CSL.Data                    (getLicense, getManPage)
+import           Text.CSL.Exception
+import           Text.CSL.Input.Bibutils          (BibFormat (..),
+                                                   readBiblioString)
+import           Text.CSL.Pandoc                  (processCites')
+import           Text.CSL.Reference               (Literal (..),
+                                                   Reference (refId))
+import           Text.Pandoc.JSON                 hiding (Format)
+import qualified Text.Pandoc.UTF8                 as UTF8
+import           Text.Pandoc.Walk
 
 main :: IO ()
 main = do
@@ -63,8 +67,8 @@ main = do
                               ("Unknown format\n" ++ header) options
                             exitWith $ ExitFailure 3
        bibstring <- case args of
-                         []    -> UTF8.getContents
-                         xs    -> mconcat <$> mapM UTF8.readFile xs
+                         [] -> UTF8.getContents
+                         xs -> mconcat <$> mapM UTF8.readFile xs
        readBiblioString bibformat bibstring >>=
          warnDuplicateKeys >>=
          if Bib2YAML `elem` flags
@@ -85,24 +89,24 @@ formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
 
 readFormat :: String -> Maybe BibFormat
 readFormat = go . map toLower
-  where go "biblatex" = Just BibLatex
-        go "bib"      = Just BibLatex
-        go "bibtex"   = Just Bibtex
-        go "json"     = Just Json
-        go "yaml"     = Just Yaml
+  where go "biblatex"   = Just BibLatex
+        go "bib"        = Just BibLatex
+        go "bibtex"     = Just Bibtex
+        go "json"       = Just Json
+        go "yaml"       = Just Yaml
 #ifdef USE_BIBUTILS
-        go "ris"      = Just Ris
-        go "endnote"  = Just Endnote
-        go "enl"      = Just Endnote
+        go "ris"        = Just Ris
+        go "endnote"    = Just Endnote
+        go "enl"        = Just Endnote
         go "endnotexml" = Just EndnotXml
-        go "xml"      = Just EndnotXml
-        go "wos"      = Just Isi
-        go "isi"      = Just Isi
-        go "medline"  = Just Medline
-        go "copac"    = Just Copac
-        go "mods"     = Just Mods
+        go "xml"        = Just EndnotXml
+        go "wos"        = Just Isi
+        go "isi"        = Just Isi
+        go "medline"    = Just Medline
+        go "copac"      = Just Copac
+        go "mods"       = Just Mods
 #endif
-        go _          = Nothing
+        go _            = Nothing
 
 
 doCites :: Pandoc -> IO Pandoc

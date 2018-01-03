@@ -1,4 +1,5 @@
-{-# LANGUAGE PatternGuards, DeriveDataTypeable #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE PatternGuards      #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Output.Pandoc
@@ -24,12 +25,13 @@ module Text.CSL.Output.Pandoc
     , toCapital
     ) where
 
-import Text.CSL.Util ( proc, proc', tailInline, lastInline,
-                       initInline, tailFirstInlineStr, headInline, toCapital )
-import Data.Maybe ( fromMaybe )
-import Text.CSL.Style
-import Text.Pandoc.Definition
-import Text.Pandoc.XML (fromEntities)
+import           Data.Maybe             (fromMaybe)
+import           Text.CSL.Style
+import           Text.CSL.Util          (headInline, initInline, lastInline,
+                                         proc, proc', tailFirstInlineStr,
+                                         tailInline, toCapital)
+import           Text.Pandoc.Definition
+import           Text.Pandoc.XML        (fromEntities)
 
 renderPandoc :: Style -> Formatted -> [Inline]
 renderPandoc sty

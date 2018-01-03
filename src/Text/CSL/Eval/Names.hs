@@ -1,4 +1,5 @@
-{-# LANGUAGE PatternGuards, FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE PatternGuards    #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Eval.Names
@@ -15,20 +16,20 @@
 
 module Text.CSL.Eval.Names where
 
-import Control.Monad.State
-import Data.Char  ( isLower, isUpper, isLetter )
-import Data.List  ( nub, intersperse )
-import Data.List.Split ( wordsBy )
-import Data.Maybe ( isJust )
+import           Control.Monad.State
+import           Data.Char              (isLetter, isLower, isUpper)
+import           Data.List              (intersperse, nub)
+import           Data.List.Split        (wordsBy)
+import           Data.Maybe             (isJust)
 
-import Text.CSL.Eval.Common
-import Text.CSL.Eval.Output
-import Text.CSL.Util ( headInline, lastInline, readNum, (<^>), query, toRead,
-                       splitStrWhen, isRange )
-import Text.CSL.Style
-import Text.Pandoc.Definition
-import Text.Pandoc.Shared ( stringify )
-import qualified Text.Pandoc.Builder as B
+import           Text.CSL.Eval.Common
+import           Text.CSL.Eval.Output
+import           Text.CSL.Style
+import           Text.CSL.Util          (headInline, isRange, lastInline, query,
+                                         readNum, splitStrWhen, toRead, (<^>))
+import qualified Text.Pandoc.Builder    as B
+import           Text.Pandoc.Definition
+import           Text.Pandoc.Shared     (stringify)
 
 evalNames :: Bool -> [String] -> [Name] -> String -> State EvalState [Output]
 evalNames skipEdTrans ns nl d
@@ -136,8 +137,8 @@ formatNames ea del p s as n
       updateEtal x = modify $ \st ->
                      let x' = if length x == 1 then repeat $ head x else x
                      in st { etal = case etal st of
-                                         []  -> x
-                                         ys  -> zipWith (++) ys x'
+                                         [] -> x
+                                         ys -> zipWith (++) ys x'
                            }
       isWithLastName os
           | "true" <-       getOptionVal "et-al-use-last"  os
@@ -286,8 +287,8 @@ formatName m b f fm ops np n
                      then givenLong
                      else when_ (givenName  n) . Formatted . trimsp . fixsp . concatMap initial $ givenName n
       fixsp     (Space:Space:xs) = fixsp (Space:xs)
-      fixsp     (x:xs)       = x : fixsp xs
-      fixsp     []           = []
+      fixsp     (x:xs)           = x : fixsp xs
+      fixsp     []               = []
       trimsp = reverse . dropWhile (==Space) . reverse . dropWhile (==Space)
       givenLong = when_ (givenName  n) . mconcat . intersperse (Formatted [Space]) $ givenName n
       family    = familyName n
@@ -380,9 +381,9 @@ Formatted [] <+> ss = ss
 s  <+> Formatted [] = s
 Formatted xs <+> Formatted ys =
   case lastInline xs of
-       "’"  -> Formatted (xs ++ ys)
-       "-"  -> Formatted (xs ++ ys)
-       _    -> Formatted (xs ++ [Space] ++ ys)
+       "’" -> Formatted (xs ++ ys)
+       "-" -> Formatted (xs ++ ys)
+       _   -> Formatted (xs ++ [Space] ++ ys)
 
 (<++>) :: [Output] -> [Output] -> [Output]
 [] <++> o  = o

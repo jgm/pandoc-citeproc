@@ -1,4 +1,5 @@
-{-# LANGUAGE PatternGuards, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternGuards     #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Proc
@@ -16,24 +17,25 @@
 
 module Text.CSL.Proc where
 
-import Control.Arrow ( (&&&), (>>>), second )
-import Data.Char ( toLower, isLetter, isDigit )
-import Data.List
-import Data.Ord  ( comparing )
-import Data.Maybe ( mapMaybe )
-import Text.CSL.Eval
-import Text.CSL.Util ( proc, proc', query, uncamelize, tr' )
-import Text.CSL.Proc.Collapse
-import Text.CSL.Proc.Disamb
-import Text.CSL.Reference
-import Text.CSL.Style
-import Data.Aeson
-import Control.Applicative ((<|>))
-import Text.Pandoc.Definition (Inline(Space, Str, Note), Block(Para))
+import           Control.Applicative    ((<|>))
+import           Control.Arrow          (second, (&&&), (>>>))
+import           Data.Aeson
+import           Data.Char              (isDigit, isLetter, toLower)
+import           Data.List
+import           Data.Maybe             (mapMaybe)
+import           Data.Ord               (comparing)
+import           Text.CSL.Eval
+import           Text.CSL.Proc.Collapse
+import           Text.CSL.Proc.Disamb
+import           Text.CSL.Reference
+import           Text.CSL.Style
+import           Text.CSL.Util          (proc, proc', query, tr', uncamelize)
+import           Text.Pandoc.Definition (Block (Para),
+                                         Inline (Note, Space, Str))
 
 data ProcOpts
     = ProcOpts
-      { bibOpts :: BibOpts
+      { bibOpts       :: BibOpts
       , linkCitations :: Bool
       }
     deriving ( Show, Read, Eq )
@@ -269,10 +271,10 @@ filterRefs bos refs
       include i r =       or  . flip map i $ \(f,v) ->       lookup_ r f v
       exclude e r =       and . flip map e $ \(f,v) -> not $ lookup_ r f v
       lookup_ r f v = case f of
-                        "type"         -> look "ref-type"
-                        "id"           -> look "ref-id"
-                        "categories"   -> look "categories"
-                        x              -> look x
+                        "type"       -> look "ref-type"
+                        "id"         -> look "ref-id"
+                        "categories" -> look "categories"
+                        x            -> look x
           where
             look s = case lookup s (mkRefMap (Just r)) of
                        Just x | Just v' <- (fromValue x :: Maybe RefType  ) -> v == uncamelize (show v')
@@ -318,10 +320,10 @@ formatCitLayout s (CG co f d cs)
       combine (Formatted []) ys = ys
       combine xs ys =
         case ys of
-             Formatted [] -> xs
+             Formatted []           -> xs
              Formatted (Note _ : _) -> xs <> ys
-             Formatted (Str [c]:_) | c `elem` (", ;:" :: String) -> xs <> ys
-             _ -> xs <> Formatted [Space] <> ys
+             Formatted (Str [c]:_)  | c `elem` (", ;:" :: String) -> xs <> ys
+             _                      -> xs <> Formatted [Space] <> ys
       formatAuth   = formatOutput . localMod
       formatCits   = (if isNote then toNote else id) .
                      formatOutputList . appendOutput formatting . addAffixes f .
@@ -331,7 +333,7 @@ formatCitLayout s (CG co f d cs)
                         verticalAlign = if isAuthorInText cs
                                            then ""
                                            else verticalAlign f }
-      isAuthorInText [] = False
+      isAuthorInText []        = False
       isAuthorInText ((c,_):_) = authorInText c
       localMod     = uncurry $ localModifiers s (not $ null co)
       setAsSupAu h = map $ \(c,o) -> if (citeId c, citeHash c) == h

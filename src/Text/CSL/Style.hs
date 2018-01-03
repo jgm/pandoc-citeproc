@@ -1,10 +1,16 @@
-{-# LANGUAGE OverloadedStrings, PatternGuards, DeriveDataTypeable,
-    ScopedTypeVariables, FlexibleInstances, DeriveGeneric,
-    GeneralizedNewtypeDeriving, CPP, MultiParamTypeClasses #-}
+{-# LANGUAGE CPP                        #-}
+{-# LANGUAGE DeriveDataTypeable         #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE PatternGuards              #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
 #if MIN_VERSION_base(4,8,0)
 #define OVERLAPS {-# OVERLAPPING #-}
 #else
-{-# LANGUAGE OverlappingInstances #-}
+{-# LANGUAGE OverlappingInstances       #-}
 #define OVERLAPS
 #endif
 -----------------------------------------------------------------------------
@@ -86,41 +92,42 @@ module Text.CSL.Style ( readCSLString
                       )
 where
 
-import Data.Aeson hiding (Number)
-import GHC.Generics (Generic)
-import Data.String
-import Control.Arrow hiding (left, right)
-import Control.Monad (liftM, mplus)
-import Control.Applicative ((<|>))
-import qualified Data.Aeson as Aeson
-import Data.Aeson.Types (Pair)
-import Data.List ( nubBy, isPrefixOf, isInfixOf, intersperse, intercalate )
-import Data.List.Split ( splitWhen, wordsBy )
-import Data.Generics ( Data, Typeable )
-import Data.Maybe ( listToMaybe )
-import qualified Data.Map as M
-import Data.Char (isPunctuation, isUpper, isLetter)
-import Text.CSL.Util (mb, parseBool, parseString, (.#?), (.#:), query,
-                      betterThan, trimr, tailInline, headInline,
-                      initInline, lastInline, splitStrWhen, mapping',
-                      (&=))
-import Data.Yaml.Builder(ToYaml(..))
-import qualified Data.Yaml.Builder as Y
-import Text.Pandoc.Definition hiding (Citation, Cite)
-import Text.Pandoc (bottomUp)
-import Text.CSL.Compat.Pandoc (readHtml, writeMarkdown)
-import qualified Text.Pandoc.Walk as Walk
-import qualified Text.Pandoc.Builder as B
-import qualified Data.Text as T
-import Text.Pandoc.XML (fromEntities)
+import           Control.Applicative    ((<|>))
+import           Control.Arrow          hiding (left, right)
+import           Control.Monad          (liftM, mplus)
+import           Data.Aeson             hiding (Number)
+import qualified Data.Aeson             as Aeson
+import           Data.Aeson.Types       (Pair)
+import           Data.Char              (isLetter, isPunctuation, isUpper)
+import           Data.Generics          (Data, Typeable)
+import           Data.List              (intercalate, intersperse, isInfixOf,
+                                         isPrefixOf, nubBy)
+import           Data.List.Split        (splitWhen, wordsBy)
+import qualified Data.Map               as M
+import           Data.Maybe             (listToMaybe)
+import           Data.String
+import qualified Data.Text              as T
+import           Data.Yaml.Builder      (ToYaml (..))
+import qualified Data.Yaml.Builder      as Y
+import           GHC.Generics           (Generic)
+import           Text.CSL.Compat.Pandoc (readHtml, writeMarkdown)
+import           Text.CSL.Util          (betterThan, headInline, initInline,
+                                         lastInline, mapping', mb, parseBool,
+                                         parseString, query, splitStrWhen,
+                                         tailInline, trimr, (&=), (.#:), (.#?))
+import           Text.Pandoc            (bottomUp)
+import qualified Text.Pandoc.Builder    as B
+import           Text.Pandoc.Definition hiding (Citation, Cite)
+import qualified Text.Pandoc.Walk       as Walk
+import           Text.Pandoc.XML        (fromEntities)
 
 #ifdef UNICODE_COLLATION
-import qualified Data.Text     as T
-import qualified Data.Text.ICU as T
+import qualified Data.Text              as T
+import qualified Data.Text.ICU          as T
 #else
-import Data.RFC5051 (compareUnicode)
+import           Data.RFC5051           (compareUnicode)
 #endif
-import qualified Data.Vector as V
+import qualified Data.Vector            as V
 
 -- Note:  FromJSON reads HTML, ToJSON writes Markdown.
 -- This means that they aren't proper inverses of each other, which
@@ -131,9 +138,9 @@ import qualified Data.Vector as V
 readCSLString :: String -> [Inline]
 readCSLString s = Walk.walk handleSmallCapsSpans
                 $ case readHtml (adjustScTags s) of
-                        Pandoc _ [Plain ils]   -> ils
-                        Pandoc _ [Para  ils]   -> ils
-                        Pandoc _ x             -> Walk.query (:[]) x
+                        Pandoc _ [Plain ils] -> ils
+                        Pandoc _ [Para  ils] -> ils
+                        Pandoc _ x           -> Walk.query (:[]) x
   -- this is needed for versions of pandoc that don't turn
   -- a span with font-variant:small-caps into a SmallCaps element:
   where handleSmallCapsSpans (Span ("",[],[("style",sty)]) ils)
@@ -704,7 +711,7 @@ instance FromJSON Cite where
 instance OVERLAPS
          FromJSON [[Cite]] where
   parseJSON (Array v) = mapM parseJSON $ V.toList v
-  parseJSON _ = return []
+  parseJSON _         = return []
 
 emptyCite :: Cite
 emptyCite  = Cite [] mempty mempty [] [] [] [] False False False 0
@@ -764,11 +771,11 @@ isPunctuationInQuote sty =
 
 object' :: [Pair] -> Aeson.Value
 object' = object . filter (not . isempty)
-  where isempty (_, Array v)  = V.null v
-        isempty (_, String t) = T.null t
+  where isempty (_, Array v)                                    = V.null v
+        isempty (_, String t)                                   = T.null t
         isempty ("first-reference-note-number", Aeson.Number n) = n == 0
-        isempty ("citation-number", Aeson.Number n) = n == 0
-        isempty (_, _)        = False
+        isempty ("citation-number", Aeson.Number n)             = n == 0
+        isempty (_, _)                                          = False
 
 data Agent
     = Agent { givenName       :: [Formatted]
@@ -788,9 +795,9 @@ emptyAgent = Agent [] mempty mempty mempty mempty mempty False False
 -- CSL JSON uses quotes to protect capitalization
 removeQuoted :: Formatted -> Formatted
 removeQuoted (Formatted ils) = Formatted (go ils)
-  where go [] = []
+  where go []                             = []
         go (Quoted DoubleQuote ils' : xs) = ils' ++ go xs
-        go (x:xs) = x : go xs
+        go (x:xs)                         = x : go xs
 
 instance FromJSON Agent where
   parseJSON (Object v) = nameTransform <$> (Agent <$>
@@ -866,18 +873,18 @@ droppingPartTransform ag
 
 startWithCapital' :: Inline -> Bool
 startWithCapital' (Str (c:_)) = isUpper c && isLetter c
-startWithCapital' _ = False
+startWithCapital' _           = False
 
 startWithCapital :: Formatted -> Bool
 startWithCapital (Formatted (x:_)) = startWithCapital' x
-startWithCapital _ = False
+startWithCapital _                 = False
 
 stripFinalComma :: Formatted -> (String, Formatted)
 stripFinalComma (Formatted ils) =
   case reverse $ splitStrWhen isPunctuation ils of
-       Str ",":xs -> (",", Formatted $ reverse xs)
+       Str ",":xs         -> (",", Formatted $ reverse xs)
        Str "!":Str ",":xs -> (",!", Formatted $ reverse xs)
-       _ -> ("", Formatted ils)
+       _                  -> ("", Formatted ils)
 
 suffixTransform :: Agent -> Agent
 suffixTransform ag
@@ -915,7 +922,7 @@ instance OVERLAPS
          FromJSON [Agent] where
   parseJSON (Array xs) = mapM parseJSON $ V.toList xs
   parseJSON (Object v) = (:[]) `fmap` parseJSON (Object v)
-  parseJSON _ = fail "Could not parse [Agent]"
+  parseJSON _          = fail "Could not parse [Agent]"
 
 -- instance ToJSON [Agent] where
 -- toJSON xs  = Array (V.fromList $ map toJSON xs)

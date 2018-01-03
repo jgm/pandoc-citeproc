@@ -20,35 +20,36 @@ module Text.CSL.Input.Bibtex
     )
     where
 
-import Text.Parsec hiding (optional, (<|>), many, State)
-import Control.Applicative
-import qualified Control.Exception as E
-import Text.CSL.Compat.Pandoc (readLaTeX)
-import Text.CSL.Exception
-         (CiteprocException (ErrorReadingBib, ErrorReadingBibFile))
-import Text.Pandoc.Definition
-import Text.Pandoc.Generic (bottomUp)
-import Data.List.Split (splitOn, splitWhen, wordsBy)
-import Data.List (intercalate, foldl')
-import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper, isDigit, isAlphaNum)
-import Control.Monad
-import Control.Monad.RWS
-import System.Environment (getEnvironment)
-import Text.CSL.Reference
-import Text.CSL.Style (Formatted(..), Locale(..), CslTerm(..), Agent(..))
-import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen,
-                      safeRead)
-import Text.CSL.Parser (parseLocale)
-import qualified Text.Pandoc.Walk as Walk
-import qualified Text.Pandoc.UTF8 as UTF8
+import           Control.Applicative
+import qualified Control.Exception      as E
+import           Control.Monad
+import           Control.Monad.RWS
+import           Data.Char              (isAlphaNum, isDigit, isUpper, toLower,
+                                         toUpper)
+import           Data.List              (foldl', intercalate)
+import           Data.List.Split        (splitOn, splitWhen, wordsBy)
+import           Data.Maybe
+import           System.Environment     (getEnvironment)
+import           Text.CSL.Compat.Pandoc (readLaTeX)
+import           Text.CSL.Exception     (CiteprocException (ErrorReadingBib, ErrorReadingBibFile))
+import           Text.CSL.Parser        (parseLocale)
+import           Text.CSL.Reference
+import           Text.CSL.Style         (Agent (..), CslTerm (..),
+                                         Formatted (..), Locale (..))
+import           Text.CSL.Util          (onBlocks, protectCase, safeRead,
+                                         splitStrWhen, trim, unTitlecase)
+import           Text.Pandoc.Definition
+import           Text.Pandoc.Generic    (bottomUp)
+import qualified Text.Pandoc.UTF8       as UTF8
+import qualified Text.Pandoc.Walk       as Walk
+import           Text.Parsec            hiding (State, many, optional, (<|>))
 
 blocksToFormatted  :: [Block]  -> Bib Formatted
 blocksToFormatted bs =
   case bs of
-       [Plain xs]  -> inlinesToFormatted xs
-       [Para  xs]  -> inlinesToFormatted xs
-       _           -> inlinesToFormatted $ Walk.query (:[]) bs
+       [Plain xs] -> inlinesToFormatted xs
+       [Para  xs] -> inlinesToFormatted xs
+       _          -> inlinesToFormatted $ Walk.query (:[]) bs
 
 adjustSpans :: Lang -> Inline -> [Inline]
 adjustSpans _ (Span ("",[],[]) xs) = xs
@@ -73,10 +74,10 @@ parseRawLaTeX lang ('\\':xs) =
          f "mkbibparens"   ils = [Str "("] ++ ils ++ [Str ")"] -- TODO: ...
          f "mkbibbrackets" ils = [Str "["] ++ ils ++ [Str "]"] -- TODO: ...
          -- ... both should be nestable & should work in year fields
-         f "autocap"    ils = ils  -- TODO: should work in year fields
-         f "textnormal" ils = [Span ("",["nodecor"],[]) ils]
+         f "autocap"    ils    = ils  -- TODO: should work in year fields
+         f "textnormal" ils    = [Span ("",["nodecor"],[]) ils]
          f "bibstring" [Str s] = [Str $ resolveKey' lang s]
-         f _            ils = [Span nullAttr ils]
+         f _            ils    = [Span nullAttr ils]
 parseRawLaTeX _ _ = []
 
 inlinesToFormatted :: [Inline] -> Bib Formatted
@@ -95,9 +96,9 @@ getLangFromEnv = do
   env <- getEnvironment
   return $ case lookup "LANG" env of
                   Just x  -> case splitWhen (\c -> c == '.' || c == '_' || c == '-') x of
-                                   (w:z:_)            -> Lang w z
-                                   [w] | not (null w) -> Lang w mempty
-                                   _                  -> Lang "en" "US"
+                                   (w:z:_) -> Lang w z
+                                   [w]     | not (null w) -> Lang w mempty
+                                   _       -> Lang "en" "US"
                   Nothing -> Lang "en" "US"
 
 -- | Parse a BibTeX or BibLaTeX file into a list of 'Reference's.
@@ -110,7 +111,7 @@ readBibtex isBibtex caseTransform f = do
   E.catch (readBibtexString isBibtex caseTransform contents)
         (\e -> case e of
                   ErrorReadingBib es -> E.throwIO $ ErrorReadingBibFile f es
-                  _ -> E.throwIO e)
+                  _                  -> E.throwIO e)
 
 -- | Like 'readBibtex' but operates on a String rather than a file.
 readBibtexString :: Bool -> Bool -> String -> IO [Reference]
@@ -409,38 +410,38 @@ resolveKey' (Lang "da" "DK") k =
     case map toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
-       "forthcoming"   -> "kommende" -- csl
-       "inpress"       -> "i tryk"   -- csl
+       "forthcoming" -> "kommende" -- csl
+       "inpress"     -> "i tryk"   -- csl
        -- "prepublished"  -> "" -- missing
-       "mathesis"      -> "speciale"
-       "phdthesis"     -> "ph.d.-afhandling"
-       "candthesis"    -> "kandidatafhandling"
-       "techreport"    -> "teknisk rapport"
-       "resreport"     -> "forskningsrapport"
-       "software"      -> "software"
-       "datacd"        -> "data-cd"
-       "audiocd"       -> "lyd-cd"
-       "patent"        -> "patent"
-       "patentde"      -> "tysk patent"
-       "patenteu"      -> "europæisk patent"
-       "patentfr"      -> "fransk patent"
-       "patentuk"      -> "britisk patent"
-       "patentus"      -> "amerikansk patent"
-       "patreq"        -> "ansøgning om patent"
-       "patreqde"      -> "ansøgning om tysk patent"
-       "patreqeu"      -> "ansøgning om europæisk patent"
-       "patreqfr"      -> "ansøgning om fransk patent"
-       "patrequk"      -> "ansøgning om britisk patent"
-       "patrequs"      -> "ansøgning om amerikansk patent"
-       "countryde"     -> "Tyskland"
-       "countryeu"     -> "Europæiske Union"
-       "countryep"     -> "Europæiske Union"
-       "countryfr"     -> "Frankrig"
-       "countryuk"     -> "Storbritanien"
-       "countryus"     -> "USA"
-       "newseries"     -> "ny serie"
-       "oldseries"     -> "gammel serie"
-       _               -> k
+       "mathesis"    -> "speciale"
+       "phdthesis"   -> "ph.d.-afhandling"
+       "candthesis"  -> "kandidatafhandling"
+       "techreport"  -> "teknisk rapport"
+       "resreport"   -> "forskningsrapport"
+       "software"    -> "software"
+       "datacd"      -> "data-cd"
+       "audiocd"     -> "lyd-cd"
+       "patent"      -> "patent"
+       "patentde"    -> "tysk patent"
+       "patenteu"    -> "europæisk patent"
+       "patentfr"    -> "fransk patent"
+       "patentuk"    -> "britisk patent"
+       "patentus"    -> "amerikansk patent"
+       "patreq"      -> "ansøgning om patent"
+       "patreqde"    -> "ansøgning om tysk patent"
+       "patreqeu"    -> "ansøgning om europæisk patent"
+       "patreqfr"    -> "ansøgning om fransk patent"
+       "patrequk"    -> "ansøgning om britisk patent"
+       "patrequs"    -> "ansøgning om amerikansk patent"
+       "countryde"   -> "Tyskland"
+       "countryeu"   -> "Europæiske Union"
+       "countryep"   -> "Europæiske Union"
+       "countryfr"   -> "Frankrig"
+       "countryuk"   -> "Storbritanien"
+       "countryus"   -> "USA"
+       "newseries"   -> "ny serie"
+       "oldseries"   -> "gammel serie"
+       _             -> k
 resolveKey' (Lang "de" "DE") k =
     case map toLower k of
        "inpreparation" -> "in Vorbereitung"
@@ -524,79 +525,79 @@ resolveKey' (Lang "en" "US") k =
        "submitted"      -> "submitted"
        "techreport"     -> "technical report"
        "volume"         -> "vol."
-       _               -> k
+       _                -> k
 resolveKey' (Lang "es" "ES") k =
     case map toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
-       "forthcoming"   -> "previsto"    -- csl
-       "inpress"       -> "en imprenta" -- csl
+       "forthcoming" -> "previsto"    -- csl
+       "inpress"     -> "en imprenta" -- csl
        -- "prepublished"  -> "" -- missing
-       "mathesis"      -> "Tesis de licenciatura"
-       "phdthesis"     -> "Tesis doctoral"
+       "mathesis"    -> "Tesis de licenciatura"
+       "phdthesis"   -> "Tesis doctoral"
        -- "candthesis" -> "" -- missing
-       "techreport"    -> "informe técnico"
+       "techreport"  -> "informe técnico"
        -- "resreport"  -> "" -- missing
        -- "software"   -> "" -- missing
        -- "datacd"     -> "" -- missing
        -- "audiocd"    -> "" -- missing
-       "patent"        -> "patente"
-       "patentde"      -> "patente alemana"
-       "patenteu"      -> "patente europea"
-       "patentfr"      -> "patente francesa"
-       "patentuk"      -> "patente británica"
-       "patentus"      -> "patente americana"
-       "patreq"        -> "solicitud de patente"
-       "patreqde"      -> "solicitud de patente alemana"
-       "patreqeu"      -> "solicitud de patente europea"
-       "patreqfr"      -> "solicitud de patente francesa"
-       "patrequk"      -> "solicitud de patente británica"
-       "patrequs"      -> "solicitud de patente americana"
-       "countryde"     -> "Alemania"
-       "countryeu"     -> "Unión Europea"
-       "countryep"     -> "Unión Europea"
-       "countryfr"     -> "Francia"
-       "countryuk"     -> "Reino Unido"
-       "countryus"     -> "Estados Unidos de América"
-       "newseries"     -> "nueva época"
-       "oldseries"     -> "antigua época"
-       _               -> k
+       "patent"      -> "patente"
+       "patentde"    -> "patente alemana"
+       "patenteu"    -> "patente europea"
+       "patentfr"    -> "patente francesa"
+       "patentuk"    -> "patente británica"
+       "patentus"    -> "patente americana"
+       "patreq"      -> "solicitud de patente"
+       "patreqde"    -> "solicitud de patente alemana"
+       "patreqeu"    -> "solicitud de patente europea"
+       "patreqfr"    -> "solicitud de patente francesa"
+       "patrequk"    -> "solicitud de patente británica"
+       "patrequs"    -> "solicitud de patente americana"
+       "countryde"   -> "Alemania"
+       "countryeu"   -> "Unión Europea"
+       "countryep"   -> "Unión Europea"
+       "countryfr"   -> "Francia"
+       "countryuk"   -> "Reino Unido"
+       "countryus"   -> "Estados Unidos de América"
+       "newseries"   -> "nueva época"
+       "oldseries"   -> "antigua época"
+       _             -> k
 resolveKey' (Lang "fi" "FI") k =
     case map toLower k of
        -- "inpreparation" -> ""      -- missing
        -- "submitted"     -> ""      -- missing
-       "forthcoming"   -> "tulossa"  -- csl
-       "inpress"       -> "painossa" -- csl
+       "forthcoming" -> "tulossa"  -- csl
+       "inpress"     -> "painossa" -- csl
        -- "prepublished"  -> ""      -- missing
-       "mathesis"      -> "tutkielma"
-       "phdthesis"     -> "tohtorinväitöskirja"
-       "candthesis"    -> "kandidat"
-       "techreport"    -> "tekninen raportti"
-       "resreport"     -> "tutkimusraportti"
-       "software"      -> "ohjelmisto"
-       "datacd"        -> "data-CD"
-       "audiocd"       -> "ääni-CD"
-       "patent"        -> "patentti"
-       "patentde"      -> "saksalainen patentti"
-       "patenteu"      -> "Euroopan Unionin patentti"
-       "patentfr"      -> "ranskalainen patentti"
-       "patentuk"      -> "englantilainen patentti"
-       "patentus"      -> "yhdysvaltalainen patentti"
-       "patreq"        -> "patenttihakemus"
-       "patreqde"      -> "saksalainen patenttihakemus"
-       "patreqeu"      -> "Euroopan Unionin patenttihakemus"
-       "patreqfr"      -> "ranskalainen patenttihakemus"
-       "patrequk"      -> "englantilainen patenttihakemus"
-       "patrequs"      -> "yhdysvaltalainen patenttihakemus"
-       "countryde"     -> "Saksa"
-       "countryeu"     -> "Euroopan Unioni"
-       "countryep"     -> "Euroopan Unioni"
-       "countryfr"     -> "Ranska"
-       "countryuk"     -> "Iso-Britannia"
-       "countryus"     -> "Yhdysvallat"
-       "newseries"     -> "uusi sarja"
-       "oldseries"     -> "vanha sarja"
-       _               -> k
+       "mathesis"    -> "tutkielma"
+       "phdthesis"   -> "tohtorinväitöskirja"
+       "candthesis"  -> "kandidat"
+       "techreport"  -> "tekninen raportti"
+       "resreport"   -> "tutkimusraportti"
+       "software"    -> "ohjelmisto"
+       "datacd"      -> "data-CD"
+       "audiocd"     -> "ääni-CD"
+       "patent"      -> "patentti"
+       "patentde"    -> "saksalainen patentti"
+       "patenteu"    -> "Euroopan Unionin patentti"
+       "patentfr"    -> "ranskalainen patentti"
+       "patentuk"    -> "englantilainen patentti"
+       "patentus"    -> "yhdysvaltalainen patentti"
+       "patreq"      -> "patenttihakemus"
+       "patreqde"    -> "saksalainen patenttihakemus"
+       "patreqeu"    -> "Euroopan Unionin patenttihakemus"
+       "patreqfr"    -> "ranskalainen patenttihakemus"
+       "patrequk"    -> "englantilainen patenttihakemus"
+       "patrequs"    -> "yhdysvaltalainen patenttihakemus"
+       "countryde"   -> "Saksa"
+       "countryeu"   -> "Euroopan Unioni"
+       "countryep"   -> "Euroopan Unioni"
+       "countryfr"   -> "Ranska"
+       "countryuk"   -> "Iso-Britannia"
+       "countryus"   -> "Yhdysvallat"
+       "newseries"   -> "uusi sarja"
+       "oldseries"   -> "vanha sarja"
+       _             -> k
 
 resolveKey' (Lang "fr" "FR") k =
     case map toLower k of
@@ -638,38 +639,38 @@ resolveKey' (Lang "it" "IT") k =
     case map toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
-       "forthcoming"   -> "futuro" -- csl
-       "inpress"       -> "in stampa"
+       "forthcoming" -> "futuro" -- csl
+       "inpress"     -> "in stampa"
        -- "prepublished"  -> "" -- missing
-       "mathesis"      -> "tesi di laurea magistrale"
-       "phdthesis"     -> "tesi di dottorato"
+       "mathesis"    -> "tesi di laurea magistrale"
+       "phdthesis"   -> "tesi di dottorato"
        -- "candthesis" -> "" -- missing
-       "techreport"    -> "rapporto tecnico"
-       "resreport"     -> "rapporto di ricerca"
+       "techreport"  -> "rapporto tecnico"
+       "resreport"   -> "rapporto di ricerca"
        -- "software"   -> "" -- missing
        -- "datacd"     -> "" -- missing
        -- "audiocd"    -> "" -- missing
-       "patent"        -> "brevetto"
-       "patentde"      -> "brevetto tedesco"
-       "patenteu"      -> "brevetto europeo"
-       "patentfr"      -> "brevetto francese"
-       "patentuk"      -> "brevetto britannico"
-       "patentus"      -> "brevetto americano"
-       "patreq"        -> "brevetto richiesto"
-       "patreqde"      -> "brevetto tedesco richiesto"
-       "patreqeu"      -> "brevetto europeo richiesto"
-       "patreqfr"      -> "brevetto francese richiesto"
-       "patrequk"      -> "brevetto britannico richiesto"
-       "patrequs"      -> "brevetto U.S.A. richiesto"
-       "countryde"     -> "Germania"
-       "countryeu"     -> "Unione Europea"
-       "countryep"     -> "Unione Europea"
-       "countryfr"     -> "Francia"
-       "countryuk"     -> "Regno Unito"
-       "countryus"     -> "Stati Uniti d’America"
-       "newseries"     -> "nuova serie"
-       "oldseries"     -> "vecchia serie"
-       _               -> k
+       "patent"      -> "brevetto"
+       "patentde"    -> "brevetto tedesco"
+       "patenteu"    -> "brevetto europeo"
+       "patentfr"    -> "brevetto francese"
+       "patentuk"    -> "brevetto britannico"
+       "patentus"    -> "brevetto americano"
+       "patreq"      -> "brevetto richiesto"
+       "patreqde"    -> "brevetto tedesco richiesto"
+       "patreqeu"    -> "brevetto europeo richiesto"
+       "patreqfr"    -> "brevetto francese richiesto"
+       "patrequk"    -> "brevetto britannico richiesto"
+       "patrequs"    -> "brevetto U.S.A. richiesto"
+       "countryde"   -> "Germania"
+       "countryeu"   -> "Unione Europea"
+       "countryep"   -> "Unione Europea"
+       "countryfr"   -> "Francia"
+       "countryuk"   -> "Regno Unito"
+       "countryus"   -> "Stati Uniti d’America"
+       "newseries"   -> "nuova serie"
+       "oldseries"   -> "vecchia serie"
+       _             -> k
 resolveKey' (Lang "nl" "NL") k =
     case map toLower k of
        "inpreparation" -> "in voorbereiding"
@@ -741,38 +742,38 @@ resolveKey' (Lang "pl" "PL") k =
 resolveKey' (Lang "pt" "PT") k =
     case map toLower k of
        -- "candthesis" -> "" -- missing
-       "techreport"    -> "relatório técnico"
-       "resreport"     -> "relatório de pesquisa"
-       "software"      -> "software"
-       "datacd"        -> "CD-ROM"
-       "patent"        -> "patente"
-       "patentde"      -> "patente alemã"
-       "patenteu"      -> "patente européia"
-       "patentfr"      -> "patente francesa"
-       "patentuk"      -> "patente britânica"
-       "patentus"      -> "patente americana"
-       "patreq"        -> "pedido de patente"
-       "patreqde"      -> "pedido de patente alemã"
-       "patreqeu"      -> "pedido de patente européia"
-       "patreqfr"      -> "pedido de patente francesa"
-       "patrequk"      -> "pedido de patente britânica"
-       "patrequs"      -> "pedido de patente americana"
-       "countryde"     -> "Alemanha"
-       "countryeu"     -> "União Europeia"
-       "countryep"     -> "União Europeia"
-       "countryfr"     -> "França"
-       "countryuk"     -> "Reino Unido"
-       "countryus"     -> "Estados Unidos da América"
-       "newseries"     -> "nova série"
-       "oldseries"     -> "série antiga"
+       "techreport"  -> "relatório técnico"
+       "resreport"   -> "relatório de pesquisa"
+       "software"    -> "software"
+       "datacd"      -> "CD-ROM"
+       "patent"      -> "patente"
+       "patentde"    -> "patente alemã"
+       "patenteu"    -> "patente européia"
+       "patentfr"    -> "patente francesa"
+       "patentuk"    -> "patente britânica"
+       "patentus"    -> "patente americana"
+       "patreq"      -> "pedido de patente"
+       "patreqde"    -> "pedido de patente alemã"
+       "patreqeu"    -> "pedido de patente européia"
+       "patreqfr"    -> "pedido de patente francesa"
+       "patrequk"    -> "pedido de patente britânica"
+       "patrequs"    -> "pedido de patente americana"
+       "countryde"   -> "Alemanha"
+       "countryeu"   -> "União Europeia"
+       "countryep"   -> "União Europeia"
+       "countryfr"   -> "França"
+       "countryuk"   -> "Reino Unido"
+       "countryus"   -> "Estados Unidos da América"
+       "newseries"   -> "nova série"
+       "oldseries"   -> "série antiga"
        -- "inpreparation" -> "" -- missing
-       "forthcoming"   -> "a publicar" -- csl
-       "inpress"       -> "na imprensa"
+       "forthcoming" -> "a publicar" -- csl
+       "inpress"     -> "na imprensa"
        -- "prepublished"  -> "" -- missing
-       "mathesis"      -> "tese de mestrado"
-       "phdthesis"     -> "tese de doutoramento"
-       "audiocd"       -> "CD áudio"
-       _               -> k
+       "mathesis"    -> "tese de mestrado"
+       "phdthesis"   -> "tese de doutoramento"
+       "audiocd"     -> "CD áudio"
+       _             -> k
 resolveKey' (Lang "pt" "BR") k =
     case map toLower k of
        -- "candthesis" -> "" -- missing
@@ -812,38 +813,38 @@ resolveKey' (Lang "sv" "SE") k =
     case map toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
-       "forthcoming"   -> "kommande" -- csl
-       "inpress"       -> "i tryck"  -- csl
+       "forthcoming" -> "kommande" -- csl
+       "inpress"     -> "i tryck"  -- csl
        -- "prepublished"  -> "" -- missing
-       "mathesis"      -> "examensarbete"
-       "phdthesis"     -> "doktorsavhandling"
-       "candthesis"    -> "kandidatavhandling"
-       "techreport"    -> "teknisk rapport"
-       "resreport"     -> "forskningsrapport"
-       "software"      -> "datorprogram"
-       "datacd"        -> "data-cd"
-       "audiocd"       -> "ljud-cd"
-       "patent"        -> "patent"
-       "patentde"      -> "tyskt patent"
-       "patenteu"      -> "europeiskt patent"
-       "patentfr"      -> "franskt patent"
-       "patentuk"      -> "brittiskt patent"
-       "patentus"      -> "amerikanskt patent"
-       "patreq"        -> "patentansökan"
-       "patreqde"      -> "ansökan om tyskt patent"
-       "patreqeu"      -> "ansökan om europeiskt patent"
-       "patreqfr"      -> "ansökan om franskt patent"
-       "patrequk"      -> "ansökan om brittiskt patent"
-       "patrequs"      -> "ansökan om amerikanskt patent"
-       "countryde"     -> "Tyskland"
-       "countryeu"     -> "Europeiska unionen"
-       "countryep"     -> "Europeiska unionen"
-       "countryfr"     -> "Frankrike"
-       "countryuk"     -> "Storbritannien"
-       "countryus"     -> "USA"
-       "newseries"     -> "ny följd"
-       "oldseries"     -> "gammal följd"
-       _               -> k
+       "mathesis"    -> "examensarbete"
+       "phdthesis"   -> "doktorsavhandling"
+       "candthesis"  -> "kandidatavhandling"
+       "techreport"  -> "teknisk rapport"
+       "resreport"   -> "forskningsrapport"
+       "software"    -> "datorprogram"
+       "datacd"      -> "data-cd"
+       "audiocd"     -> "ljud-cd"
+       "patent"      -> "patent"
+       "patentde"    -> "tyskt patent"
+       "patenteu"    -> "europeiskt patent"
+       "patentfr"    -> "franskt patent"
+       "patentuk"    -> "brittiskt patent"
+       "patentus"    -> "amerikanskt patent"
+       "patreq"      -> "patentansökan"
+       "patreqde"    -> "ansökan om tyskt patent"
+       "patreqeu"    -> "ansökan om europeiskt patent"
+       "patreqfr"    -> "ansökan om franskt patent"
+       "patrequk"    -> "ansökan om brittiskt patent"
+       "patrequs"    -> "ansökan om amerikanskt patent"
+       "countryde"   -> "Tyskland"
+       "countryeu"   -> "Europeiska unionen"
+       "countryep"   -> "Europeiska unionen"
+       "countryfr"   -> "Frankrike"
+       "countryuk"   -> "Storbritannien"
+       "countryus"   -> "USA"
+       "newseries"   -> "ny följd"
+       "oldseries"   -> "gammal följd"
+       _             -> k
 resolveKey' _ k = resolveKey' (Lang "en" "US") k
 
 parseMonth :: String -> String
@@ -864,8 +865,8 @@ parseMonth s =
          _     -> s
 
 data BibState = BibState{
-           untitlecase     :: Bool
-         , localeLanguage  :: Lang
+           untitlecase    :: Bool
+         , localeLanguage :: Lang
          }
 
 type Bib = RWST Item () BibState Maybe
@@ -954,13 +955,13 @@ parseDate s = do
   let year'' = case safeRead year' of
                     -- EDTF 0 == CSL JSON -1 (1 BCE)
                     Just (n :: Integer) | n <= 0 -> show (n - 1)
-                    _ -> year'
+                    _                   -> year'
   let (season'', month'') = case month' of
                                  "21" -> ("1","")
                                  "22" -> ("2","")
                                  "23" -> ("3","")
                                  "24" -> ("4","")
-                                 _ -> ("", month')
+                                 _    -> ("", month')
   return RefDate { year   = Literal $ dropWhile (=='0') year''
                  , month  = Literal $ dropWhile (=='0') month''
                  , season = Literal season''
@@ -1104,8 +1105,8 @@ toAuthor opts ils = do
   let (von, lastname) =
          if bibtex
             then case span isCapitalized $ reverse vonlast of
-                        ([],(w:ws))    -> (reverse ws, [w])
-                        (vs, ws)       -> (reverse ws, reverse vs)
+                        ([],(w:ws)) -> (reverse ws, [w])
+                        (vs, ws)    -> (reverse ws, reverse vs)
             else case span (not . isCapitalized) vonlast of
                         (vs@(_:_), []) -> (init vs, [last vs])
                         (vs, ws)       -> (vs, ws)
@@ -1144,7 +1145,7 @@ latex' s = Walk.walk removeSoftBreak bs
 
 removeSoftBreak :: Inline -> Inline
 removeSoftBreak SoftBreak = Space
-removeSoftBreak x = x
+removeSoftBreak x         = x
 
 latex :: String -> Bib Formatted
 latex s = blocksToFormatted $ latex' $ trim s
@@ -1162,67 +1163,67 @@ bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = fmap fst $ evalRWST m entry (BibState True (Lang "en" "US"))
 
 toLocale :: String -> String
-toLocale "english"    = "en-US" -- "en-EN" unavailable in CSL
-toLocale "usenglish"  = "en-US"
-toLocale "american"   = "en-US"
-toLocale "british"    = "en-GB"
-toLocale "ukenglish"  = "en-GB"
-toLocale "canadian"   = "en-US" -- "en-CA" unavailable in CSL
-toLocale "australian" = "en-GB" -- "en-AU" unavailable in CSL
-toLocale "newzealand" = "en-GB" -- "en-NZ" unavailable in CSL
-toLocale "afrikaans"  = "af-ZA"
-toLocale "arabic"     = "ar"
-toLocale "basque"     = "eu"
-toLocale "bulgarian"  = "bg-BG"
-toLocale "catalan"    = "ca-AD"
-toLocale "croatian"   = "hr-HR"
-toLocale "czech"      = "cs-CZ"
-toLocale "danish"     = "da-DK"
-toLocale "dutch"      = "nl-NL"
-toLocale "estonian"   = "et-EE"
-toLocale "finnish"    = "fi-FI"
-toLocale "canadien"   = "fr-CA"
-toLocale "acadian"    = "fr-CA"
-toLocale "french"     = "fr-FR"
-toLocale "francais"   = "fr-FR"
-toLocale "austrian"   = "de-AT"
-toLocale "naustrian"  = "de-AT"
-toLocale "german"     = "de-DE"
-toLocale "germanb"    = "de-DE"
-toLocale "ngerman"    = "de-DE"
-toLocale "greek"      = "el-GR"
+toLocale "english"         = "en-US" -- "en-EN" unavailable in CSL
+toLocale "usenglish"       = "en-US"
+toLocale "american"        = "en-US"
+toLocale "british"         = "en-GB"
+toLocale "ukenglish"       = "en-GB"
+toLocale "canadian"        = "en-US" -- "en-CA" unavailable in CSL
+toLocale "australian"      = "en-GB" -- "en-AU" unavailable in CSL
+toLocale "newzealand"      = "en-GB" -- "en-NZ" unavailable in CSL
+toLocale "afrikaans"       = "af-ZA"
+toLocale "arabic"          = "ar"
+toLocale "basque"          = "eu"
+toLocale "bulgarian"       = "bg-BG"
+toLocale "catalan"         = "ca-AD"
+toLocale "croatian"        = "hr-HR"
+toLocale "czech"           = "cs-CZ"
+toLocale "danish"          = "da-DK"
+toLocale "dutch"           = "nl-NL"
+toLocale "estonian"        = "et-EE"
+toLocale "finnish"         = "fi-FI"
+toLocale "canadien"        = "fr-CA"
+toLocale "acadian"         = "fr-CA"
+toLocale "french"          = "fr-FR"
+toLocale "francais"        = "fr-FR"
+toLocale "austrian"        = "de-AT"
+toLocale "naustrian"       = "de-AT"
+toLocale "german"          = "de-DE"
+toLocale "germanb"         = "de-DE"
+toLocale "ngerman"         = "de-DE"
+toLocale "greek"           = "el-GR"
 toLocale "polutonikogreek" = "el-GR"
-toLocale "hebrew"     = "he-IL"
-toLocale "hungarian"  = "hu-HU"
-toLocale "icelandic"  = "is-IS"
-toLocale "italian"    = "it-IT"
-toLocale "japanese"   = "ja-JP"
-toLocale "latvian"    = "lv-LV"
-toLocale "lithuanian" = "lt-LT"
-toLocale "magyar"     = "hu-HU"
-toLocale "mongolian"  = "mn-MN"
-toLocale "norsk"      = "nb-NO"
-toLocale "nynorsk"    = "nn-NO"
-toLocale "farsi"      = "fa-IR"
-toLocale "polish"     = "pl-PL"
-toLocale "brazil"     = "pt-BR"
-toLocale "brazilian"  = "pt-BR"
-toLocale "portugues"  = "pt-PT"
-toLocale "portuguese" = "pt-PT"
-toLocale "romanian"   = "ro-RO"
-toLocale "russian"    = "ru-RU"
-toLocale "serbian"    = "sr-RS"
-toLocale "serbianc"   = "sr-RS"
-toLocale "slovak"     = "sk-SK"
-toLocale "slovene"    = "sl-SL"
-toLocale "spanish"    = "es-ES"
-toLocale "swedish"    = "sv-SE"
-toLocale "thai"       = "th-TH"
-toLocale "turkish"    = "tr-TR"
-toLocale "ukrainian"  = "uk-UA"
-toLocale "vietnamese" = "vi-VN"
-toLocale "latin"      = "la"
-toLocale x            = x
+toLocale "hebrew"          = "he-IL"
+toLocale "hungarian"       = "hu-HU"
+toLocale "icelandic"       = "is-IS"
+toLocale "italian"         = "it-IT"
+toLocale "japanese"        = "ja-JP"
+toLocale "latvian"         = "lv-LV"
+toLocale "lithuanian"      = "lt-LT"
+toLocale "magyar"          = "hu-HU"
+toLocale "mongolian"       = "mn-MN"
+toLocale "norsk"           = "nb-NO"
+toLocale "nynorsk"         = "nn-NO"
+toLocale "farsi"           = "fa-IR"
+toLocale "polish"          = "pl-PL"
+toLocale "brazil"          = "pt-BR"
+toLocale "brazilian"       = "pt-BR"
+toLocale "portugues"       = "pt-PT"
+toLocale "portuguese"      = "pt-PT"
+toLocale "romanian"        = "ro-RO"
+toLocale "russian"         = "ru-RU"
+toLocale "serbian"         = "sr-RS"
+toLocale "serbianc"        = "sr-RS"
+toLocale "slovak"          = "sk-SK"
+toLocale "slovene"         = "sl-SL"
+toLocale "spanish"         = "es-ES"
+toLocale "swedish"         = "sv-SE"
+toLocale "thai"            = "th-TH"
+toLocale "turkish"         = "tr-TR"
+toLocale "ukrainian"       = "uk-UA"
+toLocale "vietnamese"      = "vi-VN"
+toLocale "latin"           = "la"
+toLocale x                 = x
 
 concatWith :: Char -> [Formatted] -> Formatted
 concatWith sep = Formatted . foldl' go mempty . map unFormatted
@@ -1365,8 +1366,8 @@ itemToReference lang locale bibtex caseTransform = bib $ do
   editor'' <- getAuthorList' "editor" <|> return []
   director'' <- getAuthorList' "director" <|> return []
   let (editor', director') = case editortype of
-                                  "director"  -> ([], editor'')
-                                  _           -> (editor'', director'')
+                                  "director" -> ([], editor'')
+                                  _          -> (editor'', director'')
   -- FIXME: add same for editora, editorb, editorc
 
   -- titles
@@ -1542,8 +1543,8 @@ itemToReference lang locale bibtex caseTransform = bib $ do
 
   let takeDigits (Str xs : _) =
          case takeWhile isDigit xs of
-              []               -> []
-              ds               -> [Str ds]
+              [] -> []
+              ds -> [Str ds]
       takeDigits x             = x
 
   return $ emptyReference

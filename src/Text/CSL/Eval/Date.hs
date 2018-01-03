@@ -15,19 +15,19 @@
 
 module Text.CSL.Eval.Date where
 
-import Control.Monad.State
-import qualified Control.Exception as E
+import qualified Control.Exception      as E
+import           Control.Monad.State
 
-import Data.List
-import Data.List.Split
+import           Data.List
+import           Data.List.Split
 
-import Text.CSL.Exception
-import Text.CSL.Eval.Common
-import Text.CSL.Eval.Output
-import Text.CSL.Style
-import Text.CSL.Reference
-import Text.CSL.Util ( readNum, toRead, last')
-import Text.Pandoc.Definition ( Inline (Str) )
+import           Text.CSL.Eval.Common
+import           Text.CSL.Eval.Output
+import           Text.CSL.Exception
+import           Text.CSL.Reference
+import           Text.CSL.Style
+import           Text.CSL.Util          (last', readNum, toRead)
+import           Text.Pandoc.Definition (Inline (Str))
 
 evalDate :: Element -> State EvalState [Output]
 evalDate (Date s f fm dl dp dp') = do
@@ -81,8 +81,8 @@ formatDate em k tm dp date
     | (a:b:_) <- date = addODate . concat $ doRange a b
     | otherwise       = []
     where
-      addODate []   = []
-      addODate xs   = [ODate xs]
+      addODate [] = []
+      addODate xs = [ODate xs]
       splitDate a b = case split (onSublist $ diff a b dp) dp of
                         [x,y,z] -> (x,y,z)
                         _       -> E.throw ErrorSplittingDate

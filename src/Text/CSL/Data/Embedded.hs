@@ -2,8 +2,8 @@
 
 module Text.CSL.Data.Embedded (localeFiles, defaultCSL, manpage, license)
 where
-import Data.FileEmbed
 import qualified Data.ByteString.Char8 as S
+import           Data.FileEmbed
 
 localeFiles :: [(FilePath, S.ByteString)]
 localeFiles = $(embedDir "locales")

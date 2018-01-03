@@ -1,4 +1,5 @@
-{-# LANGUAGE OverloadedStrings, TupleSections #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections     #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Parser
@@ -15,25 +16,25 @@
 module Text.CSL.Parser (readCSLFile, parseCSL, parseCSL',
                         parseLocale, localizeCSL)
 where
-import qualified Data.Text as T
-import qualified Data.ByteString.Lazy as L
-import qualified Data.Map as M
-import qualified Control.Exception as E
-import Control.Monad (when)
-import Data.Either (lefts, rights)
-import Data.Text (Text, unpack)
-import Text.CSL.Style hiding (parseNames)
-import Text.CSL.Util (toRead, findFile)
-import System.Directory (getAppUserDataDirectory)
-import qualified Text.XML as X
-import Data.Default
-import Text.Pandoc.Shared (safeRead)
-import Text.XML.Cursor
-import Data.Maybe (listToMaybe, fromMaybe)
-import Text.Pandoc.UTF8 (fromStringLazy)
-import Text.CSL.Compat.Pandoc (fetchItem)
-import Text.CSL.Data (getLocale)
-import Text.CSL.Exception
+import qualified Control.Exception      as E
+import           Control.Monad          (when)
+import qualified Data.ByteString.Lazy   as L
+import           Data.Default
+import           Data.Either            (lefts, rights)
+import qualified Data.Map               as M
+import           Data.Maybe             (fromMaybe, listToMaybe)
+import           Data.Text              (Text, unpack)
+import qualified Data.Text              as T
+import           System.Directory       (getAppUserDataDirectory)
+import           Text.CSL.Compat.Pandoc (fetchItem)
+import           Text.CSL.Data          (getLocale)
+import           Text.CSL.Exception
+import           Text.CSL.Style         hiding (parseNames)
+import           Text.CSL.Util          (findFile, toRead)
+import           Text.Pandoc.Shared     (safeRead)
+import           Text.Pandoc.UTF8       (fromStringLazy)
+import qualified Text.XML               as X
+import           Text.XML.Cursor
 
 -- | Parse a 'String' into a 'Style' (with default locale).
 parseCSL :: String -> Style
@@ -72,8 +73,8 @@ readCSLFile mbLocale src = do
        y   -> do
            -- note, we insert locale from the dependent style:
            let mbLocale' = case stringAttr "default-locale" cur of
-                                  ""   -> mbLocale
-                                  x    -> Just x
+                                  "" -> mbLocale
+                                  x  -> Just x
            readCSLFile mbLocale' y
 
 parseCSL' :: L.ByteString -> Style
@@ -130,8 +131,8 @@ string = unpack . T.concat . content
 attrWithDefault :: Read a => Text -> a -> Cursor -> a
 attrWithDefault t d cur =
   case safeRead (toRead $ stringAttr t cur) of
-       Just x   -> x
-       Nothing  -> d
+       Just x  -> x
+       Nothing -> d
 
 stringAttr :: Text -> Cursor -> String
 stringAttr t cur =
@@ -178,16 +179,16 @@ parseElement cur =
   case node cur of
        X.NodeElement e ->
          case X.nameLocalName $ X.elementName e of
-              "term" -> parseTerm cur
-              "text" -> parseText cur
-              "choose" -> parseChoose cur
-              "group" -> parseGroup cur
-              "label" -> parseLabel cur
-              "number" -> parseNumber cur
+              "term"       -> parseTerm cur
+              "text"       -> parseText cur
+              "choose"     -> parseChoose cur
+              "group"      -> parseGroup cur
+              "label"      -> parseLabel cur
+              "number"     -> parseNumber cur
               "substitute" -> parseSubstitute cur
-              "names" -> parseNames cur
-              "date" -> parseDate cur
-              _ -> []
+              "names"      -> parseNames cur
+              "date"       -> parseDate cur
+              _            -> []
        _ -> []
 
 getFormatting :: Cursor -> Formatting
@@ -228,13 +229,13 @@ parseDatePart defaultForm cur =
   DatePart { dpName       = stringAttr "name" cur
            , dpForm       = case stringAttr "form" cur of
                                   ""  -> case defaultForm of
-                                              TextDate -> "long"
+                                              TextDate    -> "long"
                                               NumericDate -> "numeric"
-                                              _ -> "long"
+                                              _           -> "long"
                                   x    -> x
            , dpRangeDelim = case stringAttr "range-delimiter" cur of
-                                  ""  -> "-"
-                                  x   -> x
+                                  "" -> "-"
+                                  x  -> x
            , dpFormatting = getFormatting cur
            }
 
@@ -390,8 +391,8 @@ parseKey cur =
                        (stringAttr "names-use-last" cur)]
        x  -> [SortVariable x sorting]
   where sorting = case stringAttr "sort" cur of
-                       "descending"  -> Descending ""
-                       _             -> Ascending ""
+                       "descending" -> Descending ""
+                       _            -> Ascending ""
 
 parseBiblio :: Cursor -> Bibliography
 parseBiblio cur =

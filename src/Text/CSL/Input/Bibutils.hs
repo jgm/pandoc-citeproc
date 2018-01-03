@@ -1,4 +1,6 @@
-{-# LANGUAGE CPP, ForeignFunctionInterface, PatternGuards #-}
+{-# LANGUAGE CPP                      #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE PatternGuards            #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Input.Bibutils
@@ -18,26 +20,26 @@ module Text.CSL.Input.Bibutils
     , convertRefs
     ) where
 
-import qualified Text.Pandoc.UTF8 as UTF8
-import Text.Pandoc hiding (readMarkdown)
-import Text.CSL.Compat.Pandoc (readMarkdown)
-import Data.Char
-import System.FilePath ( takeExtension )
-import Text.CSL.Exception
-import Text.CSL.Reference hiding ( Value )
-import Text.CSL.Input.Bibtex
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.Map as M
-import Data.Aeson
-import qualified Control.Exception as E
+import qualified Control.Exception      as E
+import           Data.Aeson
+import qualified Data.ByteString.Lazy   as BL
+import           Data.Char
+import qualified Data.Map               as M
+import           System.FilePath        (takeExtension)
+import           Text.CSL.Compat.Pandoc (readMarkdown)
+import           Text.CSL.Exception
+import           Text.CSL.Input.Bibtex
+import           Text.CSL.Reference     hiding (Value)
+import           Text.Pandoc            hiding (readMarkdown)
+import qualified Text.Pandoc.UTF8       as UTF8
 
 #ifdef USE_BIBUTILS
-import Control.Exception ( bracket, catch )
-import Control.Monad.Trans ( liftIO )
-import System.FilePath ( (</>), (<.>) )
-import System.IO.Error ( isAlreadyExistsError )
-import System.Directory
-import Text.Bibutils
+import           Control.Exception      (bracket, catch)
+import           Control.Monad.Trans    (liftIO)
+import           System.Directory
+import           System.FilePath        ((<.>), (</>))
+import           System.IO.Error        (isAlreadyExistsError)
+import           Text.Bibutils
 #endif
 
 -- | Read a file with a bibliographic database. The database format
@@ -167,14 +169,14 @@ convertRefs (Just v) =
          -- references:
          -- ...
          case fromJSON (metaValueToJSON v) of
-               Success ""   -> Right []
-               _            -> Left s
+               Success "" -> Right []
+               _          -> Left s
        Success x            -> Right x
 
 metaValueToJSON :: MetaValue -> Value
-metaValueToJSON (MetaMap m) = toJSON $ M.map metaValueToJSON m
-metaValueToJSON (MetaList xs) = toJSON $ map metaValueToJSON xs
-metaValueToJSON (MetaString t) = toJSON t
-metaValueToJSON (MetaBool b) = toJSON b
+metaValueToJSON (MetaMap m)       = toJSON $ M.map metaValueToJSON m
+metaValueToJSON (MetaList xs)     = toJSON $ map metaValueToJSON xs
+metaValueToJSON (MetaString t)    = toJSON t
+metaValueToJSON (MetaBool b)      = toJSON b
 metaValueToJSON (MetaInlines ils) = toJSON ils
-metaValueToJSON (MetaBlocks bs) = toJSON bs
+metaValueToJSON (MetaBlocks bs)   = toJSON bs

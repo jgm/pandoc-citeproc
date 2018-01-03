@@ -1,4 +1,7 @@
-{-# LANGUAGE ScopedTypeVariables, PatternGuards, FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PatternGuards         #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
 module Text.CSL.Util
   ( safeRead
   , readNum
@@ -45,29 +48,30 @@ module Text.CSL.Util
   , parseRomanNumeral
   , isRange
   ) where
-import Data.Aeson
-import Data.Aeson.Types (Parser)
-import Data.Text (Text)
-import qualified Data.Text as T
-import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation, isAscii)
+import           Control.Monad.State
+import           Data.Aeson
+import           Data.Aeson.Types    (Parser)
+import           Data.Char           (isAscii, isLower, isPunctuation, isUpper,
+                                      toLower, toUpper)
+import           Data.Generics       (Data, Typeable, everything, everywhere,
+                                      everywhere', everywhereM, mkM, mkQ, mkT)
+import           Data.List.Split     (wordsBy)
+import qualified Data.Set            as Set
+import           Data.Text           (Text)
+import qualified Data.Text           as T
 import qualified Data.Traversable
-import Text.Pandoc.Shared (safeRead, stringify)
-import Text.Pandoc.Walk (walk)
-import Text.Pandoc
-import Data.List.Split (wordsBy)
-import Control.Monad.State
-import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
-                       everywhere', everything, mkT, mkQ )
-import qualified Data.Set as Set
-import System.FilePath
-import System.Directory (doesFileExist)
-import qualified Data.Yaml.Builder as Y
-import Data.Yaml.Builder (ToYaml(..), YamlBuilder)
-import qualified Text.Parsec as P
+import           Data.Yaml.Builder   (ToYaml (..), YamlBuilder)
+import qualified Data.Yaml.Builder   as Y
+import           System.Directory    (doesFileExist)
+import           System.FilePath
+import           Text.Pandoc
+import           Text.Pandoc.Shared  (safeRead, stringify)
+import           Text.Pandoc.Walk    (walk)
+import qualified Text.Parsec         as P
 
 #ifdef TRACE
 import qualified Debug.Trace
-import Text.Show.Pretty (ppShow)
+import           Text.Show.Pretty    (ppShow)
 #endif
 
 #ifdef TRACE
@@ -93,7 +97,7 @@ sa <^> (s:xs)
 sa <^> sb         = sa ++ sb
 
 capitalize :: String -> String
-capitalize [] = []
+capitalize []     = []
 capitalize (c:cs) = toUpper c : cs
 
 isPunct :: Char -> Bool
@@ -189,7 +193,7 @@ splitUpStr :: [Inline] -> [Inline]
 splitUpStr ils =
   case reverse (combineInternalPeriods
          (splitStrWhen (\c -> isPunctuation c || c == '\160') ils)) of
-         [] -> []
+         []     -> []
          (x:xs) -> reverse $ Span ("",["lastword"],[]) [x] : xs
 
 -- We want to make sure that the periods in www.example.com, for
@@ -316,7 +320,7 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
                b <- get
                case b of
                     WordBoundary -> put LastWordBoundary
-                    _ -> return ()
+                    _            -> return ()
                go acc x
         go acc (Span ("",classes,[]) xs)
           | null classes || classes == ["nocase"] = do
@@ -411,7 +415,7 @@ tailFirstInlineStr = mapHeadInline (drop 1)
 
 toCapital :: [Inline] -> [Inline]
 toCapital ils@(Span (_,["nocase"],_) _:_) = ils
-toCapital ils = mapHeadInline capitalize ils
+toCapital ils                             = mapHeadInline capitalize ils
 
 mapHeadInline :: (String -> String) -> [Inline] -> [Inline]
 mapHeadInline _ [] = []

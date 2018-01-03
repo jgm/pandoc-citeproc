@@ -21,16 +21,16 @@
 
 module Text.CSL.Proc.Disamb where
 
-import Control.Arrow ( (&&&), (>>>), second )
-import Data.List ( elemIndex, find, findIndex, sortBy, mapAccumL
-                 , nub, nubBy, groupBy, isPrefixOf )
-import Data.Maybe
-import Data.Ord ( comparing )
+import           Control.Arrow      (second, (&&&), (>>>))
+import           Data.List          (elemIndex, find, findIndex, groupBy,
+                                     isPrefixOf, mapAccumL, nub, nubBy, sortBy)
+import           Data.Maybe
+import           Data.Ord           (comparing)
 
-import Text.CSL.Eval
-import Text.CSL.Reference
-import Text.CSL.Style
-import Text.CSL.Util (query, proc)
+import           Text.CSL.Eval
+import           Text.CSL.Reference
+import           Text.CSL.Style
+import           Text.CSL.Util      (proc, query)
 
 -- | Given the 'Style', the list of references and the citation
 -- groups, disambiguate citations according to the style options.
@@ -58,12 +58,12 @@ disambCitations s bibs cs groups
       hasYSuffOpt = "disambiguate-add-year-suffix" `elem` disOpts
       giveNameDisamb = case getOptionVal "givenname-disambiguation-rule"
                              (citOptions (citation s)) of
-                        "by-cite" -> ByCite
-                        "all-names" -> AllNames
-                        "all-names-with-initials" -> AllNames
-                        "primary-name" -> PrimaryName
+                        "by-cite"                    -> ByCite
+                        "all-names"                  -> AllNames
+                        "all-names-with-initials"    -> AllNames
+                        "primary-name"               -> PrimaryName
                         "primary-name-with-initials" -> PrimaryName
-                        _ -> ByCite -- default as of CSL 1.0
+                        _                            -> ByCite -- default as of CSL 1.0
       clean     = if hasGNameOpt then id else proc rmHashAndGivenNames
       withNames = flip map duplics $ same . clean .
                   map (if hasNamesOpt then disambData else return . disambYS)
@@ -234,8 +234,8 @@ getCiteData out
                               -- allow title to disambiguate
                         xs -> xs
       years o = case query getYears o of
-                     []    -> [([],[])]
-                     r     -> r
+                     [] -> [([],[])]
+                     r  -> r
       zipData = uncurry . zipWith $ \c y -> if key c /= []
                                             then c {citYear = snd y}
                                             else c {key     = fst y
@@ -408,11 +408,11 @@ hasYearSuf = not . null . query getYearSuf
 -- | Removes all given names and name hashes from OName elements.
 rmHashAndGivenNames :: Output -> Output
 rmHashAndGivenNames (OName _ s _ f) = OName emptyAgent s [] f
-rmHashAndGivenNames o = o
+rmHashAndGivenNames o               = o
 
 rmGivenNames :: Output -> Output
 rmGivenNames (OName a s _ f) = OName a s [] f
-rmGivenNames o = o
+rmGivenNames o               = o
 
 -- | Add, with 'proc', a give name to the family name. Needed for
 -- disambiguation.

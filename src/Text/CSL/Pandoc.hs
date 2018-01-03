@@ -1,41 +1,46 @@
-{-# LANGUAGE PatternGuards, OverloadedStrings, FlexibleInstances,
-    ScopedTypeVariables, CPP #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PatternGuards       #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Text.CSL.Pandoc (processCites, processCites')
 where
 
-import Text.Pandoc
-import Text.Pandoc.Walk
-import Text.Pandoc.Builder (setMeta, deleteMeta)
-import Text.Pandoc.Shared (stringify)
-import Text.HTML.TagSoup.Entity (lookupEntity)
-import qualified Data.ByteString.Lazy as L
-import System.SetEnv (setEnv)
-import System.Environment (getEnv)
-import Control.Applicative ((<|>))
-import Data.Aeson
-import Data.Char ( isDigit, isPunctuation, toLower, isSpace )
-import qualified Data.Map as M
-import Text.CSL.Reference hiding (processCites, Value)
-import Text.CSL.Input.Bibutils (readBiblioFile, convertRefs)
-import Text.CSL.Style hiding (Cite(..), Citation(..))
-import Text.CSL.Proc
-import Text.CSL.Output.Pandoc (renderPandoc, renderPandoc')
-import qualified Text.CSL.Style as CSL
-import Text.CSL.Parser
-import Text.CSL.Output.Pandoc ( headInline, tailInline, initInline,
-                                toCapital )
-import Text.CSL.Data (getDefaultCSL)
-import Text.Parsec hiding (State, (<|>))
-import Control.Monad
-import qualified Control.Exception as E
-import Control.Monad.State
-import System.FilePath
-import System.Directory (getAppUserDataDirectory)
-import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim,
-                      lastInline)
-import Text.CSL.Exception
-import System.IO.Error (isDoesNotExistError)
-import Data.Maybe (fromMaybe)
+import           Control.Applicative      ((<|>))
+import qualified Control.Exception        as E
+import           Control.Monad
+import           Control.Monad.State
+import           Data.Aeson
+import qualified Data.ByteString.Lazy     as L
+import           Data.Char                (isDigit, isPunctuation, isSpace,
+                                           toLower)
+import qualified Data.Map                 as M
+import           Data.Maybe               (fromMaybe)
+import           System.Directory         (getAppUserDataDirectory)
+import           System.Environment       (getEnv)
+import           System.FilePath
+import           System.IO.Error          (isDoesNotExistError)
+import           System.SetEnv            (setEnv)
+import           Text.CSL.Data            (getDefaultCSL)
+import           Text.CSL.Exception
+import           Text.CSL.Input.Bibutils  (convertRefs, readBiblioFile)
+import           Text.CSL.Output.Pandoc   (renderPandoc, renderPandoc')
+import           Text.CSL.Output.Pandoc   (headInline, initInline, tailInline,
+                                           toCapital)
+import           Text.CSL.Parser
+import           Text.CSL.Proc
+import           Text.CSL.Reference       hiding (Value, processCites)
+import           Text.CSL.Style           hiding (Citation (..), Cite (..))
+import qualified Text.CSL.Style           as CSL
+import           Text.CSL.Util            (findFile, lastInline,
+                                           parseRomanNumeral, splitStrWhen, tr',
+                                           trim)
+import           Text.HTML.TagSoup.Entity (lookupEntity)
+import           Text.Pandoc
+import           Text.Pandoc.Builder      (deleteMeta, setMeta)
+import           Text.Pandoc.Shared       (stringify)
+import           Text.Pandoc.Walk
+import           Text.Parsec              hiding (State, (<|>))
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -137,7 +142,7 @@ mkNociteWildcards refs nocites =
 
 removeNocaseSpans :: Inline -> [Inline]
 removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs
-removeNocaseSpans x = [x]
+removeNocaseSpans x                            = [x]
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  The style filename is derived from
@@ -248,9 +253,9 @@ processCite s cs (Cite t _) =
 processCite _ _ x = x
 
 isNote :: Inline -> Bool
-isNote (Note _) = True
+isNote (Note _)          = True
 isNote (Cite _ [Note _]) = True
-isNote _ = False
+isNote _                 = False
 
 mvPunctInsideQuote :: Inline -> Inline -> [Inline]
 mvPunctInsideQuote (Quoted qt ils) (Str s) | s `elem` [".", ","] =
@@ -258,9 +263,9 @@ mvPunctInsideQuote (Quoted qt ils) (Str s) | s `elem` [".", ","] =
 mvPunctInsideQuote il il' = [il, il']
 
 isSpacy :: Inline -> Bool
-isSpacy Space = True
+isSpacy Space     = True
 isSpacy SoftBreak = True
-isSpacy _ = False
+isSpacy _         = False
 
 mvPunct :: Bool -> Style -> [Inline] -> [Inline]
 mvPunct _ _ (x : Space : xs)
@@ -375,8 +380,8 @@ locatorWords :: LocatorMap -> [Inline] -> (String, String, [Inline])
 locatorWords locMap inp =
   case parse (pLocatorWords locMap) "suffix" $
          splitStrWhen (\c -> isLocatorPunct c || isSpace c) inp of
-       Right r   -> r
-       Left _    -> ("","",inp)
+       Right r -> r
+       Left _  -> ("","",inp)
 
 pLocatorWords :: LocatorMap -> Parsec [Inline] st (String, String, [Inline])
 pLocatorWords locMap = do
@@ -437,12 +442,12 @@ pDigit = do
   t <- anyToken
   case t of
       Str (d:_) | isDigit d -> return ()
-      _ -> mzero
+      _         -> mzero
 
 pLocatorPunct :: Parsec [Inline] st Inline
 pLocatorPunct = pMatch isLocatorPunct'
   where isLocatorPunct' (Str [c]) = isLocatorPunct c
-        isLocatorPunct' _ = False
+        isLocatorPunct' _         = False
 
 isLocatorPunct :: Char -> Bool
 isLocatorPunct ':' = False

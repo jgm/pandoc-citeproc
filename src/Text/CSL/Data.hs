@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 -----------------------------------------------------------------------------
 -- |
@@ -21,16 +21,17 @@ module Text.CSL.Data
     , langBase
     ) where
 
-import System.FilePath ()
-import Data.Typeable
-import qualified Data.ByteString.Lazy as L
-import qualified Control.Exception as E
+import qualified Control.Exception      as E
+import qualified Data.ByteString.Lazy   as L
+import           Data.Typeable
+import           System.FilePath        ()
 #ifdef EMBED_DATA_FILES
-import Data.Maybe (fromMaybe)
-import Text.CSL.Data.Embedded (localeFiles, defaultCSL, manpage, license)
+import           Data.Maybe             (fromMaybe)
+import           Text.CSL.Data.Embedded (defaultCSL, license, localeFiles,
+                                         manpage)
 #else
-import Paths_pandoc_citeproc (getDataFileName)
-import System.Directory  (doesFileExist)
+import           Paths_pandoc_citeproc  (getDataFileName)
+import           System.Directory       (doesFileExist)
 #endif
 
 data CSLLocaleException =
@@ -38,7 +39,7 @@ data CSLLocaleException =
   | CSLLocaleReadError E.IOException
   deriving Typeable
 instance Show CSLLocaleException where
-  show (CSLLocaleNotFound s) = "Could not find locale data for " ++ s
+  show (CSLLocaleNotFound s)  = "Could not find locale data for " ++ s
   show (CSLLocaleReadError e) = show e
 instance E.Exception CSLLocaleException
 
