@@ -239,8 +239,8 @@ instance OVERLAPS
   toJSON xs = object' $
     case filter (not . null) (map toDatePart xs) of
          []  -> ["literal" .= intercalate "; " (map (unLiteral . other) xs)]
-         dps -> ["date-parts" .= dps ] ++
-                 ["circa" .= (1 :: Int) | or (map circa xs)]
+         dps -> "date-parts" .= dps :
+                 ["circa" .= (1 :: Int) | any circa xs]
 
 setCirca :: Bool -> RefDate -> RefDate
 setCirca circa' rd = rd{ circa = circa' }

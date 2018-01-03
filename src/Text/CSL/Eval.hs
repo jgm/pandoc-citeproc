@@ -153,7 +153,7 @@ evalElement el
     where
       addSpaces strng = (if take 1 strng == " " then (OSpace:) else id) .
                         (if last' strng == " " then (++[OSpace]) else id)
-      substituteWith e = head <$> gets (names . env) >>= \(Names _ ns fm d _) -> 
+      substituteWith e = head <$> gets (names . env) >>= \(Names _ ns fm d _) ->
                            case e of
                              Names rs [Name NotSet fm'' [] [] []] fm' d' []
                                  -> let nfm = mergeFM fm'' $ mergeFM fm' fm in
@@ -179,8 +179,8 @@ evalElement el
                      nums <- mapM getStringVar numVars
                      let pluralizeTerm (Term s f fm _) = Term s f fm $
                             case numVars of
-                              ["number-of-volumes"] -> not $  elem "1" nums
-                              ["number-of-pages"]   -> not $  elem "1" nums
+                              ["number-of-volumes"] -> notElem "1" nums
+                              ["number-of-pages"]   -> notElem "1" nums
                               _ -> any isRange nums
                          pluralizeTerm x = x
                      if null res
@@ -275,7 +275,7 @@ evalIfThen (IfThen c' m' el') ei e = whenElse (evalCond m' c') (return el') rest
                                            then val
                                            else getAbbreviation as v val
                              return (isNumericString val')
-      chkDate         v = not . null . filter circa <$> getDateVar v
+      chkDate         v = not . not . any circa <$> getDateVar v
       chkPosition     s = if s == "near-note"
                           then gets (nearNote . cite . env)
                           else compPosition s <$> gets (citePosition . cite . env)
@@ -393,7 +393,7 @@ isTransNumber = all isDigit
 isSpecialChar = all (`elem` "&-,.\x2013")
 isNumber   cs = case [c | c <- cs
                         , not (isLetter c)
-                        , notElem c "&-.,\x2013"] of
+                        , c `notElem` "&-.,\x2013"] of
                      [] -> False
                      xs -> all isDigit xs
 
@@ -431,7 +431,7 @@ formatRange fm p = do
                  "minimal"     -> map (joinRange . minimalRange 1)
                  "minimal-two" -> map (joinRange . minimalRange 2)
                  _             -> map joinRange
-  return [flip OLoc fm [OStr (process pages) emptyFormatting]]
+  return [OLoc [OStr (process pages) emptyFormatting] fm]
 
 -- Abbreviated page ranges are expanded to their non-abbreviated form:
 -- 42–45, 321–328, 2787–2816

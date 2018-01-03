@@ -93,7 +93,7 @@ formatNames ea del p s as n
         let odel  = if del /= [] then del else getOptionVal "name-delimiter" o
             del'
               | d   /= [] = d
-              | odel == [] = ", "
+              | null odel = ", "
               | otherwise = odel
             (_,i) = isEtAl b o p as
             form  = case f of
@@ -304,7 +304,7 @@ formatName m b f fm ops np n
                       c <= '\x5FF' ||
                       (c >= '\x1e00' && c <= '\x1fff')
       shortName = oPan' (unFormatted $ nondropping <+> family) (form "family")
-      
+
       longName g
         | isSorting m = let firstPart = case getOptionVal "demote-non-dropping-particle" ops of
                                            "never" -> nondropping <+> family  <+> dropping
@@ -378,7 +378,7 @@ formatLabel f fm p s
                       v <- getStringVar s
                       format  s (isRange v)
       format      = form output id
-      form o g t b = o fm <$> g . period <$> getTerm (b && p) f t
+      form o g t b = o fm . g . period <$> getTerm (b && p) f t
       period      = if stripPeriods fm then filter (/= '.') else id
 
 (<+>) :: Formatted -> Formatted -> Formatted

@@ -133,7 +133,7 @@ citeproc ops s rs cs
 -- according to the 'Style' and assign the citation number to each
 -- 'Reference'.
 procRefs :: Style -> [Reference] -> [Reference]
-procRefs (Style {biblio = mb, csMacros = ms , styleLocale = l, styleAbbrevs = as, csOptions = opts}) rs
+procRefs Style {biblio = mb, csMacros = ms , styleLocale = l, styleAbbrevs = as, csOptions = opts} rs
     = maybe (setCNum rs) process mb
     where
       opts'   b = mergeOptions (bibOptions b) opts
@@ -158,8 +158,8 @@ sortItems l
 -- | With a 'Style' and a sorted list of 'Reference's produce the
 -- evaluated output for the bibliography.
 procBiblio :: BibOpts -> Style -> [Reference] -> [[Output]]
-procBiblio bos (Style {biblio = mb, csMacros = ms , styleLocale = l,
-                       styleAbbrevs = as, csOptions = opts}) rs
+procBiblio bos Style {biblio = mb, csMacros = ms , styleLocale = l,
+                       styleAbbrevs = as, csOptions = opts} rs
     = map addSpaceAfterCitNum $ maybe [] process mb
     where
       -- handle second-field-align (sort of)
@@ -198,7 +198,7 @@ subsequentAuthorSubstitute b = if null subAuthStr then id else chkCreator
 
       getPartialEach x xs = concat . take 1 . map fst .
                             sortBy (flip (comparing $ length . snd)) . filter ((<) 0 . length . snd) .
-                            zip xs . map (takeWhile id . map (uncurry (==)) . zip x) $ xs
+                            zip xs . map (takeWhile id .  zipWith (==) x) $ xs
 
       chkCreator = if subAuthRule == "partial-each" then chPartialEach [] else chkCr []
 
@@ -266,15 +266,15 @@ filterRefs bos refs
     | otherwise          = refs
     where
       quash  [] _ = True
-      quash   q r = not . and . flip map q $ \(f,v) ->       lookup_ r f v
-      select  s r =       and . flip map s $ \(f,v) ->       lookup_ r f v
-      include i r =       or  . flip map i $ \(f,v) ->       lookup_ r f v
-      exclude e r =       and . flip map e $ \(f,v) -> not $ lookup_ r f v
-      lookup_ r f v = case f of
-                        "type"       -> look "ref-type"
-                        "id"         -> look "ref-id"
-                        "categories" -> look "categories"
-                        x            -> look x
+      quash   q r = not $ all (lookup_ r) q
+      select  s r =       all (lookup_ r) s
+      include i r =       any (lookup_ r) i
+      exclude e r =       all (not . lookup_ r) e
+      lookup_ r (f, v) = case f of
+                          "type"       -> look "ref-type"
+                          "id"         -> look "ref-id"
+                          "categories" -> look "categories"
+                          x            -> look x
           where
             look s = case lookup s (mkRefMap (Just r)) of
                        Just x | Just v' <- (fromValue x :: Maybe RefType  ) -> v == uncamelize (show v')
@@ -288,8 +288,8 @@ filterRefs bos refs
 -- 'Reference's, generate a 'CitationGroup'. The citations are sorted
 -- according to the 'Style'.
 procGroup :: Style -> [(Cite, Maybe Reference)] -> CitationGroup
-procGroup (Style {citation = ct, csMacros = ms , styleLocale = l,
-                  styleAbbrevs = as, csOptions = opts}) cr
+procGroup Style {citation = ct, csMacros = ms , styleLocale = l,
+                  styleAbbrevs = as, csOptions = opts} cr
     = CG authIn (layFormat $ citLayout ct) (layDelim $ citLayout ct) (authIn ++ co)
     where
       (co, authIn) = case cr of

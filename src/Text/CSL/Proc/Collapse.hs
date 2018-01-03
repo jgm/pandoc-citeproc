@@ -56,7 +56,7 @@ collapseNumber (CG _ f d os) = mapCitationGroup process $ CG [] f d os
       citNums (OCitNum i _) = [i]
       citNums (Output xs _) = concatMap citNums xs
       citNums _             = []
-      numOf  = foldr (const) 0 . citNums
+      numOf  = foldr const 0 . citNums
       process xs = if hasLocator xs
                       then xs
                       else flip concatMap (groupConsecWith numOf xs)
@@ -183,7 +183,7 @@ collapseYearSufRanged = process
       getOYS o
           | OYearSuf s _ _ f <- o = [(if s /= [] then ord (head s) else 0, f)]
           | otherwise             = []
-      sufOf   = foldr (const) (0,emptyFormatting) . query getOYS
+      sufOf   = foldr const (0,emptyFormatting) . query getOYS
       newSuf  = map sufOf >>> (map fst >>> groupConsec) &&& map snd >>> uncurry zip
       process xs = flip concatMap (newSuf xs) $
                    \(x,f) -> if length x > 2
