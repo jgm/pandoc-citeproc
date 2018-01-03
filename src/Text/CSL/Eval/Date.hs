@@ -134,12 +134,12 @@ formatDate em k tm dp date
           | "year"  <- n, o /= mempty = output fm o
           | otherwise                 = []
 
-      withDelim _  [[]] [[]] = []
-      withDelim xs o1 o2 = o1 ++
-                           (case dpRangeDelim <$> last' xs of
-                             ["-"] -> [[OPan [Str "\x2013"]]]
-                             [s]   -> [[OPan [Str s]]]
-                             _     -> []) ++ o2
+      withDelim xs o1 o2
+        | null (concat o1 ++ concat o2) = []
+        | otherwise = o1 ++ (case dpRangeDelim <$> last' xs of
+                              ["-"] -> [[OPan [Str "\x2013"]]]
+                              [s]   -> [[OPan [Str s]]]
+                              _     -> []) ++ o2
 
       formatYear f y
           | "short" <- f = drop 2 y
