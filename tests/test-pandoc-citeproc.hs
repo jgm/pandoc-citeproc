@@ -1,22 +1,22 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP                 #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module Main where
-import System.Exit
-import System.Directory
-import System.FilePath
-import Data.Maybe (fromMaybe)
-import System.IO
-import System.IO.Temp (withSystemTempDirectory)
-import System.Process (rawSystem)
-import qualified Data.Aeson as Aeson
-import Text.Pandoc.Definition
-import qualified Text.Pandoc.UTF8 as UTF8
-import Text.CSL.Compat.Pandoc (writeNative, pipeProcess)
-import Data.List (isSuffixOf)
-import System.Environment
-import Control.Monad (when)
+import           Control.Monad          (when)
+import qualified Data.Aeson             as Aeson
+import           Data.List              (isSuffixOf)
+import           Data.Maybe             (fromMaybe)
+import           System.Directory
+import           System.Environment
+import           System.Exit
+import           System.FilePath
+import           System.IO
+import           System.IO.Temp         (withSystemTempDirectory)
+import           System.Process         (rawSystem)
+import           Text.CSL.Compat.Pandoc (pipeProcess, writeNative)
+import           Text.Pandoc.Definition
+import qualified Text.Pandoc.UTF8       as UTF8
 #if MIN_VERSION_pandoc(2,0,0)
-import qualified Control.Exception as E
+import qualified Control.Exception      as E
 #endif
 
 main :: IO ()
