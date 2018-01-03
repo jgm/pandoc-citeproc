@@ -32,7 +32,6 @@ import           Text.CSL.Style
 import           Text.CSL.Util          (proc, proc', query, tr', uncamelize)
 import           Text.Pandoc.Definition (Block (Para),
                                          Inline (Note, Space, Str))
-
 data ProcOpts
     = ProcOpts
       { bibOpts       :: BibOpts
@@ -127,6 +126,8 @@ citeproc ops s rs cs
          OCitNum n f{hyperlink = "#ref-" ++ citeid}
       addLink' citeid (OCitLabel l f) =
          OCitLabel l f{hyperlink = "#ref-" ++ citeid}
+      addLink' citeid (Output xs@(OStr _ _: _) f) =
+         Output xs f{hyperlink = "#ref-" ++ citeid}
       addLink' _ x = x
 
 -- | Given the CSL 'Style' and the list of 'Reference's sort the list
