@@ -1,15 +1,15 @@
 stack:
-	stack install --test --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:test_citeproc' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall -optP--cpp' --test-arguments='-j4 --hide-successes $(TESTARGS)'
+	stack install --test --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:test_citeproc' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall' --test-arguments='-j4 --hide-successes $(TESTARGS)'
 
 debug:
-	stack install --test --flag 'pandoc-citeproc:debug' --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall -optP--cpp' --test-arguments='-j4 --hide-successes $(TESTARGS)'
+	stack install --test --flag 'pandoc-citeproc:debug' --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall' --test-arguments='-j4 --hide-successes $(TESTARGS)'
 
 quick: deps
-	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization --ghc-options "-optP--cpp"
+	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --disable-optimization --ghc-options "-Wall"
 	cabal build
 
 full: deps man
-	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --ghc-options "-optP--cpp"
+	cabal configure --enable-tests -ftest_citeproc -fembed_data_files --ghc-options "-Wall"
 	cabal build
 
 man:
@@ -19,7 +19,7 @@ deps:
 	cabal install --only-dependencies --enable-tests -ftest_citeproc -fembed_data_files
 
 prof: deps
-	cabal configure --enable-library-profiling --enable-executable-profiling --enable-optimization --ghc-options "-optP--cpp"
+	cabal configure --enable-library-profiling --enable-executable-profiling --enable-optimization --ghc-options "-Wall"
 	cabal build
 
 install:
