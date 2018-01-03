@@ -26,7 +26,7 @@ import Text.CSL.Eval.Common
 import Text.CSL.Eval.Output
 import Text.CSL.Style
 import Text.CSL.Reference
-import Text.CSL.Util ( readNum, toRead, init', last' )
+import Text.CSL.Util ( readNum, toRead, last')
 import Text.Pandoc.Definition ( Inline (Str) )
 
 evalDate :: Element -> State EvalState [Output]
@@ -77,7 +77,7 @@ getDate f = do
 
 formatDate :: EvalMode -> String -> [CslTerm] -> [DatePart] -> [RefDate] -> [Output]
 formatDate em k tm dp date
-    | [d]     <- date = concatMap (formatDatePart False d) dp
+    | [d]     <- date = concatMap (formatDatePart d) dp
     | (a:b:_) <- date = addODate . concat $ doRange a b
     | otherwise       = []
     where
@@ -87,27 +87,35 @@ formatDate em k tm dp date
                         [x,y,z] -> (x,y,z)
                         _       -> E.throw ErrorSplittingDate
       doRange   a b = let (x,y,z) = splitDate a b in
-                      map (formatDatePart False  a) x ++
-                      map (formatDatePart False  a) (init' y) ++
-                      map (formatDatePart True   a) (last' y) ++
-                      map (formatDatePart False  b) (rmPrefix y) ++
-                      map (formatDatePart False  b) z
+                      map (formatDatePart a) x ++
+                      withDelim y
+                        (map (formatDatePart a) (rmSuffix y))
+                        (map (formatDatePart b) (rmPrefix y))
+                        ++
+                      map (formatDatePart b) z
       -- the point of rmPrefix is to remove the blank space that otherwise
       -- gets added after the delimiter in a range:  24- 26.
       rmPrefix (dp':rest) = dp'{ dpFormatting =
                                  (dpFormatting dp') { prefix = "" } } : rest
       rmPrefix []         = []
-      diff  a b = filter (flip elem (diffDate a b) . dpName)
-      diffDate (RefDate ya ma sa da _ _)
-               (RefDate yb mb sb db _ _) = case () of
-                                             _ | ya /= yb  -> ["year","month","day"]
-                                               | ma /= mb  ->
-                                                 if da == mempty && db == mempty
-                                                    then ["month"]
-                                                    else ["month","day"]
-                                               | da /= db  -> ["day"]
-                                               | sa /= sb  -> ["month"]
-                                               | otherwise -> ["year","month","day"]
+      rmSuffix (dp':rest)
+         | null rest      = [dp'{ dpFormatting =
+                                  (dpFormatting dp') { suffix = "" } }]
+         | otherwise      = dp':rmSuffix rest
+      rmSuffix []         = []
+
+      diff (RefDate ya ma sa da _ _)
+           (RefDate yb mb sb db _ _)
+           = filter (\x -> dpName x `elem` ns)
+              where ns =
+                      case () of
+                        _ | ya /= yb  -> ["year","month","day"]
+                          | ma /= mb || sa /= sb ->
+                            if da == mempty && db == mempty
+                               then ["month"]
+                               else ["month","day"]
+                          | da /= db  -> ["day"]
+                          | otherwise -> ["year","month","day"]
 
       term f t = let f' = if f `elem` ["verb", "short", "verb-short", "symbol"]
                           then read $ toRead f
@@ -116,26 +124,22 @@ formatDate em k tm dp date
 
       addZero n = if length n == 1 then '0' : n else n
       addZeros  = reverse . take 5 . flip (++) (repeat '0') . reverse
-      formatDatePart False (RefDate (Literal y) (Literal m)
-        (Literal e) (Literal d) _ _) (DatePart n f _ fm)
+      formatDatePart (RefDate (Literal y) (Literal m)
+        (Literal e) (Literal d) (Literal o) _) (DatePart n f _ fm)
           | "year"  <- n, y /= mempty = return $ OYear (formatYear  f    y) k fm
           | "month" <- n, m /= mempty = output fm      (formatMonth f fm m)
           | "day"   <- n, d /= mempty = output fm      (formatDay   f m  d)
           | "month" <- n, m == mempty
                         , e /= mempty = output fm $ term f ("season-0" ++ e)
-
-      formatDatePart True (RefDate (Literal y) (Literal m) (Literal e) (Literal d) _ _) (DatePart n f rd fm)
-          | "year"  <- n, y /= mempty = OYear (formatYear  f y) k (fm {suffix = []}) : formatDelim
-          | "month" <- n, m /= mempty = output (fm {suffix = []}) (formatMonth f fm m) ++ formatDelim
-          | "day"   <- n, d /= mempty = output (fm {suffix = []}) (formatDay   f m  d) ++ formatDelim
-          | "month" <- n, m == mempty
-                        , e /= mempty = output (fm {suffix = []}) (term f $ "season-0" ++ e) ++ formatDelim
-          where
-            formatDelim = if rd == "-" then [OPan [Str "\x2013"]] else [OPan [Str rd]]
-
-      formatDatePart _ (RefDate _ _ _ _ (Literal o) _) (DatePart n _ _ fm)
           | "year"  <- n, o /= mempty = output fm o
           | otherwise                 = []
+
+      withDelim _  [[]] [[]] = []
+      withDelim xs o1 o2 = o1 ++
+                           (case dpRangeDelim <$> last' xs of
+                             ["-"] -> [[OPan [Str "\x2013"]]]
+                             [s]   -> [[OPan [Str s]]]
+                             _     -> []) ++ o2
 
       formatYear f y
           | "short" <- f = drop 2 y
