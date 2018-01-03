@@ -20,6 +20,7 @@ import           Control.Monad.State
 
 import           Data.List
 import           Data.List.Split
+import           Data.Maybe (fromMaybe)
 
 import           Text.CSL.Eval.Common
 import           Text.CSL.Eval.Output
@@ -218,11 +219,8 @@ longOrdinal ts v s
 
 getOrdinal :: String -> String -> [CslTerm] -> CslTerm
 getOrdinal v s ts
-    = case findTerm' s Long gender ts of
-        Just  x -> x
-        Nothing -> case findTerm' s Long Neuter ts of
-                     Just  x -> x
-                     Nothing -> newTerm
+    = fromMaybe newTerm $ findTerm' s Long gender ts `mplus`
+                          findTerm' s Long Neuter ts
     where
       gender = if v `elem` numericVars || "month" `isPrefixOf` v
                then maybe Neuter termGender $ findTerm v Long ts
