@@ -22,7 +22,6 @@
 module Text.CSL.Proc.Disamb where
 
 import Control.Arrow ( (&&&), (>>>), second )
-import Data.Char ( chr )
 import Data.List ( elemIndex, find, findIndex, sortBy, mapAccumL
                  , nub, nubBy, groupBy, isPrefixOf )
 import Data.Maybe
@@ -276,11 +275,13 @@ getName = query getName'
 
 generateYearSuffix :: [Reference] -> [(String, [Output])] -> [(String,String)]
 generateYearSuffix refs
-    = concatMap (flip zip suffs) .
+    = concatMap (`zip` suffs) .
       -- sort clashing cites using their position in the sorted bibliography
-      getFst . map sort' . map (filter ((/=) 0 . snd)) . map (map getP) .
+      getFst . map (sort' . (filter ((/=) 0 . snd)) . (map getP)) .
       -- group clashing cites
-      getFst . filter (\grp -> length grp >= 2) . map nub . groupBy (\a b -> snd a == snd b) . sort' . filter ((/=) [] . snd)
+      getFst . filter (\grp -> length grp >= 2) . map nub .
+      groupBy (\a b -> snd a == snd b) .
+      sort' . filter (not . null . snd)
     where
       sort'  :: (Ord a, Ord b) => [(a,b)] -> [(a,b)]
       sort'  = sortBy (comparing snd)
@@ -288,8 +289,8 @@ generateYearSuffix refs
       getP k = case findIndex ((==) k . unLiteral . refId) refs of
                    Just x -> (k, x + 1)
                    _      -> (k,     0)
-      suffs = l ++ [x ++ y | x <- l, y <- l ]
-      l = map (return . chr) [97..122]
+      suffs = letters ++ [x ++ y | x <- letters, y <- letters ]
+      letters = map (:[]) ['a'..'z']
 
 setYearSuffCollision :: Bool -> [CiteData] -> [Output] -> [Output]
 setYearSuffCollision b cs = proc (setYS cs) . (map $ \x -> if hasYearSuf x then x else addYearSuffix x)
@@ -315,9 +316,11 @@ getYearSuffixes :: CitationGroup -> [(String,[Output])]
 getYearSuffixes (CG _ _ _ d) = map go d
   where go (c,x) = (citeId c, relevant False [x])
         relevant :: Bool -> [Output] -> [Output] -- bool is true if has contrib
-        -- we're only interested in OContrib and OYear, unless there is no OContrib
+        -- we're only interested in OContrib and OYear,
+        -- unless there is no OContrib
         relevant c (Output xs _ : rest) = relevant c xs ++ relevant c rest
         relevant c (OYear n _ _ : rest) = OStr n emptyFormatting : relevant c rest
+        relevant c (ODate xs : rest)    = relevant c xs ++ relevant c rest
         relevant False (OStr s _    : rest) = OStr s emptyFormatting : relevant False rest
         relevant False (OSpace      : rest) = OSpace : relevant False rest
         relevant False (OPan ils    : rest) = OPan ils : relevant False rest
@@ -377,11 +380,11 @@ allTheSame (x:xs) = all (== x) xs
 -- | Add the year suffix to the year. Needed for disambiguation.
 addYearSuffix :: Output -> Output
 addYearSuffix o
-    | OYear y k     f <- o = Output [OYear y k emptyFormatting,OYearSuf [] k [] emptyFormatting] f
-    | ODate  (x:xs)   <- o = if or $ map hasYear xs
+    | OYear y k     f <- o = Output [OYear y k emptyFormatting, OYearSuf [] k [] emptyFormatting] f
+    | ODate  (x:xs)   <- o = if any hasYear xs
                              then Output (x : [addYearSuffix $ ODate xs]) emptyFormatting
                              else addYearSuffix (Output (x:xs) emptyFormatting)
-    | Output (x:xs) f <- o = if or $ map hasYearSuf (x : xs)
+    | Output (x:xs) f <- o = if any hasYearSuf (x : xs)
                              then Output (x : xs) f
                              else if hasYear x
                                   then Output (addYearSuffix x : xs) f
