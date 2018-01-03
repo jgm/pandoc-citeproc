@@ -1,3 +1,9 @@
+pandoc-citeproc (0.12.2.5)
+
+  * Fixed spurious disambiguation on some date ranges (#312).
+
+  * Fix spurious dash after date range in certain cases (#312).
+
 pandoc-citeproc (0.12.2.4)
 
   * Properly fixed range delimiters.  Closes #312.
