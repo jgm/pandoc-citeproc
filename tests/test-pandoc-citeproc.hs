@@ -23,8 +23,8 @@ main :: IO ()
 main = do
   args <- getArgs
   let regenerate = "--accept" `elem` args
-  testnames <- fmap (map (dropExtension . takeBaseName) .
-                     filter (".in.native" `isSuffixOf`)) $
+  testnames <- (map (dropExtension . takeBaseName) .
+                     filter (".in.native" `isSuffixOf`)) <$>
                getDirectoryContents "tests"
   citeprocTests <- mapM (testCase regenerate) testnames
   fs <- filter (\f -> takeExtension f `elem` [".bibtex",".biblatex"])
@@ -57,7 +57,7 @@ testCase regenerate csl = do
   hPutStr stderr $ "[" ++ csl ++ ".in.native] "
   indataNative <- UTF8.readFile $ "tests/" ++ csl ++ ".in.native"
   expectedNative <- UTF8.readFile $ "tests/" ++ csl ++ ".expected.native"
-  let jsonIn = Aeson.encode $ (read indataNative :: Pandoc)
+  let jsonIn = Aeson.encode (read indataNative :: Pandoc)
   let expectedDoc = read expectedNative
   testProgPath <- getExecutablePath
   let pandocCiteprocPath = takeDirectory testProgPath </> ".." </>
@@ -68,11 +68,11 @@ testCase regenerate csl = do
                      [] jsonIn
   if ec == ExitSuccess
      then do
-       let outDoc = fromMaybe mempty $ Aeson.decode $ jsonOut
+       let outDoc = fromMaybe mempty $Aeson.decode jsonOut
        if outDoc == expectedDoc
           then err "PASSED" >> return Passed
           else do
-             err $ "FAILED"
+             err "FAILED"
              showDiff (writeNative expectedDoc) (writeNative outDoc)
              when regenerate $
                UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $

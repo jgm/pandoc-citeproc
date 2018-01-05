@@ -24,9 +24,8 @@ import           System.SetEnv            (setEnv)
 import           Text.CSL.Data            (getDefaultCSL)
 import           Text.CSL.Exception
 import           Text.CSL.Input.Bibutils  (convertRefs, readBiblioFile)
-import           Text.CSL.Output.Pandoc   (renderPandoc, renderPandoc')
-import           Text.CSL.Output.Pandoc   (headInline, initInline, tailInline,
-                                           toCapital)
+import           Text.CSL.Output.Pandoc   (renderPandoc, renderPandoc',
+                      headInline, initInline, tailInline, toCapital)
 import           Text.CSL.Parser
 import           Text.CSL.Proc
 import           Text.CSL.Reference       hiding (Value, processCites)
@@ -80,7 +79,7 @@ insertRefs meta refs bs =
                (bs', True) -> bs'
                (_, False)  ->
                   case reverse bs of
-                        (Header lev (id',classes,kvs) ys) : xs ->
+                        Header lev (id',classes,kvs) ys : xs ->
                           reverse xs ++
                             [Header lev (id',addUnNumbered classes,kvs) ys,
                              Div ("refs",["references"],[]) refs]
@@ -126,7 +125,7 @@ isLinkCitations meta =
 -- create a cite with to all the references.
 mkNociteWildcards :: [Reference] -> [[Citation]] -> [[Citation]]
 mkNociteWildcards refs nocites =
-  map (\citgrp -> expandStar citgrp) nocites
+  map expandStar nocites
   where expandStar cs =
          case [c | c <- cs
                  , citationId c == "*"] of
@@ -188,9 +187,9 @@ processCites' (Pandoc meta blocks) = do
               -- Note that LANG needs to be set for bibtex conversion:
               setEnv "LANG" "en-US.UTF-8"
               setEnv "LC_ALL" "en-US.UTF-8"
-            else do
+            else
               setEnv "LC_ALL" envlang
-  bibRefs <- getBibRefs $ maybe (MetaList []) id
+  bibRefs <- getBibRefs $ Data.Maybe.fromMaybe (MetaList [])
                         $ lookupMeta "bibliography" meta
   let refs = inlineRefs ++ bibRefs
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
@@ -259,7 +258,7 @@ isNote _                 = False
 
 mvPunctInsideQuote :: Inline -> Inline -> [Inline]
 mvPunctInsideQuote (Quoted qt ils) (Str s) | s `elem` [".", ","] =
-  [Quoted qt (init ils ++ (mvPunctInsideQuote (last ils) (Str s)))]
+  [Quoted qt (init ils ++ mvPunctInsideQuote (last ils) (Str s))]
 mvPunctInsideQuote il il' = [il, il']
 
 isSpacy :: Inline -> Bool
@@ -311,7 +310,7 @@ endWithPunct onlyFinal xs@(_:_) =
   where isEndPunct c = c `elem` (".,;:!?" :: String)
 
 startWithPunct :: [Inline] -> Bool
-startWithPunct = and . map (`elem` (".,;:!?" :: String)) . headInline
+startWithPunct = all (`elem` (".,;:!?" :: String)) . headInline
 
 deNote :: Pandoc -> Pandoc
 deNote = topDown go
@@ -360,7 +359,7 @@ toCslCite locMap c
           s'      = case (la,lo,s) of
                          -- treat a bare locator as if it begins with space
                          -- so @item1 [blah] is like [@item1, blah]
-                         ("","",(x:_))
+                         ("","",x:_)
                            | not (isPunct x) -> Space : s
                          _                   -> s
           isPunct (Str (x:_)) = isPunctuation x

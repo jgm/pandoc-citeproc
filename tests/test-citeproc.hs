@@ -64,8 +64,8 @@ instance FromJSON TestCase where
               v .:  "input" <*>
               v .:  "result"
         where parseCitations :: Data.Aeson.Value -> Parser [CiteObject]
-              parseCitations x@(Array{}) = parseJSON x
-              parseCitations _           = return []
+              parseCitations x@Array{} = parseJSON x
+              parseCitations _         = return []
   parseJSON _ = fail "Could not parse test case"
 
 newtype CiteObject =

@@ -179,8 +179,8 @@ evalElement el
                      nums <- mapM getStringVar numVars
                      let pluralizeTerm (Term s f fm _) = Term s f fm $
                             case numVars of
-                              ["number-of-volumes"] -> notElem "1" nums
-                              ["number-of-pages"]   -> notElem "1" nums
+                              ["number-of-volumes"] -> "1" `notElem` nums
+                              ["number-of-pages"]   -> "1" `notElem` nums
                               _ -> any isRange nums
                          pluralizeTerm x = x
                      if null res
@@ -275,7 +275,7 @@ evalIfThen (IfThen c' m' el') ei e = whenElse (evalCond m' c') (return el') rest
                                            then val
                                            else getAbbreviation as v val
                              return (isNumericString val')
-      chkDate         v = not . not . any circa <$> getDateVar v
+      chkDate         v = any circa <$> getDateVar v
       chkPosition     s = if s == "near-note"
                           then gets (nearNote . cite . env)
                           else compPosition s <$> gets (citePosition . cite . env)
