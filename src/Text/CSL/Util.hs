@@ -179,7 +179,7 @@ x .#? y = (x .:? y) >>= mb parseString
 x .#: y = (x .: y) >>= parseString
 
 onBlocks :: ([Inline] -> [Inline]) -> [Block] -> [Block]
-onBlocks f bs = walk f' bs
+onBlocks f = walk f'
   where f' (Para ils)  = Para (f ils)
         f' (Plain ils) = Plain (f ils)
         f' x           = x
@@ -263,7 +263,7 @@ titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
                              | isMixedCase s   -> Str s
                              | otherwise       -> Str (toUpper x:xs)
                         SentenceBoundary ->
-                           if isMixedCase (x:xs) || (all isUpperOrPunct (x:xs))
+                           if isMixedCase (x:xs) || all isUpperOrPunct (x:xs)
                               then Str (x:xs)
                               else Str (toUpper x : xs)
                         _ -> Str (x:xs)
@@ -308,9 +308,7 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
           | c `elem` "-/\x2013\x2014\160" = do
                put WordBoundary
                return $ Str [c] : acc
-          | isPunctuation c = do
-               -- leave state unchanged
-               return $ Str [c] : acc
+          | isPunctuation c = return $ Str [c] : acc -- leave state unchanged
         go acc (Str []) = return acc
         go acc (Str xs) = do
                res <- xform (Str xs)
@@ -390,7 +388,7 @@ lastInline xs = case stringify xs of
 
 initInline :: [Inline] -> [Inline]
 initInline [] = []
-initInline (i:[])
+initInline [i]
     | Str          s <- i = return $ Str         (init'       s)
     | Emph        is <- i = return $ Emph        (initInline is)
     | Strong      is <- i = return $ Strong      (initInline is)
@@ -476,19 +474,19 @@ pRomanNumeral = do
                          else lowercaseRomanDigits
     let [one, five, ten, fifty, hundred, fivehundred, thousand] =
           map P.char romanDigits
-    thousands <- P.many thousand >>= (return . (1000 *) . length)
+    thousands <- ((1000 *) . length) <$> P.many thousand
     ninehundreds <- P.option 0 $ P.try $ hundred >> thousand >> return 900
-    fivehundreds <- P.many fivehundred >>= (return . (500 *) . length)
+    fivehundreds <- ((500 *) . length) <$> P.many fivehundred
     fourhundreds <- P.option 0 $ P.try $ hundred >> fivehundred >> return 400
-    hundreds <- P.many hundred >>= (return . (100 *) . length)
+    hundreds <- ((100 *) . length) <$> P.many hundred
     nineties <- P.option 0 $ P.try $ ten >> hundred >> return 90
-    fifties <- P.many fifty >>= (return . (50 *) . length)
+    fifties <- ((50 *) . length) <$> P.many fifty
     forties <- P.option 0 $ P.try $ ten >> fifty >> return 40
-    tens <- P.many ten >>= (return . (10 *) . length)
+    tens <- ((10 *) . length) <$> P.many ten
     nines <- P.option 0 $ P.try $ one >> ten >> return 9
-    fives <- P.many five >>= (return . (5 *) . length)
+    fives <- ((5 *) . length) <$> P.many five
     fours <- P.option 0 $ P.try $ one >> five >> return 4
-    ones <- P.many one >>= (return . length)
+    ones <- length <$> P.many one
     let total = thousands + ninehundreds + fivehundreds + fourhundreds +
                 hundreds + nineties + fifties + forties + tens + nines +
                 fives + fours + ones
