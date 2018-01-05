@@ -57,7 +57,7 @@ references:
   - family: Chow
     given: We Min
   issued:
-  - year: '1978'
+  - year: 1978
   title: A hybrid hierarchical model of a multiple virtual storage (MVS) operating
     system
   publisher: IBM

@@ -38,7 +38,7 @@ references:
   - family: Weinberg
     given: Steven
   issued:
-  - year: '1967'
+  - year: 1967
   title: A model of leptons
   container-title: Phys. Rev. Lett.
   page: '1264-1266'

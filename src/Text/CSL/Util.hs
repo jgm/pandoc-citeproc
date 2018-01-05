@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PatternGuards         #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
@@ -19,6 +20,7 @@ module Text.CSL.Util
   , parseBool
   , parseString
   , parseInt
+  , parseMaybeInt
   , mb
   , (.#?)
   , (.#:)
@@ -43,7 +45,7 @@ module Text.CSL.Util
   , mapHeadInline
   , tr'
   , findFile
-  , (&=)
+  , AddYaml(..)
   , mapping'
   , parseRomanNumeral
   , isRange
@@ -160,13 +162,27 @@ parseString v          = fail $ "Could not read as string: " ++ show v
 
 -- | Parse JSON value as Int.
 parseInt :: Value -> Parser Int
-parseInt (String s) = case safeRead (T.unpack s) of
-                            Just n  -> return n
-                            Nothing -> fail "Could not read Int"
 parseInt (Number n) = case fromJSON (Number n) of
                             Success (x :: Int) -> return x
-                            Error e -> fail $ "Could not read string: " ++ e
-parseInt _          = fail "Could not read string"
+                            Error e -> fail $ "Could not read Int: " ++ e
+parseInt x = parseString x >>= \s ->
+              case safeRead s of
+                   Just n  -> return n
+                   Nothing -> fail "Could not read Int"
+
+-- | Parse JSON value as Maybe Int.
+parseMaybeInt :: Maybe Value -> Parser (Maybe Int)
+parseMaybeInt Nothing = return Nothing
+parseMaybeInt (Just (Number n)) = case fromJSON (Number n) of
+                                       Success (x :: Int) -> return (Just x)
+                                       Error e -> fail $ "Could not read Int: " ++ e
+parseMaybeInt (Just x) =
+  parseString x >>= \s ->
+                   if null s
+                      then return Nothing
+                      else case safeRead s of
+                                Just n  -> return (Just n)
+                                Nothing -> fail $ "Could not read as Int: " ++ show s
 
 mb :: Monad m => (b -> m a) -> (Maybe b -> m (Maybe a))
 mb  = Data.Traversable.mapM
@@ -445,11 +461,27 @@ findFile (p:ps) f
         then return $ Just (p </> f)
         else findFile ps f
 
-(&=) :: (ToYaml a, Monoid a, Eq a)
-     => Text -> a -> [(Text, YamlBuilder)] -> [(Text, YamlBuilder)]
-x &= y = \acc -> if y == mempty
-                    then acc
-                    else (x Y..= y) : acc
+class AddYaml a where
+  (&=) :: Text -> a -> [(Text, YamlBuilder)] -> [(Text, YamlBuilder)]
+
+instance ToYaml a => AddYaml [a] where
+  x &= y = \acc -> if null y
+                      then acc
+                      else (x Y..= y) : acc
+
+instance ToYaml a => AddYaml (Maybe a) where
+  x &= y = \acc -> case y of
+                        Nothing -> acc
+                        Just z  -> (x Y..= z) : acc
+
+instance AddYaml Text where
+  x &= y = \acc -> if T.null y
+                      then acc
+                      else (x Y..= y) : acc
+
+instance AddYaml Bool where
+  _ &= False = id
+  x &= True = \acc -> (x Y..= Y.bool True) : acc
 
 mapping' :: [[(Text, YamlBuilder)] -> [(Text, YamlBuilder)]] -> YamlBuilder
 mapping' = Y.mapping . foldr ($) []

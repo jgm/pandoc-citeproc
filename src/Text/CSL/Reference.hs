@@ -39,7 +39,6 @@ module Text.CSL.Reference ( Literal(..)
                           , handleLiteral
                           , toDatePart
                           , setCirca
-                          , mkRefDate
                           , RefType(..)
                           , CNum(..)
                           , CLabel(..)
@@ -50,6 +49,7 @@ module Text.CSL.Reference ( Literal(..)
                           , processCites
                           , setPageFirst
                           , setNearNote
+                          , parseEDTFDate
                           )
 where
 
@@ -74,15 +74,18 @@ import qualified Data.Yaml.Builder   as Y
 import           GHC.Generics        (Generic)
 import           Text.CSL.Style      hiding (Number)
 import           Text.CSL.Util       (camelize, capitalize, inlinesToString,
-                                      mapping', parseBool, parseInt,
-                                      parseString, readNum, safeRead,
-                                      uncamelize, (&=))
+                                      mapping', parseBool, parseInt, parseMaybeInt,
+                                      parseString, readNum, safeRead, trim,
+                                      uncamelize, AddYaml(..))
 import           Text.Pandoc         (Inline (Str))
 import qualified Text.Parsec         as P
 import qualified Text.Parsec.String  as P
 
 newtype Literal = Literal { unLiteral :: String }
   deriving ( Show, Read, Eq, Data, Typeable, Monoid, Generic )
+
+instance AddYaml Literal
+  where x &= (Literal y) = x &= (T.pack y)
 
 instance FromJSON Literal where
   parseJSON v             = Literal `fmap` parseString v
@@ -130,41 +133,46 @@ isValueSet val
 data Empty = Empty deriving ( Typeable, Data, Generic )
 
 data RefDate =
-    RefDate { year   :: Literal
-            , month  :: Literal
-            , season :: Literal
-            , day    :: Literal
+    RefDate { year   :: Maybe Int
+            , month  :: Maybe Int
+            , season :: Maybe Int
+            , day    :: Maybe Int
             , other  :: Literal
             , circa  :: Bool
             } deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
+instance AddYaml RefDate where
+  _ &= (RefDate Nothing Nothing Nothing Nothing o _) | o == mempty = id
+  x &= y = x &= y
+
 instance FromJSON RefDate where
   parseJSON (Array v) = handlePseudoMonths <$>
      case fromJSON (Array v) of
-          Success [y]     -> RefDate <$> parseJSON y <*>
-                    pure "" <*> pure "" <*> pure "" <*> pure "" <*> pure False
-          Success [y,m]   -> RefDate <$> parseJSON y <*> parseJSON m <*>
-                    pure "" <*> pure "" <*> pure "" <*> pure False
-          Success [y,m,d] -> RefDate <$> parseJSON y <*> parseJSON m <*>
-                    pure "" <*> parseJSON d <*> pure "" <*> pure False
+          Success [y]     -> RefDate <$> parseMaybeInt y <*>
+                    pure Nothing <*> pure Nothing <*> pure Nothing <*>
+                    pure "" <*> pure False
+          Success [y,m]   -> RefDate <$> parseMaybeInt y <*> parseMaybeInt m <*>
+                    pure Nothing <*> pure Nothing <*> pure "" <*> pure False
+          Success [y,m,d] -> RefDate <$> parseMaybeInt y <*> parseMaybeInt m <*>
+                    pure Nothing <*> parseMaybeInt d <*> pure "" <*> pure False
           Error e         -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
      where handlePseudoMonths r =
-              case unLiteral (month r) of
-                   "13" -> r{ month = mempty, season = Literal "1" }
-                   "14" -> r{ month = mempty, season = Literal "2" }
-                   "15" -> r{ month = mempty, season = Literal "3" }
-                   "16" -> r{ month = mempty, season = Literal "4" }
-                   "21" -> r{ month = mempty, season = Literal "1" }
-                   "22" -> r{ month = mempty, season = Literal "2" }
-                   "23" -> r{ month = mempty, season = Literal "3" }
-                   "24" -> r{ month = mempty, season = Literal "4" }
+              case month r of
+                   Just 13 -> r{ month = Nothing, season = Just 1 }
+                   Just 14 -> r{ month = Nothing, season = Just 2 }
+                   Just 15 -> r{ month = Nothing, season = Just 3 }
+                   Just 16 -> r{ month = Nothing, season = Just 4 }
+                   Just 21 -> r{ month = Nothing, season = Just 1 }
+                   Just 22 -> r{ month = Nothing, season = Just 2 }
+                   Just 23 -> r{ month = Nothing, season = Just 3 }
+                   Just 24 -> r{ month = Nothing, season = Just 4 }
                    _    -> r
   parseJSON (Object v) = RefDate <$>
-              v .:? "year" .!= "" <*>
-              v .:? "month" .!= "" <*>
-              v .:? "season" .!= "" <*>
-              v .:? "day" .!= "" <*>
+              (v .:? "year" >>= parseMaybeInt) <*>
+              (v .:? "month" >>= parseMaybeInt) <*>
+              (v .:? "season" >>= parseMaybeInt) <*>
+              (v .:? "day" >>= parseMaybeInt) <*>
               v .:? "literal" .!= "" <*>
               ((v .: "circa" >>= parseBool) <|> pure False)
   parseJSON _ = fail "Could not parse RefDate"
@@ -181,13 +189,14 @@ instance ToJSON RefDate where
 -}
 
 instance ToYaml RefDate where
-  toYaml r = mapping' [ "year" &= year r
-                      , "month" &= month r
-                      , "season" &= season r
-                      , "day" &= day r
-                      , "literal" &= other r
-                      , "circa" &= T.pack (if circa r then "1" else "")
-                      ]
+  toYaml r = mapping'
+               [ "year" &= year r
+               , "month" &= month r
+               , "season" &= season r
+               , "day" &= day r
+               , "literal" &= other r
+               , "circa" &= circa r
+               ]
 
 instance OVERLAPS
          FromJSON [RefDate] where
@@ -200,38 +209,12 @@ instance OVERLAPS
     case dateParts of
          Just (Array xs) | isNothing raw' && not (V.null xs)
                           -> mapM (fmap (setCirca circa' .
-                                     maybe id setSeason season') . parseJSON)
+                                   maybe id setSeason season') . parseJSON)
                              $ V.toList xs
          _ -> case raw' of
                   Nothing -> handleLiteral <$> parseJSON (Object v)
                   Just r  -> return $ parseRawDate r
   parseJSON x  = parseRawDate <$> parseJSON x
-
--- Zotero doesn't properly support date ranges, so a common
--- workaround is 2005_2007 or 2005_; support this as date range:
-handleLiteral :: RefDate -> [RefDate]
-handleLiteral d@(RefDate (Literal "") (Literal "") (Literal "")
-                         (Literal "") (Literal xs) b)
-  = case splitWhen (=='_') xs of
-         [x,y] | all isDigit x && all isDigit y &&
-                 not (null x) ->
-                 [RefDate (Literal x) mempty mempty mempty mempty b,
-                  RefDate (Literal y) mempty mempty mempty mempty b]
-         _ -> [d]
-handleLiteral d = [d]
-
-toDatePart :: RefDate -> [Int]
-toDatePart refdate =
-    case (safeRead (unLiteral $ year refdate),
-          safeRead (unLiteral $ month refdate)
-           `mplus`
-          ((+ 12) <$> safeRead (unLiteral $ season refdate)),
-          safeRead (unLiteral $ day refdate)) of
-         (Just (y :: Int), Just (m :: Int), Just (d :: Int))
-                                     -> [y, m, d]
-         (Just y, Just m, Nothing)   -> [y, m]
-         (Just y, Nothing, Nothing)  -> [y]
-         _                           -> []
 
 instance OVERLAPS
          ToJSON [RefDate] where
@@ -242,16 +225,36 @@ instance OVERLAPS
          dps -> "date-parts" .= dps :
                  ["circa" .= (1 :: Int) | any circa xs]
 
+
+-- Zotero doesn't properly support date ranges, so a common
+-- workaround is 2005_2007 or 2005_; support this as date range:
+handleLiteral :: RefDate -> [RefDate]
+handleLiteral d@(RefDate Nothing Nothing Nothing Nothing (Literal xs) b)
+  = case splitWhen (=='_') xs of
+         [x,y] | all isDigit x && all isDigit y &&
+                 not (null x) ->
+                 [RefDate (safeRead x) Nothing Nothing Nothing mempty b,
+                  RefDate (safeRead y) Nothing Nothing Nothing mempty b]
+         _ -> [d]
+handleLiteral d = [d]
+
+toDatePart :: RefDate -> [Int]
+toDatePart refdate =
+    case (year refdate, month refdate
+           `mplus`
+          ((+ 12) <$> season refdate),
+          day refdate) of
+         (Just (y :: Int), Just (m :: Int), Just (d :: Int))
+                                     -> [y, m, d]
+         (Just y, Just m, Nothing)   -> [y, m]
+         (Just y, Nothing, Nothing)  -> [y]
+         _                           -> []
+
 setCirca :: Bool -> RefDate -> RefDate
 setCirca circa' rd = rd{ circa = circa' }
 
-setSeason :: Literal -> RefDate -> RefDate
+setSeason :: Maybe Int -> RefDate -> RefDate
 setSeason season' rd = rd{ season = season' }
-
-mkRefDate :: Literal -> Parser [RefDate]
-mkRefDate z@(Literal xs)
-  | all isDigit xs = return [RefDate z mempty mempty mempty mempty False]
-  | otherwise      = return [RefDate mempty mempty mempty mempty z False]
 
 data RefType
     = NoType
@@ -883,38 +886,72 @@ setNearNote s cs
 parseRawDate :: String -> [RefDate]
 parseRawDate o =
   case P.parse rawDate "raw date" o of
-       Left _   -> [RefDate mempty mempty mempty mempty (Literal o) False]
+       Left _   -> [RefDate Nothing Nothing Nothing Nothing (Literal o) False]
        Right ds -> ds
 
 rawDate :: P.Parser [RefDate]
 rawDate = rawDateISO <|> rawDateOld
 
+parseEDTFDate :: String -> [RefDate]
+parseEDTFDate o =
+  case handleRanges (trim o) of
+       [] -> []
+       o' -> case P.parse rawDateISO "date" o' of
+                Left _   -> []
+                Right ds -> ds
+    where handleRanges s =
+            case splitWhen (=='/') s of
+                 -- 199u EDTF format for a range
+                 [x] | 'u' `elem` x ->
+                      map (\c -> if c == 'u' then '0' else c) x ++ "/" ++
+                      map (\c -> if c == 'u' then '9' else c) x
+                 [x, "open"] -> x ++ "/"    -- EDTF
+                 [x, "unknown"] -> x ++ "/" -- EDTF
+                 _  -> s
+
 rawDateISO :: P.Parser [RefDate]
 rawDateISO = do
   d1 <- isoDate
-  P.option [d1] (P.char '/' >> (\x -> [d1, x]) <$> isoDate)
+  P.option [d1] (P.char '/' >>
+                  (\x -> [d1, x]) <$>
+                   (  isoDate <|> return emptydate )) <* P.eof
+   where emptydate = RefDate Nothing Nothing Nothing Nothing mempty False
 
 isoDate :: P.Parser RefDate
 isoDate = P.try $ do
+  extyear <- P.option False (True <$ P.char 'y')  -- EDTF year > 4 digits
+  -- needed for bibtex
   y <- do
     sign <- P.option "" (P.string "-")
     rest <- P.count 4 P.digit
-    return $ sign ++ rest
+    extended <- if extyear
+                   then P.many P.digit
+                   else return []
+    return $ case safeRead (sign ++ rest ++ extended) of
+                    Just x | x <= 0 -> Just (x - 1)  -- 0 = -1 AD
+                    x               -> x
   m' <- P.option Nothing $ Just <$> P.try (P.char '-' >> P.many1 P.digit)
   (m,s) <- case m' >>= safeRead of
                    Just (n::Int)
-                          | n >= 1 && n <= 12  -> return (show n, "")
-                          | n >= 13 && n <= 16 -> return ("", show (n - 12))
-                          | n >= 21 && n <= 24 -> return ("", show (n - 20))
-                   Nothing | isNothing m' -> return ("", "")
+                          | n >= 1 && n <= 12  -> return (Just n, Nothing)
+                          | n >= 13 && n <= 16 -> return (Nothing, Just (n - 12))
+                          | n >= 21 && n <= 24 -> return (Nothing, Just (n - 20))
+                   Nothing | isNothing m' -> return (Nothing, Nothing)
                    _ -> fail "Improper month"
-  d <- P.option Nothing $ Just <$> P.try (P.char '-' >> P.many1 P.digit)
-  guard $ isNothing d || case d >>= safeRead of
-                           Just (n::Int) | n >= 1 && n <= 31 -> True
-                           _             -> False
+  d <- P.option Nothing $ safeRead <$> P.try (P.char '-' >> P.many1 P.digit)
+  guard $ case d of
+           Nothing -> True
+           Just (n::Int) | n >= 1 && n <= 31 -> True
+           _ -> False
+  P.optional $ do
+    _ <- P.char 'T'
+    _ <- P.many (P.digit <|> P.char ':')
+    P.optional $ (P.oneOf "+-" >> P.many1 (P.digit <|> P.char ':'))
+              <|> P.string "Z"
+  _ <- P.optional (P.char '?')
   c <- P.option False (True <$ P.char '~')
-  return RefDate{ year = Literal y, month = Literal m,
-                  season = Literal s, day = maybe mempty Literal d,
+  return RefDate{ year = y, month = m,
+                  season = s, day = d,
                   other = mempty, circa = c }
 
 rawDateOld :: P.Parser [RefDate]
@@ -926,43 +963,42 @@ rawDateOld = do
         xs <- P.many1 P.letter <|> P.many1 P.digit
         if all isDigit xs
            then case safeRead xs of
-                      Just (n::Int) | n >= 1 && n <= 12 -> return (show n)
-                      _             -> fail "Improper month"
+                      Just (n::Int) | n >= 1 && n <= 12 -> return (Just n)
+                      _ -> fail "Improper month"
            else case elemIndex (map toLower $ take 3 xs) months of
                      Nothing -> fail "Improper month"
-                     Just n  -> return (show (n+1))
+                     Just n  -> return (Just (n+1))
   let pseason = P.try $ do
         xs <- P.many1 P.letter
         case elemIndex (map toLower $ take 3 xs) seasons of
              Nothing -> fail "Improper season"
-             Just n  -> return (show (n+1))
+             Just n  -> return (Just (n+1))
   let pday = P.try $ do
         xs <- P.many1 P.digit
         case safeRead xs of
-             Just (n::Int) | n >= 1 && n <= 31 -> return (show n)
-             _             -> fail "Improper day"
-  let pyear = P.many1 P.digit
+             Just (n::Int) | n >= 1 && n <= 31 -> return (Just n)
+             _ -> fail "Improper day"
+  let pyear = safeRead <$> P.many1 P.digit
   let sep = P.oneOf [' ','/',','] >> P.spaces
   let rangesep = P.try $ P.spaces >> P.char '-' >> P.spaces
-  let refDate = RefDate mempty mempty mempty mempty mempty False
+  let refDate = RefDate Nothing Nothing Nothing Nothing mempty False
   let date = P.choice $ map P.try [
-                 do s <- pseason
-                    sep
-                    y <- pyear
-                    return refDate{ year = Literal y, season = Literal s }
-               , do m <- pmonth
-                    sep
-                    d <- pday
-                    sep
-                    y <- pyear
-                    return refDate{ year = Literal y, month = Literal m,
-                                    day = Literal d }
-               , do m <- pmonth
-                    sep
-                    y <- pyear
-                    return refDate{ year = Literal y, month = Literal m }
-               , do y <- pyear
-                    return refDate{ year = Literal y }
+                 (do s <- pseason
+                     sep
+                     y <- pyear
+                     return refDate{ year = y, season = s })
+               , (do m <- pmonth
+                     sep
+                     d <- pday
+                     sep
+                     y <- pyear
+                     return refDate{ year = y, month = m, day = d })
+               , (do m <- pmonth
+                     sep
+                     y <- pyear
+                     return refDate{ year = y, month = m })
+               , (do y <- pyear
+                     return refDate{ year = y })
                ]
   d1 <- date
   P.option [d1] ((\x -> [d1,x]) <$> (rangesep >> date))

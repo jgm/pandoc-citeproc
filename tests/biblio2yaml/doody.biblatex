@@ -69,7 +69,7 @@ references:
   - family: Doody
     given: Terrence
   issued:
-  - year: '1974'
+  - year: 1974
   title: Hemingway’s style and Jake’s narration
   container-title: The Journal of Narrative Technique
   page: '212-225'
@@ -85,7 +85,7 @@ references:
   - family: Matuz
     given: Roger
   issued:
-  - year: '1990'
+  - year: 1990
   title: Contemporary literary criticism
   publisher: Gale
   publisher-place: Detroit

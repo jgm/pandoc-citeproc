@@ -114,7 +114,8 @@ import           Text.CSL.Compat.Pandoc (readHtml, writeMarkdown)
 import           Text.CSL.Util          (betterThan, headInline, initInline,
                                          lastInline, mapping', mb, parseBool,
                                          parseString, query, splitStrWhen,
-                                         tailInline, trimr, (&=), (.#:), (.#?))
+                                         tailInline, trimr, (.#:), (.#?),
+                                         AddYaml(..))
 import           Text.Pandoc            (bottomUp)
 import qualified Text.Pandoc.Builder    as B
 import           Text.Pandoc.Definition hiding (Citation, Cite)
@@ -215,6 +216,12 @@ instance ToYaml Formatted where
 
 instance IsString Formatted where
   fromString = Formatted . toStr
+
+instance AddYaml Formatted where
+  x &= (Formatted y) =
+           \acc -> if null y
+                      then acc
+                      else (x Y..= Formatted y) : acc
 
 instance Monoid Formatted where
   mempty = Formatted []

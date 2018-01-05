@@ -58,9 +58,9 @@ references:
   - family: Sanders
     given: Peter
   issued:
-  - year: '2010'
-    month: '8'
-    day: '17'
+  - year: 2010
+    month: 8
+    day: 17
   title: Faster radix sort via virtual memory and write-combining
   version: '1'
   annote: A recent online reference from arXiv using the new (April 2007 onward) identifier

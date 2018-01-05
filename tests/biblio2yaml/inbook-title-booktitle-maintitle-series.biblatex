@@ -25,7 +25,7 @@ references:
   - family: Author
     given: Al
   issued:
-  - year: '2011'
+  - year: 2011
   title: 'Title of the “inbook” Entry: Subtitle. Titleaddon'
   container-title: 'Maintitle: Mainsubtitle. Maintitleaddon'
   volume-title: 'Booktitle: Booksubtitle. Booktitleaddon'

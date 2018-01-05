@@ -40,7 +40,7 @@ references:
   - family: Moore
     given: Gordon E.
   issued:
-  - year: '1965'
+  - year: 1965
   title: Cramming more components onto integrated circuits
   container-title: Electronics
   page: '114-117'

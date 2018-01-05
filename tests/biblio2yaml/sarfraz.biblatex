@@ -46,7 +46,7 @@ references:
   - family: Razzak
     given: M. F. A.
   issued:
-  - year: '2002'
+  - year: 2002
   title: 'Technical section: An algorithm for automatic capturing of the font outlines'
   title-short: Technical section
   container-title: Computers and Graphics

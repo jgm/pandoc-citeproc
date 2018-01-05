@@ -18,81 +18,81 @@ references:
 - id: item3-3
   type: article-journal
   issued:
-  - year: '1998'
+  - year: 1998
   - {}
 
 - id: item3-4
   type: article-journal
   issued:
-  - year: '1999'
+  - year: 1999
   - {}
 
 - id: item3-10
   type: article-journal
   issued:
-  - year: '2004'
-    month: '4'
-    day: '5'
+  - year: 2004
+    month: 4
+    day: 5
 
 - id: item5-1
   type: article-journal
   issued:
-  - year: '-1'
+  - year: -1
 
 - id: item5-2
   type: article-journal
   issued:
-  - year: '-877'
+  - year: -877
 
 - id: item5-3
   type: article-journal
   issued:
-  - year: '-878'
-  - year: '-867'
+  - year: -878
+  - year: -867
 
 - id: item5-5
   type: article-journal
   issued:
-  - year: '-344'
-    month: '2'
+  - year: -344
+    month: 2
 
 - id: item5-8
   type: article-journal
   issued:
-  - year: '1723'
-    circa: '1'
+  - year: 1723
+    circa: true
 
 - id: item5-9
   type: article-journal
   issued:
-  - year: '1723'
+  - year: 1723
 
 - id: item5-10
   type: article-journal
   issued:
-  - year: '1723'
-    circa: '1'
+  - year: 1723
+    circa: true
 
 - id: item5-11
   type: article-journal
   issued:
-  - year: '2004'
-    season: '2'
+  - year: 2004
+    season: 2
 
 - id: item5-12
   type: article-journal
   issued:
-  - year: '2004'
-    season: '4'
+  - year: 2004
+    season: 4
 
 - id: item5-13
   type: article-journal
   issued:
-  - year: '2000'
-  - year: '2099'
+  - year: 2000
+  - year: 2099
 
 - id: item5-14
   type: article-journal
   issued:
-  - year: '-123456790'
+  - year: -123456790
 ...

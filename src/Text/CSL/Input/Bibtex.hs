@@ -846,22 +846,22 @@ resolveKey' (Lang "sv" "SE") k =
        _             -> k
 resolveKey' _ k = resolveKey' (Lang "en" "US") k
 
-parseMonth :: String -> String
+parseMonth :: String -> Maybe Int
 parseMonth s =
   case map toLower s of
-         "jan" -> "1"
-         "feb" -> "2"
-         "mar" -> "3"
-         "apr" -> "4"
-         "may" -> "5"
-         "jun" -> "6"
-         "jul" -> "7"
-         "aug" -> "8"
-         "sep" -> "9"
-         "oct" -> "10"
-         "nov" -> "11"
-         "dec" -> "12"
-         _     -> s
+         "jan" -> Just 1
+         "feb" -> Just 2
+         "mar" -> Just 3
+         "apr" -> Just 4
+         "may" -> Just 5
+         "jun" -> Just 6
+         "jul" -> Just 7
+         "aug" -> Just 8
+         "sep" -> Just 9
+         "oct" -> Just 10
+         "nov" -> Just 11
+         "dec" -> Just 12
+         _     -> safeRead s
 
 data BibState = BibState{
            untitlecase    :: Bool
@@ -917,57 +917,7 @@ upToColon [Plain xs] = upToColon [Para xs]
 upToColon bs         = bs
 
 getDates :: String -> Bib [RefDate]
-getDates f = getRawField f >>= parseDates
-
-parseDates :: Monad m => String-> m [RefDate]
-parseDates s
-  | '/' `elem` s = mapM parseDate . splitWhen (== '/') $ s
-  -- 199u EDTF format for a range:
-  | 'u' `elem` s = let s1 = map (\c -> if c == 'u' then '0' else c) s
-                       s2 = map (\c -> if c == 'u' then '9' else c) s
-                   in  mapM parseDate [s1, s2]
-  | otherwise    = mapM parseDate [s]
-
-parseDate :: Monad m => String -> m RefDate
--- EDTF format for year of more than 4 digits, starts with 'y':
-parseDate ('y':xs) = parseDate xs
-parseDate "open" = return RefDate { year = mempty,
-                         month = mempty, season = mempty, day = mempty,
-                         other = mempty, circa = False }
-parseDate "unknown" = return RefDate { year = mempty,
-                         month = mempty, season = mempty, day = mempty,
-                         other = mempty, circa = False }
-parseDate s = do
-  let circa' = '~' `elem` s
-  let (year', month', day') =
-        case splitWhen (== '-') $ filter (`notElem` "~?")
-                                -- drop time component:
-                                $ takeWhile (/='T') s of
-             -- initial - is negative year:
-             ["",y]     -> ('-':y, mempty, mempty)
-             ["",y,m]   -> ('-':y, m, mempty)
-             ["",y,m,d] -> ('-':y, m, d)
-             [y]        -> (y, mempty, mempty)
-             [y,m]      -> (y, m, mempty)
-             [y,m,d]    -> (y, m, d)
-             _          -> (mempty, mempty, mempty)
-  let year'' = case safeRead year' of
-                    -- EDTF 0 == CSL JSON -1 (1 BCE)
-                    Just (n :: Integer) | n <= 0 -> show (n - 1)
-                    _                   -> year'
-  let (season'', month'') = case month' of
-                                 "21" -> ("1","")
-                                 "22" -> ("2","")
-                                 "23" -> ("3","")
-                                 "24" -> ("4","")
-                                 _    -> ("", month')
-  return RefDate { year   = Literal $ dropWhile (=='0') year''
-                 , month  = Literal $ dropWhile (=='0') month''
-                 , season = Literal season''
-                 , day    = Literal $ dropWhile (=='0') day'
-                 , other  = mempty
-                 , circa  = circa'
-                 }
+getDates f = parseEDTFDate <$> getRawField f
 
 isNumber :: String -> Bool
 isNumber ('-':d:ds) = all isDigit (d:ds)
@@ -982,33 +932,31 @@ fixLeadingDash xs = xs
 
 getOldDates :: String -> Bib [RefDate]
 getOldDates prefix = do
-  year' <- fixLeadingDash <$> getRawField (prefix ++ "year")
+  year' <- fixLeadingDash <$> getRawField (prefix ++ "year") <|> return ""
   month' <- (parseMonth
-              <$> getRawField (prefix ++ "month")) <|> return ""
-  day' <- getRawField (prefix ++ "day") <|> return mempty
-  endyear' <- fixLeadingDash <$> getRawField (prefix ++ "endyear") <|> return ""
-  endmonth' <- (parseMonth <$> getRawField (prefix ++ "endmonth")) <|> return ""
-  endday' <- getRawField (prefix ++ "endday") <|> return ""
-  let start' = RefDate { year   = Literal $ if isNumber year' then year' else ""
-                       , month  =
-        Literal month'
-                       , season = mempty
-                       , day    = Literal day'
+              <$> getRawField (prefix ++ "month")) <|> return Nothing
+  day' <- (safeRead <$> getRawField (prefix ++ "day")) <|> return Nothing
+  endyear' <- (fixLeadingDash <$> getRawField (prefix ++ "endyear"))
+            <|> return ""
+  endmonth' <- (parseMonth <$> getRawField (prefix ++ "endmonth"))
+            <|> return Nothing
+  endday' <- (safeRead <$> getRawField (prefix ++ "endday")) <|> return Nothing
+  let start' = RefDate { year   = safeRead year'
+                       , month  = month'
+                       , season = Nothing
+                       , day    = day'
                        , other  = Literal $ if isNumber year' then "" else year'
                        , circa  = False
                        }
-  let end' = if null endyear'
-                then []
-                else [RefDate { year   = Literal $ if isNumber endyear' then endyear' else ""
-                              , month  =
-               Literal endmonth'
-                              , day    =
-               Literal endday'
-                              , season = mempty
-                              , other  = Literal $ if isNumber endyear' then "" else endyear'
-                              , circa  = False
-                              }]
-  return (start':end')
+  let end' = RefDate { year     = safeRead endyear'
+                       , month  = endmonth'
+                       , day    = endday'
+                       , season = Nothing
+                       , other  = Literal $ if isNumber endyear' then "" else endyear'
+                       , circa  = False
+                       }
+  let hasyear r = isJust (year r)
+  return $ filter hasyear [start', end']
 
 getRawField :: String -> Bib String
 getRawField f = do

@@ -50,7 +50,7 @@ references:
   - family: Samarin
     given: Alexander
   issued:
-  - year: '1994'
+  - year: 1994
   title: The LaTeX companion
   title-short: LaTeX companion
   publisher: Addison-Wesley
