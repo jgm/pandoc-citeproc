@@ -28,9 +28,9 @@ matrix:
   include:
   # We grab the appropriate GHC and cabal-install versions from hvr's PPA. See:
   # https://github.com/hvr/multi-ghc-travis
-  - env: BUILD=cabal GHCVER=7.8.4 CABALVER=1.18
+  - env: BUILD=cabal GHCVER=7.8.4 CABALVER=1.22
     compiler: ": #GHC 7.8.4"
-    addons: {apt: {packages: [cabal-install-1.18,ghc-7.8.4,happy-1.19.5], sources: [hvr-ghc]}}
+    addons: {apt: {packages: [cabal-install-1.22,ghc-7.8.4,happy-1.19.5], sources: [hvr-ghc]}}
 
   - env: BUILD=cabal GHCVER=7.10.3 CABALVER=1.22
     compiler: ": #GHC 7.10.3"
