@@ -105,7 +105,6 @@ install:
       cabal --version
       travis_retry cabal update
       cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls --disable-optimization -ffast --reorder-goals --max-backjumps=-1 $CABALARGS
-      cabal test
       ;;
   esac
 
@@ -122,7 +121,7 @@ script:
     cabal)
       cabal sdist --output-directory=sourcedist && \
       cd sourcedist && \
-      cabal configure --enable-tests --enable-benchmarks -ffast -ftest_citeproc -fembed_data_files -v2 --ghc-options="-O0 -Wall -fno-warn-unused-do-bind -Werror" && \
+      cabal configure --enable-tests --enable-benchmarks -ffast -ftest_citeproc -v2 --ghc-options="-O0 -Wall -fno-warn-unused-do-bind -Werror" && \
       cabal build && \
       cabal test
       ;;
