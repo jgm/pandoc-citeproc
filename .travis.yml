@@ -104,7 +104,8 @@ install:
     cabal)
       cabal --version
       travis_retry cabal update
-      cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls --disable-optimization -ffast -fembed_data_files -ftest_citeproc --reorder-goals --max-backjumps=-1 $CABALARGS
+      cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls --disable-optimization -ffast --reorder-goals --max-backjumps=-1 $CABALARGS
+      cabal test
       ;;
   esac
 
