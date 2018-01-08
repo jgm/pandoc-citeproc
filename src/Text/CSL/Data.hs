@@ -25,8 +25,8 @@ import qualified Control.Exception      as E
 import qualified Data.ByteString.Lazy   as L
 import           Data.Typeable
 import           System.FilePath        ()
-#ifdef EMBED_DATA_FILES
 import           Data.Maybe             (fromMaybe)
+#ifdef EMBED_DATA_FILES
 import           Text.CSL.Data.Embedded (defaultCSL, license, localeFiles,
                                          manpage)
 #else
@@ -68,7 +68,7 @@ getLocale s = do
   f <- case length s of
              0 -> return "locales/locales-en-US.xml"
              2 -> getDataFileName ("locales/locales-" ++
-                                Data.Maybe.fromMaybe s (lookup s langBase) ++ ".xml")
+                                fromMaybe s (lookup s langBase) ++ ".xml")
              _ -> getDataFileName ("locales/locales-" ++ take 5 s ++ ".xml")
   exists <- doesFileExist f
   if not exists && length s > 2
