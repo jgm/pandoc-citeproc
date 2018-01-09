@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP                      #-}
-
+{-# LANGUAGE ScopedTypeVariables      #-}
 {-# LANGUAGE PatternGuards            #-}
 -----------------------------------------------------------------------------
 -- |
@@ -23,6 +23,11 @@ module Text.CSL.Input.Bibutils
 import qualified Control.Exception      as E
 import           Data.Aeson
 import qualified Data.ByteString.Lazy   as BL
+import qualified Data.ByteString        as BS
+import qualified Data.HashMap.Strict    as HM
+import qualified Data.Text              as T
+import qualified Data.Yaml              as Yaml
+import qualified Data.Vector            as V
 import           Data.Char
 import qualified Data.Map               as M
 import           System.FilePath        (takeExtension)
@@ -30,6 +35,7 @@ import           Text.CSL.Compat.Pandoc (readMarkdown)
 import           Text.CSL.Exception
 import           Text.CSL.Input.Bibtex
 import           Text.CSL.Reference     hiding (Value)
+import           Text.CSL.Util          (parseString)
 import           Text.Pandoc            hiding (readMarkdown)
 import qualified Text.Pandoc.UTF8       as UTF8
 
@@ -45,7 +51,7 @@ import           Text.Bibutils
 -- | Read a file with a bibliographic database. The database format
 -- is recognized by the file extension.  The first argument is
 -- a predicate to filter citation identifiers.  Currently it
--- does not affect json or yaml bibliographies.
+-- does not affect json bibliographies.
 --
 -- Supported formats are: @json@, @mods@, @bibtex@, @biblatex@, @ris@,
 -- @endnote@, @endnotexml@, @isi@, @medline@, and @copac@.
@@ -161,7 +167,36 @@ readYamlBib :: (String -> Bool) -> String -> Either String [Reference]
 readYamlBib idpred s =
   case readMarkdown s' of
          (Pandoc meta _) -> convertRefs (lookupMeta "references" meta)
-  where s' = s
+  where s' = addTop $ addBottom
+                    $ UTF8.toString
+                    $ selectEntries idpred
+                    $ UTF8.fromString
+                    $ s
+        addTop = ("---\n" ++)
+        addBottom = (++ "...\n")
+
+selectEntries :: (String -> Bool) -> BS.ByteString -> BS.ByteString
+selectEntries idpred bs =
+  case Yaml.decodeEither bs of
+       Right (Array vs) -> Yaml.encode (filterObjects $ V.toList vs)
+       Right (Object o) ->
+              case HM.lookup (T.pack "references") o of
+                   Just (Array vs) ->
+                     Yaml.encode (HM.insert (T.pack "references")
+                                    (filterObjects $ V.toList vs) mempty)
+                   _ -> BS.empty
+       Right _ -> BS.empty
+       Left e  -> E.throw $ ErrorParsingReferences e
+    where filterObjects = filter
+               (\x -> case x of
+                        Object o ->
+                            case HM.lookup (T.pack "id") o of
+                                 Just i ->
+                                  case Yaml.parseMaybe parseString i of
+                                       Just s -> idpred s
+                                       Nothing -> False
+                                 _ -> False
+                        _ -> False)
 
 convertRefs :: Maybe MetaValue -> Either String [Reference]
 convertRefs Nothing = Right []
