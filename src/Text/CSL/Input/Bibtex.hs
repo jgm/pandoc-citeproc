@@ -1,4 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 -----------------------------------------------------------------------------
 -- |
@@ -136,34 +137,32 @@ bibEntries :: BibParser [Item]
 bibEntries = do
   skipMany nonEntry
   many (bibItem <* skipMany nonEntry)
- where nonEntry = bibSkip <|> bibComment <|> bibPreamble <|> bibString
+ where nonEntry = bibSkip <|>
+                  try (char '@' >>
+                       (bibComment <|> bibPreamble <|> bibString))
 
 bibSkip :: BibParser ()
 bibSkip = skipMany1 (satisfy (/='@'))
 
 bibComment :: BibParser ()
-bibComment = try $ do
-  char '@'
+bibComment = do
   cistring "comment"
   spaces
   void inBraces <|> bibSkip <|> return ()
 
 bibPreamble :: BibParser ()
-bibPreamble = try $ do
-  char '@'
+bibPreamble = do
   cistring "preamble"
   spaces
   void inBraces
 
 bibString :: BibParser ()
-bibString = try $ do
-  char '@'
+bibString = do
   cistring "string"
   spaces
   char '{'
   spaces
   (k,v) <- entField
-  spaces
   char '}'
   updateState (Map.insert k v)
   return ()
@@ -208,14 +207,13 @@ bibItem = do
   spaces
   char ','
   spaces
-  entfields <- entField `sepEndBy` char ','
+  entfields <- entField `sepEndBy` (char ',' >> spaces)
   spaces
   char '}'
   return $ Item entid enttype entfields
 
 entField :: BibParser (String, String)
-entField = try $ do
-  spaces
+entField = do
   k <- fieldName
   spaces
   char '='
@@ -237,11 +235,12 @@ expandString = do
        Nothing -> return k -- return raw key if not found
 
 cistring :: String -> BibParser String
-cistring [] = return []
-cistring (c:cs) = do
-  x <- char (toLower c) <|> char (toUpper c)
-  xs <- cistring cs
-  return (x:xs)
+cistring s = try (go s)
+ where go [] = return []
+       go (c:cs) = do
+         x <- char (toLower c) <|> char (toUpper c)
+         xs <- go cs
+         return (x:xs)
 
 resolveCrossRefs :: Bool -> [Item] -> [Item]
 resolveCrossRefs isBibtex entries =
