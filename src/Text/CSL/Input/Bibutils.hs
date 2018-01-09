@@ -55,7 +55,8 @@ readBiblioFile idpred f
         ".json"     -> BL.readFile f >>= either
                        (E.throwIO . ErrorReadingBibFile f) return . eitherDecode
         ".yaml"     -> UTF8.readFile f >>= either
-                       (E.throwIO . ErrorReadingBibFile f) return . readYamlBib
+                       (E.throwIO . ErrorReadingBibFile f) return .
+                       readYamlBib idpred
         ".bib"      -> readBibtex idpred False True f
         ".bibtex"   -> readBibtex idpred True True f
         ".biblatex" -> readBibtex idpred False True f
@@ -93,7 +94,7 @@ readBiblioString idpred b s
     | Json      <- b = either (E.throwIO . ErrorReadingBib)
                          return $ eitherDecode $ UTF8.fromStringLazy s
     | Yaml      <- b = either (E.throwIO . ErrorReadingBib)
-                         return $ readYamlBib s
+                         return $ readYamlBib idpred s
     | Bibtex    <- b = readBibtexString idpred True True s
     | BibLatex  <- b = readBibtexString idpred False True s
 #ifdef USE_BIBUTILS
@@ -156,10 +157,11 @@ createTempDir num baseName = do
 getExt :: String -> String
 getExt = takeExtension . map toLower
 
-readYamlBib :: String -> Either String [Reference]
-readYamlBib s =
-  case readMarkdown s of
+readYamlBib :: (String -> Bool) -> String -> Either String [Reference]
+readYamlBib idpred s =
+  case readMarkdown s' of
          (Pandoc meta _) -> convertRefs (lookupMeta "references" meta)
+  where s' = s
 
 convertRefs :: Maybe MetaValue -> Either String [Reference]
 convertRefs Nothing = Right []
