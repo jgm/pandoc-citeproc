@@ -104,7 +104,7 @@ install:
     cabal)
       cabal --version
       travis_retry cabal update
-      cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls --disable-optimization -ffast --reorder-goals --max-backjumps=-1 $CABALARGS
+      cabal install --only-dependencies --enable-tests --force-reinstalls --disable-optimization -ffast --reorder-goals --max-backjumps=-1 $CABALARGS
       ;;
   esac
 
@@ -121,7 +121,7 @@ script:
     cabal)
       cabal sdist --output-directory=sourcedist && \
       cd sourcedist && \
-      cabal install --enable-tests --run-tests --enable-benchmarks -ffast --ghc-options="-O0 -Wall -fno-warn-unused-do-bind -Werror" ||
-      (ls -R /home/travis/.cabal/share && exit 1)
+      cabal install --enable-tests -ffast --ghc-options="-O0 -Wall -fno-warn-unused-do-bind -Werror" && \
+      cabal test
       ;;
   esac
