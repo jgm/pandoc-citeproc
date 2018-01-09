@@ -89,7 +89,7 @@ inlinesToFormatted ils = do
 
 data Item = Item{ identifier :: String
                 , entryType  :: String
-                , fields     :: [(String, String)]
+                , fields     :: Map.Map String String
                 }
 
 -- | Get 'Lang' from the environment variable LANG, defaulting to en-US.
@@ -210,7 +210,7 @@ bibItem = do
   entfields <- entField `sepEndBy` (char ',' >> spaces)
   spaces
   char '}'
-  return $ Item entid enttype entfields
+  return $ Item entid enttype (Map.fromList entfields)
 
 entField :: BibParser (String, String)
 entField = do
@@ -253,27 +253,29 @@ getXrefFields :: Bool -> Item -> [Item] -> String -> [(String, String)]
 getXrefFields isBibtex baseEntry entries keys = do
   let keys' = splitKeys keys
   xrefEntry <- [e | e <- entries, identifier e `elem` keys']
-  (k, v) <- fields xrefEntry
+  (k, v) <- Map.toList $ fields xrefEntry
   if k == "crossref" || k == "xdata"
      then do
        xs <- mapM (getXrefFields isBibtex baseEntry entries)
                    (splitKeys v)
        (x, y) <- xs
-       guard $ isNothing $ lookup x $ fields xrefEntry
+       guard $ isNothing $ Map.lookup x $ fields xrefEntry
        return (x, y)
      else do
        k' <- if isBibtex
                 then return k
                 else transformKey (entryType xrefEntry) (entryType baseEntry) k
-       guard $ isNothing $ lookup k' $ fields baseEntry
+       guard $ isNothing $ Map.lookup k' $ fields baseEntry
        return (k',v)
 
 resolveCrossRef :: Bool -> [Item] -> Item -> Item
-resolveCrossRef isBibtex entries entry = foldr go entry (fields entry)
-  where go (key, val) entry' =
+resolveCrossRef isBibtex entries entry =
+  Map.foldrWithKey go entry (fields entry)
+  where go key val entry' =
           if key == "crossref" || key == "xdata"
-          then entry'{ fields = fields entry' ++
-                                    getXrefFields isBibtex entry entries val }
+          then entry'{ fields = fields entry' <>
+                          Map.fromList (getXrefFields isBibtex
+                                        entry entries val) }
           else entry'
 
 -- transformKey source target key
@@ -880,21 +882,21 @@ notFound f = fail $ f ++ " not found"
 getField :: String -> Bib Formatted
 getField f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> latex x
        Nothing -> notFound f
 
 getPeriodicalTitle :: String -> Bib Formatted
 getPeriodicalTitle f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> blocksToFormatted $ onBlocks protectCase $ latex' $ trim x
        Nothing -> notFound f
 
 getTitle :: String -> Bib Formatted
 getTitle f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> latexTitle x
        Nothing -> notFound f
 
@@ -903,7 +905,7 @@ getShortTitle requireColon f = do
   fs <- asks fields
   utc <- gets untitlecase
   let processTitle = if utc then onBlocks unTitlecase else id
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> case processTitle $ latex' x of
                        bs | not requireColon || containsColon bs ->
                                   blocksToFormatted $ upToColon bs
@@ -965,21 +967,21 @@ getOldDates prefix = do
 getRawField :: String -> Bib String
 getRawField f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> return x
        Nothing -> notFound f
 
 getAuthorList :: Options -> String -> Bib [Agent]
 getAuthorList opts  f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> latexAuthors opts x
        Nothing -> notFound f
 
 getLiteralList :: String -> Bib [Formatted]
 getLiteralList f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> toLiteralList $ latex' x
        Nothing -> notFound f
 
