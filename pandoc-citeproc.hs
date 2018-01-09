@@ -54,35 +54,37 @@ main = do
   when (License `elem` flags) $ do
     getLicense >>= BL.putStr
     exitSuccess
-  if Bib2YAML `elem` flags || Bib2JSON `elem` flags
-     then do
-       let mbformat = case [f | Format f <- flags] of
-                           [x] -> readFormat x
-                           _   -> Nothing
-       bibformat <- case mbformat <|>
-                         msum (map formatFromExtension args) of
-                         Just f   -> return f
-                         Nothing  -> do
-                            UTF8.hPutStrLn stderr $ usageInfo
-                              ("Unknown format\n" ++ header) options
-                            exitWith $ ExitFailure 3
-       bibstring <- case args of
-                         [] -> UTF8.getContents
-                         xs -> mconcat <$> mapM UTF8.readFile xs
-       readBiblioString (const True) bibformat bibstring >>=
-         warnDuplicateKeys >>=
-         if Bib2YAML `elem` flags
-            then outputYamlBlock .
-                 B8.intercalate (B.singleton 10) .
-                 map (unescapeTags . toByteString . (:[]))
-            else B8.putStrLn . unescapeUnicode . B.concat . BL.toChunks .
-              encodePretty' defConfig{ confIndent = Spaces 2
-                                     , confCompare = compare
-                                     , confNumFormat = Generic }
-     else E.catch (toJSONFilter doCites)
-          (\(e :: CiteprocException) -> do
-             UTF8.hPutStrLn stderr $ renderError e
-             exitWith (ExitFailure 1))
+
+  E.handle
+    (\(e :: CiteprocException) -> do
+        UTF8.hPutStrLn stderr $ renderError e
+        exitWith (ExitFailure 1)) $
+    if Bib2YAML `elem` flags || Bib2JSON `elem` flags
+       then do
+         let mbformat = case [f | Format f <- flags] of
+                             [x] -> readFormat x
+                             _   -> Nothing
+         bibformat <- case mbformat <|>
+                           msum (map formatFromExtension args) of
+                           Just f   -> return f
+                           Nothing  -> do
+                              UTF8.hPutStrLn stderr $ usageInfo
+                                ("Unknown format\n" ++ header) options
+                              exitWith $ ExitFailure 3
+         bibstring <- case args of
+                           [] -> UTF8.getContents
+                           xs -> mconcat <$> mapM UTF8.readFile xs
+         readBiblioString (const True) bibformat bibstring >>=
+           warnDuplicateKeys >>=
+           if Bib2YAML `elem` flags
+              then outputYamlBlock .
+                   B8.intercalate (B.singleton 10) .
+                   map (unescapeTags . toByteString . (:[]))
+              else B8.putStrLn . unescapeUnicode . B.concat . BL.toChunks .
+                encodePretty' defConfig{ confIndent = Spaces 2
+                                       , confCompare = compare
+                                       , confNumFormat = Generic }
+       else toJSONFilter doCites
 
 formatFromExtension :: FilePath -> Maybe BibFormat
 formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
