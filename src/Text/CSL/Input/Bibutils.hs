@@ -43,28 +43,30 @@ import           Text.Bibutils
 #endif
 
 -- | Read a file with a bibliographic database. The database format
--- is recognized by the file extension.
+-- is recognized by the file extension.  The first argument is
+-- a predicate to filter citation identifiers.  Currently it
+-- does not affect json or yaml bibliographies.
 --
 -- Supported formats are: @json@, @mods@, @bibtex@, @biblatex@, @ris@,
 -- @endnote@, @endnotexml@, @isi@, @medline@, and @copac@.
-readBiblioFile :: FilePath -> IO [Reference]
-readBiblioFile f
+readBiblioFile :: (String -> Bool) -> FilePath -> IO [Reference]
+readBiblioFile idpred f
     = case getExt f of
         ".json"     -> BL.readFile f >>= either
                        (E.throwIO . ErrorReadingBibFile f) return . eitherDecode
         ".yaml"     -> UTF8.readFile f >>= either
                        (E.throwIO . ErrorReadingBibFile f) return . readYamlBib
-        ".bib"      -> readBibtex False True f
-        ".bibtex"   -> readBibtex True True f
-        ".biblatex" -> readBibtex False True f
+        ".bib"      -> readBibtex idpred False True f
+        ".bibtex"   -> readBibtex idpred True True f
+        ".biblatex" -> readBibtex idpred False True f
 #ifdef USE_BIBUTILS
-        ".mods"     -> readBiblioFile' f mods_in
-        ".ris"      -> readBiblioFile' f ris_in
-        ".enl"      -> readBiblioFile' f endnote_in
-        ".xml"      -> readBiblioFile' f endnotexml_in
-        ".wos"      -> readBiblioFile' f isi_in
-        ".medline"  -> readBiblioFile' f medline_in
-        ".copac"    -> readBiblioFile' f copac_in
+        ".mods"     -> readBiblioFile' idpred f mods_in
+        ".ris"      -> readBiblioFile' idpred f ris_in
+        ".enl"      -> readBiblioFile' idpred f endnote_in
+        ".xml"      -> readBiblioFile' idpred f endnotexml_in
+        ".wos"      -> readBiblioFile' idpred f isi_in
+        ".medline"  -> readBiblioFile' idpred f medline_in
+        ".copac"    -> readBiblioFile' idpred f copac_in
         _           -> E.throwIO $ ErrorReadingBibFile f "the format of the bibliographic database could not be recognized from the file extension"
 #else
         _           -> E.throwIO $ ErrorReadingBibFile f "bibliography format not supported"
@@ -86,14 +88,14 @@ data BibFormat
 #endif
     deriving Show
 
-readBiblioString :: BibFormat -> String -> IO [Reference]
-readBiblioString b s
+readBiblioString :: (String -> Bool) -> BibFormat -> String -> IO [Reference]
+readBiblioString idpred b s
     | Json      <- b = either (E.throwIO . ErrorReadingBib)
                          return $ eitherDecode $ UTF8.fromStringLazy s
     | Yaml      <- b = either (E.throwIO . ErrorReadingBib)
                          return $ readYamlBib s
-    | Bibtex    <- b = readBibtexString True True s
-    | BibLatex  <- b = readBibtexString False True s
+    | Bibtex    <- b = readBibtexString idpred True True s
+    | BibLatex  <- b = readBibtexString idpred False True s
 #ifdef USE_BIBUTILS
     | Ris       <- b = go ris_in
     | Endnote   <- b = go endnote_in
@@ -110,13 +112,13 @@ readBiblioString b s
       go f = withTempDir "citeproc" $ \tdir -> do
                let tfile = tdir </> "bibutils-tmp.biblio"
                UTF8.writeFile tfile s
-               readBiblioFile' tfile f
+               readBiblioFile' idpred tfile f
 #endif
 
 #ifdef USE_BIBUTILS
-readBiblioFile' :: FilePath -> BiblioIn -> IO [Reference]
-readBiblioFile' fin bin
-    | bin == biblatex_in = readBibtex False True fin
+readBiblioFile' :: (String -> Bool) -> FilePath -> BiblioIn -> IO [Reference]
+readBiblioFile' idpred fin bin
+    | bin == biblatex_in = readBibtex idpred False True fin
     | otherwise      = withTempDir "citeproc"
                        $ \tdir -> do
                             let tfile = tdir </> "bibutils-tmp"
@@ -130,7 +132,7 @@ readBiblioFile' fin bin
                               _ <- bibl_write param bibl tfile
                               bibl_free bibl
                               bibl_freeparams param
-                            refs <- readBibtex True False tfile
+                            refs <- readBibtex idpred True False tfile
                             return $! refs
   where handleBibfileError :: E.SomeException -> IO ()
         handleBibfileError e = E.throwIO $ ErrorReadingBibFile fin (show e)

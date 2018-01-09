@@ -69,7 +69,7 @@ main = do
        bibstring <- case args of
                          [] -> UTF8.getContents
                          xs -> mconcat <$> mapM UTF8.readFile xs
-       readBiblioString bibformat bibstring >>=
+       readBiblioString (const True) bibformat bibstring >>=
          warnDuplicateKeys >>=
          if Bib2YAML `elem` flags
             then outputYamlBlock .

@@ -102,20 +102,22 @@ getLangFromEnv = do
                   Nothing -> Lang "en" "US"
 
 -- | Parse a BibTeX or BibLaTeX file into a list of 'Reference's.
--- If the first parameter is true, the file will be treated as
--- BibTeX; otherwse as BibLaTeX.  If the second parameter is
+-- The first parameter is a predicate to filter identifiers.
+-- If the second parameter is true, the file will be treated as
+-- BibTeX; otherwse as BibLaTeX.  If the third parameter is
 -- true, an "untitlecase" transformation will be performed.
-readBibtex :: Bool -> Bool -> FilePath -> IO [Reference]
-readBibtex isBibtex caseTransform f = do
+readBibtex :: (String -> Bool) -> Bool -> Bool -> FilePath -> IO [Reference]
+readBibtex idpred isBibtex caseTransform f = do
   contents <- UTF8.readFile f
-  E.catch (readBibtexString isBibtex caseTransform contents)
+  E.catch (readBibtexString idpred isBibtex caseTransform contents)
         (\e -> case e of
                   ErrorReadingBib es -> E.throwIO $ ErrorReadingBibFile f es
                   _                  -> E.throwIO e)
 
 -- | Like 'readBibtex' but operates on a String rather than a file.
-readBibtexString :: Bool -> Bool -> String -> IO [Reference]
-readBibtexString isBibtex caseTransform contents = do
+readBibtexString :: (String -> Bool) -> Bool -> Bool -> String
+                 -> IO [Reference]
+readBibtexString idpred isBibtex caseTransform contents = do
   lang <- getLangFromEnv
   locale <- parseLocale (langToLocale lang)
   case runParser (bibEntries <* eof) [] "stdin" contents of
@@ -123,7 +125,9 @@ readBibtexString isBibtex caseTransform contents = do
           Left err -> E.throwIO $ ErrorReadingBib $ drop 8 $ show err
           Right xs -> return $ mapMaybe
             (itemToReference lang locale isBibtex caseTransform)
-            (resolveCrossRefs isBibtex xs)
+            (filter (idpred . identifier)
+              (resolveCrossRefs isBibtex
+                xs))
 
 type BibParser = Parsec String [(String, String)]
 

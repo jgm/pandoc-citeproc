@@ -15,6 +15,7 @@ import qualified Data.ByteString.Lazy     as L
 import           Data.Char                (isDigit, isPunctuation, isSpace,
                                            toLower)
 import qualified Data.Map                 as M
+import qualified Data.Set                 as Set
 import           Data.Maybe               (fromMaybe)
 import           System.Directory         (getAppUserDataDirectory)
 import           System.Environment       (getEnv)
@@ -189,8 +190,12 @@ processCites' (Pandoc meta blocks) = do
               setEnv "LC_ALL" "en-US.UTF-8"
             else
               setEnv "LC_ALL" envlang
-  bibRefs <- getBibRefs $ Data.Maybe.fromMaybe (MetaList [])
-                        $ lookupMeta "bibliography" meta
+  let citids = query getCitationIds (Pandoc meta blocks)
+  let idpred = if "*" `Set.member` citids
+                  then const True
+                  else (`Set.member` citids)
+  bibRefs <- getBibRefs idpred $ Data.Maybe.fromMaybe (MetaList [])
+                               $ lookupMeta "bibliography" meta
   let refs = inlineRefs ++ bibRefs
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
   let skipLeadingSpace = L.dropWhile (\s -> s == 32 || (s >= 9 && s <= 13))
@@ -212,13 +217,13 @@ toPath (MetaList xs) = case reverse xs of
 toPath (MetaInlines ils) = Just $ stringify ils
 toPath _ = Nothing
 
-getBibRefs :: MetaValue -> IO [Reference]
-getBibRefs (MetaList xs) = concat `fmap` mapM getBibRefs xs
-getBibRefs (MetaInlines xs) = getBibRefs (MetaString $ stringify xs)
-getBibRefs (MetaString s) = do
+getBibRefs :: (String -> Bool) -> MetaValue -> IO [Reference]
+getBibRefs idpred (MetaList xs) = concat `fmap` mapM (getBibRefs idpred) xs
+getBibRefs idpred (MetaInlines xs) = getBibRefs idpred (MetaString $ stringify xs)
+getBibRefs idpred (MetaString s) = do
   path <- findFile ["."] s >>= maybe (E.throwIO $ CouldNotFindBibFile s) return
-  map unescapeRefId `fmap` readBiblioFile path
-getBibRefs _ = return []
+  map unescapeRefId `fmap` readBiblioFile idpred path
+getBibRefs _ _ = return []
 
 -- unescape reference ids, which may contain XML entities, so
 -- that we can do lookups with regular string equality
@@ -341,6 +346,10 @@ comb f xs ys =
 getCitation :: Inline -> [[Citation]]
 getCitation i | Cite t _ <- i = [t]
               | otherwise     = []
+
+getCitationIds :: Inline -> Set.Set String
+getCitationIds (Cite cs _) = Set.fromList (map citationId cs)
+getCitationIds _ = mempty
 
 setHashes :: Inline -> State Int Inline
 setHashes i | Cite t ils <- i = do t' <- mapM setHash t
