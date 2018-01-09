@@ -50,8 +50,7 @@ import           Text.Bibutils
 
 -- | Read a file with a bibliographic database. The database format
 -- is recognized by the file extension.  The first argument is
--- a predicate to filter citation identifiers.  Currently it
--- does not affect json bibliographies.
+-- a predicate to filter citation identifiers.
 --
 -- Supported formats are: @json@, @mods@, @bibtex@, @biblatex@, @ris@,
 -- @endnote@, @endnotexml@, @isi@, @medline@, and @copac@.
@@ -59,7 +58,8 @@ readBiblioFile :: (String -> Bool) -> FilePath -> IO [Reference]
 readBiblioFile idpred f
     = case getExt f of
         ".json"     -> BL.readFile f >>= either
-                       (E.throwIO . ErrorReadingBibFile f) return . eitherDecode
+                       (E.throwIO . ErrorReadingBibFile f)
+                       (return . filterEntries idpred) . eitherDecode
         ".yaml"     -> UTF8.readFile f >>= either
                        (E.throwIO . ErrorReadingBibFile f) return .
                        readYamlBib idpred
@@ -197,6 +197,9 @@ selectEntries idpred bs =
                                        Nothing -> False
                                  _ -> False
                         _ -> False)
+
+filterEntries :: (String -> Bool) -> [Reference] -> [Reference]
+filterEntries idpred = filter (\r -> idpred (unLiteral (refId r)))
 
 convertRefs :: Maybe MetaValue -> Either String [Reference]
 convertRefs Nothing = Right []
