@@ -28,6 +28,7 @@ import           Data.Char              (isAlphaNum, isDigit, isUpper, toLower,
                                          toUpper)
 import           Data.List              (foldl', intercalate)
 import           Data.List.Split        (splitOn, splitWhen, wordsBy)
+import qualified Data.Map               as Map
 import           Data.Maybe
 import           System.Environment     (getEnvironment)
 import           Text.CSL.Compat.Pandoc (readLaTeX)
@@ -120,7 +121,7 @@ readBibtexString :: (String -> Bool) -> Bool -> Bool -> String
 readBibtexString idpred isBibtex caseTransform contents = do
   lang <- getLangFromEnv
   locale <- parseLocale (langToLocale lang)
-  case runParser (bibEntries <* eof) [] "stdin" contents of
+  case runParser (bibEntries <* eof) (Map.empty) "stdin" contents of
                       -- drop 8 to remove "stdin" + space
           Left err -> E.throwIO $ ErrorReadingBib $ drop 8 $ show err
           Right xs -> return $ mapMaybe
@@ -129,7 +130,7 @@ readBibtexString idpred isBibtex caseTransform contents = do
               (resolveCrossRefs isBibtex
                 xs))
 
-type BibParser = Parsec String [(String, String)]
+type BibParser = Parsec String (Map.Map String String)
 
 bibEntries :: BibParser [Item]
 bibEntries = do
@@ -161,10 +162,10 @@ bibString = try $ do
   spaces
   char '{'
   spaces
-  f <- entField
+  (k,v) <- entField
   spaces
   char '}'
-  updateState (f:)
+  updateState (Map.insert k v)
   return ()
 
 inBraces :: BibParser String
@@ -231,7 +232,7 @@ expandString :: BibParser String
 expandString = do
   k <- fieldName
   strs <- getState
-  case lookup k strs of
+  case Map.lookup k strs of
        Just v  -> return v
        Nothing -> return k -- return raw key if not found
 
