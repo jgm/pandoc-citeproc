@@ -41,7 +41,6 @@ import           Text.CSL.Style         (Agent (..), CslTerm (..),
 import           Text.CSL.Util          (onBlocks, protectCase, safeRead,
                                          splitStrWhen, trim, unTitlecase)
 import           Text.Pandoc.Definition
-import           Text.Pandoc.Generic    (bottomUp)
 import qualified Text.Pandoc.UTF8       as UTF8
 import qualified Text.Pandoc.Walk       as Walk
 import Text.Parsec hiding (State, many, (<|>))
@@ -57,7 +56,8 @@ adjustSpans :: Lang -> Inline -> [Inline]
 adjustSpans _ (Span ("",[],[]) xs) = xs
 adjustSpans lang (RawInline (Format "latex") s)
   | s == "\\hyphen" || s == "\\hyphen " = [Str "-"]
-  | otherwise = bottomUp (concatMap (adjustSpans lang)) $ parseRawLaTeX lang s
+  | otherwise = Walk.walk (concatMap (adjustSpans lang))
+                $ parseRawLaTeX lang s
 adjustSpans _ x = [x]
 
 parseRawLaTeX :: Lang -> String -> [Inline]
@@ -85,7 +85,7 @@ parseRawLaTeX _ _ = []
 inlinesToFormatted :: [Inline] -> Bib Formatted
 inlinesToFormatted ils = do
   lang <- gets localeLanguage
-  return $ Formatted $ bottomUp (concatMap (adjustSpans lang)) ils
+  return $ Formatted $ Walk.walk (concatMap (adjustSpans lang)) ils
 
 data Item = Item{ identifier :: String
                 , entryType  :: String

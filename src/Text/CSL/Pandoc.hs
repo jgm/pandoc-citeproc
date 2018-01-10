@@ -60,12 +60,12 @@ processCites style refs (Pandoc m1 b1) =
       moveNotes     = case lookupMeta "notes-after-punctuation" m1 of
                            Just (MetaBool False) -> False
                            _                     -> True
-      Pandoc m3 bs  = bottomUp (mvPunct moveNotes style) . deNote .
-                        topDown (processCite style cits_map) $ Pandoc m2 b2
+      Pandoc m3 bs  = walk (mvPunct moveNotes style) . deNote .
+                        walk (processCite style cits_map) $ Pandoc m2 b2
       m             = case metanocites of
                             Nothing -> m3
                             Just x  -> setMeta "nocite" x m3
-  in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
+  in  Pandoc m $ walk (concatMap removeNocaseSpans)
                $ insertRefs m biblioList bs
 
 -- if document contains a Div with id="refs", insert
@@ -272,34 +272,38 @@ isSpacy SoftBreak = True
 isSpacy _         = False
 
 mvPunct :: Bool -> Style -> [Inline] -> [Inline]
-mvPunct _ _ (x : Space : xs)
-  | isSpacy x = x : xs
-mvPunct moveNotes _ (s : x : ys)
+mvPunct moveNotes sty (x : Space : xs)
+  | isSpacy x = x : mvPunct moveNotes sty xs
+mvPunct moveNotes sty (s : x : ys)
   | isSpacy s
   , isNote x
   , startWithPunct ys
   = if moveNotes
-       then Str (headInline ys) : x : tailInline ys
-       else x : ys
-mvPunct moveNotes _ (Cite cs ils : ys)
+       then Str (headInline ys) : x :
+            mvPunct moveNotes sty (tailInline ys)
+       else x : mvPunct moveNotes sty ys
+mvPunct moveNotes sty (Cite cs ils : ys)
    | length ils > 1
    , isNote (last ils)
    , startWithPunct ys
    , moveNotes
    = Cite cs (init ils
      ++ [Str (headInline ys) | not (endWithPunct False (init ils))]
-     ++ [last ils]) : tailInline ys
+     ++ [last ils]) : mvPunct moveNotes sty (tailInline ys)
 mvPunct moveNotes sty (q@(Quoted _ _) : w@(Str _) : x : ys)
   | isNote x
   , isPunctuationInQuote sty
   , moveNotes
-  = mvPunctInsideQuote q w ++ (x : ys)
-mvPunct _ _ (s : x : ys) | isSpacy s, isNote x = x : ys
-mvPunct _ _ (s : x@(Cite _ (Superscript _ : _)) : ys) | isSpacy s = x : ys
-mvPunct _ _ (Cite cs ils : Str "." : ys)
+  = mvPunctInsideQuote q w ++ (x : mvPunct moveNotes sty ys)
+mvPunct moveNotes sty (s : x : ys) | isSpacy s, isNote x =
+  x : mvPunct moveNotes sty ys
+mvPunct moveNotes sty (s : x@(Cite _ (Superscript _ : _)) : ys)
+  | isSpacy s = x : mvPunct moveNotes sty ys
+mvPunct moveNotes sty (Cite cs ils : Str "." : ys)
   | lastInline ils == "."
-  = Cite cs ils : ys
-mvPunct _ _ xs = xs
+  = Cite cs ils : mvPunct moveNotes sty ys
+mvPunct moveNotes sty (x:xs) = x : mvPunct moveNotes sty xs
+mvPunct _ _ [] = []
 
 endWithPunct :: Bool -> [Inline] -> Bool
 endWithPunct _ [] = True

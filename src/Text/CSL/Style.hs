@@ -116,7 +116,6 @@ import           Text.CSL.Util          (betterThan, headInline, initInline,
                                          parseString, query, splitStrWhen,
                                          tailInline, trimr, (.#:), (.#?),
                                          AddYaml(..))
-import           Text.Pandoc            (bottomUp)
 import qualified Text.Pandoc.Builder    as B
 import           Text.Pandoc.Definition hiding (Citation, Cite)
 import qualified Text.Pandoc.Walk       as Walk
@@ -165,13 +164,13 @@ writeYAMLString :: [Inline] -> String
 writeYAMLString ils =
   trimr $ writeMarkdown
         $ Pandoc nullMeta
-          [Plain $ bottomUp (concatMap (adjustCSL False)) ils]
+          [Plain $ Walk.walk (concatMap (adjustCSL False)) ils]
 
 writeCSLString :: [Inline] -> String
 writeCSLString ils =
   trimr $ writeMarkdown
         $ Pandoc nullMeta
-          [Plain $ bottomUp (concatMap (adjustCSL True)) ils]
+          [Plain $ Walk.walk (concatMap (adjustCSL True)) ils]
 
 -- If the first param is True, we use special rich text conventions
 -- for CSL JSON, described here:
