@@ -1,3 +1,36 @@
+pandoc-citeproc (0.13)
+
+  * Made bibliography parsing more efficient.  (API change)
+    This commit adds an extra parameter to the bibliography parsing
+    functions: readBibtex, readBibtexString, readBiblioString,
+    readBiblioFile.  The extra (first) parameter is a function
+    from strings to booleans that acts as a filter on citation
+    identifiers, so that non-matching identifiers are not parsed
+    in full.  pandoc-citeproc now gets a list of the citation
+    identifiers in a document and passes it to readBiblio*,
+    which gives a very substantial speed increase with large
+    bibliographies.  This is most noticable with bibtex,
+    biblatex, and yaml bibliographies.
+
+  * Improved RefDate type (#313, API change).  RefDate fields
+    (month, day, season, year) were previously strings; they've
+    been changed to Maybe Int.  In addition, the AddYaml class
+    is exported from Text.CSL.Util; (&=) is now a method of that
+    class.  Finally, parseEDTFDate is exported from Text.CSL.Reference,
+    and is used instead of the old date parsing code in
+    Text.CSL.Input.Bibtex.
+
+  * Link to bibliographies in undated citations, like
+    (Doe, n.d.) (#250).
+
+  * Bibtex parser: a few efficiency improvements.
+
+  * pandoc-citeproc.hs - better exception messages for -y and -j.
+
+  * Added needed import of fromMaybe without embed_data_files.
+    This makes it possible to build pandoc-citeproc without
+    the embed_data_files flag again.
+
 pandoc-citeproc (0.12.2.5)
 
   * Fixed spurious disambiguation on some date ranges (#312).
