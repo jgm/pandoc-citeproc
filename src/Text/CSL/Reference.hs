@@ -1,6 +1,5 @@
 {-# LANGUAGE CPP                        #-}
 {-# LANGUAGE DeriveDataTypeable         #-}
-{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE ExistentialQuantification  #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -59,8 +58,8 @@ import           Data.Aeson          hiding (Value)
 import qualified Data.Aeson          as Aeson
 import           Data.Aeson.Types    (Parser)
 import           Data.Char           (isDigit, toLower)
+import           Data.Generics
 import           Data.Either         (lefts, rights)
-import           Data.Generics       hiding (Generic)
 import qualified Data.HashMap.Strict as H
 import           Data.List           (elemIndex, intercalate)
 import           Data.List.Split     (splitWhen)
@@ -71,7 +70,6 @@ import qualified Data.Text           as T
 import qualified Data.Vector         as V
 import           Data.Yaml.Builder   (ToYaml (..))
 import qualified Data.Yaml.Builder   as Y
-import           GHC.Generics        (Generic)
 import           Text.CSL.Style      hiding (Number)
 import           Text.CSL.Util       (camelize, capitalize, inlinesToString,
                                       mapping', parseBool, parseInt, parseMaybeInt,
@@ -82,7 +80,7 @@ import qualified Text.Parsec         as P
 import qualified Text.Parsec.String  as P
 
 newtype Literal = Literal { unLiteral :: String }
-  deriving ( Show, Read, Eq, Data, Typeable, Monoid, Generic )
+  deriving ( Show, Read, Eq, Data, Typeable, Monoid )
 
 instance AddYaml Literal
   where x &= (Literal y) = x &= (T.pack y)
@@ -130,7 +128,7 @@ isValueSet val
     | Just _ <- fromValue val :: Maybe Empty     = True
     | otherwise = False
 
-data Empty = Empty deriving ( Typeable, Data, Generic )
+data Empty = Empty deriving ( Typeable, Data )
 
 data RefDate =
     RefDate { year   :: Maybe Int
@@ -139,7 +137,7 @@ data RefDate =
             , day    :: Maybe Int
             , other  :: Literal
             , circa  :: Bool
-            } deriving ( Show, Read, Eq, Typeable, Data, Generic )
+            } deriving ( Show, Read, Eq, Typeable, Data )
 
 instance AddYaml RefDate where
   _ &= (RefDate Nothing Nothing Nothing Nothing o _) | o == mempty = id
@@ -293,7 +291,7 @@ data RefType
     | Thesis
     | Treaty
     | Webpage
-      deriving ( Read, Eq, Typeable, Data, Generic )
+      deriving ( Read, Eq, Typeable, Data )
 
 instance Show RefType where
     show x = map toLower . uncamelize . showConstr . toConstr $ x
@@ -324,7 +322,7 @@ handleSpecialCases "personal-communication" = "personal_communication"
 handleSpecialCases "legal-case"             = "legal_case"
 handleSpecialCases x                        = x
 
-newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data, Generic )
+newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data )
 
 instance FromJSON CNum where
   parseJSON x = CNum `fmap` parseInt x
@@ -335,7 +333,7 @@ instance ToJSON CNum where
 instance ToYaml CNum where
   toYaml r = Y.string (T.pack $ show $ unCNum r)
 
-newtype CLabel = CLabel { unCLabel :: String } deriving ( Show, Read, Eq, Typeable, Data, Generic )
+newtype CLabel = CLabel { unCLabel :: String } deriving ( Show, Read, Eq, Typeable, Data )
 
 instance Monoid CLabel where
     mempty = CLabel mempty
@@ -432,7 +430,7 @@ data Reference =
     , citationNumber           :: CNum
     , firstReferenceNoteNumber :: Int
     , citationLabel            :: CLabel
-    } deriving ( Eq, Show, Read, Typeable, Data, Generic )
+    } deriving ( Eq, Show, Read, Typeable, Data )
 
 instance FromJSON Reference where
   parseJSON (Object v') = do
