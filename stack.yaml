@@ -13,4 +13,6 @@ extra-deps:
 - pandoc-2.1
 - hslua-0.9.5
 - skylighting-0.5.1
+ghc-options:
+   "$locals": -fhide-source-paths
 resolver: lts-10.2
