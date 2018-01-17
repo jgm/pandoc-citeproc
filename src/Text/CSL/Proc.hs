@@ -317,6 +317,7 @@ formatCitLayout s (CG co f d cs)
     | otherwise = formatCits cs
     where
       isNote    = styleClass s == "note"
+      toNote (Formatted []) = mempty
       toNote (Formatted xs) = Formatted [Note [Para xs]]
       combine (Formatted []) ys = ys
       combine xs ys =
