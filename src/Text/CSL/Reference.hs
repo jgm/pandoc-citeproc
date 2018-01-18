@@ -205,7 +205,7 @@ instance OVERLAPS
     raw' <- v .:? "raw"
     dateParts <- v .:? "date-parts"
     circa' <- (v .: "circa" >>= parseBool) <|> pure False
-    season' <- v .:? "season"
+    season' <- v .:? "season" >>= parseMaybeInt
     case dateParts of
          Just (Array xs) | isNothing raw' && not (V.null xs)
                           -> mapM (fmap (setCirca circa' .
@@ -253,8 +253,8 @@ toDatePart refdate =
 setCirca :: Bool -> RefDate -> RefDate
 setCirca circa' rd = rd{ circa = circa' }
 
-setSeason :: Maybe Int -> RefDate -> RefDate
-setSeason season' rd = rd{ season = season' }
+setSeason :: Int -> RefDate -> RefDate
+setSeason season' rd = rd{ season = Just season' }
 
 data RefType
     = NoType
