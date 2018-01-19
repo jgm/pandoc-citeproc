@@ -35,6 +35,8 @@ module Text.CSL.Reference ( Literal(..)
                           , fromValue
                           , isValueSet
                           , Empty(..)
+                          , Season(..)
+                          , seasonToInt
                           , RefDate(..)
                           , handleLiteral
                           , toDatePart
@@ -62,7 +64,7 @@ import           Data.Char           (isDigit, toLower)
 import           Data.Either         (lefts, rights)
 import           Data.Generics       hiding (Generic)
 import qualified Data.HashMap.Strict as H
-import           Data.List           (elemIndex, intercalate)
+import           Data.List           (elemIndex)
 import           Data.List.Split     (splitWhen)
 import           Data.Maybe          (fromMaybe, isNothing)
 import           Data.String
@@ -132,10 +134,55 @@ isValueSet val
 
 data Empty = Empty deriving ( Typeable, Data, Generic )
 
+data Season = Spring | Summer | Autumn | Winter | RawSeason String
+     deriving (Show, Read, Eq, Typeable, Data, Generic)
+
+instance ToYaml Season where
+  toYaml Spring = toYaml (1 :: Int)
+  toYaml Summer = toYaml (2 :: Int)
+  toYaml Autumn = toYaml (3 :: Int)
+  toYaml Winter = toYaml (4 :: Int)
+  toYaml (RawSeason s) = toYaml (T.pack s)
+
+seasonToInt :: Season -> Maybe Int
+seasonToInt Spring = Just 1
+seasonToInt Summer = Just 2
+seasonToInt Autumn = Just 3
+seasonToInt Winter = Just 4
+seasonToInt _      = Nothing
+
+intToSeason :: Int -> Maybe Season
+intToSeason 1 = Just Spring
+intToSeason 2 = Just Summer
+intToSeason 3 = Just Autumn
+intToSeason 4 = Just Winter
+intToSeason _  = Nothing
+
+pseudoMonthToSeason :: Int -> Maybe Season
+pseudoMonthToSeason n
+  | n >= 13 && n <= 16 = intToSeason (n - 12)
+  | n >= 21 && n <= 24 = intToSeason (n - 20)
+  | otherwise          = Nothing
+
+-- | Parse JSON value as Maybe Season.
+parseMaybeSeason :: Maybe Aeson.Value -> Parser (Maybe Season)
+parseMaybeSeason Nothing = return Nothing
+parseMaybeSeason (Just x) = do
+  mbn <- parseMaybeInt (Just x) <|> return Nothing
+  case mbn of
+       Just n -> case intToSeason n of
+                      Just s  -> return $ Just s
+                      Nothing -> fail $ "Could not read season: " ++ show n
+       Nothing -> do
+         s <- parseString x
+         if null s
+            then return Nothing
+            else return $ Just $ RawSeason s
+
 data RefDate =
     RefDate { year   :: Maybe Int
             , month  :: Maybe Int
-            , season :: Maybe Int
+            , season :: Maybe Season
             , day    :: Maybe Int
             , other  :: Literal
             , circa  :: Bool
@@ -158,20 +205,13 @@ instance FromJSON RefDate where
           Error e         -> fail $ "Could not parse RefDate: " ++ e
           _               -> fail "Could not parse RefDate"
      where handlePseudoMonths r =
-              case month r of
-                   Just 13 -> r{ month = Nothing, season = Just 1 }
-                   Just 14 -> r{ month = Nothing, season = Just 2 }
-                   Just 15 -> r{ month = Nothing, season = Just 3 }
-                   Just 16 -> r{ month = Nothing, season = Just 4 }
-                   Just 21 -> r{ month = Nothing, season = Just 1 }
-                   Just 22 -> r{ month = Nothing, season = Just 2 }
-                   Just 23 -> r{ month = Nothing, season = Just 3 }
-                   Just 24 -> r{ month = Nothing, season = Just 4 }
-                   _    -> r
+              case month r >>= pseudoMonthToSeason of
+                   Just s  -> r{ month = Nothing, season = Just s }
+                   Nothing -> r
   parseJSON (Object v) = RefDate <$>
               (v .:? "year" >>= parseMaybeInt) <*>
               (v .:? "month" >>= parseMaybeInt) <*>
-              (v .:? "season" >>= parseMaybeInt) <*>
+              (v .:? "season" >>= parseMaybeSeason) <*>
               (v .:? "day" >>= parseMaybeInt) <*>
               v .:? "literal" .!= "" <*>
               ((v .: "circa" >>= parseBool) <|> pure False)
@@ -205,7 +245,7 @@ instance OVERLAPS
     raw' <- v .:? "raw"
     dateParts <- v .:? "date-parts"
     circa' <- (v .: "circa" >>= parseBool) <|> pure False
-    season' <- v .:? "season" >>= parseMaybeInt
+    season' <- v .:? "season" >>= parseMaybeSeason
     case dateParts of
          Just (Array xs) | isNothing raw' && not (V.null xs)
                           -> mapM (fmap (setCirca circa' .
@@ -219,11 +259,31 @@ instance OVERLAPS
 instance OVERLAPS
          ToJSON [RefDate] where
   toJSON [] = Array V.empty
-  toJSON xs = object' $
-    case filter (not . null) (map toDatePart xs) of
-         []  -> ["literal" .= intercalate "; " (map (unLiteral . other) xs)]
-         dps -> "date-parts" .= dps :
-                 ["circa" .= (1 :: Int) | any circa xs]
+  toJSON xs = toJSON $ map toJSONDate xs
+
+toJSONDate :: RefDate -> Aeson.Value
+toJSONDate rd = object' $
+  [ "date-parts" .= dateparts | not (null dateparts) ] ++
+  ["circa" .= (1 :: Int) | circa rd] ++
+  (case season rd of
+        Just (RawSeason s) -> ["season" .= s]
+        _                  -> []) ++
+  (case other rd of
+        Literal l | not (null l) -> ["literal" .= l]
+        _                        -> [])
+  where dateparts = toDatePart rd
+
+toDatePart :: RefDate -> [Int]
+toDatePart refdate =
+    case (year refdate, month refdate
+           `mplus`
+          ((12+) <$> (season refdate >>= seasonToInt)),
+          day refdate) of
+         (Just (y :: Int), Just (m :: Int), Just (d :: Int))
+                                     -> [y, m, d]
+         (Just y, Just m, Nothing)   -> [y, m]
+         (Just y, Nothing, Nothing)  -> [y]
+         _                           -> []
 
 
 -- Zotero doesn't properly support date ranges, so a common
@@ -238,22 +298,10 @@ handleLiteral d@(RefDate Nothing Nothing Nothing Nothing (Literal xs) b)
          _ -> [d]
 handleLiteral d = [d]
 
-toDatePart :: RefDate -> [Int]
-toDatePart refdate =
-    case (year refdate, month refdate
-           `mplus`
-          ((+ 12) <$> season refdate),
-          day refdate) of
-         (Just (y :: Int), Just (m :: Int), Just (d :: Int))
-                                     -> [y, m, d]
-         (Just y, Just m, Nothing)   -> [y, m]
-         (Just y, Nothing, Nothing)  -> [y]
-         _                           -> []
-
 setCirca :: Bool -> RefDate -> RefDate
 setCirca circa' rd = rd{ circa = circa' }
 
-setSeason :: Int -> RefDate -> RefDate
+setSeason :: Season -> RefDate -> RefDate
 setSeason season' rd = rd{ season = Just season' }
 
 data RefType
@@ -934,8 +982,8 @@ isoDate = P.try $ do
   (m,s) <- case m' >>= safeRead of
                    Just (n::Int)
                           | n >= 1 && n <= 12  -> return (Just n, Nothing)
-                          | n >= 13 && n <= 16 -> return (Nothing, Just (n - 12))
-                          | n >= 21 && n <= 24 -> return (Nothing, Just (n - 20))
+                          | n >= 13 && n <= 16 -> return (Nothing, pseudoMonthToSeason n)
+                          | n >= 21 && n <= 24 -> return (Nothing, pseudoMonthToSeason n)
                    Nothing | isNothing m' -> return (Nothing, Nothing)
                    _ -> fail "Improper month"
   d <- P.option Nothing $ safeRead <$> P.try (P.char '-' >> P.many1 P.digit)
@@ -971,8 +1019,11 @@ rawDateOld = do
   let pseason = P.try $ do
         xs <- P.many1 P.letter
         case elemIndex (map toLower $ take 3 xs) seasons of
-             Nothing -> fail "Improper season"
-             Just n  -> return (Just (n+1))
+             Just 0  -> return (Just Spring)
+             Just 1  -> return (Just Summer)
+             Just 2  -> return (Just Autumn)
+             Just 3  -> return (Just Winter)
+             _       -> fail "Improper season"
   let pday = P.try $ do
         xs <- P.many1 P.digit
         case safeRead xs of

@@ -127,7 +127,11 @@ formatDate em k tm dp date
       formatDatePart (RefDate y m e d o _) (DatePart n f _ fm)
           | "year"  <- n, Just y' <- y = return $ OYear (formatYear  f    y') k fm
           | "month" <- n, Just m' <- m = output fm      (formatMonth f fm m')
-          | "month" <- n, Just e' <- e = output fm $ term f (printf "season-%02d" e')
+          | "month" <- n, Just e' <- e =
+               case e' of
+                    RawSeason s -> [OStr s fm]
+                    _ -> output fm $ term f (printf "season-%02d"
+                                              $ fromMaybe 0 $ seasonToInt e')
           | "day"   <- n, Just d' <- d = output fm      (formatDay   f m  d')
           | "year"  <- n, o /= mempty = output fm (unLiteral o)
           | otherwise                 = []
