@@ -1,3 +1,16 @@
+pandoc-citeproc (0.14)
+
+  * Fix non-numerical season parsing in RefDate (#316).
+    These changes allow non-numerical dates to be handled.
+    API changes: season in RefDate is now Maybe Season instead
+    of Maybe Int. Text.CSL.Reference exports Season(..) and
+    seasonToInt.
+
+  * Fix parsing of season field in DateRef object.
+
+  * Treat date-part with all 0s the same as empty.
+    This is used to indicate an open-ended range.
+
 pandoc-citeproc (0.13.0.1)
 
   * Suppress empty footnotes.
