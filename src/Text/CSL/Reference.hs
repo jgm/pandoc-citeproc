@@ -263,7 +263,7 @@ instance OVERLAPS
 
 toJSONDate :: RefDate -> Aeson.Value
 toJSONDate rd = object' $
-  [ "date-parts" .= dateparts | not (null dateparts) ] ++
+  [ "date-parts" .= dateparts | not (emptyDatePart dateparts) ] ++
   ["circa" .= (1 :: Int) | circa rd] ++
   (case season rd of
         Just (RawSeason s) -> ["season" .= s]
@@ -272,6 +272,8 @@ toJSONDate rd = object' $
         Literal l | not (null l) -> ["literal" .= l]
         _                        -> [])
   where dateparts = toDatePart rd
+        emptyDatePart [] = True
+        emptyDatePart xs = all (== 0) xs
 
 toDatePart :: RefDate -> [Int]
 toDatePart refdate =
