@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE PatternGuards     #-}
 -----------------------------------------------------------------------------
 -- |
@@ -19,6 +20,7 @@ module Text.CSL.Proc where
 
 import           Control.Applicative    ((<|>))
 import           Control.Arrow          (second, (&&&), (>>>))
+import           Control.Monad.State    (execState, modify)
 import           Data.Aeson
 import           Data.Char              (isDigit, isLetter, toLower)
 import           Data.List
@@ -304,7 +306,19 @@ procGroup Style {citation = ct, csMacros = ms , styleLocale = l,
       format (c,r) = (c,  evalLayout (citLayout ct) (EvalCite c) False l ms opts' as r)
       sort_  (c,r) = evalSorting (EvalSorting c) l ms opts' (citSort ct) as r
       process      = map (second (flip Output emptyFormatting) . format &&& sort_)
-      result       = sortItems $ process cr
+      result       = concatMap sortItems $ toChunks $ process cr
+      -- toChunks splits the citations up into groups, such that
+      -- a citation with a non-null prefix is by itself in its
+      -- group, otherwise preserving the order (see #292 for
+      -- motivation; we don't want to move prefixed citations
+      -- around)
+      toChunks  xs = reverse $ execState (toChunks' xs) []
+      toChunks' xs = do
+        case break hasPrefix xs of
+                ([], [])   -> return ()
+                ([], y:ys) -> modify ([y]:) >> toChunks' ys
+                (zs, ys)   -> modify (zs:) >> toChunks' ys
+      hasPrefix ((c,_),_) = citePrefix c /= mempty
 
 formatBiblioLayout :: Formatting -> Delimiter -> [Output] -> [Output]
 formatBiblioLayout  f d = appendOutput f . addDelim d
