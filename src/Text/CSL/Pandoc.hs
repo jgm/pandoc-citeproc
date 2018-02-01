@@ -280,13 +280,13 @@ isSpacy _         = False
 mvPunct :: Bool -> Style -> [Inline] -> [Inline]
 mvPunct moveNotes sty (x : Space : xs)
   | isSpacy x = x : mvPunct moveNotes sty xs
-mvPunct moveNotes sty (s : x : ys)
+mvPunct moveNotes sty (q : s : x : ys)
   | isSpacy s
   , isNote x
   , startWithPunct ys
   = if moveNotes
-       then Str (headInline ys) : x :
-            mvPunct moveNotes sty (tailInline ys)
+       then mvPunct moveNotes sty $
+            q : Str (headInline ys) : x : tailInline ys
        else x : mvPunct moveNotes sty ys
 mvPunct moveNotes sty (Cite cs ils : ys)
    | length ils > 1
