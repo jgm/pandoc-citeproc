@@ -57,9 +57,8 @@ processCites style refs (Pandoc m1 b1) =
                         map (map (toCslCite locMap)) grps)
       cits_map      = tr' "cits_map" $ M.fromList $ zip grps (citations result)
       biblioList    = map (renderPandoc' style) $ zip (bibliography result) (citationIds result)
-      moveNotes     = case lookupMeta "notes-after-punctuation" m1 of
-                           Just (MetaBool False) -> False
-                           _                     -> True
+      moveNotes     = maybe True truish $
+                        lookupMeta "notes-after-punctuation" m1
       Pandoc m3 bs  = walk (mvPunct moveNotes style) . deNote .
                         walk (processCite style cits_map) $ Pandoc m2 b2
       m             = case metanocites of
@@ -109,18 +108,25 @@ refTitle meta =
 
 isRefRemove :: Meta -> Bool
 isRefRemove meta =
-  case lookupMeta "suppress-bibliography" meta of
-    Just (MetaBool True) -> True
-    _                    -> False
+  maybe False truish $ lookupMeta "suppress-bibliography" meta
 
 isLinkCitations :: Meta -> Bool
 isLinkCitations meta =
-  case lookupMeta "link-citations" meta of
-    Just (MetaBool True)   -> True
-    Just (MetaString s)    -> map toLower s `elem` yesValues
-    Just (MetaInlines ils) -> map toLower (stringify ils) `elem` yesValues
-    _                      -> False
-  where yesValues = ["true", "yes", "on"]
+  maybe False truish $ lookupMeta "link-citations" meta
+
+truish :: MetaValue -> Bool
+truish (MetaBool t) = t
+truish (MetaString s) = isYesValue (map toLower s)
+truish (MetaInlines ils) = isYesValue (map toLower (stringify ils))
+truish (MetaBlocks [Plain ils]) = isYesValue (map toLower (stringify ils))
+truish _ = False
+
+isYesValue :: String -> Bool
+isYesValue "t" = True
+isYesValue "true" = True
+isYesValue "yes" = True
+isYesValue "on" = True
+isYesValue _ = False
 
 -- if the 'nocite' Meta field contains a citation with id = '*',
 -- create a cite with to all the references.
@@ -194,7 +200,7 @@ processCites' (Pandoc meta blocks) = do
   let idpred = if "*" `Set.member` citids
                   then const True
                   else (`Set.member` citids)
-  bibRefs <- getBibRefs idpred $ Data.Maybe.fromMaybe (MetaList [])
+  bibRefs <- getBibRefs idpred $ fromMaybe (MetaList [])
                                $ lookupMeta "bibliography" meta
   let refs = inlineRefs ++ bibRefs
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
