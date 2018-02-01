@@ -287,7 +287,7 @@ mvPunct moveNotes sty (q : s : x : ys)
   = if moveNotes
        then mvPunct moveNotes sty $
             q : Str (headInline ys) : x : tailInline ys
-       else x : mvPunct moveNotes sty ys
+       else q : x : mvPunct moveNotes sty ys
 mvPunct moveNotes sty (Cite cs ils : ys)
    | length ils > 1
    , isNote (last ils)
