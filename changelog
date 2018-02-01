@@ -1,3 +1,10 @@
+pandoc-citeproc (0.14.1.1)
+
+  * Fix regression in movement of punctuation inside quotes before note.
+    Example: `Here is a "test citation" [@item1].`
+    should become `Here is a a "test citation."[^1]` (at least in
+    locales where punctuation moves inside quotes, like en-US).
+
 pandoc-citeproc (0.14.1)
 
   * More robust handling of boolean metadata values.
