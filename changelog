@@ -1,3 +1,16 @@
+pandoc-citeproc (0.14.1)
+
+  * More robust handling of boolean metadata values.
+  * Keep position of citations with prefixes when sorting (behavior
+    change, #292).  If citations with prefixes are moved around,
+    gibberish can result.  E.g.:
+    `A fascinating research tidbit [@Zanadu1999, p. 35; see
+    for comparison @Aalto2005]` can become
+    "A fascinating research tidbit (see for comparison Aalto, 2005;
+    Zanadu, 1999: 35)" with a sorting style like sage-harvard.csl.
+    This change causes sorting to be applied only to subgroups of citations
+    that lack prefixes.
+
 pandoc-citeproc (0.14)
 
   * Fix non-numerical season parsing in RefDate (#316).
