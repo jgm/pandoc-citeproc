@@ -56,7 +56,7 @@ module Text.CSL.Reference ( Literal(..)
 where
 
 import           Control.Applicative ((<|>))
-import           Control.Monad       (guard, mplus)
+import           Control.Monad       (guard, mplus, msum)
 import           Data.Aeson          hiding (Value)
 import qualified Data.Aeson          as Aeson
 import           Data.Aeson.Types    (Parser)
@@ -258,20 +258,20 @@ instance OVERLAPS
 
 instance OVERLAPS
          ToJSON [RefDate] where
-  toJSON [] = Array V.empty
-  toJSON xs = toJSON $ map toJSONDate xs
+  toJSON = toJSONDate
 
-toJSONDate :: RefDate -> Aeson.Value
-toJSONDate rd = object' $
-  [ "date-parts" .= dateparts | not (emptyDatePart dateparts) ] ++
-  ["circa" .= (1 :: Int) | circa rd] ++
-  (case season rd of
+toJSONDate :: [RefDate] -> Aeson.Value
+toJSONDate [] = Array V.empty
+toJSONDate ds = object' $
+  [ "date-parts" .= dateparts | not (null dateparts) ] ++
+  ["circa" .= (1 :: Int) | any circa ds] ++
+  (case msum (map season ds) of
         Just (RawSeason s) -> ["season" .= s]
         _                  -> []) ++
-  (case other rd of
+  (case mconcat (map other ds) of
         Literal l | not (null l) -> ["literal" .= l]
         _                        -> [])
-  where dateparts = toDatePart rd
+  where dateparts = filter (not . emptyDatePart) $ map toDatePart ds
         emptyDatePart [] = True
         emptyDatePart xs = all (== 0) xs
 
