@@ -1,3 +1,7 @@
+pandoc-citeproc (0.14.1.3)
+
+  * Bump xml-conduit version bound.
+
 pandoc-citeproc (0.14.1.2)
 
   * Fix regression in JSON output for date-parts (#321).
