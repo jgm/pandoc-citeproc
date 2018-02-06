@@ -485,7 +485,10 @@ compare' x y
         (_  ,'-':_)   -> GT
         _             -> comp (dropPunct x) (dropPunct y)
       where
-        dropPunct = dropWhile isPunctuation
+        dropPunct = filter (not . isApostrophe) . dropWhile isPunctuation
+        isApostrophe '\'' = True
+        isApostrophe '’'  = True  -- see #320
+        isApostrophe _    = False
 #ifdef UNICODE_COLLATION
         comp a b = T.collate (T.collator T.Current) (T.pack a) (T.pack b)
 #else
