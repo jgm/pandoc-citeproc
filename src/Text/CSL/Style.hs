@@ -98,7 +98,7 @@ import           Control.Monad          (mplus)
 import           Data.Aeson             hiding (Number)
 import qualified Data.Aeson             as Aeson
 import           Data.Aeson.Types       (Pair)
-import           Data.Char              (isLetter, isPunctuation, isUpper)
+import           Data.Char              (isLetter, isPunctuation, isUpper, toLower)
 import           Data.Generics          (Data, Typeable)
 import           Data.List              (intercalate, intersperse, isInfixOf,
                                          isPrefixOf, nubBy)
@@ -480,12 +480,12 @@ instance Ord Sorting where
 compare' :: String -> String -> Ordering
 compare' x y
     = case (x, y) of
-        ('-':_,'-':_) -> comp (dropPunct y) (dropPunct x)
+        ('-':_,'-':_) -> comp (normalize y) (normalize x)
         ('-':_, _ )   -> LT
         (_  ,'-':_)   -> GT
-        _             -> comp (dropPunct x) (dropPunct y)
+        _             -> comp (normalize x) (normalize y)
       where
-        dropPunct = filter (not . isApostrophe) . dropWhile isPunctuation
+        normalize = map toLower . filter (not . isApostrophe) . dropWhile isPunctuation
         isApostrophe '\'' = True
         isApostrophe '’'  = True  -- see #320
         isApostrophe _    = False
