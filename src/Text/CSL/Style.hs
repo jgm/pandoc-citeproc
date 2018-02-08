@@ -99,6 +99,7 @@ import           Data.Aeson             hiding (Number)
 import qualified Data.Aeson             as Aeson
 import           Data.Aeson.Types       (Pair)
 import           Data.Char              (isLetter, isPunctuation, isUpper, toLower)
+import qualified Data.Char              as Char
 import           Data.Generics          (Data, Typeable)
 import           Data.List              (intercalate, intersperse, isInfixOf,
                                          isPrefixOf, nubBy)
@@ -485,14 +486,13 @@ compare' x y
         (_  ,'-':_)   -> GT
         _             -> comp (normalize x) (normalize y)
       where
-        normalize = map toLower . filter (not . isApostrophe) . dropWhile isPunctuation
-        isApostrophe '\'' = True
-        isApostrophe '’'  = True  -- see #320
-        isApostrophe _    = False
+        normalize = map (\c -> if c == ',' || c == '.' then ' ' else c) .
+                    filter (\c -> c == ',' ||
+                                  not (isPunctuation c || Char.isSpace c))
 #ifdef UNICODE_COLLATION
         comp a b = T.collate (T.collator T.Current) (T.pack a) (T.pack b)
 #else
-        comp a b = compareUnicode a b
+        comp a b = compareUnicode (map toLower a) (map toLower b)
 #endif
 
 data Form

@@ -44,6 +44,7 @@ import           Text.CSL.Reference
 import           Text.CSL.Style         hiding (Any)
 import           Text.CSL.Util          (betterThan, isRange, last', proc,
                                          proc', query, readNum, safeRead)
+import Debug.Trace
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the
@@ -84,6 +85,10 @@ evalSorting m l ms opts ss as mbr
       render       = renderPlain . formatOutputList . proc removeDelimAndLabel
       removeDelimAndLabel OLabel{} = ONull
       removeDelimAndLabel ODel{}   = ONull
+      -- for sorting purposes, we need to distinguish between the space
+      -- inside a last name like ben Gurion, and the space between the
+      -- last name and the first.  OSpace is used for the latter.
+      removeDelimAndLabel OSpace{} = OStr "," emptyFormatting
       removeDelimAndLabel x          = x
       format (s,e) = applaySort s . render $ uncurry eval e
       eval     o e = evalLayout (Layout emptyFormatting [] [e]) m False l ms o as mbr
