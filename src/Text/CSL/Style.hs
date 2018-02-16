@@ -488,7 +488,10 @@ compare' x y
       where
         normalize = map (\c -> if c == ',' || c == '.' then ' ' else c) .
                     filter (\c -> c == ',' ||
-                                  not (isPunctuation c || Char.isSpace c))
+                                  not (isPunctuation c || Char.isSpace c
+                                      -- ayn/hamza in transliterated arabic:
+                                       || c == 'ʾ' || c == 'ʿ'
+                                       ))
 #ifdef UNICODE_COLLATION
         comp a b = T.collate (T.collator T.Current) (T.pack a) (T.pack b)
 #else
