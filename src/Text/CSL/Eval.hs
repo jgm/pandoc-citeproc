@@ -44,7 +44,6 @@ import           Text.CSL.Reference
 import           Text.CSL.Style         hiding (Any)
 import           Text.CSL.Util          (betterThan, isRange, last', proc,
                                          proc', query, readNum, safeRead)
-import Debug.Trace
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
 -- 'True' if the evaluation happens for disambiguation purposes, the
