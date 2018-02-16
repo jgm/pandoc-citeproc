@@ -1,3 +1,12 @@
+pandoc-citeproc (0.14.1.4)
+
+  * Fixed sort order bugs (#320):
+
+    + Disregard ayn and hamza in sorting Arabic names.
+    + Proper treatment of spaces:  nothing comes before something,
+      but spaces INSIDE a given name or family name are ignored.
+    + Disregard punctuation and case.
+
 pandoc-citeproc (0.14.1.3)
 
   * Bump xml-conduit version bound.
