@@ -52,7 +52,7 @@ references:
   title: 'The importance of being earnest: A trivial comedy for serious people'
   title-short: The importance of being earnest
   collection-title: English and american drama of the nineteenth century
-  publisher: Leonard Smithers and Company
+  publisher: Leonard Smithers <span class="nocase">and</span> Company
   annote: A book with eprint and eprinttype fields.
   URL: http://books.google.com?id=4HIWAAAAYAAJ
 ...

@@ -53,7 +53,7 @@ references:
   title: Die Ilias
   title-short: Ilias
   publisher: Artemis & Winkler
-  publisher-place: Düsseldorf; Zürich
+  publisher-place: D<span class="nocase">ü</span>sseldorf; Z<span class="nocase">ü</span>rich
   edition: '3'
   annote: A German translation of the *Iliad*. Note the translator and introduction
     fields and the format of the location field in the database file. Also note the

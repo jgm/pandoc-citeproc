@@ -69,7 +69,7 @@ references:
     and opinions
   collection-title: Bollingen series
   collection-number: '75'
-  publisher: Routledge and Kegan Paul
+  publisher: Routledge <span class="nocase">and</span> Kegan Paul
   publisher-place: London
   volume: '7.2'
   annote: One (partial) volume of a multivolume book. This is a book entry with a

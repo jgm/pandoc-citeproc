@@ -92,7 +92,7 @@ references:
   page: '17-30'
   volume: '14'
   issue: '1'
-  annote: An article entry with author authors. By default, long author and editor
-    lists are automatically truncated. This is configurable
+  annote: An article entry with <span class="nocase">author</span> authors. By default,
+    long author and editor lists are automatically truncated. This is configurable
   language: en-US
 ...

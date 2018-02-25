@@ -64,6 +64,6 @@ references:
     Proceedings of the eighth Nobel symposium'
   publisher: Almquist & Wiksell
   publisher-place: Stockholm
-  event-place: Aspenäsgarden, Lerum
+  event-place: Aspen<span class="nocase">ä</span>sgarden, Lerum
   page: '367-377'
 ...

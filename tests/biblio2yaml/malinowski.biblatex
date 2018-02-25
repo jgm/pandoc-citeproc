@@ -49,9 +49,9 @@ references:
   issued:
   - year: 1972
   title: 'Argonauts of the Western Pacific: An account of native enterprise and
-    adventure in the <span class="nocase">Archipelagoes of Melanesian New Guinea</span>'
+    adventure in the Archipelagoes of Melanesian New Guinea'
   title-short: Argonauts
-  publisher: Routledge and Kegan Paul
+  publisher: Routledge <span class="nocase">and</span> Kegan Paul
   publisher-place: London
   edition: '8'
   annote: This is a book entry. Note the format of the publisher and edition fields

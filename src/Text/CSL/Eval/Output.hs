@@ -15,13 +15,17 @@
 
 module Text.CSL.Eval.Output where
 
-import           Data.Char              (toLower, toUpper)
 import           Data.Maybe             (mapMaybe)
 import           Data.String            (fromString)
 import           Text.CSL.Output.Pandoc (lastInline)
 import           Text.CSL.Style
-import           Text.CSL.Util          (capitalize, isPunct, titlecase,
-                                         unTitlecase)
+import           Text.CSL.Util          (isPunct, transformCase,
+                                         titleCaseTransform,
+                                         sentenceCaseTransform,
+                                         uppercaseTransform,
+                                         lowercaseTransform,
+                                         capitalizeAllTransform,
+                                         capitalizeFirstTransform)
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk       (walk)
 import           Text.Parsec
@@ -213,24 +217,17 @@ addFormatting f =
                _      -> ils
 
         text_case (Formatted []) = Formatted []
-        text_case (Formatted ils@(i:is))
+        text_case (Formatted ils)
           | noCase f  = Formatted [Span ("",["nocase"],[]) ils]
           | otherwise = Formatted $
-              case textCase f of
-                   "lowercase"        -> walk lowercaseStr ils
-                   "uppercase"        -> walk uppercaseStr ils
-                   "capitalize-all"   -> walk capitalizeStr ils
-                   "title"            -> titlecase ils
-                   "capitalize-first" -> walk capitalizeStr i : is
-                   "sentence"         -> unTitlecase ils
-                   _                  -> ils
-
-        lowercaseStr (Str xs) = Str $ map toLower xs
-        lowercaseStr x        = x
-        uppercaseStr (Str xs) = Str $ map toUpper xs
-        uppercaseStr x        = x
-        capitalizeStr (Str xs) = Str $ capitalize xs
-        capitalizeStr x        = x
+             (case textCase f of
+                   "lowercase"        -> transformCase lowercaseTransform
+                   "uppercase"        -> transformCase uppercaseTransform
+                   "capitalize-all"   -> transformCase capitalizeAllTransform
+                   "title"            -> transformCase titleCaseTransform
+                   "capitalize-first" -> transformCase capitalizeFirstTransform
+                   "sentence"         -> transformCase sentenceCaseTransform
+                   _                  -> id) ils
 
         valign [] = []
         valign ils

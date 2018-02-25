@@ -25,9 +25,15 @@ module Text.CSL.Util
   , (.#?)
   , (.#:)
   , onBlocks
-  , titlecase
-  , unTitlecase
-  , protectCase
+  , CaseTransformation
+  , transformCase
+  , nullCaseTransform
+  , titleCaseTransform
+  , sentenceCaseTransform
+  , uppercaseTransform
+  , lowercaseTransform
+  , capitalizeAllTransform
+  , capitalizeFirstTransform
   , splitStrWhen
   , proc
   , proc'
@@ -69,6 +75,7 @@ import           System.FilePath
 import           Text.Pandoc
 import           Text.Pandoc.Shared  (safeRead, stringify)
 import           Text.Pandoc.Walk    (walk)
+import           Text.Pandoc.Builder (toList, fromList)
 import qualified Text.Parsec         as P
 
 #ifdef TRACE
@@ -200,11 +207,6 @@ onBlocks f = walk f'
         f' (Plain ils) = Plain (f ils)
         f' x           = x
 
-hasLowercaseWord :: [Inline] -> Bool
-hasLowercaseWord = any startsWithLowercase . splitStrWhen isPunctuation
-  where startsWithLowercase (Str (x:_)) = isLower x
-        startsWithLowercase _           = False
-
 splitUpStr :: [Inline] -> [Inline]
 splitUpStr ils =
   case reverse (combineInternalPeriods
@@ -220,31 +222,11 @@ combineInternalPeriods (Str xs:Str ".":Str ys:zs) =
   combineInternalPeriods $ Str (xs ++ "." ++ ys) : zs
 combineInternalPeriods (x:xs) = x : combineInternalPeriods xs
 
-unTitlecase :: [Inline] -> [Inline]
-unTitlecase zs = evalState (caseTransform untc zs) SentenceBoundary
-  where untc w = do
-          st <- get
-          case (w, st) of
-               (y, NoBoundary) -> return y
-               (Str (x:xs), LastWordBoundary) | isUpper x ->
-                 return $ Str (map toLower (x:xs))
-               (Str (x:xs), WordBoundary) | isUpper x ->
-                 return $ Str (map toLower (x:xs))
-               (Str (x:xs), SentenceBoundary) | isLower x ->
-                 return $ Str (toUpper x : xs)
-               (Span ("",[],[]) xs, _) | hasLowercaseWord xs ->
-                 return $ Span ("",["nocase"],[]) xs
-               _ -> return w
+newtype CaseTransformation =
+  CaseTransformation (String -> State CaseTransformState String)
 
-protectCase :: [Inline] -> [Inline]
-protectCase zs = evalState (caseTransform protect zs) SentenceBoundary
-  where protect (Span ("",[],[]) xs)
-          | hasLowercaseWord xs = do
-            st <- get
-            case st of
-                 NoBoundary -> return $ Span ("",[],[]) xs
-                 _          -> return $ Span ("",["nocase"],[]) xs
-        protect x = return x
+transformCase :: CaseTransformation -> [Inline] -> [Inline]
+transformCase f zs = evalState (caseTransform f zs) StartBoundary
 
 -- From CSL docs:
 -- "Title case conversion (with text-case set to “title”) for English-language
@@ -259,33 +241,99 @@ protectCase zs = evalState (caseTransform protect zs) SentenceBoundary
 -- “as”, “at”, “but”, “by”, “down”, “for”, “from”, “in”, “into”, “nor”, “of”,
 -- “on”, “onto”, “or”, “over”, “so”, “the”, “till”, “to”, “up”, “via”, “with”,
 -- and “yet”.
-titlecase :: [Inline] -> [Inline]
-titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
-  where tc (Str (x:xs)) = do
-          st <- get
-          return $ case st of
-                        LastWordBoundary ->
-                          case (x:xs) of
-                           s | not (isAscii x) -> Str s
-                             | isShortWord s   -> Str s
-                             | all isUpperOrPunct s   -> Str s
-                             | isMixedCase s   -> Str s
-                             | otherwise       -> Str (toUpper x:xs)
-                        WordBoundary ->
-                          case (x:xs) of
-                           s | not (isAscii x) -> Str s
-                             | all isUpperOrPunct s   -> Str s
-                             | isShortWord s   -> Str (map toLower s)
-                             | isMixedCase s   -> Str s
-                             | otherwise       -> Str (toUpper x:xs)
-                        SentenceBoundary ->
-                           if isMixedCase (x:xs) || all isUpperOrPunct (x:xs)
-                              then Str (x:xs)
-                              else Str (toUpper x : xs)
-                        _ -> Str (x:xs)
-        tc (Span ("",["nocase"],[]) xs) = return $ Span ("",["nocase"],[]) xs
-        tc x = return x
-        isShortWord  s = map toLower s `Set.member` shortWords
+titleCaseTransform :: CaseTransformation
+titleCaseTransform = CaseTransformation go
+  where
+    go (x:xs) = do
+       st <- get
+       return $
+         case st of
+              LastWordBoundary ->
+                case (x:xs) of
+                 s | not (isAscii x) -> s
+                   | isShortWord s   -> s
+                   | all isUpperOrPunct s  -> s
+                   | isMixedCase s   -> s
+                   | otherwise       -> toUpper x:xs
+              WordBoundary ->
+                case (x:xs) of
+                 s | not (isAscii x) -> s
+                   | all isUpperOrPunct s -> s
+                   | isShortWord s   -> map toLower s
+                   | isMixedCase s   -> s
+                   | otherwise       -> toUpper x:xs
+              SentenceBoundary ->
+                 if isMixedCase (x:xs) || all isUpperOrPunct (x:xs)
+                    then x:xs
+                    else toUpper x : xs
+              StartBoundary ->
+                 if isMixedCase (x:xs) || all isUpperOrPunct (x:xs)
+                    then x:xs
+                    else toUpper x : xs
+              NoBoundary -> x:xs
+    go [] = return []
+    isShortWord  s = map toLower s `Set.member` shortWords
+
+-- This will still affect span "nocase"
+nullCaseTransform :: CaseTransformation
+nullCaseTransform = CaseTransformation return
+
+sentenceCaseTransform :: CaseTransformation
+sentenceCaseTransform = CaseTransformation go
+  where
+    go (x:xs) = do
+      st <- get
+      case st of
+           NoBoundary -> return (x:xs)
+           LastWordBoundary | isUpper x ->
+             return (map toLower (x:xs))
+           WordBoundary | isUpper x ->
+             return (map toLower (x:xs))
+           SentenceBoundary | isLower x ->
+             return (toUpper x : xs)
+           StartBoundary | isLower x ->
+             return (toUpper x : xs)
+           _ -> return (x:xs)
+    go [] = return []
+
+uppercaseTransform :: CaseTransformation
+uppercaseTransform = CaseTransformation go
+  where
+    go xs = return (map toUpper xs)
+
+lowercaseTransform :: CaseTransformation
+lowercaseTransform = CaseTransformation go
+  where
+    go xs = return (map toLower xs)
+
+capitalizeAllTransform :: CaseTransformation
+capitalizeAllTransform = CaseTransformation go
+  where
+    go (x:xs) = do
+      st <- get
+      case st of
+           NoBoundary -> return (x:xs)
+           LastWordBoundary | isUpper x ->
+             return $ map toLower (x:xs)
+           WordBoundary | isUpper x ->
+             return $ map toLower (x:xs)
+           SentenceBoundary | isLower x ->
+             return (toUpper x : xs)
+           StartBoundary | isLower x ->
+             return (toUpper x : xs)
+           _ -> return (x:xs)
+    go [] = return []
+
+capitalizeFirstTransform :: CaseTransformation
+capitalizeFirstTransform = CaseTransformation go
+  where
+    go (x:xs) = do
+      st <- get
+      case st of
+           StartBoundary ->
+             return (toUpper x : xs)
+           _ -> return (x:xs)
+    go [] = return []
 
 shortWords :: Set.Set String
 shortWords = Set.fromList
@@ -303,15 +351,19 @@ isUpperOrPunct c = isUpper c || isPunctuation c
 data CaseTransformState = WordBoundary
                         | LastWordBoundary
                         | SentenceBoundary
+                        | StartBoundary
                         | NoBoundary
 
-caseTransform :: (Inline -> State CaseTransformState Inline) -> [Inline]
+caseTransform :: CaseTransformation
+              -> [Inline]
               -> State CaseTransformState [Inline]
-caseTransform xform = fmap reverse . foldM go [] . splitUpStr
+caseTransform xform@(CaseTransformation f) =
+  fmap reverse . foldM go [] . splitUpStr
   where go acc s | s == Space || s == SoftBreak = do
                modify (\st ->
                  case st of
                       SentenceBoundary -> SentenceBoundary
+                      StartBoundary    -> StartBoundary
                       _                -> WordBoundary)
                return $ Space : acc
         go acc LineBreak = do
@@ -327,20 +379,20 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
           | isPunctuation c = return $ Str [c] : acc -- leave state unchanged
         go acc (Str []) = return acc
         go acc (Str xs) = do
-               res <- xform (Str xs)
+               xs' <- f xs
                put NoBoundary
-               return $ res : acc
+               return $ (Str xs') : acc
         go acc (Span ("",["lastword"],[]) [x]) = do
                b <- get
                case b of
                     WordBoundary -> put LastWordBoundary
                     _            -> return ()
                go acc x
-        go acc (Span ("",classes,[]) xs)
-          | null classes || classes == ["nocase"] = do
-               res <- xform (Span ("",classes,[]) xs)
-               put NoBoundary
-               return $ res : acc
+        go acc (Span ("",["nocase"],[]) xs) = do
+               xs' <- caseTransform titleCaseTransform xs
+               if (stringify xs) == (stringify xs')
+                  then return $ Span ("",[],[]) xs : acc
+                  else return $ Span ("",["nocase"],[]) xs : acc
         go acc (Quoted qt xs)    = (:acc) <$> (Quoted qt <$> caseTransform xform xs)
         go acc (Emph xs)         = (:acc) <$> (Emph <$> caseTransform xform xs)
         go acc (Strong xs)       = (:acc) <$> (Strong <$> caseTransform xform xs)

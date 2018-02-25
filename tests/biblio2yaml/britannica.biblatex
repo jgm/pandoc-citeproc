@@ -65,7 +65,7 @@ references:
   - year: 2003
   title: The new encyclopædia Britannica
   title-short: Encyclopædia Britannica
-  publisher: Encyclopædia Britannica
+  publisher: Encyclop<span class="nocase">æ</span>dia Britannica
   publisher-place: Chicago, Ill.
   number-of-volumes: '32'
   edition: '15'

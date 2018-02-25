@@ -38,9 +38,11 @@ import           Text.CSL.Parser        (parseLocale)
 import           Text.CSL.Reference
 import           Text.CSL.Style         (Agent (..), CslTerm (..),
                                          Formatted (..), Locale (..))
-import           Text.CSL.Util          (onBlocks, protectCase, safeRead,
-                                         splitStrWhen, trim, unTitlecase)
+import           Text.CSL.Util          (onBlocks, safeRead,
+                                         splitStrWhen, trim, transformCase,
+                                         sentenceCaseTransform, nullCaseTransform)
 import           Text.Pandoc.Definition
+import           Text.Pandoc.Shared     (blocksToInlines)
 import qualified Text.Pandoc.UTF8       as UTF8
 import qualified Text.Pandoc.Walk       as Walk
 import Text.Parsec hiding (State, many, (<|>))
@@ -52,40 +54,37 @@ blocksToFormatted bs =
        [Para  xs] -> inlinesToFormatted xs
        _          -> inlinesToFormatted $ Walk.query (:[]) bs
 
-adjustSpans :: Lang -> Inline -> [Inline]
-adjustSpans _ (Span ("",[],[]) xs) = xs
-adjustSpans lang (RawInline (Format "latex") s)
-  | s == "\\hyphen" || s == "\\hyphen " = [Str "-"]
-  | otherwise = Walk.walk (concatMap (adjustSpans lang))
-                $ parseRawLaTeX lang s
-adjustSpans _ x = [x]
+adjustSpans :: Lang -> [Inline] -> [Inline]
+adjustSpans _ [] = []
+adjustSpans lang (Span ("",[],[]) xs : rest) =
+   xs ++ adjustSpans lang rest
+adjustSpans lang (Code ("",["bibstring"],[]) s : rest) =
+  Str (resolveKey' lang s) : adjustSpans lang rest
+adjustSpans lang (x:xs) = x : adjustSpans lang xs
 
-parseRawLaTeX :: Lang -> String -> [Inline]
-parseRawLaTeX lang ('\\':xs) =
-  case latex' contents of
-       [Para ys]  -> f command ys
-       [Plain ys] -> f command ys
-       _          -> []
+parseRawLaTeX :: String -> Inline
+parseRawLaTeX ('\\':xs) =
+   f command (blocksToInlines $ latex' contents)
    where (command', contents') = break (=='{') xs
          command  = trim command'
          contents = drop 1 $ reverse $ drop 1 $ reverse contents'
-         f "mkbibquote"    ils = [Quoted DoubleQuote ils]
-         f "mkbibemph"     ils = [Emph ils]
-         f "mkbibitalic"   ils = [Emph ils] -- TODO: italic/=emph
-         f "mkbibbold"     ils = [Strong ils]
-         f "mkbibparens"   ils = [Str "("] ++ ils ++ [Str ")"] -- TODO: ...
-         f "mkbibbrackets" ils = [Str "["] ++ ils ++ [Str "]"] -- TODO: ...
-         -- ... both should be nestable & should work in year fields
-         f "autocap"    ils    = ils  -- TODO: should work in year fields
-         f "textnormal" ils    = [Span ("",["nodecor"],[]) ils]
-         f "bibstring" [Str s] = [Str $ resolveKey' lang s]
-         f _            ils    = [Span nullAttr ils]
-parseRawLaTeX _ _ = []
+         f "mkbibquote"    ils = Quoted DoubleQuote ils
+         f "mkbibemph"     ils = Emph ils
+         f "mkbibitalic"   ils = Emph ils -- TODO: italic/=emph
+         f "mkbibbold"     ils = Strong ils
+         f "mkbibparens"   ils = Span nullAttr $ Str "(" : ils ++ [Str ")"]
+         f "mkbibbrackets" ils = Span nullAttr $ Str "[" : ils ++ [Str "]"]
+         -- ... TODO: the 2 above should be nestable & should work in year fields
+         f "autocap"    ils    = Span nullAttr ils  -- TODO: should work in year fields
+         f "textnormal" ils    = Span ("",["nodecor"],[]) ils
+         f "bibstring" [Str s] = Code ("",["bibstring"],[]) s
+         f _            ils    = Span nullAttr $ ils
+parseRawLaTeX _ = Span nullAttr []
 
 inlinesToFormatted :: [Inline] -> Bib Formatted
 inlinesToFormatted ils = do
   lang <- gets localeLanguage
-  return $ Formatted $ Walk.walk (concatMap (adjustSpans lang)) ils
+  return $ Formatted $ Walk.walk (adjustSpans lang) ils
 
 data Item = Item{ identifier :: String
                 , entryType  :: String
@@ -890,7 +889,9 @@ getPeriodicalTitle :: String -> Bib Formatted
 getPeriodicalTitle f = do
   fs <- asks fields
   case Map.lookup f fs of
-       Just x  -> blocksToFormatted $ onBlocks protectCase $ latex' $ trim x
+       Just x  -> blocksToFormatted
+                  $ onBlocks (transformCase nullCaseTransform)
+                  $ latex' $ trim x
        Nothing -> notFound f
 
 getTitle :: String -> Bib Formatted
@@ -904,7 +905,9 @@ getShortTitle :: Bool -> String -> Bib Formatted
 getShortTitle requireColon f = do
   fs <- asks fields
   utc <- gets untitlecase
-  let processTitle = if utc then onBlocks unTitlecase else id
+  let processTitle = if utc
+                        then onBlocks (transformCase sentenceCaseTransform)
+                        else onBlocks (transformCase nullCaseTransform)
   case Map.lookup f fs of
        Just x  -> case processTitle $ latex' x of
                        bs | not requireColon || containsColon bs ->
@@ -1098,12 +1101,15 @@ optionSet key opts = case lookup key opts of
                       _           -> False
 
 latex' :: String -> [Block]
-latex' s = Walk.walk removeSoftBreak bs
+latex' s = Walk.walk fixup bs
   where Pandoc _ bs = readLaTeX s
-
-removeSoftBreak :: Inline -> Inline
-removeSoftBreak SoftBreak = Space
-removeSoftBreak x         = x
+        fixup :: Inline -> Inline
+        fixup (Span ("",[],[]) xs) = Span ("",["nocase"],[]) xs
+        fixup SoftBreak            = Space
+        fixup (RawInline (Format "latex") raw)
+         | raw == "\\hyphen" || raw == "\\hyphen " = Str "-"
+         | otherwise = Walk.walk fixup $ parseRawLaTeX raw
+        fixup x                    = x
 
 latex :: String -> Bib Formatted
 latex s = blocksToFormatted $ latex' $ trim s
@@ -1111,11 +1117,14 @@ latex s = blocksToFormatted $ latex' $ trim s
 latexTitle :: String -> Bib Formatted
 latexTitle s = do
   utc <- gets untitlecase
-  let processTitle = if utc then onBlocks unTitlecase else id
+  let processTitle = if utc
+                        then onBlocks (transformCase sentenceCaseTransform)
+                        else onBlocks (transformCase nullCaseTransform)
   blocksToFormatted $ processTitle $ latex' s
 
 latexAuthors :: Options -> String -> Bib [Agent]
-latexAuthors opts = toAuthorList opts . latex' . trim
+latexAuthors opts =
+  toAuthorList opts . onBlocks (transformCase nullCaseTransform) . latex' . trim
 
 bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = fst Control.Applicative.<$> evalRWST m entry (BibState True (Lang "en" "US"))

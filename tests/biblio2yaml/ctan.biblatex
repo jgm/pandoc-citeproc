@@ -57,13 +57,14 @@ references:
   - year: 2006
     month: 10
     day: 1
-  title: 'CTAN: The Comprehensive TeX Archive Network'
-  title-short: CTAN
-  annote: This is an online entry. The <span style="font-variant:small-caps;">url</span>,
-    which is given in the url field, is transformed into a clickable link if hyperref
-    support has been enabled. Note the format of the urldate field (yyyy-mm-dd) in
-    the database file. Also note the label field which may be used as a fallback by
-    citation styles which need an author and/or a year
+  title: '<span class="nocase">CTAN</span>: <span class="nocase">The Comprehensive
+    TeX Archive Network</span>'
+  title-short: <span class="nocase">CTAN</span>
+  annote: This is an online entry. The <span class="smallcaps">url</span>, which is
+    given in the url field, is transformed into a clickable link if hyperref support
+    has been enabled. Note the format of the urldate field (yyyy-mm-dd) in the database
+    file. Also note the label field which may be used as a fallback by citation styles
+    which need an author and/or a year
   URL: http://www.ctan.org
   language: en-US
 ...

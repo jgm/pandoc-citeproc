@@ -60,13 +60,13 @@ references:
 - id: jaffe
   type: book
   editor:
-  - family: Jaffé
+  - family: Jaff<span class="nocase">é</span>
     given: Philipp
   issued:
   - year: 1885
   - year: 1888
   title: Regesta Pontificum Romanorum ab condita ecclesia ad annum post Christum natum
-    <span style="font-variant:small-caps;">mcxcviii</span>
+    <span class="smallcaps">mcxcviii</span>
   title-short: Regesta Pontificum Romanorum
   publisher-place: Leipzig
   number-of-volumes: '2'

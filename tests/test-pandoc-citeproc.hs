@@ -29,7 +29,7 @@ main = do
   citeprocTests <- mapM (testCase regenerate) testnames
   fs <- filter (\f -> takeExtension f `elem` [".bibtex",".biblatex"])
            `fmap` getDirectoryContents "tests/biblio2yaml"
-  biblio2yamlTests <- mapM biblio2yamlTest fs
+  biblio2yamlTests <- mapM (biblio2yamlTest regenerate) fs
   let allTests = citeprocTests ++ biblio2yamlTests
   let numpasses  = length $ filter (== Passed) allTests
   let numskipped = length $ filter (== Skipped) allTests
@@ -71,17 +71,21 @@ testCase regenerate csl = do
        let outDoc = fromMaybe mempty $Aeson.decode jsonOut
        if outDoc == expectedDoc
           then err "PASSED" >> return Passed
-          else do
-             err "FAILED"
-             showDiff (writeNative expectedDoc) (writeNative outDoc)
-             when regenerate $
-               UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
+          else
+            if regenerate
+               then do
+                 UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
 #if MIN_VERSION_pandoc(1,19,0)
-                  writeNative outDoc
+                   writeNative outDoc
 #else
-                  writeNative outDoc
+                   writeNative outDoc
 #endif
-             return Failed
+                 err "PASSED (accepted)"
+                 return Passed
+               else do
+                 err "FAILED"
+                 showDiff (writeNative expectedDoc) (writeNative outDoc)
+                 return Failed
      else do
        err "ERROR"
        err $ "Error status " ++ show ec
@@ -99,8 +103,8 @@ showDiff expected result =
     _ <- rawSystem "diff" ["-U1","expected","actual"]
     setCurrentDirectory oldDir
 
-biblio2yamlTest :: String -> IO TestResult
-biblio2yamlTest fp = do
+biblio2yamlTest :: Bool -> String -> IO TestResult
+biblio2yamlTest regenerate fp = do
   hPutStr stderr $ "[biblio2yaml/" ++ fp ++ "] "
   let yamld = "tests/biblio2yaml/"
 #if MIN_VERSION_pandoc(2,0,0)
@@ -129,10 +133,24 @@ biblio2yamlTest fp = do
      then do
        if expected == result
           then err "PASSED" >> return Passed
-          else do
-            err $ "FAILED"
-            showDiff expected result
-            return Failed
+          else
+            if regenerate
+               then do
+                 let accepted = bib ++ result
+#if MIN_VERSION_pandoc(2,0,0)
+                 p2version <- doesFileExist (yamld ++ "/pandoc-2/" ++ fp)
+                 UTF8.writeFile (if p2version
+                                    then (yamld ++ "/pandoc-2/" ++ fp)
+                                    else (yamld ++ fp)) accepted
+#else
+                 UTF8.writeFile (yamld ++ fp) accepted
+#endif
+                 err "PASSED (accepted)"
+                 return Passed
+               else do
+                 err $ "FAILED"
+                 showDiff expected result
+                 return Failed
      else do
        err "ERROR"
        err $ "Error status " ++ show ec

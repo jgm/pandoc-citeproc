@@ -28,7 +28,7 @@ references:
     given: Martha
   issued:
   - year: 1978
-  title: Aristotle’s “De Motu Animalium”
+  title: Aristotle’s “de motu animalium”
   publisher: Princeton University Press
   publisher-place: Princeton
   annote: A book entry. Note the sorttitle and indexsorttitle fields and the markup

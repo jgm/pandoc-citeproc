@@ -23,8 +23,8 @@ references:
   title: 'Upvoting the news: Breaking news aggregation, crowd collaboration, and
     algorithm-driven attention on reddit.com'
   title-short: Upvoting the news
-  publisher: University of Southern California
-  publisher-place: Los Angeles, CA
+  publisher: <span class="nocase">University of Southern California</span>
+  publisher-place: <span class="nocase">Los Angeles, CA</span>
   genre: Dissertation
   language: en-US
 ...
