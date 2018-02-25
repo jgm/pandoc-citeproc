@@ -344,8 +344,8 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
         go acc (Quoted qt xs)    = (:acc) <$> (Quoted qt <$> caseTransform xform xs)
         go acc (Emph xs)         = (:acc) <$> (Emph <$> caseTransform xform xs)
         go acc (Strong xs)       = (:acc) <$> (Strong <$> caseTransform xform xs)
-        go acc (Link at xs t)       = (:acc) <$> (Link at <$> caseTransform xform xs <*> pure t)
-        go acc (Image at xs t)      = (:acc) <$> (Link at <$> caseTransform xform xs <*> pure t)
+        go acc (Link at xs t)    = (:acc) <$> (Link at <$> caseTransform xform xs <*> pure t)
+        go acc (Image at xs t)   = (:acc) <$> (Link at <$> caseTransform xform xs <*> pure t)
         go acc (Span attr xs)    = (:acc) <$> (Span attr <$> caseTransform xform xs)
         go acc x                 = return $ x : acc
 
