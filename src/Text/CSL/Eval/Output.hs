@@ -213,7 +213,7 @@ addFormatting f =
                _      -> ils
 
         text_case (Formatted []) = Formatted []
-        text_case (Formatted ils@(i:is))
+        text_case (Formatted ils@(i:is'))
           | noCase f  = Formatted [Span ("",["nocase"],[]) ils]
           | otherwise = Formatted $
               case textCase f of
@@ -221,7 +221,10 @@ addFormatting f =
                    "uppercase"        -> walk uppercaseStr ils
                    "capitalize-all"   -> walk capitalizeStr ils
                    "title"            -> titlecase ils
-                   "capitalize-first" -> walk capitalizeStr i : is
+                   "capitalize-first"
+                     -> case i of
+                             Str cs -> Str (capitalize cs) : is'
+                             _ -> unTitlecase [i] ++ is'
                    "sentence"         -> unTitlecase ils
                    _                  -> ils
 
