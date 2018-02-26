@@ -1,7 +1,6 @@
 {-# LANGUAGE CPP                 #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module Main where
-import           Control.Monad          (when)
 import qualified Data.Aeson             as Aeson
 import           Data.List              (isSuffixOf)
 import           Data.Maybe             (fromMaybe)
