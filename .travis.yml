@@ -68,6 +68,8 @@ matrix:
   allow_failures:
   - env: BUILD=cabal GHCVER=head  CABALVER=head
   - env: BUILD=stack ARGS="--resolver nightly"
+  - env: BUILD=cabal GHCVER=8.2.2 CABALVER=2.0
+  # 8.2.2 on Cabal always hangs on travis, for unknown reasons
 
 before_install:
 # Using compiler above sets CC to an invalid value, so unset it
