@@ -8,17 +8,14 @@ flags:
     static: false
 packages:
 - '.'
-- location: '../pandoc'
-  extra-dep: true
 extra-deps:
 - rfc5051-0.1.0.3
-#- pandoc-2.1.3
+- pandoc-2.1.2
 - texmath-0.10.1.1
 - tagsoup-0.14.6
 - pandoc-types-1.17.4.2
 - hslua-0.9.5
-- skylighting-0.7.0.2
-- skylighting-core-0.7.0.2
+- skylighting-0.6
 - xml-conduit-1.8.0
 - conduit-1.3.0
 - conduit-extra-1.3.0
