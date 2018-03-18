@@ -24,7 +24,7 @@ module Text.CSL.Input.Bibtex
 import           Control.Applicative
 import qualified Control.Exception      as E
 import           Control.Monad
-import           Control.Monad.RWS
+import           Control.Monad.RWS      hiding ((<>))
 import           Data.Char              (isAlphaNum, isDigit, isUpper, toLower,
                                          toUpper)
 import           Data.List              (foldl', intercalate)

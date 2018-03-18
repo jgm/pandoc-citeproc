@@ -223,9 +223,12 @@ instance AddYaml Formatted where
                       then acc
                       else (x Y..= Formatted y) : acc
 
+instance Semigroup Formatted where
+  (<>) = appendWithPunct
+
 instance Monoid Formatted where
   mempty = Formatted []
-  mappend = appendWithPunct
+  mappend = (<>)
   mconcat = foldr mappend mempty
 
 instance Walk.Walkable Inline Formatted where
