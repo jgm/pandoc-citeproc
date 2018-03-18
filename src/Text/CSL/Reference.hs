@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE CPP                        #-}
 {-# LANGUAGE DeriveDataTypeable         #-}
 {-# LANGUAGE DeriveGeneric              #-}
@@ -55,6 +56,7 @@ module Text.CSL.Reference ( Literal(..)
                           )
 where
 
+import Prelude
 import           Control.Applicative ((<|>))
 import           Control.Monad       (guard, mplus, msum)
 import           Data.Aeson          hiding (Value)

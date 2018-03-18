@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -50,6 +51,7 @@ module Text.CSL.Util
   , parseRomanNumeral
   , isRange
   ) where
+import Prelude
 import           Control.Monad.State
 import           Data.Aeson
 import           Data.Aeson.Types    (Parser)

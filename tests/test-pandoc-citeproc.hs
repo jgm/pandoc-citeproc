@@ -1,6 +1,8 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE CPP                 #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module Main where
+import Prelude
 import qualified Data.Aeson             as Aeson
 import           Data.List              (isSuffixOf)
 import           Data.Maybe             (fromMaybe)

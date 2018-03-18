@@ -1,6 +1,6 @@
 SOURCEFILES?=$(shell find pandoc-citeproc.hs src tests -name '*.hs')
 stack:
-	stack install --test --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:test_citeproc' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall' --test-arguments='-j4 --hide-successes $(TESTARGS)'
+	stack install --test --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:test_citeproc' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall' --test-arguments='-j4 --hide-successes $(TESTARGS)' . pandoc
 
 debug:
 	stack install --test --flag 'pandoc-citeproc:debug' --flag 'pandoc:embed_data_files' --flag 'pandoc-citeproc:embed_data_files' --fast --ghc-options '-Wall' --test-arguments='-j4 --hide-successes $(TESTARGS)'

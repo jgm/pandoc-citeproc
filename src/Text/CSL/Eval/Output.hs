@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE PatternGuards #-}
 -----------------------------------------------------------------------------
 -- |
@@ -15,6 +16,7 @@
 
 module Text.CSL.Eval.Output where
 
+import Prelude
 import           Data.Char              (toLower, toUpper)
 import           Data.Maybe             (mapMaybe)
 import           Data.String            (fromString)

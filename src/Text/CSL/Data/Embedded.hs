@@ -1,7 +1,9 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Text.CSL.Data.Embedded (localeFiles, defaultCSL, manpage, license)
 where
+import Prelude
 import qualified Data.ByteString.Char8 as S
 import           Data.FileEmbed
 

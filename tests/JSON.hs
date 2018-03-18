@@ -1,6 +1,8 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 -- ToJSON/FromJSON instances for Style
 module JSON where
+import Prelude
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as L
 import qualified Data.Text.Encoding   as T

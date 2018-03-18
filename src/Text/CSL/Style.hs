@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE CPP                        #-}
 {-# LANGUAGE DeriveDataTypeable         #-}
 {-# LANGUAGE DeriveGeneric              #-}
@@ -92,6 +93,7 @@ module Text.CSL.Style ( readCSLString
                       )
 where
 
+import Prelude
 import           Control.Applicative    ((<|>), (<$>))
 import           Control.Arrow          hiding (left, right)
 import           Control.Monad          (mplus)

@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 -----------------------------------------------------------------------------
@@ -21,6 +22,7 @@ module Text.CSL.Data
     , langBase
     ) where
 
+import Prelude
 import qualified Control.Exception      as E
 import qualified Data.ByteString.Lazy   as L
 import           Data.Typeable

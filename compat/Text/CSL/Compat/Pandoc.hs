@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, ScopedTypeVariables #-}
+{-# LANGUAGE CPP, ScopedTypeVariables, NoImplicitPrelude #-}
 -- | Compatibility module to work around differences in the
 -- types of functions between pandoc < 2.0 and pandoc >= 2.0.
 module Text.CSL.Compat.Pandoc (
@@ -13,6 +13,7 @@ module Text.CSL.Compat.Pandoc (
   fetchItem,
   pipeProcess ) where
 
+import Prelude
 import qualified Control.Exception as E
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL

@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE CPP                      #-}
 {-# LANGUAGE ScopedTypeVariables      #-}
 {-# LANGUAGE PatternGuards            #-}
@@ -20,6 +21,7 @@ module Text.CSL.Input.Bibutils
     , convertRefs
     ) where
 
+import Prelude
 import qualified Control.Exception      as E
 import           Data.Aeson
 import qualified Data.ByteString.Lazy   as BL

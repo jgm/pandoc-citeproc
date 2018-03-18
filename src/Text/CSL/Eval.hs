@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE PatternGuards       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -22,6 +23,7 @@ module Text.CSL.Eval
     , module Text.CSL.Eval.Output
     ) where
 
+import Prelude
 import           Control.Arrow
 import qualified Control.Exception      as E
 import           Control.Monad.State

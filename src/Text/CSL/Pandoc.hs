@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE CPP                 #-}
 {-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE OverloadedStrings   #-}
@@ -6,6 +7,7 @@
 module Text.CSL.Pandoc (processCites, processCites')
 where
 
+import Prelude
 import           Control.Applicative      ((<|>))
 import qualified Control.Exception        as E
 import           Control.Monad

@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 
 {-# LANGUAGE PatternGuards      #-}
 -----------------------------------------------------------------------------
@@ -25,6 +26,7 @@ module Text.CSL.Output.Pandoc
     , toCapital
     ) where
 
+import Prelude
 import           Data.Maybe             (fromMaybe)
 import           Text.CSL.Style
 import           Text.CSL.Util          (headInline, initInline, lastInline,

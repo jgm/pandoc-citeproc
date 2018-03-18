@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE PatternGuards    #-}
 -----------------------------------------------------------------------------
@@ -16,6 +17,7 @@
 
 module Text.CSL.Eval.Names where
 
+import Prelude
 import           Control.Monad.State
 import           Data.Char              (isLetter, isLower, isUpper)
 import           Data.List              (intersperse, nub)

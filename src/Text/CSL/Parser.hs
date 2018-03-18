@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 -----------------------------------------------------------------------------
@@ -16,6 +17,7 @@
 module Text.CSL.Parser (readCSLFile, parseCSL, parseCSL',
                         parseLocale, localizeCSL)
 where
+import Prelude
 import qualified Control.Exception      as E
 import           Control.Monad          (when)
 import qualified Data.ByteString.Lazy   as L

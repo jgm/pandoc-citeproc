@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE PatternGuards #-}
 -----------------------------------------------------------------------------
 -- |
@@ -15,6 +16,7 @@
 
 module Text.CSL.Eval.Date where
 
+import Prelude
 import qualified Control.Exception      as E
 import           Control.Monad.State
 

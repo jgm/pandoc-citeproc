@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE PatternGuards #-}
 -----------------------------------------------------------------------------
 -- |
@@ -16,6 +17,7 @@
 
 module Text.CSL.Proc.Collapse where
 
+import Prelude
 import           Control.Arrow          (second, (&&&), (>>>))
 import           Data.Char
 import           Data.List              (groupBy, sortBy)

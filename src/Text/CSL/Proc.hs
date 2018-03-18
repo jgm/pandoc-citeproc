@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE PatternGuards     #-}
@@ -18,6 +19,7 @@
 
 module Text.CSL.Proc where
 
+import Prelude
 import           Control.Applicative    ((<|>))
 import           Control.Arrow          (second, (&&&), (>>>))
 import           Control.Monad.State    (execState, modify)

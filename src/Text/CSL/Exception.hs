@@ -1,6 +1,8 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 
 module Text.CSL.Exception (CiteprocException(..), renderError) where
+import Prelude
 import           Control.Exception (Exception)
 import           Data.Data
 

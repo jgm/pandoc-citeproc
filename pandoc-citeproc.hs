@@ -1,6 +1,8 @@
 {-# LANGUAGE CPP                 #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module Main where
+import           Prelude
 import           Control.Applicative              (many, (<|>))
 import           Control.Exception                as E
 import           Control.Monad

@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE PatternGuards #-}
 #if MIN_VERSION_base(4,9,0)
 {-# OPTIONS_GHC -fno-warn-redundant-constraints #-}
@@ -18,6 +19,7 @@
 
 module Text.CSL.Eval.Common where
 
+import Prelude
 import           Control.Arrow       ((&&&), (>>>))
 import           Control.Monad.State
 import           Data.Char           (toLower)

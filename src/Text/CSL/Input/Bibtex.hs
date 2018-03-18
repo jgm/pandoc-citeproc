@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
@@ -21,6 +22,7 @@ module Text.CSL.Input.Bibtex
     )
     where
 
+import Prelude
 import           Control.Applicative
 import qualified Control.Exception      as E
 import           Control.Monad

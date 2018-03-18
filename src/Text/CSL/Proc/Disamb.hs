@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE PatternGuards #-}
 #if MIN_VERSION_base(4,9,0)
 {-# OPTIONS_GHC -fno-warn-redundant-constraints #-}
@@ -21,6 +22,7 @@
 
 module Text.CSL.Proc.Disamb where
 
+import Prelude
 import           Control.Arrow      (second, (&&&), (>>>))
 import           Data.List          (elemIndex, find, findIndex, groupBy,
                                      isPrefixOf, mapAccumL, nub, nubBy, sortBy)
