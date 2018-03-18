@@ -1,3 +1,9 @@
+pandoc-citeproc 0.14.2
+
+  * Use custom Prelude to handle Monoid/Semigroup transition.
+  * Add Semigroup instance for Formatting (API change).
+  * Bump aeson upper bound.
+
 pandoc-citeproc (0.14.1.5)
 
   * Fixed 'capitalize-first' when the element begins with emphasis
