@@ -64,7 +64,6 @@ module Text.CSL
     , renderPandoc'
     ) where
 
-import Prelude
 import           Text.CSL.Input.Bibutils
 import           Text.CSL.Output.Pandoc
 import           Text.CSL.Output.Plain
