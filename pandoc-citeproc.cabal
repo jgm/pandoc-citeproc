@@ -180,7 +180,6 @@ executable pandoc-citeproc
 executable test-citeproc
   Main-Is:        test-citeproc.hs
   Other-Modules:  JSON
-                  Prelude
   Hs-Source-Dirs: tests, compat
   if flag(test_citeproc)
     Buildable:    True
@@ -207,7 +206,6 @@ test-suite test-pandoc-citeproc
   Type:           exitcode-stdio-1.0
   Main-Is:        test-pandoc-citeproc.hs
   Other-Modules:  JSON
-                  Prelude
   Hs-Source-Dirs: tests, compat
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.17.3 && < 1.18, mtl,
