@@ -86,7 +86,7 @@ import qualified Text.Parsec         as P
 import qualified Text.Parsec.String  as P
 
 newtype Literal = Literal { unLiteral :: String }
-  deriving ( Show, Read, Eq, Data, Typeable, Monoid, Generic )
+  deriving ( Show, Read, Eq, Data, Typeable, Semigroup, Monoid, Generic )
 
 instance AddYaml Literal
   where x &= (Literal y) = x &= (T.pack y)
@@ -387,11 +387,7 @@ instance ToJSON CNum where
 instance ToYaml CNum where
   toYaml r = Y.string (T.pack $ show $ unCNum r)
 
-newtype CLabel = CLabel { unCLabel :: String } deriving ( Show, Read, Eq, Typeable, Data, Generic )
-
-instance Monoid CLabel where
-    mempty = CLabel mempty
-    mappend (CLabel a) (CLabel b) = CLabel (mappend a b)
+newtype CLabel = CLabel { unCLabel :: String } deriving ( Show, Read, Eq, Typeable, Data, Generic, Semigroup, Monoid )
 
 instance FromJSON CLabel where
   parseJSON x = CLabel `fmap` parseString x
