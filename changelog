@@ -1,4 +1,12 @@
-pandoc-citeproc 0.14.2
+pandoc-citeproc (0.14.3)
+
+  * Fixed other-modules in cabal.
+  * Semigroup instances for Literal and CLabel.
+  * Use NoImplicitPrelude with custom prelude.
+    This allows ghci to work.
+  * stack.yaml - depend on released pandoc.
+
+pandoc-citeproc (0.14.2)
 
   * Use custom Prelude to handle Monoid/Semigroup transition.
   * Add Semigroup instance for Formatting (API change).
