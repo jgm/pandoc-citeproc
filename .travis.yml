@@ -124,7 +124,7 @@ script:
     cabal)
       cabal sdist --output-directory=sourcedist && \
       cd sourcedist && \
-      cabal install --enable-tests -ffast --disable-optimization --ghc-options="-Wall -fno-warn-unused-do-bind -Werror" --ghc-options="$OPTS" -j2 $CABALARGS && \
+      cabal install --enable-tests -ffast --disable-optimization --ghc-options="$OPTS" -j2 $CABALARGS && \
       cabal test
       ;;
   esac
