@@ -107,7 +107,7 @@ install:
     cabal)
       cabal --version
       travis_retry cabal update
-      cabal install --only-dependencies --enable-tests --force-reinstalls --disable-optimization -ffast --reorder-goals --max-backjumps=-1 --ghc-options="$OPTS" $CABALARGS
+      cabal install --only-dependencies --enable-tests --force-reinstalls --disable-optimization -ffast --reorder-goals --max-backjumps=-1 $CABALARGS
       ;;
   esac
 
