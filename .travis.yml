@@ -36,11 +36,11 @@ matrix:
     compiler: ": #GHC 8.0.1"
     addons: {apt: {packages: [cabal-install-1.24,ghc-8.0.1,happy-1.19.5], sources: [hvr-ghc]}}
 
-  - env: BUILD=cabal GHCVER=8.2.2 CABALVER=2.0
+  - env: BUILD=cabal GHCVER=8.2.2 CABALVER=2.0 OPTS="-O0 -Wall -Werrer -Wincomplete-record-updates -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances -fno-warn-unused-do-bind"
     compiler: ": #GHC 8.2.2"
     addons: {apt: {packages: [cabal-install-2.0,ghc-8.2.2,happy-1.19.5], sources: [hvr-ghc]}}
 
-  - env: BUILD=cabal GHCVER=8.4.1 CABALVER=2.0
+  - env: BUILD=cabal GHCVER=8.4.1 CABALVER=2.0 OPTS="-O0 -Wall -Werrer -Wincomplete-record-updates -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances -fno-warn-unused-do-bind"
     compiler: ": #GHC 8.4.1"
     addons: {apt: {packages: [cabal-install-2.0,ghc-8.4.1,happy-1.19.5], sources: [hvr-ghc]}}
 
@@ -107,7 +107,7 @@ install:
     cabal)
       cabal --version
       travis_retry cabal update
-      cabal install --only-dependencies --enable-tests --force-reinstalls --disable-optimization -ffast --reorder-goals --max-backjumps=-1 $CABALARGS
+      cabal install --only-dependencies --enable-tests --force-reinstalls --disable-optimization -ffast --reorder-goals --max-backjumps=-1 --ghc-options="$OPTS" $CABALARGS
       ;;
   esac
 
@@ -124,7 +124,7 @@ script:
     cabal)
       cabal sdist --output-directory=sourcedist && \
       cd sourcedist && \
-      cabal install --enable-tests -ffast --disable-optimization --ghc-options="-Wall -fno-warn-unused-do-bind -Werror" && \
+      cabal install --enable-tests -ffast --disable-optimization --ghc-options="-Wall -fno-warn-unused-do-bind -Werror" --ghc-options="$OPTS" $CABALARGS && \
       cabal test
       ;;
   esac
