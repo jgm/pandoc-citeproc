@@ -36,11 +36,11 @@ matrix:
     compiler: ": #GHC 8.0.1"
     addons: {apt: {packages: [cabal-install-1.24,ghc-8.0.1,happy-1.19.5], sources: [hvr-ghc]}}
 
-  - env: BUILD=cabal GHCVER=8.2.2 CABALVER=2.0 OPTS="-O0 -Wall -Werrer -Wincomplete-record-updates -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances -fno-warn-unused-do-bind"
+  - env: BUILD=cabal GHCVER=8.2.2 CABALVER=2.0 OPTS="-O0 -Wall -Werror -Wincomplete-record-updates -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances -fno-warn-unused-do-bind"
     compiler: ": #GHC 8.2.2"
     addons: {apt: {packages: [cabal-install-2.0,ghc-8.2.2,happy-1.19.5], sources: [hvr-ghc]}}
 
-  - env: BUILD=cabal GHCVER=8.4.1 CABALVER=2.0 OPTS="-O0 -Wall -Werrer -Wincomplete-record-updates -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances -fno-warn-unused-do-bind"
+  - env: BUILD=cabal GHCVER=8.4.1 CABALVER=2.0 OPTS="-O0 -Wall -Werror -Wincomplete-record-updates -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances -fno-warn-unused-do-bind"
     compiler: ": #GHC 8.4.1"
     addons: {apt: {packages: [cabal-install-2.0,ghc-8.4.1,happy-1.19.5], sources: [hvr-ghc]}}
 
