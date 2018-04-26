@@ -3,6 +3,6 @@ Pandoc (Meta {unMeta = fromList [("bibliography",MetaList [MetaInlines [Str "tes
  [Div ("ref-item1",[],[])
   [Para [Str "Doe,",Space,Str "John.",Space,Str "2005.",Space,Emph [Str "First",Space,Str "Book"],Str ".",Space,Str "Cambridge:",Space,Str "Cambridge",Space,Str "University",Space,Str "Press."]]
  ,Div ("ref-item2",[],[])
-  [Para [Str "\8212\8212\8212.",Space,Str "2006.",Space,Str "\8220Article.\8221",Space,Emph [Str "Journal",Space,Str "of",Space,Str "Generic",Space,Str "Studies"],Space,Str "6:33\8211\&34."]]
+  [Para [Str "\8212\8212\8212.",Space,Str "2006.",Space,Str "\8220Article.\8221",Space,Emph [Str "Journal",Space,Str "of",Space,Str "Generic",Space,Str "Studies"],Space,Str "6:",Space,Str "33\8211\&34."]]
  ,Div ("ref-\1087\1091\1085\1082\1090\&3",[],[])
   [Para [Str "Doe,",Space,Str "John,",Space,Str "and",Space,Str "Jenny",Space,Str "Roe.",Space,Str "2007.",Space,Str "\8220Why",Space,Str "Water",Space,Str "Is",Space,Str "Wet.\8221",Space,Str "In",Space,Emph [Str "Third",Space,Str "Book"],Str ",",Space,Str "edited",Space,Str "by",Space,Str "Sam",Space,Str "Smith.",Space,Str "Oxford:",Space,Str "Oxford",Space,Str "University",Space,Str "Press."]]]]

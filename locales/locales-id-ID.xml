@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <locale xmlns="http://purl.org/net/xbiblio/csl" version="1.0" xml:lang="id-ID">
   <info>
-  <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+    <translator>
+      <name>faizhabibullah</name>
+    </translator>
+    <translator>
+      <name>Deden Habibi</name>
+    </translator>
+    <translator>
+      <name>xbypass</name>
+    </translator>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
     <updated>2015-08-05T23:31:02+00:00</updated>
   </info>
   <style-options punctuation-in-quote="true"/>

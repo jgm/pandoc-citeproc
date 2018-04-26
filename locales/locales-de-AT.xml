@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <locale xmlns="http://purl.org/net/xbiblio/csl" version="1.0" xml:lang="de-AT">
   <info>
+    <translator>
+      <name>Till A. Heilmann</name>
+    </translator>
+    <translator>
+      <name>Georg Duffner</name>
+    </translator>
+    <translator>
+      <name>Sebastian Karcher</name>
+    </translator>
+    <translator>
+      <name>Sylvester Keil</name>
+    </translator>
+    <translator>
+      <name>jakov</name>
+    </translator>
+    <translator>
+      <name>Frank Bennett</name>
+    </translator>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
     <updated>2012-07-04T23:31:02+00:00</updated>
   </info>
