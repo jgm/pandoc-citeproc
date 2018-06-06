@@ -55,7 +55,7 @@ import           Text.Bibutils
 -- a predicate to filter citation identifiers.
 --
 -- Supported formats are: @json@, @mods@, @bibtex@, @biblatex@, @ris@,
--- @endnote@, @endnotexml@, @isi@, @medline@, and @copac@.
+-- @endnote@, @endnotexml@, @isi@, @medline@, @copac@, and @nbib@.
 readBiblioFile :: (String -> Bool) -> FilePath -> IO [Reference]
 readBiblioFile idpred f
     = case getExt f of
@@ -76,6 +76,7 @@ readBiblioFile idpred f
         ".wos"      -> readBiblioFile' idpred f isi_in
         ".medline"  -> readBiblioFile' idpred f medline_in
         ".copac"    -> readBiblioFile' idpred f copac_in
+        ".nbib"     -> readBiblioFile' idpred f nbib_in
         _           -> E.throwIO $ ErrorReadingBibFile f "the format of the bibliographic database could not be recognized from the file extension"
 #else
         _           -> E.throwIO $ ErrorReadingBibFile f "bibliography format not supported"
@@ -94,6 +95,7 @@ data BibFormat
     | Medline
     | Copac
     | Mods
+    | Nbib
 #endif
     deriving Show
 
@@ -113,6 +115,7 @@ readBiblioString idpred b s
     | Medline   <- b = go medline_in
     | Copac     <- b = go copac_in
     | Mods      <- b = go mods_in
+    | Nbib      <- b = go nbib_in
 #endif
     | otherwise      = E.throwIO $ ErrorReadingBib $
                           "unsupported format " ++ show b

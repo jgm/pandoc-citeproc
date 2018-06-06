@@ -52,6 +52,7 @@ the input:
     ISI               .wos
     MEDLINE           .medline
     MODS              .mods
+    NBIB              .nbib
     RIS               .ris
 
     Note that `.bib` can generally be used with both BibTeX and BibLaTeX
@@ -188,7 +189,7 @@ by other CSL implementations.
 `-f` *FORMAT*, `--format=`*FORMAT*
 :   Specify format of bibliography to be converted.  Legal values are
     `biblatex`, `bibtex`, `ris`, `endnote`, `endnotexml`, `isi`,
-    `medline`, `copac`, `mods`, and `json`.
+    `medline`, `copac`, `mods`, `nbib`, and `json`.
 
 `-h, --help`
 :   Print usage information.
