@@ -1,40 +1,48 @@
-{-# LANGUAGE PatternGuards, OverloadedStrings, FlexibleInstances,
-    ScopedTypeVariables, CPP #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE PatternGuards       #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module Text.CSL.Pandoc (processCites, processCites')
 where
 
-import Text.Pandoc
-import Text.Pandoc.Walk
-import Text.Pandoc.Builder (setMeta, deleteMeta)
-import Text.Pandoc.Shared (stringify)
-import Text.HTML.TagSoup.Entity (lookupEntity)
-import qualified Data.ByteString.Lazy as L
-import System.SetEnv (setEnv)
-import System.Environment (getEnv)
-import Control.Applicative ((<|>))
-import Data.Aeson
-import Data.Char ( isDigit, isPunctuation, toLower, isSpace )
-import qualified Data.Map as M
-import Text.CSL.Reference hiding (processCites, Value)
-import Text.CSL.Input.Bibutils (readBiblioFile, convertRefs)
-import Text.CSL.Style hiding (Cite(..), Citation(..))
-import Text.CSL.Proc
-import Text.CSL.Output.Pandoc (renderPandoc, renderPandoc')
-import qualified Text.CSL.Style as CSL
-import Text.CSL.Parser
-import Text.CSL.Output.Pandoc ( headInline, tailInline, initInline,
-                                toCapital )
-import Text.CSL.Data (getDefaultCSL)
-import Text.Parsec hiding (State, (<|>))
-import Control.Monad
-import qualified Control.Exception as E
-import Control.Monad.State
-import System.FilePath
-import System.Directory (getAppUserDataDirectory)
-import Text.CSL.Util (findFile, splitStrWhen, tr', parseRomanNumeral, trim)
-import Text.CSL.Exception
-import System.IO.Error (isDoesNotExistError)
-import Data.Maybe (fromMaybe)
+import Prelude
+import           Control.Applicative      ((<|>))
+import qualified Control.Exception        as E
+import           Control.Monad
+import           Control.Monad.State
+import           Data.Aeson
+import qualified Data.ByteString.Lazy     as L
+import           Data.Char                (isDigit, isPunctuation, isSpace,
+                                           toLower)
+import qualified Data.Map                 as M
+import qualified Data.Set                 as Set
+import           Data.Maybe               (fromMaybe)
+import           System.Directory         (getAppUserDataDirectory)
+import           System.Environment       (getEnv)
+import           System.FilePath
+import           System.IO.Error          (isDoesNotExistError)
+import           System.SetEnv            (setEnv)
+import           Text.CSL.Data            (getDefaultCSL)
+import           Text.CSL.Exception
+import           Text.CSL.Input.Bibutils  (convertRefs, readBiblioFile)
+import           Text.CSL.Output.Pandoc   (renderPandoc, renderPandoc',
+                      headInline, initInline, tailInline, toCapital)
+import           Text.CSL.Parser
+import           Text.CSL.Proc
+import           Text.CSL.Reference       hiding (Value, processCites)
+import           Text.CSL.Style           hiding (Citation (..), Cite (..))
+import qualified Text.CSL.Style           as CSL
+import           Text.CSL.Util            (findFile, lastInline,
+                                           parseRomanNumeral, splitStrWhen, tr',
+                                           trim)
+import           Text.HTML.TagSoup.Entity (lookupEntity)
+import           Text.Pandoc
+import           Text.Pandoc.Builder      (deleteMeta, setMeta)
+import           Text.Pandoc.Shared       (stringify)
+import           Text.Pandoc.Walk
+import           Text.Parsec              hiding (State, (<|>))
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
@@ -51,15 +59,14 @@ processCites style refs (Pandoc m1 b1) =
                         map (map (toCslCite locMap)) grps)
       cits_map      = tr' "cits_map" $ M.fromList $ zip grps (citations result)
       biblioList    = map (renderPandoc' style) $ zip (bibliography result) (citationIds result)
-      moveNotes     = case lookupMeta "notes-after-punctuation" m1 of
-                           Just (MetaBool False) -> False
-                           _                     -> True
-      Pandoc m3 bs  = bottomUp (mvPunct moveNotes style) . deNote .
-                        topDown (processCite style cits_map) $ Pandoc m2 b2
+      moveNotes     = maybe True truish $
+                        lookupMeta "notes-after-punctuation" m1
+      Pandoc m3 bs  = walk (mvPunct moveNotes style) . deNote .
+                        walk (processCite style cits_map) $ Pandoc m2 b2
       m             = case metanocites of
                             Nothing -> m3
                             Just x  -> setMeta "nocite" x m3
-  in  Pandoc m $ bottomUp (concatMap removeNocaseSpans)
+  in  Pandoc m $ walk (concatMap removeNocaseSpans)
                $ insertRefs m biblioList bs
 
 -- if document contains a Div with id="refs", insert
@@ -74,7 +81,7 @@ insertRefs meta refs bs =
                (bs', True) -> bs'
                (_, False)  ->
                   case reverse bs of
-                        (Header lev (id',classes,kvs) ys) : xs ->
+                        Header lev (id',classes,kvs) ys : xs ->
                           reverse xs ++
                             [Header lev (id',addUnNumbered classes,kvs) ys,
                              Div ("refs",["references"],[]) refs]
@@ -103,24 +110,31 @@ refTitle meta =
 
 isRefRemove :: Meta -> Bool
 isRefRemove meta =
-  case lookupMeta "suppress-bibliography" meta of
-    Just (MetaBool True) -> True
-    _                    -> False
+  maybe False truish $ lookupMeta "suppress-bibliography" meta
 
 isLinkCitations :: Meta -> Bool
 isLinkCitations meta =
-  case lookupMeta "link-citations" meta of
-    Just (MetaBool True)   -> True
-    Just (MetaString s)    -> map toLower s `elem` yesValues
-    Just (MetaInlines ils) -> map toLower (stringify ils) `elem` yesValues
-    _                      -> False
-  where yesValues = ["true", "yes", "on"]
+  maybe False truish $ lookupMeta "link-citations" meta
+
+truish :: MetaValue -> Bool
+truish (MetaBool t) = t
+truish (MetaString s) = isYesValue (map toLower s)
+truish (MetaInlines ils) = isYesValue (map toLower (stringify ils))
+truish (MetaBlocks [Plain ils]) = isYesValue (map toLower (stringify ils))
+truish _ = False
+
+isYesValue :: String -> Bool
+isYesValue "t" = True
+isYesValue "true" = True
+isYesValue "yes" = True
+isYesValue "on" = True
+isYesValue _ = False
 
 -- if the 'nocite' Meta field contains a citation with id = '*',
 -- create a cite with to all the references.
 mkNociteWildcards :: [Reference] -> [[Citation]] -> [[Citation]]
 mkNociteWildcards refs nocites =
-  map (\citgrp -> expandStar citgrp) nocites
+  map expandStar nocites
   where expandStar cs =
          case [c | c <- cs
                  , citationId c == "*"] of
@@ -136,7 +150,7 @@ mkNociteWildcards refs nocites =
 
 removeNocaseSpans :: Inline -> [Inline]
 removeNocaseSpans (Span ("",["nocase"],[]) xs) = xs
-removeNocaseSpans x = [x]
+removeNocaseSpans x                            = [x]
 
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  The style filename is derived from
@@ -182,10 +196,14 @@ processCites' (Pandoc meta blocks) = do
               -- Note that LANG needs to be set for bibtex conversion:
               setEnv "LANG" "en-US.UTF-8"
               setEnv "LC_ALL" "en-US.UTF-8"
-            else do
+            else
               setEnv "LC_ALL" envlang
-  bibRefs <- getBibRefs $ maybe (MetaList []) id
-                        $ lookupMeta "bibliography" meta
+  let citids = query getCitationIds (Pandoc meta blocks)
+  let idpred = if "*" `Set.member` citids
+                  then const True
+                  else (`Set.member` citids)
+  bibRefs <- getBibRefs idpred $ fromMaybe (MetaList [])
+                               $ lookupMeta "bibliography" meta
   let refs = inlineRefs ++ bibRefs
   let cslAbbrevFile = lookupMeta "citation-abbreviations" meta >>= toPath
   let skipLeadingSpace = L.dropWhile (\s -> s == 32 || (s >= 9 && s <= 13))
@@ -207,13 +225,13 @@ toPath (MetaList xs) = case reverse xs of
 toPath (MetaInlines ils) = Just $ stringify ils
 toPath _ = Nothing
 
-getBibRefs :: MetaValue -> IO [Reference]
-getBibRefs (MetaList xs) = concat `fmap` mapM getBibRefs xs
-getBibRefs (MetaInlines xs) = getBibRefs (MetaString $ stringify xs)
-getBibRefs (MetaString s) = do
+getBibRefs :: (String -> Bool) -> MetaValue -> IO [Reference]
+getBibRefs idpred (MetaList xs) = concat `fmap` mapM (getBibRefs idpred) xs
+getBibRefs idpred (MetaInlines xs) = getBibRefs idpred (MetaString $ stringify xs)
+getBibRefs idpred (MetaString s) = do
   path <- findFile ["."] s >>= maybe (E.throwIO $ CouldNotFindBibFile s) return
-  map unescapeRefId `fmap` readBiblioFile path
-getBibRefs _ = return []
+  map unescapeRefId `fmap` readBiblioFile idpred path
+getBibRefs _ _ = return []
 
 -- unescape reference ids, which may contain XML entities, so
 -- that we can do lookups with regular string equality
@@ -247,39 +265,53 @@ processCite s cs (Cite t _) =
 processCite _ _ x = x
 
 isNote :: Inline -> Bool
-isNote (Note _) = True
+isNote (Note _)          = True
 isNote (Cite _ [Note _]) = True
-isNote _ = False
+isNote _                 = False
 
 mvPunctInsideQuote :: Inline -> Inline -> [Inline]
 mvPunctInsideQuote (Quoted qt ils) (Str s) | s `elem` [".", ","] =
-  [Quoted qt (init ils ++ (mvPunctInsideQuote (last ils) (Str s)))]
+  [Quoted qt (init ils ++ mvPunctInsideQuote (last ils) (Str s))]
 mvPunctInsideQuote il il' = [il, il']
 
 isSpacy :: Inline -> Bool
-isSpacy Space = True
+isSpacy Space     = True
 isSpacy SoftBreak = True
-isSpacy _ = False
+isSpacy _         = False
 
 mvPunct :: Bool -> Style -> [Inline] -> [Inline]
-mvPunct _ _ (x : Space : xs) | isSpacy x = x : xs
-mvPunct moveNotes _ (s : x : ys) | isSpacy s, isNote x, startWithPunct ys =
-  if moveNotes
-     then Str (headInline ys) : x : tailInline ys
-     else x : ys
-mvPunct moveNotes _ (Cite cs ils : ys) |
-     length ils > 1
+mvPunct moveNotes sty (x : Space : xs)
+  | isSpacy x = x : mvPunct moveNotes sty xs
+mvPunct moveNotes sty (q : s : x : ys)
+  | isSpacy s
+  , isNote x
+  , startWithPunct ys
+  = if moveNotes
+       then mvPunct moveNotes sty $
+            q : Str (headInline ys) : x : tailInline ys
+       else q : x : mvPunct moveNotes sty ys
+mvPunct moveNotes sty (Cite cs ils : ys)
+   | length ils > 1
    , isNote (last ils)
    , startWithPunct ys
    , moveNotes
-   = Cite cs (init ils ++ [Str (headInline ys) | not (endWithPunct False (init ils))]
-     ++ [last ils]) : tailInline ys
+   = Cite cs (init ils
+     ++ [Str (headInline ys) | not (endWithPunct False (init ils))]
+     ++ [last ils]) : mvPunct moveNotes sty (tailInline ys)
 mvPunct moveNotes sty (q@(Quoted _ _) : w@(Str _) : x : ys)
-  | isNote x, isPunctuationInQuote sty, moveNotes  =
-    mvPunctInsideQuote q w ++ (x : ys)
-mvPunct _ _ (s : x : ys) | isSpacy s, isNote x = x : ys
-mvPunct _ _ (s : x@(Cite _ (Superscript _ : _)) : ys) | isSpacy s = x : ys
-mvPunct _ _ xs = xs
+  | isNote x
+  , isPunctuationInQuote sty
+  , moveNotes
+  = mvPunctInsideQuote q w ++ (x : mvPunct moveNotes sty ys)
+mvPunct moveNotes sty (s : x : ys) | isSpacy s, isNote x =
+  x : mvPunct moveNotes sty ys
+mvPunct moveNotes sty (s : x@(Cite _ (Superscript _ : _)) : ys)
+  | isSpacy s = x : mvPunct moveNotes sty ys
+mvPunct moveNotes sty (Cite cs ils : Str "." : ys)
+  | lastInline ils == "."
+  = Cite cs ils : mvPunct moveNotes sty ys
+mvPunct moveNotes sty (x:xs) = x : mvPunct moveNotes sty xs
+mvPunct _ _ [] = []
 
 endWithPunct :: Bool -> [Inline] -> Bool
 endWithPunct _ [] = True
@@ -287,14 +319,15 @@ endWithPunct onlyFinal xs@(_:_) =
   case reverse (stringify xs) of
        []                       -> True
        -- covers .), .", etc.:
-       (d:c:_) | isPunctuation d && not onlyFinal
-                && isEndPunct c -> True
-       (c:_) | isEndPunct c     -> True
-             | otherwise        -> False
+       (d:c:_) | isPunctuation d
+                 && not onlyFinal
+                 && isEndPunct c -> True
+       (c:_) | isEndPunct c      -> True
+             | otherwise         -> False
   where isEndPunct c = c `elem` (".,;:!?" :: String)
 
 startWithPunct :: [Inline] -> Bool
-startWithPunct = and . map (`elem` (".,;:!?" :: String)) . headInline
+startWithPunct = all (`elem` (".,;:!?" :: String)) . headInline
 
 deNote :: Pandoc -> Pandoc
 deNote = topDown go
@@ -326,6 +359,10 @@ getCitation :: Inline -> [[Citation]]
 getCitation i | Cite t _ <- i = [t]
               | otherwise     = []
 
+getCitationIds :: Inline -> Set.Set String
+getCitationIds (Cite cs _) = Set.fromList (map citationId cs)
+getCitationIds _ = mempty
+
 setHashes :: Inline -> State Int Inline
 setHashes i | Cite t ils <- i = do t' <- mapM setHash t
                                    return $ Cite t' ils
@@ -343,7 +380,7 @@ toCslCite locMap c
           s'      = case (la,lo,s) of
                          -- treat a bare locator as if it begins with space
                          -- so @item1 [blah] is like [@item1, blah]
-                         ("","",(x:_))
+                         ("","",x:_)
                            | not (isPunct x) -> Space : s
                          _                   -> s
           isPunct (Str (x:_)) = isPunctuation x
@@ -363,8 +400,8 @@ locatorWords :: LocatorMap -> [Inline] -> (String, String, [Inline])
 locatorWords locMap inp =
   case parse (pLocatorWords locMap) "suffix" $
          splitStrWhen (\c -> isLocatorPunct c || isSpace c) inp of
-       Right r   -> r
-       Left _    -> ("","",inp)
+       Right r -> r
+       Left _  -> ("","",inp)
 
 pLocatorWords :: LocatorMap -> Parsec [Inline] st (String, String, [Inline])
 pLocatorWords locMap = do
@@ -425,12 +462,12 @@ pDigit = do
   t <- anyToken
   case t of
       Str (d:_) | isDigit d -> return ()
-      _ -> mzero
+      _         -> mzero
 
 pLocatorPunct :: Parsec [Inline] st Inline
 pLocatorPunct = pMatch isLocatorPunct'
   where isLocatorPunct' (Str [c]) = isLocatorPunct c
-        isLocatorPunct' _ = False
+        isLocatorPunct' _         = False
 
 isLocatorPunct :: Char -> Bool
 isLocatorPunct ':' = False

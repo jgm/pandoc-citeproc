@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <locale xmlns="http://purl.org/net/xbiblio/csl" version="1.0" xml:lang="nb-NO">
   <info>
+    <translator>
+      <name>Guttorm Flatabø</name>
+    </translator>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
     <updated>2013-03-01T12:20:00+01:00</updated>
   </info>
@@ -122,7 +125,7 @@
     </term>
     <term name="page">
       <single>side</single>
-      <multiple>sider</multiple>
+      <multiple>side</multiple>
     </term>
     <term name="number-of-pages">
       <single>side</single>

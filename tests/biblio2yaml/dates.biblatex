@@ -25,7 +25,7 @@
     Author = {Author, Al},
     Journal = {Journal},
     Month = {08},
-    Title = {Year and Month, biblatex style; note that biblatex does not have a "day" field},
+    Title = {Year and Month, biblatex style; note that biblatex does not have a ``day'' field},
     Year = {1999}}
 
 @article{dates,
@@ -84,8 +84,8 @@ references:
   - family: Author
     given: Al
   issued:
-  - year: '1999'
-    month: '8'
+  - year: 1999
+    month: 8
   title: Year and month, bibtex style, supported by biblatex for backwards compatibility
   container-title: Journal
 
@@ -95,8 +95,8 @@ references:
   - family: Author
     given: Al
   issued:
-  - year: '1999'
-    month: '08'
+  - year: 1999
+    month: 8
   title: Year and month, biblatex style; note that biblatex does not have a “day”
     field
   container-title: Journal
@@ -107,21 +107,21 @@ references:
   - family: Author
     given: Al
   issued:
-  - year: '2012'
-    month: '12'
-    day: '13'
+  - year: 2012
+    month: 12
+    day: 13
   event-date:
-  - year: '2011'
-    month: '10'
-    day: '3'
+  - year: 2011
+    month: 10
+    day: 3
   accessed:
-  - year: '1999'
-    month: '5'
-    day: '23'
+  - year: 1999
+    month: 5
+    day: 23
   original-date:
-  - year: '1888'
-    month: '10'
-    day: '1'
+  - year: 1888
+    month: 10
+    day: 1
   title: Dates, default biblatex style; year, month to be ignored if date exists
   container-title: Journal
 
@@ -131,31 +131,31 @@ references:
   - family: Author
     given: Al
   issued:
-  - year: '1999'
-    month: '10'
-    day: '14'
-  - year: '2010'
-    month: '1'
-    day: '23'
+  - year: 1999
+    month: 10
+    day: 14
+  - year: 2010
+    month: 1
+    day: 23
   event-date:
-  - year: '1999'
-    month: '12'
-  - year: '2000'
-    month: '1'
+  - year: 1999
+    month: 12
+  - year: 2000
+    month: 1
   accessed:
-  - year: '2012'
-    month: '10'
-    day: '12'
-  - year: '2013'
-    month: '1'
-    day: '31'
+  - year: 2012
+    month: 10
+    day: 12
+  - year: 2013
+    month: 1
+    day: 31
   original-date:
-  - year: '1888'
-    month: '1'
-    day: '2'
-  - year: '1913'
-    month: '12'
-    day: '13'
+  - year: 1888
+    month: 1
+    day: 2
+  - year: 1913
+    month: 12
+    day: 13
   title: Date ranges; different years
   container-title: Journal
 
@@ -165,31 +165,31 @@ references:
   - family: Author
     given: Al
   issued:
-  - year: '1999'
-    month: '10'
-    day: '14'
-  - year: '1999'
-    month: '10'
-    day: '15'
+  - year: 1999
+    month: 10
+    day: 14
+  - year: 1999
+    month: 10
+    day: 15
   event-date:
-  - year: '1999'
-    month: '10'
-  - year: '1999'
-    month: '11'
+  - year: 1999
+    month: 10
+  - year: 1999
+    month: 11
   accessed:
-  - year: '2012'
-    month: '10'
-    day: '31'
-  - year: '2012'
-    month: '11'
-    day: '1'
+  - year: 2012
+    month: 10
+    day: 31
+  - year: 2012
+    month: 11
+    day: 1
   original-date:
-  - year: '1888'
-    month: '1'
-    day: '2'
-  - year: '1888'
-    month: '12'
-    day: '13'
+  - year: 1888
+    month: 1
+    day: 2
+  - year: 1888
+    month: 12
+    day: 13
   title: Date ranges; same year
   container-title: Journal
 
@@ -199,23 +199,23 @@ references:
   - family: Author
     given: Al
   issued:
-  - year: '1999'
-    month: '10'
-    day: '14'
+  - year: 1999
+    month: 10
+    day: 14
   - {}
   event-date:
-  - year: '1999'
-    month: '10'
+  - year: 1999
+    month: 10
   - {}
   accessed:
-  - year: '2012'
-    month: '10'
-    day: '31'
+  - year: 2012
+    month: 10
+    day: 31
   - {}
   original-date:
-  - year: '1888'
-    month: '1'
-    day: '2'
+  - year: 1888
+    month: 1
+    day: 2
   - {}
   title: Date ranges, open-ended
   container-title: Journal
@@ -226,21 +226,21 @@ references:
   - family: Author
     given: Al
   issued:
-  - year: '712'
-    month: '12'
-    day: '13'
+  - year: 712
+    month: 12
+    day: 13
   event-date:
-  - year: '311'
-    month: '10'
-    day: '3'
+  - year: 311
+    month: 10
+    day: 3
   accessed:
-  - year: '999'
-    month: '12'
-    day: '14'
+  - year: 999
+    month: 12
+    day: 14
   original-date:
-  - year: '88'
-    month: '10'
-    day: '1'
+  - year: 88
+    month: 10
+    day: 1
   title: Dates, year less than 1000
   container-title: Journal
 ...

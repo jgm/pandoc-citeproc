@@ -14,7 +14,7 @@ references:
 - id: jcg
   type: article-journal
   issued:
-  - year: '2011'
+  - year: 2011
   title: Semantic 3D media and content
   container-title: Computers and Graphics
   volume: '35'

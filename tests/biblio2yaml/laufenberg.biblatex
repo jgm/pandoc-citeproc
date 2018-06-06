@@ -85,9 +85,9 @@ references:
   - family: Ebner
     given: Norbert
   issued:
-  - year: '2006'
-    month: '9'
-    day: '13'
+  - year: 2006
+    month: 9
+    day: 13
   title: Elektrische Einrichtung und Betriebsverfahren
   genre: European patent
   annote: This is a patent entry with a holder field. Note the format of the type

@@ -48,9 +48,9 @@ references:
   - family: Vaughn
     given: Steven A.
   issued:
-  - year: '1997'
-    month: '9'
-    day: '16'
+  - year: 1997
+    month: 9
+    day: 16
   title: High-speed digital-to-RF converter
   genre: U.S. patent
   annote: This is a patent entry with a holder field. Note the format of the type

@@ -1,4 +1,6 @@
-{-# LANGUAGE PatternGuards, DeriveDataTypeable #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
+{-# LANGUAGE PatternGuards      #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Output.Pandoc
@@ -24,12 +26,14 @@ module Text.CSL.Output.Pandoc
     , toCapital
     ) where
 
-import Text.CSL.Util ( proc, proc', tailInline, lastInline,
-                       initInline, tailFirstInlineStr, headInline, toCapital )
-import Data.Maybe ( fromMaybe )
-import Text.CSL.Style
-import Text.Pandoc.Definition
-import Text.Pandoc.XML (fromEntities)
+import Prelude
+import           Data.Maybe             (fromMaybe)
+import           Text.CSL.Style
+import           Text.CSL.Util          (headInline, initInline, lastInline,
+                                         proc, proc', tailFirstInlineStr,
+                                         tailInline, toCapital)
+import           Text.Pandoc.Definition
+import           Text.Pandoc.XML        (fromEntities)
 
 renderPandoc :: Style -> Formatted -> [Inline]
 renderPandoc sty
@@ -47,7 +51,7 @@ renderPandoc' sty (form, citId) = Div ("ref-" ++ citId, [], []) [Para $ renderPa
 clean' :: Style -> [Inline] -> [Inline]
 clean' _   []  = []
 clean' sty (i:is) =
-  case (i:is) of
+  case i:is of
       (Str "" : rest) -> clean' sty rest
       (Str xs : Str ys : rest) -> clean' sty $ Str (xs ++ ys) : rest
       (Link a1 lab1 ('#':r1, "") : Str "\8211" : Link a2 lab2 ('#':r2, "") : rest)

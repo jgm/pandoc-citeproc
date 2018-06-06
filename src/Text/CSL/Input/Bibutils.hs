@@ -1,4 +1,7 @@
-{-# LANGUAGE CPP, ForeignFunctionInterface, PatternGuards #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE CPP                      #-}
+{-# LANGUAGE ScopedTypeVariables      #-}
+{-# LANGUAGE PatternGuards            #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Input.Bibutils
@@ -18,52 +21,62 @@ module Text.CSL.Input.Bibutils
     , convertRefs
     ) where
 
-import qualified Text.Pandoc.UTF8 as UTF8
-import Text.Pandoc hiding (readMarkdown)
-import Text.CSL.Compat.Pandoc (readMarkdown)
-import Data.Char
-import System.FilePath ( takeExtension )
-import Text.CSL.Exception
-import Text.CSL.Reference hiding ( Value )
-import Text.CSL.Input.Bibtex
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.Map as M
-import Data.Aeson
-import qualified Control.Exception as E
+import Prelude
+import qualified Control.Exception      as E
+import           Data.Aeson
+import qualified Data.ByteString.Lazy   as BL
+import qualified Data.ByteString        as BS
+import qualified Data.HashMap.Strict    as HM
+import qualified Data.Text              as T
+import qualified Data.Yaml              as Yaml
+import qualified Data.Vector            as V
+import           Data.Char
+import qualified Data.Map               as M
+import           System.FilePath        (takeExtension)
+import           Text.CSL.Compat.Pandoc (readMarkdown)
+import           Text.CSL.Exception
+import           Text.CSL.Input.Bibtex
+import           Text.CSL.Reference     hiding (Value)
+import           Text.CSL.Util          (parseString)
+import           Text.Pandoc            hiding (readMarkdown)
+import qualified Text.Pandoc.UTF8       as UTF8
 
 #ifdef USE_BIBUTILS
-import Control.Exception ( bracket, catch )
-import Control.Monad.Trans ( liftIO )
-import System.FilePath ( (</>), (<.>) )
-import System.IO.Error ( isAlreadyExistsError )
-import System.Directory
-import Text.Bibutils
+import           Control.Exception      (bracket, catch)
+import           Control.Monad.Trans    (liftIO)
+import           System.Directory
+import           System.FilePath        ((<.>), (</>))
+import           System.IO.Error        (isAlreadyExistsError)
+import           Text.Bibutils
 #endif
 
 -- | Read a file with a bibliographic database. The database format
--- is recognized by the file extension.
+-- is recognized by the file extension.  The first argument is
+-- a predicate to filter citation identifiers.
 --
 -- Supported formats are: @json@, @mods@, @bibtex@, @biblatex@, @ris@,
 -- @endnote@, @endnotexml@, @isi@, @medline@, @copac@, and @nbib@.
-readBiblioFile :: FilePath -> IO [Reference]
-readBiblioFile f
+readBiblioFile :: (String -> Bool) -> FilePath -> IO [Reference]
+readBiblioFile idpred f
     = case getExt f of
         ".json"     -> BL.readFile f >>= either
-                       (E.throwIO . ErrorReadingBibFile f) return . eitherDecode
+                       (E.throwIO . ErrorReadingBibFile f)
+                       (return . filterEntries idpred) . eitherDecode
         ".yaml"     -> UTF8.readFile f >>= either
-                       (E.throwIO . ErrorReadingBibFile f) return . readYamlBib
-        ".bib"      -> readBibtex False True f
-        ".bibtex"   -> readBibtex True True f
-        ".biblatex" -> readBibtex False True f
+                       (E.throwIO . ErrorReadingBibFile f) return .
+                       readYamlBib idpred
+        ".bib"      -> readBibtex idpred False True f
+        ".bibtex"   -> readBibtex idpred True True f
+        ".biblatex" -> readBibtex idpred False True f
 #ifdef USE_BIBUTILS
-        ".mods"     -> readBiblioFile' f mods_in
-        ".ris"      -> readBiblioFile' f ris_in
-        ".enl"      -> readBiblioFile' f endnote_in
-        ".xml"      -> readBiblioFile' f endnotexml_in
-        ".wos"      -> readBiblioFile' f isi_in
-        ".medline"  -> readBiblioFile' f medline_in
-        ".copac"    -> readBiblioFile' f copac_in
-        ".nbib"     -> readBiblioFile' f nbib_in
+        ".mods"     -> readBiblioFile' idpred f mods_in
+        ".ris"      -> readBiblioFile' idpred f ris_in
+        ".enl"      -> readBiblioFile' idpred f endnote_in
+        ".xml"      -> readBiblioFile' idpred f endnotexml_in
+        ".wos"      -> readBiblioFile' idpred f isi_in
+        ".medline"  -> readBiblioFile' idpred f medline_in
+        ".copac"    -> readBiblioFile' idpred f copac_in
+        ".nbib"     -> readBiblioFile' idpred f nbib_in
         _           -> E.throwIO $ ErrorReadingBibFile f "the format of the bibliographic database could not be recognized from the file extension"
 #else
         _           -> E.throwIO $ ErrorReadingBibFile f "bibliography format not supported"
@@ -86,14 +99,14 @@ data BibFormat
 #endif
     deriving Show
 
-readBiblioString :: BibFormat -> String -> IO [Reference]
-readBiblioString b s
+readBiblioString :: (String -> Bool) -> BibFormat -> String -> IO [Reference]
+readBiblioString idpred b s
     | Json      <- b = either (E.throwIO . ErrorReadingBib)
                          return $ eitherDecode $ UTF8.fromStringLazy s
     | Yaml      <- b = either (E.throwIO . ErrorReadingBib)
-                         return $ readYamlBib s
-    | Bibtex    <- b = readBibtexString True True s
-    | BibLatex  <- b = readBibtexString False True s
+                         return $ readYamlBib idpred s
+    | Bibtex    <- b = readBibtexString idpred True True s
+    | BibLatex  <- b = readBibtexString idpred False True s
 #ifdef USE_BIBUTILS
     | Ris       <- b = go ris_in
     | Endnote   <- b = go endnote_in
@@ -111,29 +124,29 @@ readBiblioString b s
       go f = withTempDir "citeproc" $ \tdir -> do
                let tfile = tdir </> "bibutils-tmp.biblio"
                UTF8.writeFile tfile s
-               readBiblioFile' tfile f
+               readBiblioFile' idpred tfile f
 #endif
 
 #ifdef USE_BIBUTILS
-readBiblioFile' :: FilePath -> BiblioIn -> IO [Reference]
-readBiblioFile' fin bin
-    | bin == biblatex_in = readBibtex False True fin
-    | otherwise      = E.handle handleBibfileError
-                       $ withTempDir "citeproc"
+readBiblioFile' :: (String -> Bool) -> FilePath -> BiblioIn -> IO [Reference]
+readBiblioFile' idpred fin bin
+    | bin == biblatex_in = readBibtex idpred False True fin
+    | otherwise      = withTempDir "citeproc"
                        $ \tdir -> do
                             let tfile = tdir </> "bibutils-tmp"
-                            param <- bibl_initparams bin bibtex_out "hs-bibutils"
-                            bibl  <- bibl_init
-                            unsetBOM        param
-                            setCharsetIn    param bibl_charset_unicode
-                            setCharsetOut   param bibl_charset_unicode
-                            _ <- bibl_read  param bibl fin
-                            _ <- bibl_write param bibl tfile
-                            bibl_free bibl
-                            bibl_freeparams param
-                            refs <- readBibtex True False tfile
+                            E.handle handleBibfileError $ do
+                              param <- bibl_initparams bin bibtex_out "hs-bibutils"
+                              bibl  <- bibl_init
+                              unsetBOM        param
+                              setCharsetIn    param bibl_charset_unicode
+                              setCharsetOut   param bibl_charset_unicode
+                              _ <- bibl_read  param bibl fin
+                              _ <- bibl_write param bibl tfile
+                              bibl_free bibl
+                              bibl_freeparams param
+                            refs <- readBibtex idpred True False tfile
                             return $! refs
-  where handleBibfileError :: E.SomeException -> IO [Reference]
+  where handleBibfileError :: E.SomeException -> IO ()
         handleBibfileError e = E.throwIO $ ErrorReadingBibFile fin (show e)
 
 -- | Perform a function in a temporary directory and clean up.
@@ -155,10 +168,43 @@ createTempDir num baseName = do
 getExt :: String -> String
 getExt = takeExtension . map toLower
 
-readYamlBib :: String -> Either String [Reference]
-readYamlBib s =
-  case readMarkdown s of
+readYamlBib :: (String -> Bool) -> String -> Either String [Reference]
+readYamlBib idpred s =
+  case readMarkdown s' of
          (Pandoc meta _) -> convertRefs (lookupMeta "references" meta)
+  where s' = addTop $ addBottom
+                    $ UTF8.toString
+                    $ selectEntries idpred
+                    $ UTF8.fromString
+                    $ s
+        addTop = ("---\n" ++)
+        addBottom = (++ "...\n")
+
+selectEntries :: (String -> Bool) -> BS.ByteString -> BS.ByteString
+selectEntries idpred bs =
+  case Yaml.decodeEither bs of
+       Right (Array vs) -> Yaml.encode (filterObjects $ V.toList vs)
+       Right (Object o) ->
+              case HM.lookup (T.pack "references") o of
+                   Just (Array vs) ->
+                     Yaml.encode (HM.insert (T.pack "references")
+                                    (filterObjects $ V.toList vs) mempty)
+                   _ -> BS.empty
+       Right _ -> BS.empty
+       Left e  -> E.throw $ ErrorParsingReferences e
+    where filterObjects = filter
+               (\x -> case x of
+                        Object o ->
+                            case HM.lookup (T.pack "id") o of
+                                 Just i ->
+                                  case Yaml.parseMaybe parseString i of
+                                       Just s -> idpred s
+                                       Nothing -> False
+                                 _ -> False
+                        _ -> False)
+
+filterEntries :: (String -> Bool) -> [Reference] -> [Reference]
+filterEntries idpred = filter (\r -> idpred (unLiteral (refId r)))
 
 convertRefs :: Maybe MetaValue -> Either String [Reference]
 convertRefs Nothing = Right []
@@ -170,14 +216,15 @@ convertRefs (Just v) =
          -- references:
          -- ...
          case fromJSON (metaValueToJSON v) of
-               Success ""   -> Right []
-               _            -> Left s
+               Success "" -> Right []
+               _          -> Left s
        Success x            -> Right x
 
 metaValueToJSON :: MetaValue -> Value
-metaValueToJSON (MetaMap m) = toJSON $ M.map metaValueToJSON m
-metaValueToJSON (MetaList xs) = toJSON $ map metaValueToJSON xs
-metaValueToJSON (MetaString t) = toJSON t
-metaValueToJSON (MetaBool b) = toJSON b
+metaValueToJSON (MetaMap m)       = toJSON $ M.map metaValueToJSON m
+metaValueToJSON (MetaList xs)     = toJSON $ map metaValueToJSON xs
+metaValueToJSON (MetaString t)    = toJSON t
+metaValueToJSON (MetaBool b)      = toJSON b
 metaValueToJSON (MetaInlines ils) = toJSON ils
-metaValueToJSON (MetaBlocks bs) = toJSON bs
+metaValueToJSON (MetaBlocks bs)   = toJSON bs
+

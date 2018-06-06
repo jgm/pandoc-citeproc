@@ -1,4 +1,9 @@
-{-# LANGUAGE ScopedTypeVariables, PatternGuards, FlexibleContexts #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PatternGuards         #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
 module Text.CSL.Util
   ( safeRead
   , readNum
@@ -16,6 +21,7 @@ module Text.CSL.Util
   , parseBool
   , parseString
   , parseInt
+  , parseMaybeInt
   , mb
   , (.#?)
   , (.#:)
@@ -40,34 +46,36 @@ module Text.CSL.Util
   , mapHeadInline
   , tr'
   , findFile
-  , (&=)
+  , AddYaml(..)
   , mapping'
   , parseRomanNumeral
   , isRange
   ) where
-import Data.Aeson
-import Data.Aeson.Types (Parser)
-import Data.Text (Text)
-import qualified Data.Text as T
-import Data.Char (toLower, toUpper, isLower, isUpper, isPunctuation, isAscii)
+import Prelude
+import           Control.Monad.State
+import           Data.Aeson
+import           Data.Aeson.Types    (Parser)
+import           Data.Char           (isAscii, isLower, isPunctuation, isUpper,
+                                      toLower, toUpper)
+import           Data.Generics       (Data, Typeable, everything, everywhere,
+                                      everywhere', everywhereM, mkM, mkQ, mkT)
+import           Data.List.Split     (wordsBy)
+import qualified Data.Set            as Set
+import           Data.Text           (Text)
+import qualified Data.Text           as T
 import qualified Data.Traversable
-import Text.Pandoc.Shared (safeRead, stringify)
-import Text.Pandoc.Walk (walk)
-import Text.Pandoc
-import Data.List.Split (wordsBy)
-import Control.Monad.State
-import Data.Generics ( Typeable, Data, everywhere, everywhereM, mkM,
-                       everywhere', everything, mkT, mkQ )
-import qualified Data.Set as Set
-import System.FilePath
-import System.Directory (doesFileExist)
-import qualified Data.Yaml.Builder as Y
-import Data.Yaml.Builder (ToYaml(..), YamlBuilder)
-import qualified Text.Parsec as P
+import           Data.Yaml.Builder   (ToYaml (..), YamlBuilder)
+import qualified Data.Yaml.Builder   as Y
+import           System.Directory    (doesFileExist)
+import           System.FilePath
+import           Text.Pandoc
+import           Text.Pandoc.Shared  (safeRead, stringify)
+import           Text.Pandoc.Walk    (walk)
+import qualified Text.Parsec         as P
 
 #ifdef TRACE
 import qualified Debug.Trace
-import Text.Show.Pretty (ppShow)
+import           Text.Show.Pretty    (ppShow)
 #endif
 
 #ifdef TRACE
@@ -93,7 +101,7 @@ sa <^> (s:xs)
 sa <^> sb         = sa ++ sb
 
 capitalize :: String -> String
-capitalize [] = []
+capitalize []     = []
 capitalize (c:cs) = toUpper c : cs
 
 isPunct :: Char -> Bool
@@ -156,13 +164,27 @@ parseString v          = fail $ "Could not read as string: " ++ show v
 
 -- | Parse JSON value as Int.
 parseInt :: Value -> Parser Int
-parseInt (String s) = case safeRead (T.unpack s) of
-                            Just n  -> return n
-                            Nothing -> fail "Could not read Int"
 parseInt (Number n) = case fromJSON (Number n) of
                             Success (x :: Int) -> return x
-                            Error e -> fail $ "Could not read string: " ++ e
-parseInt _          = fail "Could not read string"
+                            Error e -> fail $ "Could not read Int: " ++ e
+parseInt x = parseString x >>= \s ->
+              case safeRead s of
+                   Just n  -> return n
+                   Nothing -> fail "Could not read Int"
+
+-- | Parse JSON value as Maybe Int.
+parseMaybeInt :: Maybe Value -> Parser (Maybe Int)
+parseMaybeInt Nothing = return Nothing
+parseMaybeInt (Just (Number n)) = case fromJSON (Number n) of
+                                       Success (x :: Int) -> return (Just x)
+                                       Error e -> fail $ "Could not read Int: " ++ e
+parseMaybeInt (Just x) =
+  parseString x >>= \s ->
+                   if null s
+                      then return Nothing
+                      else case safeRead s of
+                                Just n  -> return (Just n)
+                                Nothing -> fail $ "Could not read as Int: " ++ show s
 
 mb :: Monad m => (b -> m a) -> (Maybe b -> m (Maybe a))
 mb  = Data.Traversable.mapM
@@ -175,7 +197,7 @@ x .#? y = (x .:? y) >>= mb parseString
 x .#: y = (x .: y) >>= parseString
 
 onBlocks :: ([Inline] -> [Inline]) -> [Block] -> [Block]
-onBlocks f bs = walk f' bs
+onBlocks f = walk f'
   where f' (Para ils)  = Para (f ils)
         f' (Plain ils) = Plain (f ils)
         f' x           = x
@@ -189,7 +211,7 @@ splitUpStr :: [Inline] -> [Inline]
 splitUpStr ils =
   case reverse (combineInternalPeriods
          (splitStrWhen (\c -> isPunctuation c || c == '\160') ils)) of
-         [] -> []
+         []     -> []
          (x:xs) -> reverse $ Span ("",["lastword"],[]) [x] : xs
 
 -- We want to make sure that the periods in www.example.com, for
@@ -259,7 +281,7 @@ titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
                              | isMixedCase s   -> Str s
                              | otherwise       -> Str (toUpper x:xs)
                         SentenceBoundary ->
-                           if isMixedCase (x:xs) || (all isUpperOrPunct (x:xs))
+                           if isMixedCase (x:xs) || all isUpperOrPunct (x:xs)
                               then Str (x:xs)
                               else Str (toUpper x : xs)
                         _ -> Str (x:xs)
@@ -304,9 +326,7 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
           | c `elem` "-/\x2013\x2014\160" = do
                put WordBoundary
                return $ Str [c] : acc
-          | isPunctuation c = do
-               -- leave state unchanged
-               return $ Str [c] : acc
+          | isPunctuation c = return $ Str [c] : acc -- leave state unchanged
         go acc (Str []) = return acc
         go acc (Str xs) = do
                res <- xform (Str xs)
@@ -316,7 +336,7 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
                b <- get
                case b of
                     WordBoundary -> put LastWordBoundary
-                    _ -> return ()
+                    _            -> return ()
                go acc x
         go acc (Span ("",classes,[]) xs)
           | null classes || classes == ["nocase"] = do
@@ -326,8 +346,8 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
         go acc (Quoted qt xs)    = (:acc) <$> (Quoted qt <$> caseTransform xform xs)
         go acc (Emph xs)         = (:acc) <$> (Emph <$> caseTransform xform xs)
         go acc (Strong xs)       = (:acc) <$> (Strong <$> caseTransform xform xs)
-        go acc (Link at xs t)       = (:acc) <$> (Link at <$> caseTransform xform xs <*> pure t)
-        go acc (Image at xs t)      = (:acc) <$> (Link at <$> caseTransform xform xs <*> pure t)
+        go acc (Link at xs t)    = (:acc) <$> (Link at <$> caseTransform xform xs <*> pure t)
+        go acc (Image at xs t)   = (:acc) <$> (Link at <$> caseTransform xform xs <*> pure t)
         go acc (Span attr xs)    = (:acc) <$> (Span attr <$> caseTransform xform xs)
         go acc x                 = return $ x : acc
 
@@ -386,7 +406,7 @@ lastInline xs = case stringify xs of
 
 initInline :: [Inline] -> [Inline]
 initInline [] = []
-initInline (i:[])
+initInline [i]
     | Str          s <- i = return $ Str         (init'       s)
     | Emph        is <- i = return $ Emph        (initInline is)
     | Strong      is <- i = return $ Strong      (initInline is)
@@ -411,7 +431,7 @@ tailFirstInlineStr = mapHeadInline (drop 1)
 
 toCapital :: [Inline] -> [Inline]
 toCapital ils@(Span (_,["nocase"],_) _:_) = ils
-toCapital ils = mapHeadInline capitalize ils
+toCapital ils                             = mapHeadInline capitalize ils
 
 mapHeadInline :: (String -> String) -> [Inline] -> [Inline]
 mapHeadInline _ [] = []
@@ -443,11 +463,27 @@ findFile (p:ps) f
         then return $ Just (p </> f)
         else findFile ps f
 
-(&=) :: (ToYaml a, Monoid a, Eq a)
-     => Text -> a -> [(Text, YamlBuilder)] -> [(Text, YamlBuilder)]
-x &= y = \acc -> if y == mempty
-                    then acc
-                    else (x Y..= y) : acc
+class AddYaml a where
+  (&=) :: Text -> a -> [(Text, YamlBuilder)] -> [(Text, YamlBuilder)]
+
+instance ToYaml a => AddYaml [a] where
+  x &= y = \acc -> if null y
+                      then acc
+                      else (x Y..= y) : acc
+
+instance ToYaml a => AddYaml (Maybe a) where
+  x &= y = \acc -> case y of
+                        Nothing -> acc
+                        Just z  -> (x Y..= z) : acc
+
+instance AddYaml Text where
+  x &= y = \acc -> if T.null y
+                      then acc
+                      else (x Y..= y) : acc
+
+instance AddYaml Bool where
+  _ &= False = id
+  x &= True = \acc -> (x Y..= Y.bool True) : acc
 
 mapping' :: [[(Text, YamlBuilder)] -> [(Text, YamlBuilder)]] -> YamlBuilder
 mapping' = Y.mapping . foldr ($) []
@@ -472,19 +508,19 @@ pRomanNumeral = do
                          else lowercaseRomanDigits
     let [one, five, ten, fifty, hundred, fivehundred, thousand] =
           map P.char romanDigits
-    thousands <- P.many thousand >>= (return . (1000 *) . length)
+    thousands <- ((1000 *) . length) <$> P.many thousand
     ninehundreds <- P.option 0 $ P.try $ hundred >> thousand >> return 900
-    fivehundreds <- P.many fivehundred >>= (return . (500 *) . length)
+    fivehundreds <- ((500 *) . length) <$> P.many fivehundred
     fourhundreds <- P.option 0 $ P.try $ hundred >> fivehundred >> return 400
-    hundreds <- P.many hundred >>= (return . (100 *) . length)
+    hundreds <- ((100 *) . length) <$> P.many hundred
     nineties <- P.option 0 $ P.try $ ten >> hundred >> return 90
-    fifties <- P.many fifty >>= (return . (50 *) . length)
+    fifties <- ((50 *) . length) <$> P.many fifty
     forties <- P.option 0 $ P.try $ ten >> fifty >> return 40
-    tens <- P.many ten >>= (return . (10 *) . length)
+    tens <- ((10 *) . length) <$> P.many ten
     nines <- P.option 0 $ P.try $ one >> ten >> return 9
-    fives <- P.many five >>= (return . (5 *) . length)
+    fives <- ((5 *) . length) <$> P.many five
     fours <- P.option 0 $ P.try $ one >> five >> return 4
-    ones <- P.many one >>= (return . length)
+    ones <- length <$> P.many one
     let total = thousands + ninehundreds + fivehundreds + fourhundreds +
                 hundreds + nineties + fifties + forties + tens + nines +
                 fives + fours + ones

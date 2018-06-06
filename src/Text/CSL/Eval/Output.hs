@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE PatternGuards #-}
 -----------------------------------------------------------------------------
 -- |
@@ -15,15 +16,17 @@
 
 module Text.CSL.Eval.Output where
 
-import Text.CSL.Output.Pandoc (lastInline)
-import Text.CSL.Style
-import Data.Char (toLower, toUpper)
-import Text.CSL.Util (capitalize, titlecase, unTitlecase, isPunct)
-import Text.Pandoc.Definition
-import Text.Pandoc.Walk (walk)
-import Data.String (fromString)
-import Data.Maybe (mapMaybe)
-import Text.Parsec
+import Prelude
+import           Data.Char              (toLower, toUpper)
+import           Data.Maybe             (mapMaybe)
+import           Data.String            (fromString)
+import           Text.CSL.Output.Pandoc (lastInline)
+import           Text.CSL.Style
+import           Text.CSL.Util          (capitalize, isPunct, titlecase,
+                                         unTitlecase)
+import           Text.Pandoc.Definition
+import           Text.Pandoc.Walk       (walk)
+import           Text.Parsec
 
 -- Parse affix or delimiter into Formatted, splitting out
 -- raw components in @{{format}}...{{/format}}@.
@@ -57,15 +60,15 @@ output fm s
     | otherwise   = [OStr s fm]
 
 appendOutput :: Formatting -> [Output] -> [Output]
-appendOutput fm xs = if xs /= [] then [Output xs fm] else []
+appendOutput fm xs = [Output xs fm | xs /= []]
 
 outputList :: Formatting -> Delimiter -> [Output] -> [Output]
 outputList fm d = appendOutput fm . addDelim d . mapMaybe cleanOutput'
     where
       cleanOutput' o
           | Output xs f <- o = case cleanOutput xs of
-                                 []   -> Nothing
-                                 ys   -> Just (Output ys f)
+                                 [] -> Nothing
+                                 ys -> Just (Output ys f)
           | otherwise        = rmEmptyOutput o
 
 cleanOutput :: [Output] -> [Output]
@@ -115,7 +118,7 @@ oPan []  = []
 oPan ils = [OPan ils]
 
 oPan' :: [Inline] -> Formatting -> [Output]
-oPan' [] _ = []
+oPan' [] _  = []
 oPan' ils f = [Output [OPan ils] f]
 
 formatOutputList :: [Output] -> Formatted
@@ -130,6 +133,7 @@ formatOutput o =
       OPan     i          -> Formatted i
       ODel     []         -> Formatted []
       ODel     " "        -> Formatted [Space]
+      ODel     "\n"       -> Formatted [SoftBreak]
       ODel     s          -> formatString s
       OStr     []      _  -> Formatted []
       OStr     s       f  -> addFormatting f $ formatString s
@@ -198,20 +202,20 @@ addFormatting f =
           | otherwise    = Formatted $ font_variant . font_style .  font_weight $ ils
         font_variant ils =
           case fontVariant f of
-               "small-caps"  -> [SmallCaps ils]
-               _             -> ils
+               "small-caps" -> [SmallCaps ils]
+               _            -> ils
         font_style ils =
           case fontStyle f of
-               "italic"      -> [Emph ils]
-               "oblique"     -> [Emph ils]
-               _             -> ils
+               "italic"  -> [Emph ils]
+               "oblique" -> [Emph ils]
+               _         -> ils
         font_weight ils =
           case fontWeight f of
-               "bold"        -> [Strong ils]
-               _             -> ils
+               "bold" -> [Strong ils]
+               _      -> ils
 
         text_case (Formatted []) = Formatted []
-        text_case (Formatted ils@(i:is))
+        text_case (Formatted ils@(i:is'))
           | noCase f  = Formatted [Span ("",["nocase"],[]) ils]
           | otherwise = Formatted $
               case textCase f of
@@ -219,14 +223,17 @@ addFormatting f =
                    "uppercase"        -> walk uppercaseStr ils
                    "capitalize-all"   -> walk capitalizeStr ils
                    "title"            -> titlecase ils
-                   "capitalize-first" -> walk capitalizeStr i : is
+                   "capitalize-first"
+                     -> case i of
+                             Str cs -> Str (capitalize cs) : is'
+                             _ -> unTitlecase [i] ++ is'
                    "sentence"         -> unTitlecase ils
                    _                  -> ils
 
-        lowercaseStr (Str xs)  = Str $ map toLower xs
-        lowercaseStr x         = x
-        uppercaseStr (Str xs)  = Str $ map toUpper xs
-        uppercaseStr x         = x
+        lowercaseStr (Str xs) = Str $ map toLower xs
+        lowercaseStr x        = x
+        uppercaseStr (Str xs) = Str $ map toUpper xs
+        uppercaseStr x        = x
         capitalizeStr (Str xs) = Str $ capitalize xs
         capitalizeStr x        = x
 

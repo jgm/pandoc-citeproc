@@ -1,4 +1,6 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 -----------------------------------------------------------------------------
 -- |
@@ -14,45 +16,50 @@
 module Text.CSL.Input.Bibtex
     ( readBibtex
     , readBibtexString
-    , readBibtexString'
     , Lang(..)
     , langToLocale
     , getLangFromEnv
     )
     where
 
-import Text.Parsec hiding (optional, (<|>), many, State)
-import Control.Applicative
-import Text.CSL.Compat.Pandoc (readLaTeX)
-import Text.Pandoc.Definition
-import Text.Pandoc.Generic (bottomUp)
-import Data.List.Split (splitOn, splitWhen, wordsBy)
-import Data.List (intercalate, foldl')
-import Data.Maybe
-import Data.Char (toLower, isUpper, toUpper, isDigit, isAlphaNum)
-import Control.Monad
-import Control.Monad.RWS
-import System.Environment (getEnvironment)
-import Text.CSL.Reference
-import Text.CSL.Style (Formatted(..), Locale(..), CslTerm(..), Agent(..))
-import Text.CSL.Util (trim, onBlocks, unTitlecase, protectCase, splitStrWhen,
-                      safeRead)
-import Text.CSL.Parser (parseLocale)
-import qualified Text.Pandoc.Walk as Walk
-import qualified Text.Pandoc.UTF8 as UTF8
+import Prelude
+import           Control.Applicative
+import qualified Control.Exception      as E
+import           Control.Monad
+import           Control.Monad.RWS      hiding ((<>))
+import           Data.Char              (isAlphaNum, isDigit, isUpper, toLower,
+                                         toUpper)
+import           Data.List              (foldl', intercalate)
+import           Data.List.Split        (splitOn, splitWhen, wordsBy)
+import qualified Data.Map               as Map
+import           Data.Maybe
+import           System.Environment     (getEnvironment)
+import           Text.CSL.Compat.Pandoc (readLaTeX)
+import           Text.CSL.Exception     (CiteprocException (ErrorReadingBib, ErrorReadingBibFile))
+import           Text.CSL.Parser        (parseLocale)
+import           Text.CSL.Reference
+import           Text.CSL.Style         (Agent (..), CslTerm (..),
+                                         Formatted (..), Locale (..))
+import           Text.CSL.Util          (onBlocks, protectCase, safeRead,
+                                         splitStrWhen, trim, unTitlecase)
+import           Text.Pandoc.Definition
+import qualified Text.Pandoc.UTF8       as UTF8
+import qualified Text.Pandoc.Walk       as Walk
+import Text.Parsec hiding (State, many, (<|>))
 
 blocksToFormatted  :: [Block]  -> Bib Formatted
 blocksToFormatted bs =
   case bs of
-       [Plain xs]  -> inlinesToFormatted xs
-       [Para  xs]  -> inlinesToFormatted xs
-       _           -> inlinesToFormatted $ Walk.query (:[]) bs
+       [Plain xs] -> inlinesToFormatted xs
+       [Para  xs] -> inlinesToFormatted xs
+       _          -> inlinesToFormatted $ Walk.query (:[]) bs
 
 adjustSpans :: Lang -> Inline -> [Inline]
 adjustSpans _ (Span ("",[],[]) xs) = xs
 adjustSpans lang (RawInline (Format "latex") s)
   | s == "\\hyphen" || s == "\\hyphen " = [Str "-"]
-  | otherwise = bottomUp (concatMap (adjustSpans lang)) $ parseRawLaTeX lang s
+  | otherwise = Walk.walk (concatMap (adjustSpans lang))
+                $ parseRawLaTeX lang s
 adjustSpans _ x = [x]
 
 parseRawLaTeX :: Lang -> String -> [Inline]
@@ -71,20 +78,20 @@ parseRawLaTeX lang ('\\':xs) =
          f "mkbibparens"   ils = [Str "("] ++ ils ++ [Str ")"] -- TODO: ...
          f "mkbibbrackets" ils = [Str "["] ++ ils ++ [Str "]"] -- TODO: ...
          -- ... both should be nestable & should work in year fields
-         f "autocap"    ils = ils  -- TODO: should work in year fields
-         f "textnormal" ils = [Span ("",["nodecor"],[]) ils]
+         f "autocap"    ils    = ils  -- TODO: should work in year fields
+         f "textnormal" ils    = [Span ("",["nodecor"],[]) ils]
          f "bibstring" [Str s] = [Str $ resolveKey' lang s]
-         f _            ils = [Span nullAttr ils]
+         f _            ils    = [Span nullAttr ils]
 parseRawLaTeX _ _ = []
 
 inlinesToFormatted :: [Inline] -> Bib Formatted
 inlinesToFormatted ils = do
   lang <- gets localeLanguage
-  return $ Formatted $ bottomUp (concatMap (adjustSpans lang)) ils
+  return $ Formatted $ Walk.walk (concatMap (adjustSpans lang)) ils
 
 data Item = Item{ identifier :: String
                 , entryType  :: String
-                , fields     :: [(String, String)]
+                , fields     :: Map.Map String String
                 }
 
 -- | Get 'Lang' from the environment variable LANG, defaulting to en-US.
@@ -93,72 +100,73 @@ getLangFromEnv = do
   env <- getEnvironment
   return $ case lookup "LANG" env of
                   Just x  -> case splitWhen (\c -> c == '.' || c == '_' || c == '-') x of
-                                   (w:z:_)            -> Lang w z
-                                   [w] | not (null w) -> Lang w mempty
-                                   _                  -> Lang "en" "US"
+                                   (w:z:_) -> Lang w z
+                                   [w]     | not (null w) -> Lang w mempty
+                                   _       -> Lang "en" "US"
                   Nothing -> Lang "en" "US"
 
 -- | Parse a BibTeX or BibLaTeX file into a list of 'Reference's.
--- If the first parameter is true, the file will be treated as
--- BibTeX; otherwse as BibLaTeX.  If the second parameter is
+-- The first parameter is a predicate to filter identifiers.
+-- If the second parameter is true, the file will be treated as
+-- BibTeX; otherwse as BibLaTeX.  If the third parameter is
 -- true, an "untitlecase" transformation will be performed.
-readBibtex :: Bool -> Bool -> FilePath -> IO [Reference]
-readBibtex isBibtex caseTransform f =
-  UTF8.readFile f >>= readBibtexString isBibtex caseTransform
+readBibtex :: (String -> Bool) -> Bool -> Bool -> FilePath -> IO [Reference]
+readBibtex idpred isBibtex caseTransform f = do
+  contents <- UTF8.readFile f
+  E.catch (readBibtexString idpred isBibtex caseTransform contents)
+        (\e -> case e of
+                  ErrorReadingBib es -> E.throwIO $ ErrorReadingBibFile f es
+                  _                  -> E.throwIO e)
 
 -- | Like 'readBibtex' but operates on a String rather than a file.
-readBibtexString :: Bool -> Bool -> String -> IO [Reference]
-readBibtexString isBibtex caseTransform contents = do
+readBibtexString :: (String -> Bool) -> Bool -> Bool -> String
+                 -> IO [Reference]
+readBibtexString idpred isBibtex caseTransform contents = do
   lang <- getLangFromEnv
   locale <- parseLocale (langToLocale lang)
-  return $ readBibtexString' isBibtex caseTransform lang locale contents
+  case runParser (bibEntries <* eof) (Map.empty) "stdin" contents of
+                      -- drop 8 to remove "stdin" + space
+          Left err -> E.throwIO $ ErrorReadingBib $ drop 8 $ show err
+          Right xs -> return $ mapMaybe
+            (itemToReference lang locale isBibtex caseTransform)
+            (filter (idpred . identifier)
+              (resolveCrossRefs isBibtex
+                xs))
 
--- | Pure version of readBibtexString (does not try to get the language
--- from the environment).
-readBibtexString' :: Bool -> Bool -> Lang -> Locale -> String -> [Reference]
-readBibtexString' isBibtex caseTransform lang locale bibstring =
-  let items = case runParser (bibEntries <* eof) [] "stdin" bibstring of
-                   Left err -> error (show err)
-                   Right xs -> resolveCrossRefs isBibtex xs
-  in  mapMaybe (itemToReference lang locale isBibtex caseTransform) items
-
-type BibParser = Parsec [Char] [(String, String)]
+type BibParser = Parsec String (Map.Map String String)
 
 bibEntries :: BibParser [Item]
 bibEntries = do
   skipMany nonEntry
-  items <- many (bibItem <* skipMany nonEntry)
-  return items
- where nonEntry = bibSkip <|> bibComment <|> bibPreamble <|> bibString
+  many (bibItem <* skipMany nonEntry)
+ where nonEntry = bibSkip <|>
+                  try (char '@' >>
+                       (bibComment <|> bibPreamble <|> bibString))
 
 bibSkip :: BibParser ()
 bibSkip = skipMany1 (satisfy (/='@'))
 
 bibComment :: BibParser ()
-bibComment = try $ do
-  char '@'
+bibComment = do
   cistring "comment"
-  skipMany (satisfy (/='\n'))
+  spaces
+  void inBraces <|> bibSkip <|> return ()
 
 bibPreamble :: BibParser ()
-bibPreamble = try $ do
-  char '@'
+bibPreamble = do
   cistring "preamble"
   spaces
   void inBraces
-  return ()
 
 bibString :: BibParser ()
-bibString = try $ do
-  char '@'
+bibString = do
   cistring "string"
   spaces
   char '{'
   spaces
-  f <- entField
-  spaces
+  (k,v) <- entField
   char '}'
-  updateState $ (f:)
+  updateState (Map.insert k v)
   return ()
 
 inBraces :: BibParser String
@@ -185,7 +193,7 @@ inQuotes = do
                       ) (char '"')
 
 fieldName :: BibParser String
-fieldName = (map toLower) <$> many1 (letter <|> digit <|> oneOf "-_:+")
+fieldName = map toLower <$> many1 (letter <|> digit <|> oneOf "-_:+")
 
 isBibtexKeyChar :: Char -> Bool
 isBibtexKeyChar c = isAlphaNum c || c `elem` ".:;?!`'()/*@_+=-[]*&"
@@ -201,20 +209,19 @@ bibItem = do
   spaces
   char ','
   spaces
-  entfields <- entField `sepEndBy` (char ',')
+  entfields <- entField `sepEndBy` (char ',' >> spaces)
   spaces
   char '}'
-  return $ Item entid enttype entfields
+  return $ Item entid enttype (Map.fromList entfields)
 
 entField :: BibParser (String, String)
-entField = try $ do
-  spaces
+entField = do
   k <- fieldName
   spaces
   char '='
   spaces
   vs <- (expandString <|> inQuotes <|> inBraces <|> rawWord) `sepBy`
-            (try $ spaces >> char '#' >> spaces)
+            try (spaces >> char '#' >> spaces)
   spaces
   return (k, concat vs)
 
@@ -225,16 +232,17 @@ expandString :: BibParser String
 expandString = do
   k <- fieldName
   strs <- getState
-  case lookup k strs of
+  case Map.lookup k strs of
        Just v  -> return v
        Nothing -> return k -- return raw key if not found
 
 cistring :: String -> BibParser String
-cistring [] = return []
-cistring (c:cs) = do
-  x <- (char (toLower c) <|> char (toUpper c))
-  xs <- cistring cs
-  return (x:xs)
+cistring s = try (go s)
+ where go [] = return []
+       go (c:cs) = do
+         x <- char (toLower c) <|> char (toUpper c)
+         xs <- go cs
+         return (x:xs)
 
 resolveCrossRefs :: Bool -> [Item] -> [Item]
 resolveCrossRefs isBibtex entries =
@@ -247,27 +255,29 @@ getXrefFields :: Bool -> Item -> [Item] -> String -> [(String, String)]
 getXrefFields isBibtex baseEntry entries keys = do
   let keys' = splitKeys keys
   xrefEntry <- [e | e <- entries, identifier e `elem` keys']
-  (k, v) <- fields xrefEntry
+  (k, v) <- Map.toList $ fields xrefEntry
   if k == "crossref" || k == "xdata"
      then do
        xs <- mapM (getXrefFields isBibtex baseEntry entries)
                    (splitKeys v)
        (x, y) <- xs
-       guard $ isNothing $ lookup x $ fields xrefEntry
+       guard $ isNothing $ Map.lookup x $ fields xrefEntry
        return (x, y)
      else do
        k' <- if isBibtex
                 then return k
                 else transformKey (entryType xrefEntry) (entryType baseEntry) k
-       guard $ isNothing $ lookup k' $ fields baseEntry
+       guard $ isNothing $ Map.lookup k' $ fields baseEntry
        return (k',v)
 
 resolveCrossRef :: Bool -> [Item] -> Item -> Item
-resolveCrossRef isBibtex entries entry = foldr go entry (fields entry)
-  where go (key, val) entry' =
+resolveCrossRef isBibtex entries entry =
+  Map.foldrWithKey go entry (fields entry)
+  where go key val entry' =
           if key == "crossref" || key == "xdata"
-          then entry'{ fields = fields entry' ++
-                                    getXrefFields isBibtex entry entries val }
+          then entry'{ fields = fields entry' <>
+                          Map.fromList (getXrefFields isBibtex
+                                        entry entries val) }
           else entry'
 
 -- transformKey source target key
@@ -407,38 +417,38 @@ resolveKey' (Lang "da" "DK") k =
     case map toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
-       "forthcoming"   -> "kommende" -- csl
-       "inpress"       -> "i tryk"   -- csl
+       "forthcoming" -> "kommende" -- csl
+       "inpress"     -> "i tryk"   -- csl
        -- "prepublished"  -> "" -- missing
-       "mathesis"      -> "speciale"
-       "phdthesis"     -> "ph.d.-afhandling"
-       "candthesis"    -> "kandidatafhandling"
-       "techreport"    -> "teknisk rapport"
-       "resreport"     -> "forskningsrapport"
-       "software"      -> "software"
-       "datacd"        -> "data-cd"
-       "audiocd"       -> "lyd-cd"
-       "patent"        -> "patent"
-       "patentde"      -> "tysk patent"
-       "patenteu"      -> "europæisk patent"
-       "patentfr"      -> "fransk patent"
-       "patentuk"      -> "britisk patent"
-       "patentus"      -> "amerikansk patent"
-       "patreq"        -> "ansøgning om patent"
-       "patreqde"      -> "ansøgning om tysk patent"
-       "patreqeu"      -> "ansøgning om europæisk patent"
-       "patreqfr"      -> "ansøgning om fransk patent"
-       "patrequk"      -> "ansøgning om britisk patent"
-       "patrequs"      -> "ansøgning om amerikansk patent"
-       "countryde"     -> "Tyskland"
-       "countryeu"     -> "Europæiske Union"
-       "countryep"     -> "Europæiske Union"
-       "countryfr"     -> "Frankrig"
-       "countryuk"     -> "Storbritanien"
-       "countryus"     -> "USA"
-       "newseries"     -> "ny serie"
-       "oldseries"     -> "gammel serie"
-       _               -> k
+       "mathesis"    -> "speciale"
+       "phdthesis"   -> "ph.d.-afhandling"
+       "candthesis"  -> "kandidatafhandling"
+       "techreport"  -> "teknisk rapport"
+       "resreport"   -> "forskningsrapport"
+       "software"    -> "software"
+       "datacd"      -> "data-cd"
+       "audiocd"     -> "lyd-cd"
+       "patent"      -> "patent"
+       "patentde"    -> "tysk patent"
+       "patenteu"    -> "europæisk patent"
+       "patentfr"    -> "fransk patent"
+       "patentuk"    -> "britisk patent"
+       "patentus"    -> "amerikansk patent"
+       "patreq"      -> "ansøgning om patent"
+       "patreqde"    -> "ansøgning om tysk patent"
+       "patreqeu"    -> "ansøgning om europæisk patent"
+       "patreqfr"    -> "ansøgning om fransk patent"
+       "patrequk"    -> "ansøgning om britisk patent"
+       "patrequs"    -> "ansøgning om amerikansk patent"
+       "countryde"   -> "Tyskland"
+       "countryeu"   -> "Europæiske Union"
+       "countryep"   -> "Europæiske Union"
+       "countryfr"   -> "Frankrig"
+       "countryuk"   -> "Storbritanien"
+       "countryus"   -> "USA"
+       "newseries"   -> "ny serie"
+       "oldseries"   -> "gammel serie"
+       _             -> k
 resolveKey' (Lang "de" "DE") k =
     case map toLower k of
        "inpreparation" -> "in Vorbereitung"
@@ -522,79 +532,79 @@ resolveKey' (Lang "en" "US") k =
        "submitted"      -> "submitted"
        "techreport"     -> "technical report"
        "volume"         -> "vol."
-       _               -> k
+       _                -> k
 resolveKey' (Lang "es" "ES") k =
     case map toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
-       "forthcoming"   -> "previsto"    -- csl
-       "inpress"       -> "en imprenta" -- csl
+       "forthcoming" -> "previsto"    -- csl
+       "inpress"     -> "en imprenta" -- csl
        -- "prepublished"  -> "" -- missing
-       "mathesis"      -> "Tesis de licenciatura"
-       "phdthesis"     -> "Tesis doctoral"
+       "mathesis"    -> "Tesis de licenciatura"
+       "phdthesis"   -> "Tesis doctoral"
        -- "candthesis" -> "" -- missing
-       "techreport"    -> "informe técnico"
+       "techreport"  -> "informe técnico"
        -- "resreport"  -> "" -- missing
        -- "software"   -> "" -- missing
        -- "datacd"     -> "" -- missing
        -- "audiocd"    -> "" -- missing
-       "patent"        -> "patente"
-       "patentde"      -> "patente alemana"
-       "patenteu"      -> "patente europea"
-       "patentfr"      -> "patente francesa"
-       "patentuk"      -> "patente británica"
-       "patentus"      -> "patente americana"
-       "patreq"        -> "solicitud de patente"
-       "patreqde"      -> "solicitud de patente alemana"
-       "patreqeu"      -> "solicitud de patente europea"
-       "patreqfr"      -> "solicitud de patente francesa"
-       "patrequk"      -> "solicitud de patente británica"
-       "patrequs"      -> "solicitud de patente americana"
-       "countryde"     -> "Alemania"
-       "countryeu"     -> "Unión Europea"
-       "countryep"     -> "Unión Europea"
-       "countryfr"     -> "Francia"
-       "countryuk"     -> "Reino Unido"
-       "countryus"     -> "Estados Unidos de América"
-       "newseries"     -> "nueva época"
-       "oldseries"     -> "antigua época"
-       _               -> k
+       "patent"      -> "patente"
+       "patentde"    -> "patente alemana"
+       "patenteu"    -> "patente europea"
+       "patentfr"    -> "patente francesa"
+       "patentuk"    -> "patente británica"
+       "patentus"    -> "patente americana"
+       "patreq"      -> "solicitud de patente"
+       "patreqde"    -> "solicitud de patente alemana"
+       "patreqeu"    -> "solicitud de patente europea"
+       "patreqfr"    -> "solicitud de patente francesa"
+       "patrequk"    -> "solicitud de patente británica"
+       "patrequs"    -> "solicitud de patente americana"
+       "countryde"   -> "Alemania"
+       "countryeu"   -> "Unión Europea"
+       "countryep"   -> "Unión Europea"
+       "countryfr"   -> "Francia"
+       "countryuk"   -> "Reino Unido"
+       "countryus"   -> "Estados Unidos de América"
+       "newseries"   -> "nueva época"
+       "oldseries"   -> "antigua época"
+       _             -> k
 resolveKey' (Lang "fi" "FI") k =
     case map toLower k of
        -- "inpreparation" -> ""      -- missing
        -- "submitted"     -> ""      -- missing
-       "forthcoming"   -> "tulossa"  -- csl
-       "inpress"       -> "painossa" -- csl
+       "forthcoming" -> "tulossa"  -- csl
+       "inpress"     -> "painossa" -- csl
        -- "prepublished"  -> ""      -- missing
-       "mathesis"      -> "tutkielma"
-       "phdthesis"     -> "tohtorinväitöskirja"
-       "candthesis"    -> "kandidat"
-       "techreport"    -> "tekninen raportti"
-       "resreport"     -> "tutkimusraportti"
-       "software"      -> "ohjelmisto"
-       "datacd"        -> "data-CD"
-       "audiocd"       -> "ääni-CD"
-       "patent"        -> "patentti"
-       "patentde"      -> "saksalainen patentti"
-       "patenteu"      -> "Euroopan Unionin patentti"
-       "patentfr"      -> "ranskalainen patentti"
-       "patentuk"      -> "englantilainen patentti"
-       "patentus"      -> "yhdysvaltalainen patentti"
-       "patreq"        -> "patenttihakemus"
-       "patreqde"      -> "saksalainen patenttihakemus"
-       "patreqeu"      -> "Euroopan Unionin patenttihakemus"
-       "patreqfr"      -> "ranskalainen patenttihakemus"
-       "patrequk"      -> "englantilainen patenttihakemus"
-       "patrequs"      -> "yhdysvaltalainen patenttihakemus"
-       "countryde"     -> "Saksa"
-       "countryeu"     -> "Euroopan Unioni"
-       "countryep"     -> "Euroopan Unioni"
-       "countryfr"     -> "Ranska"
-       "countryuk"     -> "Iso-Britannia"
-       "countryus"     -> "Yhdysvallat"
-       "newseries"     -> "uusi sarja"
-       "oldseries"     -> "vanha sarja"
-       _               -> k
+       "mathesis"    -> "tutkielma"
+       "phdthesis"   -> "tohtorinväitöskirja"
+       "candthesis"  -> "kandidat"
+       "techreport"  -> "tekninen raportti"
+       "resreport"   -> "tutkimusraportti"
+       "software"    -> "ohjelmisto"
+       "datacd"      -> "data-CD"
+       "audiocd"     -> "ääni-CD"
+       "patent"      -> "patentti"
+       "patentde"    -> "saksalainen patentti"
+       "patenteu"    -> "Euroopan Unionin patentti"
+       "patentfr"    -> "ranskalainen patentti"
+       "patentuk"    -> "englantilainen patentti"
+       "patentus"    -> "yhdysvaltalainen patentti"
+       "patreq"      -> "patenttihakemus"
+       "patreqde"    -> "saksalainen patenttihakemus"
+       "patreqeu"    -> "Euroopan Unionin patenttihakemus"
+       "patreqfr"    -> "ranskalainen patenttihakemus"
+       "patrequk"    -> "englantilainen patenttihakemus"
+       "patrequs"    -> "yhdysvaltalainen patenttihakemus"
+       "countryde"   -> "Saksa"
+       "countryeu"   -> "Euroopan Unioni"
+       "countryep"   -> "Euroopan Unioni"
+       "countryfr"   -> "Ranska"
+       "countryuk"   -> "Iso-Britannia"
+       "countryus"   -> "Yhdysvallat"
+       "newseries"   -> "uusi sarja"
+       "oldseries"   -> "vanha sarja"
+       _             -> k
 
 resolveKey' (Lang "fr" "FR") k =
     case map toLower k of
@@ -636,38 +646,38 @@ resolveKey' (Lang "it" "IT") k =
     case map toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
-       "forthcoming"   -> "futuro" -- csl
-       "inpress"       -> "in stampa"
+       "forthcoming" -> "futuro" -- csl
+       "inpress"     -> "in stampa"
        -- "prepublished"  -> "" -- missing
-       "mathesis"      -> "tesi di laurea magistrale"
-       "phdthesis"     -> "tesi di dottorato"
+       "mathesis"    -> "tesi di laurea magistrale"
+       "phdthesis"   -> "tesi di dottorato"
        -- "candthesis" -> "" -- missing
-       "techreport"    -> "rapporto tecnico"
-       "resreport"     -> "rapporto di ricerca"
+       "techreport"  -> "rapporto tecnico"
+       "resreport"   -> "rapporto di ricerca"
        -- "software"   -> "" -- missing
        -- "datacd"     -> "" -- missing
        -- "audiocd"    -> "" -- missing
-       "patent"        -> "brevetto"
-       "patentde"      -> "brevetto tedesco"
-       "patenteu"      -> "brevetto europeo"
-       "patentfr"      -> "brevetto francese"
-       "patentuk"      -> "brevetto britannico"
-       "patentus"      -> "brevetto americano"
-       "patreq"        -> "brevetto richiesto"
-       "patreqde"      -> "brevetto tedesco richiesto"
-       "patreqeu"      -> "brevetto europeo richiesto"
-       "patreqfr"      -> "brevetto francese richiesto"
-       "patrequk"      -> "brevetto britannico richiesto"
-       "patrequs"      -> "brevetto U.S.A. richiesto"
-       "countryde"     -> "Germania"
-       "countryeu"     -> "Unione Europea"
-       "countryep"     -> "Unione Europea"
-       "countryfr"     -> "Francia"
-       "countryuk"     -> "Regno Unito"
-       "countryus"     -> "Stati Uniti d’America"
-       "newseries"     -> "nuova serie"
-       "oldseries"     -> "vecchia serie"
-       _               -> k
+       "patent"      -> "brevetto"
+       "patentde"    -> "brevetto tedesco"
+       "patenteu"    -> "brevetto europeo"
+       "patentfr"    -> "brevetto francese"
+       "patentuk"    -> "brevetto britannico"
+       "patentus"    -> "brevetto americano"
+       "patreq"      -> "brevetto richiesto"
+       "patreqde"    -> "brevetto tedesco richiesto"
+       "patreqeu"    -> "brevetto europeo richiesto"
+       "patreqfr"    -> "brevetto francese richiesto"
+       "patrequk"    -> "brevetto britannico richiesto"
+       "patrequs"    -> "brevetto U.S.A. richiesto"
+       "countryde"   -> "Germania"
+       "countryeu"   -> "Unione Europea"
+       "countryep"   -> "Unione Europea"
+       "countryfr"   -> "Francia"
+       "countryuk"   -> "Regno Unito"
+       "countryus"   -> "Stati Uniti d’America"
+       "newseries"   -> "nuova serie"
+       "oldseries"   -> "vecchia serie"
+       _             -> k
 resolveKey' (Lang "nl" "NL") k =
     case map toLower k of
        "inpreparation" -> "in voorbereiding"
@@ -739,38 +749,38 @@ resolveKey' (Lang "pl" "PL") k =
 resolveKey' (Lang "pt" "PT") k =
     case map toLower k of
        -- "candthesis" -> "" -- missing
-       "techreport"    -> "relatório técnico"
-       "resreport"     -> "relatório de pesquisa"
-       "software"      -> "software"
-       "datacd"        -> "CD-ROM"
-       "patent"        -> "patente"
-       "patentde"      -> "patente alemã"
-       "patenteu"      -> "patente européia"
-       "patentfr"      -> "patente francesa"
-       "patentuk"      -> "patente britânica"
-       "patentus"      -> "patente americana"
-       "patreq"        -> "pedido de patente"
-       "patreqde"      -> "pedido de patente alemã"
-       "patreqeu"      -> "pedido de patente européia"
-       "patreqfr"      -> "pedido de patente francesa"
-       "patrequk"      -> "pedido de patente britânica"
-       "patrequs"      -> "pedido de patente americana"
-       "countryde"     -> "Alemanha"
-       "countryeu"     -> "União Europeia"
-       "countryep"     -> "União Europeia"
-       "countryfr"     -> "França"
-       "countryuk"     -> "Reino Unido"
-       "countryus"     -> "Estados Unidos da América"
-       "newseries"     -> "nova série"
-       "oldseries"     -> "série antiga"
+       "techreport"  -> "relatório técnico"
+       "resreport"   -> "relatório de pesquisa"
+       "software"    -> "software"
+       "datacd"      -> "CD-ROM"
+       "patent"      -> "patente"
+       "patentde"    -> "patente alemã"
+       "patenteu"    -> "patente européia"
+       "patentfr"    -> "patente francesa"
+       "patentuk"    -> "patente britânica"
+       "patentus"    -> "patente americana"
+       "patreq"      -> "pedido de patente"
+       "patreqde"    -> "pedido de patente alemã"
+       "patreqeu"    -> "pedido de patente européia"
+       "patreqfr"    -> "pedido de patente francesa"
+       "patrequk"    -> "pedido de patente britânica"
+       "patrequs"    -> "pedido de patente americana"
+       "countryde"   -> "Alemanha"
+       "countryeu"   -> "União Europeia"
+       "countryep"   -> "União Europeia"
+       "countryfr"   -> "França"
+       "countryuk"   -> "Reino Unido"
+       "countryus"   -> "Estados Unidos da América"
+       "newseries"   -> "nova série"
+       "oldseries"   -> "série antiga"
        -- "inpreparation" -> "" -- missing
-       "forthcoming"   -> "a publicar" -- csl
-       "inpress"       -> "na imprensa"
+       "forthcoming" -> "a publicar" -- csl
+       "inpress"     -> "na imprensa"
        -- "prepublished"  -> "" -- missing
-       "mathesis"      -> "tese de mestrado"
-       "phdthesis"     -> "tese de doutoramento"
-       "audiocd"       -> "CD áudio"
-       _               -> k
+       "mathesis"    -> "tese de mestrado"
+       "phdthesis"   -> "tese de doutoramento"
+       "audiocd"     -> "CD áudio"
+       _             -> k
 resolveKey' (Lang "pt" "BR") k =
     case map toLower k of
        -- "candthesis" -> "" -- missing
@@ -810,60 +820,60 @@ resolveKey' (Lang "sv" "SE") k =
     case map toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
-       "forthcoming"   -> "kommande" -- csl
-       "inpress"       -> "i tryck"  -- csl
+       "forthcoming" -> "kommande" -- csl
+       "inpress"     -> "i tryck"  -- csl
        -- "prepublished"  -> "" -- missing
-       "mathesis"      -> "examensarbete"
-       "phdthesis"     -> "doktorsavhandling"
-       "candthesis"    -> "kandidatavhandling"
-       "techreport"    -> "teknisk rapport"
-       "resreport"     -> "forskningsrapport"
-       "software"      -> "datorprogram"
-       "datacd"        -> "data-cd"
-       "audiocd"       -> "ljud-cd"
-       "patent"        -> "patent"
-       "patentde"      -> "tyskt patent"
-       "patenteu"      -> "europeiskt patent"
-       "patentfr"      -> "franskt patent"
-       "patentuk"      -> "brittiskt patent"
-       "patentus"      -> "amerikanskt patent"
-       "patreq"        -> "patentansökan"
-       "patreqde"      -> "ansökan om tyskt patent"
-       "patreqeu"      -> "ansökan om europeiskt patent"
-       "patreqfr"      -> "ansökan om franskt patent"
-       "patrequk"      -> "ansökan om brittiskt patent"
-       "patrequs"      -> "ansökan om amerikanskt patent"
-       "countryde"     -> "Tyskland"
-       "countryeu"     -> "Europeiska unionen"
-       "countryep"     -> "Europeiska unionen"
-       "countryfr"     -> "Frankrike"
-       "countryuk"     -> "Storbritannien"
-       "countryus"     -> "USA"
-       "newseries"     -> "ny följd"
-       "oldseries"     -> "gammal följd"
-       _               -> k
+       "mathesis"    -> "examensarbete"
+       "phdthesis"   -> "doktorsavhandling"
+       "candthesis"  -> "kandidatavhandling"
+       "techreport"  -> "teknisk rapport"
+       "resreport"   -> "forskningsrapport"
+       "software"    -> "datorprogram"
+       "datacd"      -> "data-cd"
+       "audiocd"     -> "ljud-cd"
+       "patent"      -> "patent"
+       "patentde"    -> "tyskt patent"
+       "patenteu"    -> "europeiskt patent"
+       "patentfr"    -> "franskt patent"
+       "patentuk"    -> "brittiskt patent"
+       "patentus"    -> "amerikanskt patent"
+       "patreq"      -> "patentansökan"
+       "patreqde"    -> "ansökan om tyskt patent"
+       "patreqeu"    -> "ansökan om europeiskt patent"
+       "patreqfr"    -> "ansökan om franskt patent"
+       "patrequk"    -> "ansökan om brittiskt patent"
+       "patrequs"    -> "ansökan om amerikanskt patent"
+       "countryde"   -> "Tyskland"
+       "countryeu"   -> "Europeiska unionen"
+       "countryep"   -> "Europeiska unionen"
+       "countryfr"   -> "Frankrike"
+       "countryuk"   -> "Storbritannien"
+       "countryus"   -> "USA"
+       "newseries"   -> "ny följd"
+       "oldseries"   -> "gammal följd"
+       _             -> k
 resolveKey' _ k = resolveKey' (Lang "en" "US") k
 
-parseMonth :: String -> String
+parseMonth :: String -> Maybe Int
 parseMonth s =
   case map toLower s of
-         "jan" -> "1"
-         "feb" -> "2"
-         "mar" -> "3"
-         "apr" -> "4"
-         "may" -> "5"
-         "jun" -> "6"
-         "jul" -> "7"
-         "aug" -> "8"
-         "sep" -> "9"
-         "oct" -> "10"
-         "nov" -> "11"
-         "dec" -> "12"
-         _     -> s
+         "jan" -> Just 1
+         "feb" -> Just 2
+         "mar" -> Just 3
+         "apr" -> Just 4
+         "may" -> Just 5
+         "jun" -> Just 6
+         "jul" -> Just 7
+         "aug" -> Just 8
+         "sep" -> Just 9
+         "oct" -> Just 10
+         "nov" -> Just 11
+         "dec" -> Just 12
+         _     -> safeRead s
 
 data BibState = BibState{
-           untitlecase     :: Bool
-         , localeLanguage  :: Lang
+           untitlecase    :: Bool
+         , localeLanguage :: Lang
          }
 
 type Bib = RWST Item () BibState Maybe
@@ -874,21 +884,21 @@ notFound f = fail $ f ++ " not found"
 getField :: String -> Bib Formatted
 getField f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> latex x
        Nothing -> notFound f
 
 getPeriodicalTitle :: String -> Bib Formatted
 getPeriodicalTitle f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> blocksToFormatted $ onBlocks protectCase $ latex' $ trim x
        Nothing -> notFound f
 
 getTitle :: String -> Bib Formatted
 getTitle f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> latexTitle x
        Nothing -> notFound f
 
@@ -897,7 +907,7 @@ getShortTitle requireColon f = do
   fs <- asks fields
   utc <- gets untitlecase
   let processTitle = if utc then onBlocks unTitlecase else id
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> case processTitle $ latex' x of
                        bs | not requireColon || containsColon bs ->
                                   blocksToFormatted $ upToColon bs
@@ -905,67 +915,17 @@ getShortTitle requireColon f = do
        Nothing -> notFound f
 
 containsColon :: [Block] -> Bool
-containsColon [Para  xs] = (Str ":") `elem` xs
+containsColon [Para  xs] = Str ":" `elem` xs
 containsColon [Plain xs] = containsColon [Para xs]
 containsColon _          = False
 
 upToColon :: [Block] -> [Block]
-upToColon [Para  xs] = [Para $ takeWhile (/= (Str ":")) xs]
+upToColon [Para  xs] = [Para $ takeWhile (/= Str ":") xs]
 upToColon [Plain xs] = upToColon [Para xs]
 upToColon bs         = bs
 
 getDates :: String -> Bib [RefDate]
-getDates f = getRawField f >>= parseDates
-
-parseDates :: Monad m => String-> m [RefDate]
-parseDates s
-  | '/' `elem` s = mapM parseDate . splitWhen (== '/') $ s
-  -- 199u EDTF format for a range:
-  | 'u' `elem` s = let s1 = map (\c -> if c == 'u' then '0' else c) s
-                       s2 = map (\c -> if c == 'u' then '9' else c) s
-                   in  mapM parseDate [s1, s2]
-  | otherwise    = mapM parseDate [s]
-
-parseDate :: Monad m => String -> m RefDate
--- EDTF format for year of more than 4 digits, starts with 'y':
-parseDate ('y':xs) = parseDate xs
-parseDate "open" = return RefDate { year = mempty,
-                         month = mempty, season = mempty, day = mempty,
-                         other = mempty, circa = False }
-parseDate "unknown" = return RefDate { year = mempty,
-                         month = mempty, season = mempty, day = mempty,
-                         other = mempty, circa = False }
-parseDate s = do
-  let circa' = '~' `elem` s
-  let (year', month', day') =
-        case splitWhen (== '-') $ filter (`notElem` "~?")
-                                -- drop time component:
-                                $ takeWhile (/='T') s of
-             -- initial - is negative year:
-             ["",y]     -> ('-':y, mempty, mempty)
-             ["",y,m]   -> ('-':y, m, mempty)
-             ["",y,m,d] -> ('-':y, m, d)
-             [y]        -> (y, mempty, mempty)
-             [y,m]      -> (y, m, mempty)
-             [y,m,d]    -> (y, m, d)
-             _          -> (mempty, mempty, mempty)
-  let year'' = case safeRead year' of
-                    -- EDTF 0 == CSL JSON -1 (1 BCE)
-                    Just (n :: Integer) | n <= 0 -> show (n - 1)
-                    _ -> year'
-  let (season'', month'') = case month' of
-                                 "21" -> ("1","")
-                                 "22" -> ("2","")
-                                 "23" -> ("3","")
-                                 "24" -> ("4","")
-                                 _ -> ("", month')
-  return RefDate { year   = Literal $ dropWhile (=='0') year''
-                 , month  = Literal $ dropWhile (=='0') month''
-                 , season = Literal season''
-                 , day    = Literal $ dropWhile (=='0') day'
-                 , other  = mempty
-                 , circa  = circa'
-                 }
+getDates f = parseEDTFDate <$> getRawField f
 
 isNumber :: String -> Bool
 isNumber ('-':d:ds) = all isDigit (d:ds)
@@ -980,49 +940,50 @@ fixLeadingDash xs = xs
 
 getOldDates :: String -> Bib [RefDate]
 getOldDates prefix = do
-  year' <- fixLeadingDash <$> getRawField (prefix ++ "year")
+  year' <- fixLeadingDash <$> getRawField (prefix ++ "year") <|> return ""
   month' <- (parseMonth
-              <$> getRawField (prefix ++ "month")) <|> return ""
-  day' <- getRawField (prefix ++ "day") <|> return mempty
-  endyear' <- fixLeadingDash <$> getRawField (prefix ++ "endyear") <|> return ""
-  endmonth' <- (parseMonth <$> getRawField (prefix ++ "endmonth")) <|> return ""
-  endday' <- getRawField (prefix ++ "endday") <|> return ""
-  let start' = RefDate { year   = Literal $ if isNumber year' then year' else ""
-                       , month  = Literal $ month'
-                       , season = mempty
-                       , day    = Literal day'
+              <$> getRawField (prefix ++ "month")) <|> return Nothing
+  day' <- (safeRead <$> getRawField (prefix ++ "day")) <|> return Nothing
+  endyear' <- (fixLeadingDash <$> getRawField (prefix ++ "endyear"))
+            <|> return ""
+  endmonth' <- (parseMonth <$> getRawField (prefix ++ "endmonth"))
+            <|> return Nothing
+  endday' <- (safeRead <$> getRawField (prefix ++ "endday")) <|> return Nothing
+  let start' = RefDate { year   = safeRead year'
+                       , month  = month'
+                       , season = Nothing
+                       , day    = day'
                        , other  = Literal $ if isNumber year' then "" else year'
                        , circa  = False
                        }
-  let end' = if null endyear'
-                then []
-                else [RefDate { year   = Literal $ if isNumber endyear' then endyear' else ""
-                              , month  = Literal $ endmonth'
-                              , day    = Literal $ endday'
-                              , season = mempty
-                              , other  = Literal $ if isNumber endyear' then "" else endyear'
-                              , circa  = False
-                              }]
-  return (start':end')
+  let end' = RefDate { year     = safeRead endyear'
+                       , month  = endmonth'
+                       , day    = endday'
+                       , season = Nothing
+                       , other  = Literal $ if isNumber endyear' then "" else endyear'
+                       , circa  = False
+                       }
+  let hasyear r = isJust (year r)
+  return $ filter hasyear [start', end']
 
 getRawField :: String -> Bib String
 getRawField f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> return x
        Nothing -> notFound f
 
 getAuthorList :: Options -> String -> Bib [Agent]
 getAuthorList opts  f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> latexAuthors opts x
        Nothing -> notFound f
 
 getLiteralList :: String -> Bib [Formatted]
 getLiteralList f = do
   fs <- asks fields
-  case lookup f fs of
+  case Map.lookup f fs of
        Just x  -> toLiteralList $ latex' x
        Nothing -> notFound f
 
@@ -1047,7 +1008,8 @@ toAuthorList opts [Plain xs] = toAuthorList opts [Para xs]
 toAuthorList _ _ = mzero
 
 toAuthor :: Options -> [Inline] -> Bib Agent
-toAuthor _ [Str "others"] = return $
+toAuthor _ [Str "others"] =
+  return
     Agent { givenName       = []
           , droppingPart    = mempty
           , nonDroppingPart = mempty
@@ -1058,7 +1020,7 @@ toAuthor _ [Str "others"] = return $
           , parseNames      = False
           }
 toAuthor _ [Span ("",[],[]) ils] =
-  return $ -- corporate author
+  return -- corporate author
     Agent { givenName       = []
           , droppingPart    = mempty
           , nonDroppingPart = mempty
@@ -1102,17 +1064,18 @@ toAuthor opts ils = do
   let (von, lastname) =
          if bibtex
             then case span isCapitalized $ reverse vonlast of
-                        ([],(w:ws))    -> (reverse ws, [w])
-                        (vs, ws)       -> (reverse ws, reverse vs)
-            else case span (not . isCapitalized) vonlast of
+                        ([],w:ws) -> (reverse ws, [w])
+                        (vs, ws)    -> (reverse ws, reverse vs)
+            else case break isCapitalized vonlast of
                         (vs@(_:_), []) -> (init vs, [last vs])
                         (vs, ws)       -> (vs, ws)
   let prefix = Formatted $ intercalate [Space] von
   let family = Formatted $ intercalate [Space] lastname
   let suffix = Formatted $ intercalate [Space] jr
   let givens = map Formatted first
-  return $
-    Agent { givenName       = givens
+
+  return Agent
+          { givenName       = givens
           , droppingPart    = if useprefix then mempty else prefix
           , nonDroppingPart = if useprefix then prefix else mempty
           , familyName      = family
@@ -1142,7 +1105,7 @@ latex' s = Walk.walk removeSoftBreak bs
 
 removeSoftBreak :: Inline -> Inline
 removeSoftBreak SoftBreak = Space
-removeSoftBreak x = x
+removeSoftBreak x         = x
 
 latex :: String -> Bib Formatted
 latex s = blocksToFormatted $ latex' $ trim s
@@ -1157,70 +1120,70 @@ latexAuthors :: Options -> String -> Bib [Agent]
 latexAuthors opts = toAuthorList opts . latex' . trim
 
 bib :: Bib Reference -> Item -> Maybe Reference
-bib m entry = fmap fst $ evalRWST m entry (BibState True (Lang "en" "US"))
+bib m entry = fst Control.Applicative.<$> evalRWST m entry (BibState True (Lang "en" "US"))
 
 toLocale :: String -> String
-toLocale "english"    = "en-US" -- "en-EN" unavailable in CSL
-toLocale "usenglish"  = "en-US"
-toLocale "american"   = "en-US"
-toLocale "british"    = "en-GB"
-toLocale "ukenglish"  = "en-GB"
-toLocale "canadian"   = "en-US" -- "en-CA" unavailable in CSL
-toLocale "australian" = "en-GB" -- "en-AU" unavailable in CSL
-toLocale "newzealand" = "en-GB" -- "en-NZ" unavailable in CSL
-toLocale "afrikaans"  = "af-ZA"
-toLocale "arabic"     = "ar"
-toLocale "basque"     = "eu"
-toLocale "bulgarian"  = "bg-BG"
-toLocale "catalan"    = "ca-AD"
-toLocale "croatian"   = "hr-HR"
-toLocale "czech"      = "cs-CZ"
-toLocale "danish"     = "da-DK"
-toLocale "dutch"      = "nl-NL"
-toLocale "estonian"   = "et-EE"
-toLocale "finnish"    = "fi-FI"
-toLocale "canadien"   = "fr-CA"
-toLocale "acadian"    = "fr-CA"
-toLocale "french"     = "fr-FR"
-toLocale "francais"   = "fr-FR"
-toLocale "austrian"   = "de-AT"
-toLocale "naustrian"  = "de-AT"
-toLocale "german"     = "de-DE"
-toLocale "germanb"    = "de-DE"
-toLocale "ngerman"    = "de-DE"
-toLocale "greek"      = "el-GR"
+toLocale "english"         = "en-US" -- "en-EN" unavailable in CSL
+toLocale "usenglish"       = "en-US"
+toLocale "american"        = "en-US"
+toLocale "british"         = "en-GB"
+toLocale "ukenglish"       = "en-GB"
+toLocale "canadian"        = "en-US" -- "en-CA" unavailable in CSL
+toLocale "australian"      = "en-GB" -- "en-AU" unavailable in CSL
+toLocale "newzealand"      = "en-GB" -- "en-NZ" unavailable in CSL
+toLocale "afrikaans"       = "af-ZA"
+toLocale "arabic"          = "ar"
+toLocale "basque"          = "eu"
+toLocale "bulgarian"       = "bg-BG"
+toLocale "catalan"         = "ca-AD"
+toLocale "croatian"        = "hr-HR"
+toLocale "czech"           = "cs-CZ"
+toLocale "danish"          = "da-DK"
+toLocale "dutch"           = "nl-NL"
+toLocale "estonian"        = "et-EE"
+toLocale "finnish"         = "fi-FI"
+toLocale "canadien"        = "fr-CA"
+toLocale "acadian"         = "fr-CA"
+toLocale "french"          = "fr-FR"
+toLocale "francais"        = "fr-FR"
+toLocale "austrian"        = "de-AT"
+toLocale "naustrian"       = "de-AT"
+toLocale "german"          = "de-DE"
+toLocale "germanb"         = "de-DE"
+toLocale "ngerman"         = "de-DE"
+toLocale "greek"           = "el-GR"
 toLocale "polutonikogreek" = "el-GR"
-toLocale "hebrew"     = "he-IL"
-toLocale "hungarian"  = "hu-HU"
-toLocale "icelandic"  = "is-IS"
-toLocale "italian"    = "it-IT"
-toLocale "japanese"   = "ja-JP"
-toLocale "latvian"    = "lv-LV"
-toLocale "lithuanian" = "lt-LT"
-toLocale "magyar"     = "hu-HU"
-toLocale "mongolian"  = "mn-MN"
-toLocale "norsk"      = "nb-NO"
-toLocale "nynorsk"    = "nn-NO"
-toLocale "farsi"      = "fa-IR"
-toLocale "polish"     = "pl-PL"
-toLocale "brazil"     = "pt-BR"
-toLocale "brazilian"  = "pt-BR"
-toLocale "portugues"  = "pt-PT"
-toLocale "portuguese" = "pt-PT"
-toLocale "romanian"   = "ro-RO"
-toLocale "russian"    = "ru-RU"
-toLocale "serbian"    = "sr-RS"
-toLocale "serbianc"   = "sr-RS"
-toLocale "slovak"     = "sk-SK"
-toLocale "slovene"    = "sl-SL"
-toLocale "spanish"    = "es-ES"
-toLocale "swedish"    = "sv-SE"
-toLocale "thai"       = "th-TH"
-toLocale "turkish"    = "tr-TR"
-toLocale "ukrainian"  = "uk-UA"
-toLocale "vietnamese" = "vi-VN"
-toLocale "latin"      = "la"
-toLocale x            = x
+toLocale "hebrew"          = "he-IL"
+toLocale "hungarian"       = "hu-HU"
+toLocale "icelandic"       = "is-IS"
+toLocale "italian"         = "it-IT"
+toLocale "japanese"        = "ja-JP"
+toLocale "latvian"         = "lv-LV"
+toLocale "lithuanian"      = "lt-LT"
+toLocale "magyar"          = "hu-HU"
+toLocale "mongolian"       = "mn-MN"
+toLocale "norsk"           = "nb-NO"
+toLocale "nynorsk"         = "nn-NO"
+toLocale "farsi"           = "fa-IR"
+toLocale "polish"          = "pl-PL"
+toLocale "brazil"          = "pt-BR"
+toLocale "brazilian"       = "pt-BR"
+toLocale "portugues"       = "pt-PT"
+toLocale "portuguese"      = "pt-PT"
+toLocale "romanian"        = "ro-RO"
+toLocale "russian"         = "ru-RU"
+toLocale "serbian"         = "sr-RS"
+toLocale "serbianc"        = "sr-RS"
+toLocale "slovak"          = "sk-SK"
+toLocale "slovene"         = "sl-SL"
+toLocale "spanish"         = "es-ES"
+toLocale "swedish"         = "sv-SE"
+toLocale "thai"            = "th-TH"
+toLocale "turkish"         = "tr-TR"
+toLocale "ukrainian"       = "uk-UA"
+toLocale "vietnamese"      = "vi-VN"
+toLocale "latin"           = "la"
+toLocale x                 = x
 
 concatWith :: Char -> [Formatted] -> Formatted
 concatWith sep = Formatted . foldl' go mempty . map unFormatted
@@ -1363,8 +1326,8 @@ itemToReference lang locale bibtex caseTransform = bib $ do
   editor'' <- getAuthorList' "editor" <|> return []
   director'' <- getAuthorList' "director" <|> return []
   let (editor', director') = case editortype of
-                                  "director"  -> ([], editor'')
-                                  _           -> (editor'', director'')
+                                  "director" -> ([], editor'')
+                                  _          -> (editor'', director'')
   -- FIXME: add same for editora, editorb, editorc
 
   -- titles
@@ -1372,7 +1335,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
   let isPeriodical = et == "periodical"
   let isChapterlike = et `elem`
          ["inbook","incollection","inproceedings","inreference","bookinbook"]
-  hasMaintitle <- (True <$ (getRawField "maintitle")) <|> return False
+  hasMaintitle <- (True <$ getRawField "maintitle") <|> return False
   let hyphenation' = if null hyphenation
                      then defaultHyphenation
                      else hyphenation
@@ -1430,7 +1393,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
   shortTitle' <- (guard (not hasMaintitle || isChapterlike) >>
                         getTitle "shorttitle")
                <|> if (subtitle' /= mempty || titleaddon' /= mempty) &&
-                      (not hasMaintitle)
+                      not hasMaintitle
                       then getShortTitle False "title"
                       else getShortTitle True  "title"
                <|> return mempty
@@ -1445,7 +1408,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
                         else getLiteralList' f)
                       <|> return Nothing)
          ["school","institution","organization", "howpublished","publisher"]
-  let publisher' = concatWith ';' [p | Just p <- pubfields]
+  let publisher' = concatWith ';' $ catMaybes pubfields
   origpublisher' <- getField "origpublisher" <|> return mempty
 
 -- places
@@ -1522,7 +1485,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
   keywords' <- getField "keywords" <|> return mempty
   note' <- if et == "periodical"
            then return mempty
-           else (getField "note" <|> return mempty)
+           else getField "note" <|> return mempty
   addendum' <- if bibtex
                then return mempty
                else getField "addendum"
@@ -1540,8 +1503,8 @@ itemToReference lang locale bibtex caseTransform = bib $ do
 
   let takeDigits (Str xs : _) =
          case takeWhile isDigit xs of
-              []               -> []
-              ds               -> [Str ds]
+              [] -> []
+              ds -> [Str ds]
       takeDigits x             = x
 
   return $ emptyReference

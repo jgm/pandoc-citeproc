@@ -22,7 +22,7 @@ references:
   - family: Author
     given: Al
   issued:
-  - year: '2013'
+  - year: 2013
   title: 'Maintitle: Mainsubtitle. Maintitleaddon'
   volume-title: 'Title of the Book: Subtitle. Titleaddon'
   collection-title: Series

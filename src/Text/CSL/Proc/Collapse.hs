@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE PatternGuards #-}
 -----------------------------------------------------------------------------
 -- |
@@ -16,16 +17,17 @@
 
 module Text.CSL.Proc.Collapse where
 
-import Data.Ord (comparing)
-import Data.Monoid (Any(..))
-import Control.Arrow ( (&&&), (>>>), second )
-import Data.Char
-import Data.List ( groupBy, sortBy )
-import Text.CSL.Util ( query, proc, proc', betterThan )
-import Text.CSL.Eval
-import Text.CSL.Proc.Disamb
-import Text.CSL.Style hiding (Any)
-import Text.Pandoc.Definition ( Inline (Str) )
+import Prelude
+import           Control.Arrow          (second, (&&&), (>>>))
+import           Data.Char
+import           Data.List              (groupBy, sortBy)
+import           Data.Monoid            (Any (..))
+import           Data.Ord               (comparing)
+import           Text.CSL.Eval
+import           Text.CSL.Proc.Disamb
+import           Text.CSL.Style         hiding (Any)
+import           Text.CSL.Util          (betterThan, proc, proc', query)
+import           Text.Pandoc.Definition (Inline (Str))
 
 -- | Collapse citations according to the style options.
 collapseCitGroups :: Style -> [CitationGroup] -> [CitationGroup]
@@ -56,7 +58,7 @@ collapseNumber (CG _ f d os) = mapCitationGroup process $ CG [] f d os
       citNums (OCitNum i _) = [i]
       citNums (Output xs _) = concatMap citNums xs
       citNums _             = []
-      numOf  = foldr (\x _ -> x) 0 . citNums
+      numOf  = foldr const 0 . citNums
       process xs = if hasLocator xs
                       then xs
                       else flip concatMap (groupConsecWith numOf xs)
@@ -72,10 +74,11 @@ collapseNumber (CG _ f d os) = mapCitationGroup process $ CG [] f d os
 
 groupCites :: [(Cite, Output)] -> [(Cite, Output)]
 groupCites []     = []
-groupCites (x:xs) = let equal    = filter ((==) (namesOf $ snd x) . namesOf . snd) xs
-                        notequal = filter ((/=) (namesOf $ snd x) . namesOf . snd) xs
+groupCites (x:xs) = let equal    = filter (hasSameNamesAs x) xs
+                        notequal = filter (not . hasSameNamesAs x) xs
                     in  x : equal ++ groupCites notequal
     where
+      hasSameNamesAs w y = namesOf (snd w) == namesOf (snd y)
       contribsQ o
           | OContrib _ _ c _ _ <- o = [c]
           | otherwise               = []
@@ -128,7 +131,7 @@ collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
                              uncurry zip . second format . unzip $ a
 
       doCollapse []     = []
-      doCollapse (x:[]) = [collapsYS x]
+      doCollapse [x] = [collapsYS x]
       doCollapse (x:xs) = let (a,b) = collapsYS x
                           in if length x > 1
                              then (a, Output (b : [ODel afterColDel]) emptyFormatting) : doCollapse xs
@@ -138,7 +141,9 @@ collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
           | OContrib _ _ c _ _ <- o = [proc' rmHashAndGivenNames c]
           | otherwise               = []
       namesOf = query contribsQ
-      process = doCollapse . groupBy (\a b -> namesOf (snd a) == namesOf (snd b)) . groupCites
+      hasSameNames a b = not (null (namesOf (snd a))) &&
+                         namesOf (snd a) == namesOf (snd b)
+      process = doCollapse . groupBy hasSameNames . groupCites
 
 collapseYearSuf :: Bool -> String -> [(Cite,Output)] -> [Output]
 collapseYearSuf ranged ysd = process
@@ -163,10 +168,10 @@ collapseYearSuf ranged ysd = process
                  null (citeLocator $ fst b)
 
       getYS []     = []
-      getYS (x:[]) = return $ uncurry addCiteAffixes x
+      getYS [x] = return $ uncurry addCiteAffixes x
       getYS (x:xs) = if ranged
-                     then proc rmOYearSuf (snd x) : addDelim ysd (processYS $ (snd x) : query rmOYear (map snd xs))
-                     else addDelim ysd  $ (snd x) : (processYS $ query rmOYear (map snd xs))
+                     then proc rmOYearSuf (snd x) : addDelim ysd (processYS $ snd x : query rmOYear (map snd xs))
+                     else addDelim ysd  $ snd x : processYS (query rmOYear (map snd xs))
       rmOYearSuf o
           | OYearSuf {} <- o = ONull
           | otherwise        = o
@@ -180,7 +185,7 @@ collapseYearSufRanged = process
       getOYS o
           | OYearSuf s _ _ f <- o = [(if s /= [] then ord (head s) else 0, f)]
           | otherwise             = []
-      sufOf   = foldr (\x _ -> x) (0,emptyFormatting) . query getOYS
+      sufOf   = foldr const (0,emptyFormatting) . query getOYS
       newSuf  = map sufOf >>> (map fst >>> groupConsec) &&& map snd >>> uncurry zip
       process xs = flip concatMap (newSuf xs) $
                    \(x,f) -> if length x > 2
@@ -212,7 +217,7 @@ addCiteAffixes c x =
 isNumStyle :: [Output] -> Bool
 isNumStyle = getAny . query ocitnum
     where
-      ocitnum (OCitNum {}) = Any True
+      ocitnum OCitNum {} = Any True
       ocitnum _            = Any False
 
 -- | Group consecutive integers:
@@ -224,7 +229,7 @@ groupConsec = groupConsecWith id
 groupConsecWith ::  (a -> Int) -> [a] -> [[a]]
 groupConsecWith f = foldr go [] . sortBy (comparing f)
   where go x []     = [[x]]
-        go x ((y:ys):gs) = if (f x + 1) == (f y)
-                              then ((x:y:ys):gs)
-                              else ([x]:(y:ys):gs)
+        go x ((y:ys):gs) = if (f x + 1) == f y
+                              then (x:y:ys):gs
+                              else [x]:(y:ys):gs
         go _ ([]:_) = error "groupConsec: head of list is empty"

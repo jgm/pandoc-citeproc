@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, ScopedTypeVariables #-}
+{-# LANGUAGE CPP, ScopedTypeVariables, NoImplicitPrelude #-}
 -- | Compatibility module to work around differences in the
 -- types of functions between pandoc < 2.0 and pandoc >= 2.0.
 module Text.CSL.Compat.Pandoc (
@@ -13,6 +13,7 @@ module Text.CSL.Compat.Pandoc (
   fetchItem,
   pipeProcess ) where
 
+import Prelude
 import qualified Control.Exception as E
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
@@ -67,11 +68,12 @@ writeMarkdown = either mempty T.unpack . runPure . Pandoc.writeMarkdown
 
 writePlain = either mempty T.unpack . runPure . Pandoc.writePlain def
 
-writeNative = either mempty T.unpack . runPure . Pandoc.writeNative def
+writeNative = either mempty T.unpack . runPure . Pandoc.writeNative def{ writerTemplate = Just "" }
 
 writeHtmlString = either mempty T.unpack . runPure . Pandoc.writeHtml4String
    def{ writerExtensions = extensionsFromList
-       [Ext_native_divs, Ext_native_spans, Ext_raw_html] }
+       [Ext_native_divs, Ext_native_spans, Ext_raw_html],
+       writerWrapText = WrapPreserve }
 
 #else
 readHtml = either mempty id . Pandoc.readHtml
@@ -95,7 +97,7 @@ writeMarkdown = Pandoc.writeMarkdown def{
 
 writePlain = Pandoc.writePlain def
 
-writeNative = Pandoc.writeNative def
+writeNative = Pandoc.writeNative def{ writerTemplate = Just "" }
 
 writeHtmlString = Pandoc.writeHtmlString def
 #endif
@@ -111,16 +113,15 @@ pipeProcess e f a b = do
   return (ec, out)
 #endif
 
-fetchItem :: Maybe String
-          -> String
+fetchItem :: String
           -> IO (Either E.SomeException (B.ByteString, Maybe MimeType))
 #if MIN_VERSION_pandoc(2,0,0)
-fetchItem mbd s = do
-  res <- runIO $ runExceptT $ lift $ Text.Pandoc.Class.fetchItem mbd s
+fetchItem s = do
+  res <- runIO $ runExceptT $ lift $ Text.Pandoc.Class.fetchItem s
   return $ case res of
        Left e          -> Left (E.toException e)
        Right (Left (e :: PandocError))  -> Left (E.toException e)
        Right (Right r) -> Right r
 #else
-fetchItem = Text.Pandoc.Shared.fetchItem
+fetchItem = Text.Pandoc.Shared.fetchItem Nothing
 #endif

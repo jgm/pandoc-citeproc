@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL
@@ -63,13 +64,13 @@ module Text.CSL
     , renderPandoc'
     ) where
 
-import Text.CSL.Proc
-import Text.CSL.Reference
-import Text.CSL.Style
-import Text.CSL.Parser
-import Text.CSL.Input.Bibutils
-import Text.CSL.Output.Pandoc
-import Text.CSL.Output.Plain
+import           Text.CSL.Input.Bibutils
+import           Text.CSL.Output.Pandoc
+import           Text.CSL.Output.Plain
+import           Text.CSL.Parser
+import           Text.CSL.Proc
+import           Text.CSL.Reference
+import           Text.CSL.Style
 
 
 -- $intro

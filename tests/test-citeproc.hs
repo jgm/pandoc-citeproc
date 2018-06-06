@@ -1,27 +1,33 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, FlexibleInstances,
-    ScopedTypeVariables, CPP #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE CPP                  #-}
+{-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
-import Text.Printf
-import System.Exit
-import qualified Control.Exception as E
-import Text.Pandoc (Block(..), Inline(..), Format(..), bottomUp,
-   nullMeta, Pandoc(..))
-import Text.CSL.Compat.Pandoc (writeHtmlString)
-import Data.Char (isSpace, toLower)
-import System.Environment (getArgs)
-import System.Process
-import System.IO.Temp (withSystemTempDirectory)
-import qualified Text.Pandoc.UTF8 as UTF8
-import Data.Aeson
-import System.FilePath
-import System.Directory
-import Data.List (sort, isInfixOf)
-import qualified Data.Map as M
-import Text.CSL.Style hiding (Number)
-import Text.CSL.Reference
-import Text.CSL
-import Control.Monad
-import qualified Data.ByteString.Lazy as BL
+import Prelude
+import qualified Control.Exception      as E
+import           Control.Monad
+import           Data.Aeson
+import           Data.Aeson.Types       (Parser)
+import qualified Data.ByteString.Lazy   as BL
+import           Data.Char              (isSpace, toLower)
+import           Data.List              (isInfixOf, sort)
+import qualified Data.Map               as M
+import           System.Directory
+import           System.Environment     (getArgs)
+import           System.Exit
+import           System.FilePath
+import           System.IO.Temp         (withSystemTempDirectory)
+import           System.Process
+import           Text.CSL
+import           Text.CSL.Compat.Pandoc (writeHtmlString)
+import           Text.CSL.Reference
+import           Text.CSL.Style         hiding (Number)
+import           Text.Pandoc            (Block (..), Format (..), Inline (..),
+                                         Pandoc (..), bottomUp, nullMeta)
+import qualified Text.Pandoc.UTF8       as UTF8
+import           Text.Printf
 
 data TestCase = TestCase{
     testMode          :: Mode        -- mode
@@ -35,28 +41,33 @@ data TestCase = TestCase{
   } deriving (Show)
 
 data Mode = CitationMode
+          | CitationRTFMode
           | BibliographyMode
           | BibliographyHeaderMode
           | BibliographyNoSortMode
           deriving Show
 
 instance FromJSON Mode where
-  parseJSON (String "citation")     = return CitationMode
-  parseJSON (String "bibliography") = return BibliographyMode
+  parseJSON (String "citation")            = return CitationMode
+  parseJSON (String "citation-rtf")        = return CitationRTFMode
+  parseJSON (String "bibliography")        = return BibliographyMode
   parseJSON (String "bibliography-header") = return BibliographyHeaderMode
   parseJSON (String "bibliography-nosort") = return BibliographyNoSortMode
-  parseJSON _                       = fail "Unknown mode"
+  parseJSON _                              = fail "Unknown mode"
 
 instance FromJSON TestCase where
   parseJSON (Object v) = TestCase <$>
               v .:  "mode" <*>
               v .:? "bibsection" .!= Select [] [] <*>
-              v .:? "citations" .!= [] <*>
+              ((v .: "citations") >>= parseCitations) <*>
               v .:? "citation_items" .!= [] <*>
-              (parseCSL <$> (v .:  "csl")) <*>
+              (parseCSL <$> (v .: "csl")) <*>
               v .:? "abbreviations" .!= (Abbreviations M.empty) <*>
               v .:  "input" <*>
               v .:  "result"
+        where parseCitations :: Data.Aeson.Value -> Parser [CiteObject]
+              parseCitations x@Array{} = parseJSON x
+              parseCitations _         = return []
   parseJSON _ = fail "Could not parse test case"
 
 newtype CiteObject =
@@ -75,7 +86,7 @@ instance FromJSON CiteObject where
 #else
 instance FromJSON [CiteObject] where
   parseJSON (Array v) = mapM parseJSON $ V.toList v
-  parseJSON _ = return []
+  parseJSON _         = return []
 #endif
 
 data TestResult =
@@ -147,8 +158,8 @@ inlinesToString ils =
 -- We want &amp; instead of &#38; etc.
 adjustEntities :: String -> String
 adjustEntities ('&':'#':'3':'8':';':xs) = "&amp;" ++ adjustEntities xs
-adjustEntities (x:xs) = x : adjustEntities xs
-adjustEntities []     = []
+adjustEntities (x:xs)                   = x : adjustEntities xs
+adjustEntities []                       = []
 
 -- citeproc-js test suite expects "citations" to be formatted like
 -- .. [0] Smith (2007)
@@ -210,7 +221,7 @@ main = do
   exists <- doesDirectoryExist testDir
   unless exists $ do
     putStrLn "Downloading test suite"
-    rawSystem "hg" ["clone", "https://bitbucket.org/bdarcus/citeproc-test"]
+    _ <- rawSystem "git" ["clone", "https://github.com/citation-style-language/test-suite.git", "citeproc-test"]
     withDirectory "citeproc-test" $
       void $ rawSystem "python" ["processor.py", "--grind"]
 

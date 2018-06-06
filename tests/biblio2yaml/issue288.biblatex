@@ -18,8 +18,8 @@ references:
   - family: Leavitt
     given: Alex
   issued:
-  - year: '2016'
-    month: '8'
+  - year: 2016
+    month: 8
   title: 'Upvoting the news: Breaking news aggregation, crowd collaboration, and
     algorithm-driven attention on reddit.com'
   title-short: Upvoting the news

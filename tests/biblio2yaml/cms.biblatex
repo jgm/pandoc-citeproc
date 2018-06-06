@@ -57,7 +57,7 @@ references:
 - id: cms
   type: book
   issued:
-  - year: '2003'
+  - year: 2003
   title: 'The Chicago manual of style: The essential guide for writers, editors,
     and publishers'
   title-short: Chicago manual of style

@@ -1,35 +1,36 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE CPP                 #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module Main where
-import System.Exit
-import System.Directory
-import System.FilePath
-import Data.Maybe (fromMaybe)
-import System.IO
-import System.IO.Temp (withSystemTempDirectory)
-import System.Process (rawSystem)
-import qualified Data.Aeson as Aeson
-import Text.Pandoc.Definition
-import qualified Text.Pandoc.UTF8 as UTF8
-import Text.CSL.Compat.Pandoc (writeNative, pipeProcess)
-import Data.List (isSuffixOf)
-import System.Environment
-import Control.Monad (when)
+import Prelude
+import qualified Data.Aeson             as Aeson
+import           Data.List              (isSuffixOf)
+import           Data.Maybe             (fromMaybe)
+import           System.Directory
+import           System.Environment
+import           System.Exit
+import           System.FilePath
+import           System.IO
+import           System.IO.Temp         (withSystemTempDirectory)
+import           System.Process         (rawSystem)
+import           Text.CSL.Compat.Pandoc (pipeProcess, writeNative)
+import           Text.Pandoc.Definition
+import qualified Text.Pandoc.UTF8       as UTF8
 #if MIN_VERSION_pandoc(2,0,0)
-import qualified Control.Exception as E
+import qualified Control.Exception      as E
 #endif
 
 main :: IO ()
 main = do
   args <- getArgs
-  let regenerate = args == ["--regenerate"]
-  testnames <- fmap (map (dropExtension . takeBaseName) .
-                     filter (".in.native" `isSuffixOf`)) $
+  let regenerate = "--accept" `elem` args
+  testnames <- (map (dropExtension . takeBaseName) .
+                     filter (".in.native" `isSuffixOf`)) <$>
                getDirectoryContents "tests"
   citeprocTests <- mapM (testCase regenerate) testnames
   fs <- filter (\f -> takeExtension f `elem` [".bibtex",".biblatex"])
            `fmap` getDirectoryContents "tests/biblio2yaml"
-  biblio2yamlTests <- mapM biblio2yamlTest fs
+  biblio2yamlTests <- mapM (biblio2yamlTest regenerate) fs
   let allTests = citeprocTests ++ biblio2yamlTests
   let numpasses  = length $ filter (== Passed) allTests
   let numskipped = length $ filter (== Skipped) allTests
@@ -57,7 +58,7 @@ testCase regenerate csl = do
   hPutStr stderr $ "[" ++ csl ++ ".in.native] "
   indataNative <- UTF8.readFile $ "tests/" ++ csl ++ ".in.native"
   expectedNative <- UTF8.readFile $ "tests/" ++ csl ++ ".expected.native"
-  let jsonIn = Aeson.encode $ (read indataNative :: Pandoc)
+  let jsonIn = Aeson.encode (read indataNative :: Pandoc)
   let expectedDoc = read expectedNative
   testProgPath <- getExecutablePath
   let pandocCiteprocPath = takeDirectory testProgPath </> ".." </>
@@ -68,20 +69,24 @@ testCase regenerate csl = do
                      [] jsonIn
   if ec == ExitSuccess
      then do
-       let outDoc = fromMaybe mempty $ Aeson.decode $ jsonOut
+       let outDoc = fromMaybe mempty $Aeson.decode jsonOut
        if outDoc == expectedDoc
           then err "PASSED" >> return Passed
-          else do
-             err $ "FAILED"
-             showDiff (writeNative expectedDoc) (writeNative outDoc)
-             when regenerate $
-               UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
+          else
+            if regenerate
+               then do
+                 UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
 #if MIN_VERSION_pandoc(1,19,0)
-                  writeNative outDoc
+                   writeNative outDoc
 #else
-                  writeNative outDoc
+                   writeNative outDoc
 #endif
-             return Failed
+                 err "PASSED (accepted)"
+                 return Passed
+               else do
+                 err "FAILED"
+                 showDiff (writeNative expectedDoc) (writeNative outDoc)
+                 return Failed
      else do
        err "ERROR"
        err $ "Error status " ++ show ec
@@ -99,8 +104,8 @@ showDiff expected result =
     _ <- rawSystem "diff" ["-U1","expected","actual"]
     setCurrentDirectory oldDir
 
-biblio2yamlTest :: String -> IO TestResult
-biblio2yamlTest fp = do
+biblio2yamlTest :: Bool -> String -> IO TestResult
+biblio2yamlTest regenerate fp = do
   hPutStr stderr $ "[biblio2yaml/" ++ fp ++ "] "
   let yamld = "tests/biblio2yaml/"
 #if MIN_VERSION_pandoc(2,0,0)
@@ -129,10 +134,24 @@ biblio2yamlTest fp = do
      then do
        if expected == result
           then err "PASSED" >> return Passed
-          else do
-            err $ "FAILED"
-            showDiff expected result
-            return Failed
+          else
+            if regenerate
+               then do
+                 let accepted = bib ++ result
+#if MIN_VERSION_pandoc(2,0,0)
+                 p2version <- doesFileExist (yamld ++ "/pandoc-2/" ++ fp)
+                 UTF8.writeFile (if p2version
+                                    then (yamld ++ "/pandoc-2/" ++ fp)
+                                    else (yamld ++ fp)) accepted
+#else
+                 UTF8.writeFile (yamld ++ fp) accepted
+#endif
+                 err "PASSED (accepted)"
+                 return Passed
+               else do
+                 err $ "FAILED"
+                 showDiff expected result
+                 return Failed
      else do
        err "ERROR"
        err $ "Error status " ++ show ec

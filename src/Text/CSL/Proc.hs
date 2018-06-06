@@ -1,4 +1,7 @@
-{-# LANGUAGE PatternGuards, OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE PatternGuards     #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Proc
@@ -16,24 +19,26 @@
 
 module Text.CSL.Proc where
 
-import Control.Arrow ( (&&&), (>>>), second )
-import Data.Char ( toLower, isLetter, isDigit )
-import Data.List
-import Data.Ord  ( comparing )
-import Data.Maybe ( mapMaybe )
-import Text.CSL.Eval
-import Text.CSL.Util ( proc, proc', query, uncamelize, tr' )
-import Text.CSL.Proc.Collapse
-import Text.CSL.Proc.Disamb
-import Text.CSL.Reference
-import Text.CSL.Style
-import Data.Aeson
-import Control.Applicative ((<|>))
-import Text.Pandoc.Definition (Inline(Space, Str, Note), Block(Para))
-
+import Prelude
+import           Control.Applicative    ((<|>))
+import           Control.Arrow          (second, (&&&), (>>>))
+import           Control.Monad.State    (execState, modify)
+import           Data.Aeson
+import           Data.Char              (isDigit, isLetter, toLower)
+import           Data.List
+import           Data.Maybe             (mapMaybe)
+import           Data.Ord               (comparing)
+import           Text.CSL.Eval
+import           Text.CSL.Proc.Collapse
+import           Text.CSL.Proc.Disamb
+import           Text.CSL.Reference
+import           Text.CSL.Style
+import           Text.CSL.Util          (proc, proc', query, tr', uncamelize)
+import           Text.Pandoc.Definition (Block (Para),
+                                         Inline (Note, Space, Str))
 data ProcOpts
     = ProcOpts
-      { bibOpts :: BibOpts
+      { bibOpts       :: BibOpts
       , linkCitations :: Bool
       }
     deriving ( Show, Read, Eq )
@@ -125,13 +130,15 @@ citeproc ops s rs cs
          OCitNum n f{hyperlink = "#ref-" ++ citeid}
       addLink' citeid (OCitLabel l f) =
          OCitLabel l f{hyperlink = "#ref-" ++ citeid}
+      addLink' citeid (Output xs@(OStr _ _: _) f) =
+         Output xs f{hyperlink = "#ref-" ++ citeid}
       addLink' _ x = x
 
 -- | Given the CSL 'Style' and the list of 'Reference's sort the list
 -- according to the 'Style' and assign the citation number to each
 -- 'Reference'.
 procRefs :: Style -> [Reference] -> [Reference]
-procRefs (Style {biblio = mb, csMacros = ms , styleLocale = l, styleAbbrevs = as, csOptions = opts}) rs
+procRefs Style {biblio = mb, csMacros = ms , styleLocale = l, styleAbbrevs = as, csOptions = opts} rs
     = maybe (setCNum rs) process mb
     where
       opts'   b = mergeOptions (bibOptions b) opts
@@ -156,8 +163,8 @@ sortItems l
 -- | With a 'Style' and a sorted list of 'Reference's produce the
 -- evaluated output for the bibliography.
 procBiblio :: BibOpts -> Style -> [Reference] -> [[Output]]
-procBiblio bos (Style {biblio = mb, csMacros = ms , styleLocale = l,
-                       styleAbbrevs = as, csOptions = opts}) rs
+procBiblio bos Style {biblio = mb, csMacros = ms , styleLocale = l,
+                       styleAbbrevs = as, csOptions = opts} rs
     = map addSpaceAfterCitNum $ maybe [] process mb
     where
       -- handle second-field-align (sort of)
@@ -196,7 +203,7 @@ subsequentAuthorSubstitute b = if null subAuthStr then id else chkCreator
 
       getPartialEach x xs = concat . take 1 . map fst .
                             sortBy (flip (comparing $ length . snd)) . filter ((<) 0 . length . snd) .
-                            zip xs . map (takeWhile id . map (uncurry (==)) . zip x) $ xs
+                            zip xs . map (takeWhile id .  zipWith (==) x) $ xs
 
       chkCreator = if subAuthRule == "partial-each" then chPartialEach [] else chkCr []
 
@@ -264,15 +271,15 @@ filterRefs bos refs
     | otherwise          = refs
     where
       quash  [] _ = True
-      quash   q r = not . and . flip map q $ \(f,v) ->       lookup_ r f v
-      select  s r =       and . flip map s $ \(f,v) ->       lookup_ r f v
-      include i r =       or  . flip map i $ \(f,v) ->       lookup_ r f v
-      exclude e r =       and . flip map e $ \(f,v) -> not $ lookup_ r f v
-      lookup_ r f v = case f of
-                        "type"         -> look "ref-type"
-                        "id"           -> look "ref-id"
-                        "categories"   -> look "categories"
-                        x              -> look x
+      quash   q r = not $ all (lookup_ r) q
+      select  s r =       all (lookup_ r) s
+      include i r =       any (lookup_ r) i
+      exclude e r =       all (not . lookup_ r) e
+      lookup_ r (f, v) = case f of
+                          "type"       -> look "ref-type"
+                          "id"         -> look "ref-id"
+                          "categories" -> look "categories"
+                          x            -> look x
           where
             look s = case lookup s (mkRefMap (Just r)) of
                        Just x | Just v' <- (fromValue x :: Maybe RefType  ) -> v == uncamelize (show v')
@@ -286,8 +293,8 @@ filterRefs bos refs
 -- 'Reference's, generate a 'CitationGroup'. The citations are sorted
 -- according to the 'Style'.
 procGroup :: Style -> [(Cite, Maybe Reference)] -> CitationGroup
-procGroup (Style {citation = ct, csMacros = ms , styleLocale = l,
-                  styleAbbrevs = as, csOptions = opts}) cr
+procGroup Style {citation = ct, csMacros = ms , styleLocale = l,
+                  styleAbbrevs = as, csOptions = opts} cr
     = CG authIn (layFormat $ citLayout ct) (layDelim $ citLayout ct) (authIn ++ co)
     where
       (co, authIn) = case cr of
@@ -301,7 +308,19 @@ procGroup (Style {citation = ct, csMacros = ms , styleLocale = l,
       format (c,r) = (c,  evalLayout (citLayout ct) (EvalCite c) False l ms opts' as r)
       sort_  (c,r) = evalSorting (EvalSorting c) l ms opts' (citSort ct) as r
       process      = map (second (flip Output emptyFormatting) . format &&& sort_)
-      result       = sortItems $ process cr
+      result       = concatMap sortItems $ toChunks $ process cr
+      -- toChunks splits the citations up into groups, such that
+      -- a citation with a non-null prefix is by itself in its
+      -- group, otherwise preserving the order (see #292 for
+      -- motivation; we don't want to move prefixed citations
+      -- around)
+      toChunks  xs = reverse $ execState (toChunks' xs) []
+      toChunks' xs = do
+        case break hasPrefix xs of
+                ([], [])   -> return ()
+                ([], y:ys) -> modify ([y]:) >> toChunks' ys
+                (zs, ys)   -> modify (zs:) >> toChunks' ys
+      hasPrefix ((c,_),_) = citePrefix c /= mempty
 
 formatBiblioLayout :: Formatting -> Delimiter -> [Output] -> [Output]
 formatBiblioLayout  f d = appendOutput f . addDelim d
@@ -314,14 +333,15 @@ formatCitLayout s (CG co f d cs)
     | otherwise = formatCits cs
     where
       isNote    = styleClass s == "note"
+      toNote (Formatted []) = mempty
       toNote (Formatted xs) = Formatted [Note [Para xs]]
       combine (Formatted []) ys = ys
       combine xs ys =
         case ys of
-             Formatted [] -> xs
+             Formatted []           -> xs
              Formatted (Note _ : _) -> xs <> ys
-             Formatted (Str [c]:_) | c `elem` (", ;:" :: String) -> xs <> ys
-             _ -> xs <> Formatted [Space] <> ys
+             Formatted (Str [c]:_)  | c `elem` (", ;:" :: String) -> xs <> ys
+             _                      -> xs <> Formatted [Space] <> ys
       formatAuth   = formatOutput . localMod
       formatCits   = (if isNote then toNote else id) .
                      formatOutputList . appendOutput formatting . addAffixes f .
@@ -331,7 +351,7 @@ formatCitLayout s (CG co f d cs)
                         verticalAlign = if isAuthorInText cs
                                            then ""
                                            else verticalAlign f }
-      isAuthorInText [] = False
+      isAuthorInText []        = False
       isAuthorInText ((c,_):_) = authorInText c
       localMod     = uncurry $ localModifiers s (not $ null co)
       setAsSupAu h = map $ \(c,o) -> if (citeId c, citeHash c) == h

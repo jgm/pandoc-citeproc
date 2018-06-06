@@ -59,7 +59,7 @@ references:
   - family: Chow
     given: We Min
   issued:
-  - year: '1978'
+  - year: 1978
   title: A hybrid hierarchical model of a Multiple Virtual Storage (MVS) operating
     system
   publisher: IBM
@@ -80,7 +80,7 @@ references:
   - family: Towsley
     given: Don
   issued:
-  - year: '1999'
+  - year: 1999
   title: A stochastic model of TCP Reno congestion avoidance and control
   publisher: University of Massachusetts
   publisher-place: Amherst, Mass.

@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE PatternGuards #-}
 #if MIN_VERSION_base(4,9,0)
 {-# OPTIONS_GHC -fno-warn-redundant-constraints #-}
@@ -18,18 +19,19 @@
 
 module Text.CSL.Eval.Common where
 
-import Control.Arrow ( (&&&), (>>>) )
-import Control.Monad.State
-import Data.Char ( toLower )
-import Data.List ( elemIndex )
-import qualified Data.Map as M
-import Data.Maybe
+import Prelude
+import           Control.Arrow       ((&&&), (>>>))
+import           Control.Monad.State
+import           Data.Char           (toLower)
+import           Data.List           (elemIndex)
+import qualified Data.Map            as M
+import           Data.Maybe
 
-import Text.Pandoc.Shared ( stringify )
-import Text.CSL.Reference
-import Text.CSL.Style
+import           Text.CSL.Reference
+import           Text.CSL.Style
+import           Text.Pandoc.Shared  (stringify)
 
-import Debug.Trace
+import           Debug.Trace
 
 data EvalState
     = EvalState

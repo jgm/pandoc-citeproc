@@ -1,3 +1,248 @@
+pandoc-citeproc (0.14.3.1)
+
+  * Allow pandoc 2.2.x.
+  * Update locales and default csl.
+
+pandoc-citeproc (0.14.3)
+
+  * Fixed other-modules in cabal.
+  * Semigroup instances for Literal and CLabel.
+  * Use NoImplicitPrelude with custom prelude.
+    This allows ghci to work.
+  * stack.yaml - depend on released pandoc.
+
+pandoc-citeproc (0.14.2)
+
+  * Use custom Prelude to handle Monoid/Semigroup transition.
+  * Add Semigroup instance for Formatting (API change).
+  * Bump aeson upper bound.
+
+pandoc-citeproc (0.14.1.5)
+
+  * Fixed 'capitalize-first' when the element begins with emphasis
+    or some other inline container.  Closes #322.
+  * test-pandoc-citeproc: make --accept work with biblio2yaml tests.
+
+pandoc-citeproc (0.14.1.4)
+
+  * Fixed sort order bugs (#320):
+
+    + Disregard ayn and hamza in sorting Arabic names.
+    + Proper treatment of spaces:  nothing comes before something,
+      but spaces INSIDE a given name or family name are ignored.
+    + Disregard punctuation and case.
+
+pandoc-citeproc (0.14.1.3)
+
+  * Bump xml-conduit version bound.
+
+pandoc-citeproc (0.14.1.2)
+
+  * Fix regression in JSON output for date-parts (#321).
+    Previous versions of represented dates as:
+    `"issued": {"date-parts": [[2006]]}`.  pandoc-citeproc 0.14
+    did instead: `"issued": [{"date-parts": [2006]}]`.
+
+pandoc-citeproc (0.14.1.1)
+
+  * Fix regression in movement of punctuation inside quotes before note.
+    Example: `Here is a "test citation" [@item1].`
+    should become `Here is a a "test citation."[^1]` (at least in
+    locales where punctuation moves inside quotes, like en-US).
+
+pandoc-citeproc (0.14.1)
+
+  * More robust handling of boolean metadata values.
+  * Keep position of citations with prefixes when sorting (behavior
+    change, #292).  If citations with prefixes are moved around,
+    gibberish can result.  E.g.:
+    `A fascinating research tidbit [@Zanadu1999, p. 35; see
+    for comparison @Aalto2005]` can become
+    "A fascinating research tidbit (see for comparison Aalto, 2005;
+    Zanadu, 1999: 35)" with a sorting style like sage-harvard.csl.
+    This change causes sorting to be applied only to subgroups of citations
+    that lack prefixes.
+
+pandoc-citeproc (0.14)
+
+  * Fix non-numerical season parsing in RefDate (#316).
+    These changes allow non-numerical dates to be handled.
+    API changes: season in RefDate is now Maybe Season instead
+    of Maybe Int. Text.CSL.Reference exports Season(..) and
+    seasonToInt.
+
+  * Fix parsing of season field in DateRef object.
+
+  * Treat date-part with all 0s the same as empty.
+    This is used to indicate an open-ended range.
+
+pandoc-citeproc (0.13.0.1)
+
+  * Suppress empty footnotes.
+  * Use walk instead of bottomUp.  This requires pandoc-types 1.17.3
+    but gives a  speed boost.
+
+pandoc-citeproc (0.13)
+
+  * Made bibliography parsing more efficient.  (API change)
+    This commit adds an extra parameter to the bibliography parsing
+    functions: readBibtex, readBibtexString, readBiblioString,
+    readBiblioFile.  The extra (first) parameter is a function
+    from strings to booleans that acts as a filter on citation
+    identifiers, so that non-matching identifiers are not parsed
+    in full.  pandoc-citeproc now gets a list of the citation
+    identifiers in a document and passes it to readBiblio*,
+    which gives a very substantial speed increase with large
+    bibliographies.  This is most noticable with bibtex,
+    biblatex, and yaml bibliographies.
+
+  * Improved RefDate type (#313, API change).  RefDate fields
+    (month, day, season, year) were previously strings; they've
+    been changed to Maybe Int.  In addition, the AddYaml class
+    is exported from Text.CSL.Util; (&=) is now a method of that
+    class.  Finally, parseEDTFDate is exported from Text.CSL.Reference,
+    and is used instead of the old date parsing code in
+    Text.CSL.Input.Bibtex.
+
+  * Link to bibliographies in undated citations, like
+    (Doe, n.d.) (#250).
+
+  * Bibtex parser: a few efficiency improvements.
+
+  * pandoc-citeproc.hs - better exception messages for -y and -j.
+
+  * Added needed import of fromMaybe without embed_data_files.
+    This makes it possible to build pandoc-citeproc without
+    the embed_data_files flag again.
+
+pandoc-citeproc (0.12.2.5)
+
+  * Fixed spurious disambiguation on some date ranges (#312).
+
+  * Fix spurious dash after date range in certain cases (#312).
+
+pandoc-citeproc (0.12.2.4)
+
+  * Properly fixed range delimiters.  Closes #312.
+
+pandoc-citeproc (0.12.2.3)
+
+  * Fix month range problems (#312).  Months in a range were being
+    concatenated with no separator with some styles (e.g. apa.csl).
+
+  * Use pseudo-months in CSL JSON output (#103).
+
+pandoc-citeproc (0.12.2.2)
+
+  * Allow pandoc 2.1.
+
+pandoc-citeproc (0.12.2.1)
+
+  * Handle pseudo-months in CSL date-range (see #103).
+    Month 13 = season 1, 14 = 2, also 21 = 1, 22 = 2, ...
+
+pandoc-citeproc (0.12.2)
+
+  * Improved parsing of raw dates.  First we attempt to parse them
+    as ISO dates or date ranges (allowing `~` at the end to indicate
+    "circa").
+
+  * Prefer 'raw' even if it occurs with 'date-parts'.  (In this case
+    'date-parts' is ignored.)
+
+  * Parse 'cheater' variables embedded in 'note' in CSL JSON (#192).
+    Both braced and newline forms are supported.
+
+  * Don't make title-case sensitive to locale for labels (#119).
+
+  * API change: export `rmTitleCase'` from Text.CSL.Style.
+
+  * Improved raw date parsing (#103).
+
+    + We now only parse 'raw' if `date-parts` is empty or missing.
+    + Code for parsing raw dates moved from Text.CSL.Eval.Date to
+      Text.CSL.Reference.
+    + Use `other` field if we can't parse data.
+
+  * Support `all-names-with-initials` disambiguation.
+
+  * Remove double quotes in parsing CSL family names.
+    CSL uses double quotes simply to protect the case in names.
+
+  * Text.CSL.Proc.Disamb: exclude year, year suffix, label
+    in detecting collisions, unless year-suffix set.
+    This causes us to pass several more citeproc tests.
+
+  * Parse 'raw' field in ref dates in CSL JSON.
+
+  * Accept numerical versions of boolean parse-names in CSL JSON input.
+    This is mainly useful for avoiding errors in test-citeproc.
+
+  * Support 'film' as synonym of 'motion_picture'.
+    I don't see this documented, but a test case in the citeproc
+    test suite depends on it.
+
+  * Support citations-rtf mode in test-citeproc.
+
+  * Preserve soft breaks in HTML output.  This allows us to pass more
+    citeproc test cases.
+
+  * Parse 'season' properly in CSL YAML or JSON dates (#309).
+
+  * Fix "primary-name" name disambiguation (#38).  This also sets the
+    default to "by-cite", since that is now the CSL default.  However,
+    more adjustments are needed, as we now fail some citeproc tests we
+    passed before.
+
+  * test-citeproc improvements:
+
+    + , use new citeproc (git) test suite, not the old hg one.
+    + Build test-citeproc too in default Makefile target.
+    + Handle boolean values for 'citations' in test data.
+
+  * Add tests for issue #87.
+
+  * Added `-threaded` to `ghc-options` (#311).
+
+  * Added biblatex-examples.bib to data files.
+
+pandoc-citeproc (0.12.1.1)
+
+  * Avoid double punctuation when citation ends with 'et al.' (#262).
+  * Fix collapsing for items that lack an author (#152).
+
+pandoc-citeproc (0.12.1)
+
+  * Fixed cases where we got plural instead of singular "issue"
+    or "volume" (#307).
+
+pandoc-citeproc (0.12)
+
+  * Text.CSL.Exception: add `renderError`.
+  * Text.CSL.Input.Bibtex: remove `readBibtexString'` (pure version).
+    We don't use this.  And we've refactored to raise better errors.
+  * Improved error handling.  Throw a CiteprocException instead of
+    using 'error', and render this nicely.
+  * Update chicago-author-date.csl and locales.
+  * Updated tests for chicago-author-date.csl  and locale changes.
+  * Pandoc compat module:  ensure `writeNative` includes the header.
+  * Use `--accept` instead of `--regenerate` in tests to regenerate test
+    cases.
+  * Bibtex parser: handle comments better (#306).
+
+pandoc-citeproc (0.11.1.3)
+
+  * Align static flag with pandoc's.
+  * Update version bound for xml-conduit.
+
+pandoc-citeproc (0.11.1.2)
+
+  * Fixed quotes in three test cases.  We'd been using straight quotes.
+  * Use latest hs-bibutils.
+  * Update compat for latest pandoc 2.0.
+  * Change type of compat's fetchItem so it doesn't take
+    a datadir argument.
+
 pandoc-citeproc (0.11.1.1)
 
   * Added containers to build deps for test-pandoc-citeproc.

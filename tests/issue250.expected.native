@@ -1,0 +1,5 @@
+Pandoc (Meta {unMeta = fromList [("link-citations",MetaBool True),("references",MetaList [MetaMap (fromList [("author",MetaMap (fromList [("family",MetaInlines [Str "Doe"])])),("id",MetaInlines [Str "doe"]),("title",MetaInlines [Str "Title"])])])]})
+[Para [Cite [Citation {citationId = "doe", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 1}] [Str "(Doe,",Space,Link ("",[],[]) [Str "n.d."] ("#ref-doe",""),Str ")"]]
+,Div ("refs",["references"],[])
+ [Div ("ref-doe",[],[])
+  [Para [Str "Doe.",Space,Str "n.d.",Space,Str "\8220Title.\8221"]]]]

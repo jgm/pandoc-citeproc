@@ -1,4 +1,5 @@
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Output.Plain
@@ -17,9 +18,10 @@ module Text.CSL.Output.Plain
     ( renderPlain
     ) where
 
-import Text.CSL.Style
-import Text.CSL.Compat.Pandoc (writePlain)
-import Text.Pandoc (Block(Plain), Pandoc(..), nullMeta)
+import Prelude
+import           Text.CSL.Compat.Pandoc (writePlain)
+import           Text.CSL.Style
+import           Text.Pandoc            (Block (Plain), Pandoc (..), nullMeta)
 
 -- | Render the 'Formatted' into a plain text string.
 renderPlain :: Formatted -> String

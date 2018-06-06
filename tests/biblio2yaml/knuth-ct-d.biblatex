@@ -52,7 +52,7 @@ references:
   - family: Knuth
     given: Donald E.
   issued:
-  - year: '1986'
+  - year: 1986
   title: Computers & typesetting
   title-short: METAFONT
   volume-title: 'METAFONT: The program'

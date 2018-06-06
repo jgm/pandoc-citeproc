@@ -1,8 +1,10 @@
-{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE DeriveDataTypeable #-}
-module Text.CSL.Exception (CiteprocException(..)) where
-import Control.Exception (Exception)
-import Data.Data
+
+module Text.CSL.Exception (CiteprocException(..), renderError) where
+import Prelude
+import           Control.Exception (Exception)
+import           Data.Data
 
 data CiteprocException =
        ErrorParsingReferences String
@@ -17,3 +19,20 @@ data CiteprocException =
 
 instance Exception CiteprocException
 
+renderError :: CiteprocException -> String
+renderError (ErrorParsingReferences s) =
+  "Error parsing references: " ++ s
+renderError (CouldNotFindAbbrevFile s) =
+  "Could not find abbreviation file: " ++ s
+renderError (CouldNotFindBibFile s) =
+  "Could not find bibliography file: " ++ s
+renderError (ErrorReadingBibFile f s) =
+  "Error reading bibliography " ++ f ++ " " ++ s
+renderError (ErrorReadingBib s) =
+  "Error reading bibliography " ++ s
+renderError ErrorSplittingDate =
+  "Error splitting date"
+renderError (MacroNotFound s) =
+  "Macro not found: " ++ s
+renderError (DependentStyleHasItselfAsParent s) =
+  "Dependent style " ++ s ++ " has itself as parent"
