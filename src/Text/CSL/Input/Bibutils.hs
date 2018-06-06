@@ -44,7 +44,7 @@ import Text.Bibutils
 -- is recognized by the file extension.
 --
 -- Supported formats are: @json@, @mods@, @bibtex@, @biblatex@, @ris@,
--- @endnote@, @endnotexml@, @isi@, @medline@, and @copac@.
+-- @endnote@, @endnotexml@, @isi@, @medline@, @copac@, and @nbib@.
 readBiblioFile :: FilePath -> IO [Reference]
 readBiblioFile f
     = case getExt f of
@@ -63,6 +63,7 @@ readBiblioFile f
         ".wos"      -> readBiblioFile' f isi_in
         ".medline"  -> readBiblioFile' f medline_in
         ".copac"    -> readBiblioFile' f copac_in
+        ".nbib"     -> readBiblioFile' f nbib_in
         _           -> E.throwIO $ ErrorReadingBibFile f "the format of the bibliographic database could not be recognized from the file extension"
 #else
         _           -> E.throwIO $ ErrorReadingBibFile f "bibliography format not supported"
@@ -81,6 +82,7 @@ data BibFormat
     | Medline
     | Copac
     | Mods
+    | Nbib
 #endif
     deriving Show
 
@@ -100,6 +102,7 @@ readBiblioString b s
     | Medline   <- b = go medline_in
     | Copac     <- b = go copac_in
     | Mods      <- b = go mods_in
+    | Nbib      <- b = go nbib_in
 #endif
     | otherwise      = E.throwIO $ ErrorReadingBib $
                           "unsupported format " ++ show b

@@ -101,6 +101,7 @@ readFormat = go . map toLower
         go "medline"  = Just Medline
         go "copac"    = Just Copac
         go "mods"     = Just Mods
+        go "nbib"     = Just Nbib
 #endif
         go _          = Nothing
 
