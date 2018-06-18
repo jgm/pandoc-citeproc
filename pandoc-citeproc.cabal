@@ -110,7 +110,7 @@ library
                       pandoc-types >= 1.17.3 && < 1.18,
                       pandoc >= 1.16 && < 2.3,
                       tagsoup,
-                      aeson >= 0.7 && < 1.4,
+                      aeson >= 0.7 && < 1.5,
                       text,
                       vector,
                       xml-conduit >= 1.2 && < 1.9,
