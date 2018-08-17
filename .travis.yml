@@ -28,9 +28,9 @@ matrix:
   include:
   # We grab the appropriate GHC and cabal-install versions from hvr's PPA. See:
   # https://github.com/hvr/multi-ghc-travis
-  - env: BUILD=cabal GHCVER=8.0.1 CABALVER=2.0
-    compiler: ": #GHC 8.0.1"
-    addons: {apt: {packages: [cabal-install-2.0,ghc-8.0.1,happy-1.19.5], sources: [hvr-ghc]}}
+  - env: BUILD=cabal GHCVER=8.0.2 CABALVER=2.0
+    compiler: ": #GHC 8.0.2"
+    addons: {apt: {packages: [cabal-install-2.0,ghc-8.0.2,happy-1.19.5], sources: [hvr-ghc]}}
 
   - env: BUILD=cabal GHCVER=8.2.2 CABALVER=2.0
     compiler: ": #GHC 8.2.2"
@@ -59,7 +59,7 @@ matrix:
   #   addons: {apt: {packages: [libgmp-dev]}}
 
   # - env: BUILD=stack ARGS="--resolver lts-8"
-  # compiler: ": #stack 8.0.1 osx"
+  # compiler: ": #stack 8.0.2 osx"
   # os: osx
 
   # - env: BUILD=stack ARGS="--resolver nightly"
@@ -69,7 +69,6 @@ matrix:
   allow_failures:
   - env: BUILD=cabal GHCVER=head  CABALVER=head
   - env: BUILD=stack ARGS="--resolver nightly"
-  - env: BUILD=cabal GHCVER=8.2.2 CABALVER=2.0
   # 8.2.2 on Cabal always hangs on travis, for unknown reasons
 
 before_install:
