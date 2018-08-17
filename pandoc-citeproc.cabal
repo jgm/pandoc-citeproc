@@ -108,7 +108,7 @@ library
     build-depends:    containers, directory, mtl,
                       bytestring, filepath,
                       pandoc-types >= 1.17.3 && < 1.18,
-                      pandoc >= 1.16 && < 2.3,
+                      pandoc >= 1.16 && < 2.4,
                       tagsoup,
                       aeson >= 0.7 && < 1.5,
                       text,
@@ -158,7 +158,7 @@ executable pandoc-citeproc
     ghc-prof-options: -fprof-auto-exported -rtsopts
     build-depends:    base >= 4, pandoc-citeproc,
                       pandoc-types >= 1.17.3 && < 1.18,
-                      pandoc >= 1.16 && < 2.3,
+                      pandoc >= 1.16 && < 2.4,
                       aeson,
                       aeson-pretty >= 0.8, yaml, bytestring, syb, attoparsec, text,
                       filepath
@@ -187,7 +187,7 @@ executable test-citeproc
     Buildable:    False
   build-depends:  base >= 4, aeson, directory, text, mtl,
                   pandoc-types >= 1.17.3 && < 1.18,
-                  pandoc >= 1.16 && < 2.3,
+                  pandoc >= 1.16 && < 2.4,
                   filepath, containers,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7, containers >= 0.4, vector >= 0.10
@@ -209,7 +209,7 @@ test-suite test-pandoc-citeproc
   Hs-Source-Dirs: tests, compat
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.17.3 && < 1.18, mtl,
-                  pandoc >= 1.16 && < 2.3, filepath, containers,
+                  pandoc >= 1.16 && < 2.4, filepath, containers,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.8.8.7
   ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind -threaded
