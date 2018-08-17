@@ -182,7 +182,7 @@ readYamlBib idpred s =
 
 selectEntries :: (String -> Bool) -> BS.ByteString -> BS.ByteString
 selectEntries idpred bs =
-  case Yaml.decodeEither bs of
+  case Yaml.decodeEither' bs of
        Right (Array vs) -> Yaml.encode (filterObjects $ V.toList vs)
        Right (Object o) ->
               case HM.lookup (T.pack "references") o of
@@ -191,7 +191,8 @@ selectEntries idpred bs =
                                     (filterObjects $ V.toList vs) mempty)
                    _ -> BS.empty
        Right _ -> BS.empty
-       Left e  -> E.throw $ ErrorParsingReferences e
+       Left e  -> E.throw $ ErrorParsingReferences
+                              (Yaml.prettyPrintParseException e)
     where filterObjects = filter
                (\x -> case x of
                         Object o ->
