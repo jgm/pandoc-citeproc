@@ -117,7 +117,7 @@ library
                       unordered-containers >= 0.2 && < 0.3,
                       data-default,
                       setenv >= 0.1 && < 0.2,
-                      split, yaml >= 0.8.8.7
+                      split, yaml >= 0.8.32
     if impl(ghc < 8.0)
       build-depends: semigroups == 0.18.*
     if impl(ghc < 8.4)
@@ -211,7 +211,7 @@ test-suite test-pandoc-citeproc
                   pandoc-types >= 1.17.3 && < 1.18, mtl,
                   pandoc >= 1.16 && < 2.4, filepath, containers,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
-                  yaml >= 0.8.8.7
+                  yaml >= 0.8.32
   ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind -threaded
   if impl(ghc < 8.0)
     build-depends: semigroups == 0.18.*
