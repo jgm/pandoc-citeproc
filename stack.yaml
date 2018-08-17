@@ -9,13 +9,14 @@ flags:
 packages:
 - '.'
 extra-deps:
-- pandoc-2.2.3.2
 - haddock-library-1.6.0
 - HsYAML-0.1.1.1
 - network-2.7.0.2
 - rfc5051-0.1.0.3
 - hs-bibutils-6.5.0.0
 - yaml-0.9.0
+- github: jgm/pandoc
+  commit: 1b668657632c58964e8d7df42ea88e5ea6abfb1e
 ghc-options:
    "$locals": -fhide-source-paths
 resolver: lts-12.0
