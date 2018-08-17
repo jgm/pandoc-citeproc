@@ -50,9 +50,9 @@ references:
   title: 'Technical section: An algorithm for automatic capturing of the font outlines'
   title-short: Technical section
   container-title: Computers and Graphics
-  page: '795-804'
+  page: 795-804
   volume: '26'
   issue: '5'
   annote: An article entry with an issn field
-  ISSN: '0097-8493'
+  ISSN: 0097-8493
 ...

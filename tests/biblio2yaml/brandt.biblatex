@@ -72,7 +72,7 @@ references:
   collection-number: '2'
   publisher: Klett-Cotta
   publisher-place: Stuttgart
-  page: '884-917'
+  page: 884-917
   annote: An incollection entry with a series and a number. Note the format of the
     printed name and compare the useprefix option in the options field as well as
     vangennep. Also note the indextitle, and indexsorttitle fields

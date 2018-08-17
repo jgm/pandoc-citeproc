@@ -101,6 +101,6 @@ references:
     build upon the previous analysis to provide both an approximate formula as well
     as a more accurate stochastic model for the steady state throughput of a bulk
     transfer TCP flow.
-  number: '99-02'
+  number: 99-02
   language: en-US
 ...

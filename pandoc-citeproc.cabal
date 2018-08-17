@@ -190,7 +190,7 @@ executable test-citeproc
                   pandoc >= 1.16 && < 2.4,
                   filepath, containers,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
-                  yaml >= 0.8.8.7, containers >= 0.4, vector >= 0.10
+                  yaml >= 0.8.32, containers >= 0.4, vector >= 0.10
   if impl(ghc < 8.0)
     build-depends: semigroups == 0.18.*
   if impl(ghc < 8.4)

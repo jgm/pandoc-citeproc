@@ -20,5 +20,5 @@ references:
   volume: '35'
   issue: '4'
   annote: This is a periodical entry with an issn field.
-  ISSN: '0097-8493'
+  ISSN: 0097-8493
 ...

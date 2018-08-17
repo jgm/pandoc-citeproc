@@ -57,7 +57,7 @@ references:
     Aristotelicum
   publisher: Cambridge University Press
   publisher-place: Cambridge
-  page: '281-324'
+  page: 281-324
   annote: This is a typical inproceedings entry. Note the booksubtitle, shorttitle,
     indextitle, and indexsorttitle fields. Also note the eventdate field.
   keyword: secondary
@@ -86,5 +86,5 @@ references:
   publisher: Almquist & Wiksell
   publisher-place: Stockholm
   event-place: Aspenäsgarden, Lerum
-  page: '367-377'
+  page: 367-377
 ...

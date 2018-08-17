@@ -55,7 +55,7 @@ references:
   container-title: 'Space and beyond: The frontier theme in science fiction'
   publisher: Greenwood
   publisher-place: Westport, Conn.; London
-  page: '55-65'
+  page: 55-65
   annote: A cross-referenced article from a collection. This is an incollection entry
     with a crossref field. Note the subtitle and indextitle fields
   language: en-US
@@ -74,8 +74,8 @@ references:
   container-title: Alternative modernities
   publisher: Duke University Press
   publisher-place: Durham; London
-  page: '1-23'
-  ISBN: '0-822-32714-7'
+  page: 1-23
+  ISBN: 0-822-32714-7
 
 - id: westfahl:frontier
   type: book

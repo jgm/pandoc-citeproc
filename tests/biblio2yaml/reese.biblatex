@@ -55,7 +55,7 @@ references:
   title: Georgia in Anglo-Spanish diplomacy, 1736-1739
   container-title: William and Mary Quarterly
   collection-title: 3rd ser.
-  page: '168-190'
+  page: 168-190
   volume: '15'
   annote: An article entry with a series and a volume field. Note the format of the
     series. If the value of the series field is an integer, this number is printed
