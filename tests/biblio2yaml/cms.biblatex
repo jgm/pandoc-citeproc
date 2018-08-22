@@ -68,7 +68,7 @@ references:
     in the database file which is provided for author-year citation styles. Also note
     the sorttitle and indextitle fields. By default, all entries without an author
     or editor are alphabetized by title but we want this entry to be alphabetized
-    under “C” rather than “T”. There’s also an isbn field
+    under ‘C’ rather than ‘T’. There’s also an isbn field
   ISBN: 0-226-10403-6
   language: en-US
 ...
