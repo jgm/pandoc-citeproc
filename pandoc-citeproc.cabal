@@ -153,14 +153,19 @@ library
 
 executable pandoc-citeproc
     main-is:          pandoc-citeproc.hs
-    hs-source-dirs:   .
+    hs-source-dirs:   ., aeson-pretty
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -fprof-auto-exported -rtsopts
-    build-depends:    base >= 4, pandoc-citeproc,
+    build-depends:    base >= 4,
+                      pandoc-citeproc,
+                      base-compat,
+                      vector,
+                      scientific,
+                      unordered-containers,
                       pandoc-types >= 1.17.3 && < 1.18,
                       pandoc >= 1.16 && < 2.4,
-                      aeson,
-                      aeson-pretty >= 0.8, yaml, bytestring, syb, attoparsec, text,
+                      aeson >= 1.0,
+                      yaml, bytestring, syb, attoparsec, text,
                       filepath
     if impl(ghc < 8.0)
       build-depends: semigroups == 0.18.*
