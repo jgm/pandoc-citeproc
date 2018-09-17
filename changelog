@@ -3,6 +3,12 @@ pandoc-citeproc (0.14.4)
   * Allow latest aeson (Adam Bergmark, #336).
   * Use latest hs-bibutils.
   * NBIB support (#333, Václav Haisman, API change).
+  * Allow pandoc 2.3.x.
+  * Update tests for pandoc changes.
+  * Use recent yaml library that doesn't quote number ranges.
+    This required some adjustments in the tests.
+  * Use lts-12 for stack build.
+  * Use Yaml.decodeEither' instead of deprecated decodeEither.
 
 pandoc-citeproc (0.14.3.1)
 
