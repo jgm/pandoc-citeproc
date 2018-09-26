@@ -54,22 +54,24 @@ evalDate (Date s f fm dl dp dp') = do
   case f of
     NoFormDate -> outputList fm dl .
                   concatMap (formatDate em k tm dp) <$> mapM getDateVar s
-    _          -> do Date _ _ lfm ldl ldp _ <- getDate f
-                     let go dps = return . outputList (updateFM fm lfm) (if ldl /= [] then ldl else dl) .
-                                  concatMap (formatDate em k tm dps)
-                         update l x@(DatePart a b c d) =
-                             case filter ((==) a . dpName) l of
-                               (DatePart _ b' c' d':_) -> DatePart a (updateS  b b')
-                                                                     (updateS  c c')
-                                                                     (updateFM d d')
-                               _                       -> x
-                         updateDP = map (update dp) ldp
-                         date     = mapM getDateVar s
-                     case dp' of
-                       "year-month" -> go (filter ((/=) "day"  . dpName) updateDP) =<< date
-                       "year"       -> go (filter ((==) "year" . dpName) updateDP) =<< date
-                       _            -> go                                updateDP  =<< date
-
+    _          -> do res <- getDate f
+                     case res of
+                       Date _ _ lfm ldl ldp _ -> do
+                         let go dps = return . outputList (updateFM fm lfm) (if ldl /= [] then ldl else dl) .
+                                      concatMap (formatDate em k tm dps)
+                             update l x@(DatePart a b c d) =
+                                 case filter ((==) a . dpName) l of
+                                   (DatePart _ b' c' d':_) -> DatePart a (updateS  b b')
+                                                                         (updateS  c c')
+                                                                         (updateFM d d')
+                                   _                       -> x
+                             updateDP = map (update dp) ldp
+                             date     = mapM getDateVar s
+                         case dp' of
+                           "year-month" -> go (filter ((/=) "day"  . dpName) updateDP) =<< date
+                           "year"       -> go (filter ((==) "year" . dpName) updateDP) =<< date
+                           _            -> go                                updateDP  =<< date
+                       _ -> return []
 evalDate _ = return []
 
 getDate :: DateForm -> State EvalState Element
