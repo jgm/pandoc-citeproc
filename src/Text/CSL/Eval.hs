@@ -241,11 +241,11 @@ evalElement el
                "pmid"        -> getStringVar "pmid" >>= \d ->
                                 if null d
                                    then return []
-                                   else return [Output [OPan [Link nullAttr [Str d] ("http://www.ncbi.nlm.nih.gov/pubmed/" ++ d, "")]] fm]
+                                   else return [Output [OPan [Link nullAttr [Str d] ("https://www.ncbi.nlm.nih.gov/pubmed/" ++ d, "")]] fm]
                "pmcid"       -> getStringVar "pmcid" >>= \d ->
                                 if null d
                                    then return []
-                                   else return [Output [OPan [Link nullAttr [Str d] ("http://www.ncbi.nlm.nih.gov/pmc/articles/" ++ d, "")]] fm]
+                                   else return [Output [OPan [Link nullAttr [Str d] ("https://www.ncbi.nlm.nih.gov/pmc/articles/" ++ d, "")]] fm]
                _ -> do (opts, as) <- gets (env >>> options &&& abbrevs)
                        r <- getVar []
                               (getFormattedValue opts as f fm s) s
