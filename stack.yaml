@@ -15,8 +15,7 @@ extra-deps:
 - rfc5051-0.1.0.3
 - hs-bibutils-6.5.0.0
 - yaml-0.9.0
-- github: jgm/pandoc
-  commit: 889254e1d5c7b683b93f623207347a773e25776b
+- pandoc-2.3
 ghc-options:
    "$locals": -fhide-source-paths
 resolver: lts-12.0
