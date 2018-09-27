@@ -202,6 +202,9 @@ by other CSL implementations.
 `--license`
 :   Print the license.
 
+`-q, --quiet`
+:   Silence all warnings.
+
 `-V, --version`
 :   Print version.
 

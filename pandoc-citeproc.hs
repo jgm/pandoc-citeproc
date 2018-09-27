@@ -77,7 +77,7 @@ main = do
                            [] -> UTF8.getContents
                            xs -> mconcat <$> mapM UTF8.readFile xs
          readBiblioString (const True) bibformat bibstring >>=
-           warnDuplicateKeys >>=
+           (if Quiet `elem` flags then return else warnDuplicateKeys) >>=
            if Bib2YAML `elem` flags
               then outputYamlBlock .
                    B8.intercalate (B.singleton 10) .
@@ -86,7 +86,7 @@ main = do
                 encodePretty' defConfig{ confIndent = Spaces 2
                                        , confCompare = compare
                                        , confNumFormat = Generic }
-       else toJSONFilter doCites
+       else toJSONFilter (doCites (Quiet `elem` flags))
 
 formatFromExtension :: FilePath -> Maybe BibFormat
 formatFromExtension = readFormat . dropWhile (=='.') . takeExtension
@@ -114,11 +114,11 @@ readFormat = go . map toLower
         go _            = Nothing
 
 
-doCites :: Pandoc -> IO Pandoc
-doCites doc = do
+doCites :: Bool -> Pandoc -> IO Pandoc
+doCites beQuiet doc = do
   doc' <- processCites' doc
   let warnings = query findWarnings doc'
-  mapM_ (UTF8.hPutStrLn stderr) warnings
+  unless beQuiet $ mapM_ (UTF8.hPutStrLn stderr) warnings
   return doc'
 
 findWarnings :: Inline -> [String]
@@ -137,6 +137,7 @@ data Option =
     | Format String
     | Bib2YAML
     | Bib2JSON
+    | Quiet
   deriving (Ord, Eq, Show)
 
 options :: [OptDescr Option]
@@ -147,6 +148,7 @@ options =
   , Option ['V'] ["version"] (NoArg Version) "show program version"
   , Option ['y'] ["bib2yaml"] (NoArg Bib2YAML) "convert bibliography to YAML"
   , Option ['j'] ["bib2json"] (NoArg Bib2JSON) "convert bibliography to JSON"
+  , Option ['q'] ["quiet"] (NoArg Quiet) "silence all warnings"
   , Option ['f'] ["format"] (ReqArg Format "FORMAT") "bibliography format"
   ]
 
