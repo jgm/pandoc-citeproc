@@ -1,3 +1,12 @@
+pandoc-citeproc (0.14.5)
+
+  * Add flag to silence all warnings (#350, Albert Krewinkel).
+    Introduce new command line flag `--quiet`/`-q` which can be used to
+    suppress all warnings.
+  * Use HTTPS for PMID and PMCID hyperlinks (#349, Daniel Himmelstein.)
+  * Fix pattern match in do block that could fail, so pandoc-citeproc
+    compiles with ghc 8.6.
+
 pandoc-citeproc (0.14.4)
 
   * Allow latest aeson (Adam Bergmark, #336).
