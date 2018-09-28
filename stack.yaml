@@ -15,6 +15,8 @@ extra-deps:
 - rfc5051-0.1.0.3
 - hs-bibutils-6.5.0.0
 - yaml-0.9.0
+- hslua-1.0.0
+- hslua-module-text-0.2.0
 - github: jgm/pandoc
   commit: c292a0bae3167570511543d3d96a0385b9b5f2d8
 ghc-options:
