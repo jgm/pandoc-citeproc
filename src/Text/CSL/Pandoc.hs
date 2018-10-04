@@ -214,7 +214,7 @@ processCites' (Pandoc meta blocks) = do
                either error return . eitherDecode . skipLeadingSpace)
              cslAbbrevFile
   let csl' = csl{ styleAbbrevs = abbrevs }
-  return $ processCites csl' refs $ Pandoc meta blocks
+  return $ processCites (tr' "CSL" csl') refs $ Pandoc meta blocks
 
 toPath :: MetaValue -> Maybe String
 toPath (MetaString s) = Just s
