@@ -249,15 +249,16 @@ instance OVERLAPS
     circa' <- (v .: "circa" >>= parseBool) <|> pure False
     season' <- v .:? "season" >>= parseMaybeSeason
     case dateParts of
-         Just (Array xs) | isNothing raw' ->
-           case V.toList xs of
-              []                   -> return []
-              [Null]               -> return []
-              [Array v] | V.null v -> return []
+         Just (Array y) | isNothing raw' ->
+           case V.toList y of
+              []           -> return []
+              [Null]       -> return []
+              [Array x]
+                | V.null x -> return []
                    -- [ null ] and [ [] ] are sometimes seen. See
                    -- https://github.com/greenelab/manubot/issues/66
-              xs              -> mapM (fmap (setCirca circa' .
-                                   maybe id setSeason season') . parseJSON) xs
+              ys           -> mapM (fmap (setCirca circa' .
+                                maybe id setSeason season') . parseJSON) ys
          _ -> case raw' of
                   Nothing -> handleLiteral <$> parseJSON (Object v)
                   Just r  -> return $ parseRawDate r
