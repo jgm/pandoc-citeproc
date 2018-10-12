@@ -1,0 +1,5 @@
+Pandoc (Meta {unMeta = fromList [("csl",MetaInlines [Str "tests/zeitschrift-fur-kunstgeschichte.csl"]),("references",MetaList [MetaMap (fromList [("editor",MetaList [MetaMap (fromList [("family",MetaInlines [Str "Nietzsche"]),("given",MetaInlines [Str "Friedrich"])])]),("id",MetaInlines [Str "Nie72"]),("issued",MetaList [MetaMap (fromList [("year",MetaInlines [Str "1872"])])]),("title",MetaInlines [Str "Die",Space,Str "geburt"]),("type",MetaInlines [Str "book"])])])]})
+[Para [Cite [Citation {citationId = "Nie72", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 1}] [Str "Friedrich",Space,Str "Nietzsche",Space,Str "(ed.)",Note [Para [Emph [Str "Die",Space,Str "geburt"],Str ",",Space,Str "1872."]]]]
+,Div ("refs",["references"],[])
+ [Div ("ref-Nie72",[],[])
+  [Para [Str "Nietzsche,",Space,Str "Friedrich",Space,Str "(ed.),",Space,Emph [Str "Die",Space,Str "geburt"],Str ",",Space,Str "1872."]]]]

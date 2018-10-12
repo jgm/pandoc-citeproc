@@ -1,6 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE PatternGuards       #-}
+{-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 -----------------------------------------------------------------------------
 -- |
@@ -159,12 +160,15 @@ evalElement el
     where
       addSpaces strng = (if take 1 strng == " " then (OSpace:) else id) .
                         (if last' strng == " " then (++[OSpace]) else id)
-      substituteWith e = head <$> gets (names . env) >>= \(Names _ ns fm d _) ->
-                           case e of
-                             Names rs [Name NotSet fm'' [] [] []] fm' d' []
-                                 -> let nfm = mergeFM fm'' $ mergeFM fm' fm in
-                                    evalElement $ Names rs ns nfm (d' `betterThan` d) []
-                             _   -> evalElement e
+      substituteWith e =
+        gets (names . env) >>= \case
+          (Names _ ns fm d _ : _) -> evalElement $ proc replaceNames e
+             where
+               replaceNames (Names rs [Name NotSet fm'' [] [] []] fm' d' []) =
+                  let nfm = mergeFM fm'' $ mergeFM fm' fm in
+                  Names rs ns nfm (d' `betterThan` d) []
+               replaceNames x = x
+          _ -> return []
 
       -- from citeproc documentation: "cs:group implicitly acts as a
       -- conditional: cs:group and its child elements are suppressed if
