@@ -21,7 +21,6 @@ import Prelude
 import qualified Control.Exception      as E
 import           Control.Monad          (when)
 import qualified Data.ByteString.Lazy   as L
-import           Data.Default
 import           Data.Either            (lefts, rights)
 import qualified Data.Map               as M
 import           Data.Maybe             (fromMaybe, listToMaybe)
@@ -45,7 +44,7 @@ parseCSL = parseCSL' . fromStringLazy
 -- | Parse locale.  Raises 'CSLLocaleException' on error.
 parseLocale :: String -> IO Locale
 parseLocale locale =
-  parseLocaleElement . fromDocument . X.parseLBS_ def <$> getLocale locale
+  parseLocaleElement . fromDocument . X.parseLBS_ X.def <$> getLocale locale
 
 -- | Merge locale into a CSL style.
 localizeCSL :: Maybe String -> Style -> IO Style
@@ -63,7 +62,7 @@ readCSLFile mbLocale src = do
   f <- case fetchRes of
             Left err         -> E.throwIO err
             Right (rawbs, _) -> return $ L.fromChunks [rawbs]
-  let cur = fromDocument $ X.parseLBS_ def f
+  let cur = fromDocument $ X.parseLBS_ X.def f
   -- see if it's a dependent style, and if so, try to fetch its parent:
   let pickParentCur = get "link" >=> attributeIs (X.Name "rel" Nothing Nothing) "independent-parent"
   let parentCur = cur $/ get "info" &/ pickParentCur
@@ -80,7 +79,7 @@ readCSLFile mbLocale src = do
            readCSLFile mbLocale' y
 
 parseCSL' :: L.ByteString -> Style
-parseCSL' = parseCSLCursor . fromDocument . X.parseLBS_ def
+parseCSL' = parseCSLCursor . fromDocument . X.parseLBS_ X.def
 
 parseCSLCursor :: Cursor -> Style
 parseCSLCursor cur =
