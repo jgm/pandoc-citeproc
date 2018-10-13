@@ -193,7 +193,8 @@ inQuotes = do
                       ) (char '"')
 
 fieldName :: BibParser String
-fieldName = map toLower <$> many1 (letter <|> digit <|> oneOf "-_:+")
+fieldName =
+  resolveAlias . map toLower <$> many1 (letter <|> digit <|> oneOf "-_:+")
 
 isBibtexKeyChar :: Char -> Bool
 isBibtexKeyChar c = isAlphaNum c || c `elem` ".:;?!`'()/*@_+=-[]*&"
@@ -224,6 +225,11 @@ entField = do
             try (spaces >> char '#' >> spaces)
   spaces
   return (k, concat vs)
+
+resolveAlias :: String -> String
+resolveAlias "archiveprefix" = "eprinttype"
+resolveAlias "primaryclass" = "eprintclass"
+resolveAlias s = s
 
 rawWord :: BibParser String
 rawWord = many1 alphaNum
