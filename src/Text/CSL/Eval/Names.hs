@@ -19,7 +19,7 @@ module Text.CSL.Eval.Names where
 
 import Prelude
 import           Control.Monad.State
-import           Data.Char              (isLetter, isLower, isUpper)
+import           Data.Char              (isLower, isUpper)
 import           Data.List              (intersperse, nub)
 import           Data.List.Split        (wordsBy)
 import           Data.Maybe             (isJust)
@@ -278,9 +278,12 @@ formatName m b f fm ops np n
                      $ splitStrWhen (=='-') x
 
       sortSep g s = when_ g $ separator ++ addAffixes (g <+> s) "given" mempty
-      separator   = if null (getOptionVal "sort-separator" ops)
-                    then [OPan [Str ",", Space]]
-                    else [OPan $ B.toList $ B.text $ getOptionVal "sort-separator" ops]
+      separator   = if any isByzantine (stringify family)
+                       then
+                         if null (getOptionVal "sort-separator" ops)
+                            then [OPan [Str ",", Space]]
+                            else [OPan $ B.toList $ B.text $ getOptionVal "sort-separator" ops]
+                       else []
 
       suff      = if commaSuffix n && nameSuffix n /= mempty
                   then suffCom
@@ -319,6 +322,7 @@ formatName m b f fm ops np n
                       (c >= '\x2018' && c <= '\x0219') ||
                       (c >= '\x021a' && c <= '\x021b') ||
                       (c >= '\x202a' && c <= '\x202e')
+
       shortName = oPan' (unFormatted $ nondropping <+> family) (form "family")
 
       longName g
