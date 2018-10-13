@@ -302,9 +302,23 @@ formatName m b f fm ops np n
       dropping  = droppingPart n
       nondropping  = nonDroppingPart n
       -- see src/load.js ROMANESQUE_REGEX in citeproc-js:
-      isByzantine c = not (isLetter c) ||
-                      c <= '\x5FF' ||
-                      (c >= '\x1e00' && c <= '\x1fff')
+      -- /[-0-9a-zA-Z\u0e01-\u0e5b\u00c0-\u017f\u0370-\u03ff\u0400-\u052f\u0590-\u05d4\u05d6-\u05ff\u1f00-\u1fff\u0600-\u06ff\u200c\u200d\u200e\u0218\u0219\u021a\u021b\u202a-\u202e]/
+      isByzantine c = c == '-' ||
+                      (c >= '0' && c <= '9') ||
+                      (c >= 'a' && c <= 'z') ||
+                      (c >= 'A' && c <= 'Z') ||
+                      (c >= '\x0e01' && c <= '\x0e5b') ||
+                      (c >= '\x00c0' && c <= '\x017f') ||
+                      (c >= '\x0370' && c <= '\x03ff') ||
+                      (c >= '\x0400' && c <= '\x052f') ||
+                      (c >= '\x0590' && c <= '\x05d4') ||
+                      (c >= '\x05d6' && c <= '\x05ff') ||
+                      (c >= '\x1f00' && c <= '\x1fff') ||
+                      (c >= '\x0600' && c <= '\x06ff') ||
+                      (c >= '\x200c' && c <= '\x200e') ||
+                      (c >= '\x2018' && c <= '\x0219') ||
+                      (c >= '\x021a' && c <= '\x021b') ||
+                      (c >= '\x202a' && c <= '\x202e')
       shortName = oPan' (unFormatted $ nondropping <+> family) (form "family")
 
       longName g
