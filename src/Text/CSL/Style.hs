@@ -114,7 +114,7 @@ import           Data.Yaml.Builder      (ToYaml (..))
 import qualified Data.Yaml.Builder      as Y
 import           GHC.Generics           (Generic)
 import           Text.CSL.Compat.Pandoc (readHtml, writeMarkdown)
-import           Text.CSL.Util          (betterThan, headInline, initInline,
+import           Text.CSL.Util          (orIfNull, headInline, initInline,
                                          lastInline, mapping', mb, parseBool,
                                          parseString, query, splitStrWhen,
                                          tailInline, trimr, (.#:), (.#?),
@@ -635,16 +635,16 @@ emptyFormatting
 mergeFM :: Formatting -> Formatting -> Formatting
 mergeFM (Formatting aa ab ac ad ae af ag ah ai aj ak al am an ahl)
         (Formatting ba bb bc bd be bf bg bh bi bj bk bl bm bn bhl) =
-                   Formatting (ba `betterThan` aa)
-                              (bb `betterThan` ab)
-                              (bc `betterThan` ac)
-                              (bd `betterThan` ad)
-                              (be `betterThan` ae)
-                              (bf `betterThan` af)
-                              (bg `betterThan` ag)
-                              (bh `betterThan` ah)
-                              (bi `betterThan` ai)
-                              (bj `betterThan` aj)
+                   Formatting (ba `orIfNull` aa)
+                              (bb `orIfNull` ab)
+                              (bc `orIfNull` ac)
+                              (bd `orIfNull` ad)
+                              (be `orIfNull` ae)
+                              (bf `orIfNull` af)
+                              (bg `orIfNull` ag)
+                              (bh `orIfNull` ah)
+                              (bi `orIfNull` ai)
+                              (bj `orIfNull` aj)
                               (if bk == NoQuote then ak else bk)
                               (bl || al)
                               (bm || am)

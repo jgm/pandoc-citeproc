@@ -34,7 +34,7 @@ module Text.CSL.Util
   , proc'
   , procM
   , query
-  , betterThan
+  , orIfNull
   , toRead
   , inlinesToString
   , headInline
@@ -379,9 +379,9 @@ procM f = everywhereM (mkM f)
 query :: (Typeable a, Data b, Monoid m) => (a -> m) -> b -> m
 query f = everything mappend (mempty `mkQ` f)
 
-betterThan :: [a] -> [a] -> [a]
-betterThan [] b = b
-betterThan a  _ = a
+orIfNull :: [a] -> [a] -> [a]
+orIfNull [] b = b
+orIfNull a  _ = a
 
 toRead :: String -> String
 toRead    []  = []

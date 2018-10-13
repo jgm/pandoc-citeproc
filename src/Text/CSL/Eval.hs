@@ -45,7 +45,7 @@ import           Text.CSL.Exception
 import           Text.CSL.Output.Plain
 import           Text.CSL.Reference
 import           Text.CSL.Style         hiding (Any)
-import           Text.CSL.Util          (betterThan, isRange, last', proc,
+import           Text.CSL.Util          (orIfNull, isRange, last', proc,
                                          proc', query, readNum, safeRead)
 
 -- | Produce the output with a 'Layout', the 'EvalMode', a 'Bool'
@@ -166,7 +166,7 @@ evalElement el
              where
                replaceNames (Names rs [Name NotSet fm'' [] [] []] fm' d' []) =
                   let nfm = mergeFM fm'' $ mergeFM fm' fm in
-                  Names rs ns nfm (d' `betterThan` d) []
+                  Names rs ns nfm (d' `orIfNull` d) []
                replaceNames x = x
           _ -> return []
 

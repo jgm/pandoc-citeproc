@@ -26,7 +26,7 @@ import           Data.Ord               (comparing)
 import           Text.CSL.Eval
 import           Text.CSL.Proc.Disamb
 import           Text.CSL.Style         hiding (Any)
-import           Text.CSL.Util          (betterThan, proc, proc', query)
+import           Text.CSL.Util          (orIfNull, proc, proc', query)
 import           Text.Pandoc.Definition (Inline (Str))
 
 -- | Collapse citations according to the style options.
@@ -103,9 +103,9 @@ collapseYear :: Style -> String -> CitationGroup -> CitationGroup
 collapseYear s ranged (CG cs f d os) = CG cs f [] (process os)
     where
       styleYSD    = getOptionVal "year-suffix-delimiter"    . citOptions . citation $ s
-      yearSufDel  = styleYSD `betterThan` (layDelim . citLayout . citation $ s)
+      yearSufDel  = styleYSD `orIfNull` (layDelim . citLayout . citation $ s)
       afterCD     = getOptionVal "after-collapse-delimiter" . citOptions . citation $ s
-      afterColDel = afterCD  `betterThan` d
+      afterColDel = afterCD  `orIfNull` d
 
       format []     = []
       format (x:xs) = x : map getYearAndSuf xs
