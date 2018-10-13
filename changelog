@@ -1,3 +1,26 @@
+pandoc-citeproc (0.14.6)
+
+  * Bibtex: Support jstor and pubmed as eprinttype.
+  * Bibtex: Resolve aliases on field names (#348).
+    'primaryclass' -> 'eprintclass', 'archiveprefix' -> 'eprinttype'
+  * Util: Rename betterThan to orIfNull.
+  * Update chicago-author-date.csl and locale.
+  * Don't apply sort-separator between non-byzantine names (#327).
+    “As is the case for name-as-sort-order, this attribute [sort-separator]
+    only affects names written in the latin or Cyrillic alphabets.”
+  * Match zotero's regex for isByzantine.
+    Fix issue #338 tests.
+  * Explicitly use Text.XML.def in Parser.hs. (Eduard Nicodei, #331).
+  * Ensure that groups with only empty variables are skipped (#338).
+  * Make sure substitute works in nested contexts (#351).
+    Previously it only worked for names elements right
+    below it, not for names embedded in a conditional.
+  * Handle date-part of the form `[[]]` or `[ null ]`.
+    These seem to occur in the wild, and it seems better to parse them
+    as an empty date parts than to crash with a parse error.
+    See greenelab/manubot#66.
+  * Allow pandoc 2.4.x.
+
 pandoc-citeproc (0.14.5)
 
   * Add flag to silence all warnings (#350, Albert Krewinkel).
