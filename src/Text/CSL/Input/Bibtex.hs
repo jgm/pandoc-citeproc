@@ -1466,15 +1466,21 @@ itemToReference lang locale bibtex caseTransform = bib $ do
 
   -- url, doi, isbn, etc.:
   -- note that with eprinttype = arxiv, we take eprint to be a partial url
+  -- archivePrefix is an alias for eprinttype
   url' <- (guard (et == "online" || lookup "url" opts /= Just "false")
            >> getRawField "url")
        <|> (do etype <- getRawField "eprinttype"
                eprint <- getRawField "eprint"
-               case map toLower etype of
-                    "arxiv"       -> return $ "http://arxiv.org/abs/" ++ eprint
-                    "googlebooks" -> return $ "http://books.google.com?id=" ++
-                                        eprint
-                    _             -> mzero)
+               let baseUrl =
+                     case map toLower etype of
+                       "arxiv"       -> "http://arxiv.org/abs/"
+                       "jstor"       -> "http://www.jstor.org/stable/"
+                       "pubmed"      -> "http://www.ncbi.nlm.nih.gov/pubmed/"
+                       "googlebooks" -> "http://books.google.com?id="
+                       _             -> ""
+               if null baseUrl
+                  then mzero
+                  else return $ baseUrl ++ eprint)
        <|> return mempty
   doi' <- (guard (lookup "doi" opts /= Just "false") >> getRawField "doi")
          <|> return mempty
