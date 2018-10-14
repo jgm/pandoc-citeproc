@@ -1,3 +1,7 @@
+pandoc-citeproc (0.14.7)
+
+  * Support first-reference-note-number (#31).
+
 pandoc-citeproc (0.14.6)
 
   * Bibtex: Support jstor and pubmed as eprinttype.
