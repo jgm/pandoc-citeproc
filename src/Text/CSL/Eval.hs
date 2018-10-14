@@ -33,7 +33,7 @@ import           Data.Maybe
 import           Data.Monoid            (Any (..))
 import           Data.String            (fromString)
 import qualified Data.Text              as T
-import           Text.Pandoc.Definition (Inline (Link, Str), nullAttr)
+import           Text.Pandoc.Definition (Inline (Link, Span, Str), nullAttr)
 import           Text.Pandoc.Shared     (stringify)
 import           Text.Pandoc.Walk       (walk)
 
@@ -223,6 +223,10 @@ evalElement el
              consumeVariable s >> formatTitle s f fm
         | otherwise =
              case map toLower s of
+               "first-reference-note-number"
+                             -> do refid <- getStringVar "ref-id"
+                                   return [Output [OPan [Span ("",["first-reference-note-number"],[("refid",refid)]) [Str "0"]]] fm]
+
                "year-suffix" -> getStringVar "ref-id" >>= \k  ->
                                 return . return $ OYearSuf [] k [] fm
                "page"        -> getStringVar "page" >>= formatRange fm
