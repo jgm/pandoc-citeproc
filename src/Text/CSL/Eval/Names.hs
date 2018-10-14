@@ -361,8 +361,9 @@ formatName m b f fm ops np n
                          | disWithGiven, isLong        -> [longName givenLong]
                          | otherwise                   -> []
 
-formatTerm :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
-formatTerm f fm p s = do
+formatTerm :: Form -> Formatting -> Bool -> String -> String
+           -> State EvalState [Output]
+formatTerm f fm p refid s = do
   plural <- if s `elem` ["page", "volume", "issue"]
                then do
                  varset <- isVarSet s
@@ -371,7 +372,10 @@ formatTerm f fm p s = do
                     else return p
                else return p
   t <- getTerm plural f s
-  return $ oStr' t fm
+  return $
+     if s == "no date"
+        then [OYear t refid fm]
+        else oStr' t fm
 
 formatLabel :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
 formatLabel f fm p s
