@@ -2,6 +2,7 @@
 {-# LANGUAGE CPP                 #-}
 {-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE TupleSections       #-}
 {-# LANGUAGE PatternGuards       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 module Text.CSL.Pandoc (processCites, processCites')
@@ -66,8 +67,31 @@ processCites style refs (Pandoc m1 b1) =
       m             = case metanocites of
                             Nothing -> m3
                             Just x  -> setMeta "nocite" x m3
-  in  Pandoc m $ walk (concatMap removeNocaseSpans)
+      notemap       = mkNoteMap (Pandoc m3 bs)
+  in  Pandoc m $ walk (addFirstNoteNumber notemap)
+               $ walk (concatMap removeNocaseSpans)
                $ insertRefs m biblioList bs
+
+addFirstNoteNumber :: M.Map String Int -> Inline -> Inline
+addFirstNoteNumber notemap
+  s@(Span ("",["first-reference-note-number"],[("refid",refid)]) _)
+  = case M.lookup refid notemap of
+         Nothing -> s
+         Just n  -> Str (show n)
+addFirstNoteNumber _ -- see below, these spans added by deNote
+  (Note [Para (Span ("",["reference-id-list"],_) [] : ils)])
+  = Note [Para ils]
+addFirstNoteNumber _ x = x
+
+mkNoteMap :: Pandoc -> M.Map String Int
+mkNoteMap doc =
+  foldr go mempty $ splitUp $ zip [1..] $ query getNoteCitationIds doc
+  where
+   splitUp :: [(Int, [String])] -> [(Int, String)]
+   splitUp = concatMap (\(n,ss) -> map (n,) ss)
+   go :: (Int, String) -> M.Map String Int -> M.Map String Int
+   go (notenumber, citeid) notemap =
+     M.insert citeid notenumber notemap
 
 -- if document contains a Div with id="refs", insert
 -- references as its contents.  Otherwise, insert references
@@ -264,6 +288,14 @@ processCite s cs (Cite t _) =
     where isSuppressAuthor c = citationMode c == SuppressAuthor
 processCite _ _ x = x
 
+getNoteCitationIds :: Inline -> [[String]]
+getNoteCitationIds (Note [Para (Span ("",["reference-id-list"]
+                                      ,[("refids",refids)]) [] : _)])
+  -- see deNote below which inserts this special Span
+  = [words refids]
+getNoteCitationIds (Note _) = [[]]
+getNoteCitationIds _        = []
+
 isNote :: Inline -> Bool
 isNote (Note _)          = True
 isNote (Cite _ [Note _]) = True
@@ -332,9 +364,13 @@ startWithPunct = all (`elem` (".,;:!?" :: String)) . headInline
 deNote :: Pandoc -> Pandoc
 deNote = topDown go
   where go (Cite (c:cs) [Note [Para xs]]) =
-            Cite (c:cs) [Note [Para $ toCapital xs]]
+            Cite (c:cs) [Note [Para $ specialSpan (c:cs) : toCapital xs]]
         go (Note xs) = Note $ topDown go' xs
         go x = x
+        -- we insert this to help getNoteCitationIds:
+        specialSpan cs =
+          Span ("",["reference-id-list"],
+            [("refids", unwords (map citationId cs))]) []
         go' (x : Cite cs [Note [Para xs]] : ys) | not (isSpacy x) =
              x : Str "," : Space : comb (\zs -> [Cite cs zs]) xs ys
         go' (x : Note [Para xs] : ys) | not (isSpacy x) =
