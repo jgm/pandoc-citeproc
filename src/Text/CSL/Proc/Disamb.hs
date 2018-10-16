@@ -28,7 +28,6 @@ import           Data.List          (elemIndex, find, findIndex, groupBy,
                                      isPrefixOf, mapAccumL, nub, nubBy, sortBy)
 import           Data.Maybe
 import           Data.Ord           (comparing)
-import           Data.Char          (isDigit)
 import           Text.CSL.Eval
 import           Text.CSL.Reference
 import           Text.CSL.Style
