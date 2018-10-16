@@ -382,13 +382,8 @@ allTheSame (x:xs) = all (== x) xs
 -- | Add the year suffix to the year. Needed for disambiguation.
 addYearSuffix :: Output -> Output
 addYearSuffix o
-    | OYear y k     f <- o =
-      -- if year is 'n.d.', we want a space before the suffix
-      let suffixFormatting = if all isDigit y
-                                then emptyFormatting
-                                else emptyFormatting{ prefix = "\160" }
-      in  Output [ OYear y k emptyFormatting
-                 , OYearSuf [] k [] suffixFormatting] f
+    | OYear y k     f <- o = Output [ OYear y k emptyFormatting
+                                    , OYearSuf [] k [] emptyFormatting] f
     | ODate  (x:xs)   <- o = if any hasYear xs
                              then Output (x : [addYearSuffix $ ODate xs]) emptyFormatting
                              else addYearSuffix (Output (x:xs) emptyFormatting)
