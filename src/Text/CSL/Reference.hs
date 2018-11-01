@@ -68,7 +68,7 @@ import           Data.Generics       hiding (Generic)
 import qualified Data.HashMap.Strict as H
 import           Data.List           (elemIndex)
 import           Data.List.Split     (splitWhen)
-import           Data.Maybe          (fromMaybe, isNothing)
+import           Data.Maybe          (fromMaybe, isNothing, isJust, fromJust)
 import           Data.String
 import           Data.Text           (Text)
 import qualified Data.Text           as T
@@ -890,24 +890,50 @@ processCites rs cs
 
       procCs a [] = (a,[])
       procCs a (c:xs)
-          | isIbid,  isLocSet = go "ibid-with-locator"
-          | isIbid            = go "ibid"
-          | isElem            = go "subsequent"
-          | otherwise         = go "first"
+          | isIbid          = go (fromJust $ fmap ibidPosition prevSameCite)
+          | isElem          = go "subsequent"
+          | otherwise       = go "first"
           where
             go s = let addCite    = init a ++ [last a ++ [c]]
                        (a', rest) = procCs addCite xs
                    in  (a', (c { citePosition = s},
                              procRef <$> getReference rs c) : rest)
             isElem   = citeId c `elem` map citeId (concat a)
-            isIbid   = case reverse (last a) of
-                            []    -> case reverse (init a) of
-                                          []     -> False
-                                          (zs:_) -> not (null zs) &&
-                                                    all (== citeId c)
-                                                        (map citeId zs)
-                            (x:_) -> citeId c == citeId x
-            isLocSet = citeLocator c /= ""
+            isIbid       = isJust $ prevSameCite
+
+            -- apply psc to the current group and the list of previous groups
+            -- reversed so it can find the head
+            -- x is previous cite in current group
+            -- zs is the previous group
+            prevSameCite = psc (reverse (last a)) (reverse (init a)) where
+
+                -- you can't have an ibid at the start of your document
+                psc [] []     = Nothing
+
+                -- a. the current cite immediately follows on another cite,
+                --    within the same citation, that references the same item
+                psc (x:_) _   = if citeId c == citeId x then Just x else Nothing
+
+                -- b.  [] => the current cite is the first cite in the citation
+                --     zs => and the previous citation consists of a single cite
+                --           that refs the same item
+                -- The spec appears to be concerned that you cannot know the
+                -- correct one to match the locator against.
+                -- It is a super clunky if you have [@a, 1; @a, 2] then [@a, 3],
+                -- where the second citation gets "subsequent" even though there were
+                -- only @a keys.
+                -- This is silly. We will use the last one to match against.
+                psc [] (zs:_) = if (not (null zs)) && all (== citeId c) (map citeId zs)
+                                   then Just (last zs)
+                                   else Nothing
+
+            -- http://docs.citationstyles.org/en/stable/specification.html#locators
+            ibidPosition x = let hasL k = citeLocator k /= ""
+                                 with b = if b then "ibid-with-locator" else "ibid"
+                             in  case (hasL x, hasL c) of
+                                   (False, cur) -> with cur
+                                   (True, True)  -> with (citeLocator x /= citeLocator c)
+                                   (True, False) -> "subsequent"
 
 setPageFirst :: Reference -> Reference
 setPageFirst ref =
