@@ -387,7 +387,7 @@ comb f xs ys =
       removeLeadingPunct zs = zs
   in  f xs' ++ ys
 
--- | Retrieve all citations from a 'Pandoc' docuument. To be used with
+-- | Retrieve all citations from a 'Pandoc' document. To be used with
 -- 'query'.
 getCitation :: Inline -> [[Citation]]
 getCitation i | Cite t _ <- i = [t]
@@ -430,41 +430,175 @@ toCslCite locMap c
                      , CSL.citeHash       = citationHash c
                      }
 
+splitInp :: [Inline] -> [Inline]
+splitInp = splitStrWhen (\c -> splitOn c || isSpace c)
+  where
+      splitOn ':' = False
+      splitOn c   = isPunctuation c
+
 locatorWords :: LocatorMap -> [Inline] -> (String, String, [Inline])
 locatorWords locMap inp =
-  case parse (pLocatorWords locMap) "suffix" $
-         splitStrWhen (\c -> isLocatorPunct c || isSpace c) inp of
+  case parse (pLocatorWords locMap) "suffix" $ splitInp inp of
        Right r -> r
        Left _  -> ("","",inp)
 
+-- Some terminology
+-- ----------------
+-- Word       => 89
+--               12-15
+--               13(a)(i)-(iv)
+--               [1.2.5]
+--
+-- Integrated => [@citekey, 89]
+--               [@citekey, p. 40, 41, 89-199, suffix]
+-- Delimited  => [@citekey{89}]
+--               [@citekey, {p. literally anything except unbalanced curly quotes}, suffix]
+--
+-- When parsing integrated locators you have to be careful not to include
+-- 'suffix' in the locator, so that means pretty strict control over when
+-- you're allowed to use NO digits in a word. [@citekey, p. 40(a) (bcd)] will
+-- stop parsing the locator after (a). You also have to be careful not to parse
+-- random terms like 'and' in en-US as citeLabels, which means careful control
+-- over what must come directly after any label string (via notFollowedBy).
+--
+-- With delimited locators, it's a different story. Parse as long a locator
+-- label as you can find in the terms map, then include EVERYTHING in the outer
+-- {} braces.
+--
+-- Ultimately the complexity is driven by wanting as many locator words as
+-- possible being parsed in the integrated style, because it fits with the
+-- aims of Markdown (being readable). Ideally, anything except a word with
+-- neither roman numerals nor arabic digits can be integrated. Some
+-- counter-examples:
+-- a
+-- (a)(b)(c)
+-- (hello)
+
 pLocatorWords :: LocatorMap -> Parsec [Inline] st (String, String, [Inline])
 pLocatorWords locMap = do
-  (la,lo) <- pLocator locMap
-  s <- getInput -- rest is suffix
-  return (la, lo, s)
-
-pMatch :: (Inline -> Bool) -> Parsec [Inline] st Inline
-pMatch condition = try $ do
-  t <- anyToken
-  guard $ condition t
-  return t
-
-pSpace :: Parsec [Inline] st Inline
-pSpace = pMatch (\t -> isSpacy t || t == Str "\160")
-
-pLocator :: LocatorMap -> Parsec [Inline] st (String, String)
-pLocator locMap = try $ do
-  optional $ pMatch (== Str ",")
+  optional $ pMatchChar "," (== ',')
   optional pSpace
-  la <- try (do ts <- many1 (notFollowedBy (pWordWithDigits True) >> anyToken)
-                case M.lookup (trim (stringify ts)) locMap of
-                       Just l  -> return l
-                       Nothing -> mzero)
-      <|> (lookAhead pDigit >> return "page")
-  g <- pWordWithDigits True
-  gs <- many (pWordWithDigits False)
+  (la, lo) <- pLocatorIntegrated locMap
+  s <- getInput -- rest is suffix
+  -- need to trim, otherwise "p. 9" and "9" will have 'different' locators later on
+  -- i.e. the first one will be " 9"
+  return (la, trim lo, s)
+
+pLocatorIntegrated :: LocatorMap -> Parsec [Inline] st (String, String)
+pLocatorIntegrated locMap = try $ do
+  (la, wasImplicit) <- pLocatorLabelIntegrated locMap
+  -- if we got the label implicitly, we have presupposed the first one is going
+  -- to have a digit, so guarantee that. You _can_ have p. (a) because you
+  -- specified it.
+  let modifier = if wasImplicit
+                    then requireDigits
+                    else requireRomansOrDigits
+  g <- try $ pLocatorWordIntegrated (not wasImplicit) >>= modifier
+  gs <- many (try $ pLocatorWordIntegrated False >>= modifier)
   let lo = concat (g:gs)
   return (la, lo)
+
+pLocatorLabelIntegrated :: LocatorMap -> Parsec [Inline] st (String, Bool)
+pLocatorLabelIntegrated locMap
+  = pLocatorLabel' locMap lim <|> (lookAhead digital >> return ("page", True))
+    where
+      lim = try $ pLocatorWordIntegrated True >>= requireRomansOrDigits
+      digital = try $ pLocatorWordIntegrated True >>= requireDigits
+
+pLocatorLabel' :: LocatorMap -> Parsec [Inline] st String -> Parsec [Inline] st (String, Bool)
+pLocatorLabel' locMap lim = go ""
+    where
+      -- grow the match string until we hit the end
+      -- trying to find the largest match for a label
+      go acc = try $ do
+          -- advance at least one token each time
+          -- the pathological case is "p.3"
+          t <- anyToken
+          ts <- manyTill anyToken (try $ lookAhead lim)
+          let s = acc ++ stringify (t:ts)
+          case M.lookup (trim s) locMap of
+            -- try to find a longer one, or return this one
+            Just l -> go s <|> return (l, False)
+            Nothing -> go s
+
+-- hard requirement for a locator to have some real digits in it
+requireDigits :: (Bool, String) -> Parsec [Inline] st String
+requireDigits (_, s) = if not (any isDigit s)
+                          then fail "requireDigits"
+                          else return s
+
+-- soft requirement for a sequence with some roman or arabic parts
+-- (a)(iv) -- because iv is roman
+-- 1(a)  -- because 1 is an actual digit
+-- NOT: a, (a)-(b), hello, (some text in brackets)
+requireRomansOrDigits :: (Bool, String) -> Parsec [Inline] st String
+requireRomansOrDigits (d, s) = if not d
+                                  then fail "requireRomansOrDigits"
+                                  else return s
+
+pLocatorWordIntegrated :: Bool -> Parsec [Inline] st (Bool, String)
+pLocatorWordIntegrated isFirst = try $ do
+  punct <- if isFirst
+              then return ""
+              else stringify <$> option (Str "") pLocatorSep
+  sp <- option "" (pSpace >> return " ")
+  (dig, s) <- pBalancedBraces [('(',')'), ('[',']'), ('{','}')] pPageSeq
+  return (dig, punct ++ sp ++ s)
+
+-- we want to capture:  123, 123A, C22, XVII, 33-44, 22-33; 22-11
+--                      34(1), 34A(A), 34(1)(i)(i), (1)(a)
+--                      [17], [17]-[18], '591 [84]'
+--                      (because CSL cannot pull out individual pages/sections
+--                      to wrap in braces on a per-style basis)
+pBalancedBraces :: [(Char, Char)] -> Parsec [Inline] st (Bool, String) -> Parsec [Inline] st (Bool, String)
+pBalancedBraces braces p = try $ do
+  ss <- many1 surround
+  return $ anyWereDigitLike ss
+  where
+      except = notFollowedBy pBraces >> p
+      -- outer and inner
+      surround = foldl (\a (open, close) -> sur open close except <|> a) except braces
+
+      isc c = stringify <$> pMatchChar [c] (== c)
+
+      sur c c' m = try $ do
+          (d, mid) <- between (isc c) (isc c') (option (False, "") m)
+          return (d, [c] ++  mid ++ [c'])
+
+      flattened = concatMap (\(o, c) -> [o, c]) braces
+      pBraces = pMatchChar "braces" (`elem` flattened)
+
+-- YES 1, 1.2, 1.2.3
+-- NO  1., 1.2. a.6
+-- can't use sepBy because we want to leave trailing .s
+pPageSeq :: Parsec [Inline] st (Bool, String)
+pPageSeq = oneDotTwo <|> withPeriod
+  where
+      oneDotTwo = do
+          u <- pPageUnit
+          us <- many withPeriod
+          return $ anyWereDigitLike (u:us)
+      withPeriod = try $ do
+          -- .2
+          p <- pMatchChar "." (== '.')
+          u <- try pPageUnit
+          return (fst u, stringify p ++ snd u)
+
+anyWereDigitLike :: [(Bool, String)] -> (Bool, String)
+anyWereDigitLike as = (any fst as, concatMap snd as)
+
+pPageUnit :: Parsec [Inline] st (Bool, String)
+pPageUnit = roman <|> plainUnit
+  where
+      -- roman is a 'digit'
+      roman = (True,) <$> pRoman
+      plainUnit = do
+          ts <- many1 (notFollowedBy pSpace >>
+                       notFollowedBy pLocatorPunct >>
+                       anyToken)
+          let s = stringify ts
+          -- otherwise look for actual digits or -s
+          return (any isDigit s, s)
 
 pRoman :: Parsec [Inline] st String
 pRoman = try $ do
@@ -475,37 +609,37 @@ pRoman = try $ do
                       Just _  -> return xs
        _      -> mzero
 
--- we want to capture:  123, 123A, C22, XVII, 33-44, 22-33; 22-11
-pWordWithDigits :: Bool -> Parsec [Inline] st String
-pWordWithDigits isfirst = try $ do
-  punct <- if isfirst
-              then return ""
-              else stringify `fmap` pLocatorPunct
-  sp <- option "" (pSpace >> return " ")
-  s <-  pRoman <|>
-        try (do ts <- many1 (notFollowedBy pSpace >>
-                             notFollowedBy pLocatorPunct >>
-                             anyToken)
-                let ts' = stringify ts
-                guard (any isDigit ts')
-                return ts')
-  return $ punct ++ sp ++ s
-
-pDigit :: Parsec [Inline] st ()
-pDigit = do
-  t <- anyToken
-  case t of
-      Str (d:_) | isDigit d -> return ()
-      _         -> mzero
+isLocatorPunct :: Char -> Bool
+isLocatorPunct '-' = False -- page range
+isLocatorPunct ':' = False -- vol:page-range hack
+isLocatorPunct c   = isPunctuation c -- includes [{()}]
 
 pLocatorPunct :: Parsec [Inline] st Inline
-pLocatorPunct = pMatch isLocatorPunct'
-  where isLocatorPunct' (Str [c]) = isLocatorPunct c
-        isLocatorPunct' _         = False
+pLocatorPunct = pMatchChar "punctuation" isLocatorPunct
 
-isLocatorPunct :: Char -> Bool
-isLocatorPunct ':' = False
-isLocatorPunct c   = isPunctuation c
+pLocatorSep :: Parsec [Inline] st Inline
+pLocatorSep = pMatchChar "locator separator" isLocatorSep
+
+isLocatorSep :: Char -> Bool
+isLocatorSep ',' = True
+isLocatorSep ';' = True
+isLocatorSep _   = False
+
+pMatchChar :: String -> (Char -> Bool) -> Parsec [Inline] st Inline
+pMatchChar msg f = pMatch msg mc
+    where
+        mc (Str [c]) = f c
+        mc _         = False
+
+pSpace :: Parsec [Inline] st Inline
+pSpace = pMatch "' '" (\t -> isSpacy t || t == Str "\160")
+
+pMatch :: String -> (Inline -> Bool) -> Parsec [Inline] st Inline
+pMatch msg condition = try $ do
+  t <- anyToken
+  if not (condition t)
+     then fail msg
+     else return t
 
 type LocatorMap = M.Map String String
 
