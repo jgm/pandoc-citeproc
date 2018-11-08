@@ -206,7 +206,10 @@ addCiteAffixes c x =
           case y of
             Formatted  []    -> []
             Formatted ils
-              | isprefix  -> [OPan ils, OSpace]
+              | isprefix  -> case reverse ils of
+                                  (Str zs@(_:_):_) |
+                                    last zs == '\160' -> [OPan ils]
+                                  _ -> [OPan ils, OSpace]
               | otherwise -> case ils of
                                   (Str (z:_):_)
                                     | isAlphaNum z ||
