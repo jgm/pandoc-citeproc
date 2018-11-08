@@ -1,3 +1,11 @@
+pandoc-citeproc (0.14.8.1)
+
+  * Avoid putting a space after nonbreaking space at end of prefix.
+    Previously this resulted in overly long spaces after abbreviations
+    like 'cf.' at the end of prefixes.
+  * Fix bug which caused names with apostrophes to be treated like
+    East Asian names in certain styles (#360).
+
 pandoc-citeproc (0.14.8)
 
   * Add disambiguation to undated references (n.d.a, n.d.b) (#325).
