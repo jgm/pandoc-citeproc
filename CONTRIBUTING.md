@@ -138,7 +138,7 @@ Then run pandoc-citeproc on this this to generated the "expected" result:
 
 Check the resulting file carefully for correctness. (You can
 convert it to HTML using pandoc to make this easier.) If all is
-well, add tests/issue267.*.native to the repository.
+well, add `tests/issue267.*.native` to the repository.
 
 [pandoc-discuss]: http://groups.google.com/group/pandoc-discuss
 [pandoc-citeproc(1)]: https://github.com/jgm/pandoc-citeproc/blob/master/man/pandoc-citeproc.1.md
