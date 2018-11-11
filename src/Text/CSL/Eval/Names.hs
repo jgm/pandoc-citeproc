@@ -278,7 +278,7 @@ formatName m b f fm ops np n
                      $ splitStrWhen (=='-') x
 
       sortSep g s = when_ g $ separator ++ addAffixes (g <+> s) "given" mempty
-      separator   = if any isByzantine (stringify family)
+      separator   = if isByzantineFamily
                        then
                          if null (getOptionVal "sort-separator" ops)
                             then [OPan [Str ",", Space]]
@@ -323,6 +323,7 @@ formatName m b f fm ops np n
                       (c >= '\x021a' && c <= '\x021b') ||
                       (c >= '\x202a' && c <= '\x202e')
 
+      isByzantineFamily = any isByzantine (stringify family)
       shortName = oPan' (unFormatted $ nondropping <+> family) (form "family")
 
       longName g
@@ -338,7 +339,7 @@ formatName m b f fm ops np n
                                                           in oPan' (unFormatted fam) (form "family") <> sortSep g par <> suffCom
         | otherwise = let fam = addAffixes (dropping <+> nondropping <+> family) "family" suff
                           gvn = oPan' (unFormatted g) (form "given")
-                      in  if all isByzantine $ stringify $ unFormatted family
+                      in  if isByzantineFamily
                           then gvn <++> fam
                           else fam <> gvn
 
