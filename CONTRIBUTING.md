@@ -140,6 +140,13 @@ Check the resulting file carefully for correctness. (You can
 convert it to HTML using pandoc to make this easier.) If all is
 well, add `tests/issue267.*.native` to the repository.
 
+You may wish to use the testing utility to streamline all this.
+
+    ./mktest.sh -h
+
+    # to generate .in.native and .expected.native, and then open an HTML preview
+    ./mktest.sh issue267.md -gpo
+
 [pandoc-discuss]: http://groups.google.com/group/pandoc-discuss
 [pandoc-citeproc(1)]: https://github.com/jgm/pandoc-citeproc/blob/master/man/pandoc-citeproc.1.md
 [issue tracker]: https://github.com/jgm/pandoc-citeproc/issues
