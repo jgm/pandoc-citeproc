@@ -68,7 +68,7 @@ import           Data.Generics       hiding (Generic)
 import qualified Data.HashMap.Strict as H
 import           Data.List           (elemIndex)
 import           Data.List.Split     (splitWhen)
-import           Data.Maybe          (fromMaybe, isNothing, isJust, fromJust)
+import           Data.Maybe          (fromMaybe, isNothing)
 import           Data.String
 import           Data.Text           (Text)
 import qualified Data.Text           as T
@@ -889,17 +889,25 @@ processCites rs cs
                         in res : procGr (a' ++ [[]]) xs
 
       procCs a [] = (a,[])
-      procCs a (c:xs)
-          | isIbid          = go (fromJust $ fmap ibidPosition prevSameCite)
-          | isElem          = go "subsequent"
-          | otherwise       = go "first"
+      procCs a (c:xs) = let addCite    = init a ++ [last a ++ [c]]
+                            (a', rest) = procCs addCite xs
+                         in  (a', (c { citePosition = getCitePosition },
+                                  procRef <$> getReference rs c) : rest)
           where
-            go s = let addCite    = init a ++ [last a ++ [c]]
-                       (a', rest) = procCs addCite xs
-                   in  (a', (c { citePosition = s},
-                             procRef <$> getReference rs c) : rest)
-            isElem   = citeId c `elem` map citeId (concat a)
-            isIbid       = isJust $ prevSameCite
+
+            -- http://docs.citationstyles.org/en/stable/specification.html#locators
+            getCitePosition = fromMaybe notIbid (ibidPosition <$> prevSameCite)
+                where
+                    notIbid = if citeId c `elem` map citeId (concat a)
+                                 then "subsequent"
+                                 else "first"
+
+            ibidPosition x = let hasL k = citeLocator k /= ""
+                                 with b = if b then "ibid-with-locator" else "ibid"
+                             in  case (hasL x, hasL c) of
+                                   (False, cur) -> with cur
+                                   (True, True)  -> with (citeLocator x /= citeLocator c)
+                                   (True, False) -> "subsequent"
 
             -- apply psc to the current group and the list of previous groups
             -- reversed so it can find the head
@@ -926,14 +934,6 @@ processCites rs cs
                 psc [] (zs:_) = if (not (null zs)) && all (== citeId c) (map citeId zs)
                                    then Just (last zs)
                                    else Nothing
-
-            -- http://docs.citationstyles.org/en/stable/specification.html#locators
-            ibidPosition x = let hasL k = citeLocator k /= ""
-                                 with b = if b then "ibid-with-locator" else "ibid"
-                             in  case (hasL x, hasL c) of
-                                   (False, cur) -> with cur
-                                   (True, True)  -> with (citeLocator x /= citeLocator c)
-                                   (True, False) -> "subsequent"
 
 setPageFirst :: Reference -> Reference
 setPageFirst ref =
