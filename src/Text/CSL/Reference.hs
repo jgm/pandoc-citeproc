@@ -1075,24 +1075,24 @@ rawDateOld = do
   let sep = P.oneOf [' ','/',','] >> P.spaces
   let rangesep = P.try $ P.spaces >> P.char '-' >> P.spaces
   let refDate = RefDate Nothing Nothing Nothing Nothing mempty False
-  let date = P.choice $ map P.try [
-                 (do s <- pseason
+  let date = P.choice $ map P.try
+                [ do s <- pseason
                      sep
                      y <- pyear
-                     return refDate{ year = y, season = s })
-               , (do m <- pmonth
+                     return refDate{ year = y, season = s }
+                , do m <- pmonth
                      sep
                      d <- pday
                      sep
                      y <- pyear
-                     return refDate{ year = y, month = m, day = d })
-               , (do m <- pmonth
+                     return refDate{ year = y, month = m, day = d }
+                , do m <- pmonth
                      sep
                      y <- pyear
-                     return refDate{ year = y, month = m })
-               , (do y <- pyear
-                     return refDate{ year = y })
-               ]
+                     return refDate{ year = y, month = m }
+                , do y <- pyear
+                     return refDate{ year = y }
+                ]
   d1 <- date
   P.option [d1] ((\x -> [d1,x]) <$> (rangesep >> date))
 
