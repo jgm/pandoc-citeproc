@@ -25,13 +25,13 @@ module Text.CSL.Proc.Disamb where
 import Prelude
 import           Control.Arrow      (second, (&&&), (>>>))
 import           Data.List          (elemIndex, find, findIndex, groupBy,
-                                     isPrefixOf, mapAccumL, nub, nubBy, sortBy)
+                                     isPrefixOf, mapAccumL, nub, nubBy, sortOn)
 import           Data.Maybe
-import           Data.Ord           (comparing)
 import           Text.CSL.Eval
 import           Text.CSL.Reference
 import           Text.CSL.Style
 import           Text.CSL.Util      (proc, query)
+import           Text.Pandoc.Shared (ordNub)
 
 -- | Given the 'Style', the list of references and the citation
 -- groups, disambiguate citations according to the style options.
@@ -42,7 +42,7 @@ disambCitations s bibs cs groups
     where
       -- utils
       when_ b f = if b then f else []
-      filter_ f = concatMap (map fst) . map (filter f) . map (uncurry zip)
+      filter_ f = concatMap (map fst . filter f . uncurry zip)
 
       -- the list of the position and the reference of each citation
       -- for each citation group.
@@ -89,14 +89,16 @@ disambCitations s bibs cs groups
 
       withYearS = addNames $
                   if hasYSuffOpt
-                  then map (mapCitationGroup $ setYearSuffCollision hasNamesOpt needYSuff) $ reEvaluated
-                  else rmYearSuff $ reEvaluated
+                     then map (mapCitationGroup
+                               (setYearSuffCollision hasNamesOpt needYSuff))
+                              reEvaluated
+                     else rmYearSuff reEvaluated
 
       yearSuffs = when_ hasYSuffOpt . generateYearSuffix bibs . concatMap getYearSuffixes $ withYearS
 
       addNames  = proc (updateContrib giveNameDisamb newNames newGName)
       processed = if hasYSuffOpt
-                  then proc (updateYearSuffixes yearSuffs) $ withYearS
+                  then proc (updateYearSuffixes yearSuffs) withYearS
                   else withYearS
 
       citOutput = if disOpts /= [] then processed else reEvaluated
@@ -122,10 +124,12 @@ disambAddNames b needName = addLNames
       needName' = nub' needName []
       addLNames = map (\(c,n) -> c { disambed = if null n then collision c else head n }) disSolved
       nub' []     r = r
-      nub' (x:xs) r = case elemIndex (disambData $ clean x) (map (disambData . clean) r) of
+      nub' (x:xs) r = case elemIndex (disambData $ clean x)
+                           (map (disambData . clean) r) of
                          Nothing -> nub' xs (x:r)
                          Just i  -> let y = r !! i
-                                    in nub' xs (y {sameAs = key x : sameAs y} : filter (/= y) r)
+                                    in nub' xs (y {sameAs = key x : sameAs y}
+                                                 : filter (/= y) r)
 
 disambAddGivenNames :: [NameData] -> [NameData]
 disambAddGivenNames needName = addGName
@@ -158,9 +162,13 @@ updateOName n o
 -- | Evaluate again a citation group with the 'EvalState' 'disamb'
 -- field set to 'True' (for matching the @\"disambiguate\"@
 -- condition).
-reEvaluate :: Style -> [CiteData] -> [(Cite, Maybe Reference)] -> CitationGroup -> CitationGroup
-reEvaluate (Style {citation = ct, csMacros = ms , styleLocale = lo,
-                   styleAbbrevs = as}) l cr (CG a f d os)
+reEvaluate :: Style
+           -> [CiteData]
+           -> [(Cite, Maybe Reference)]
+           -> CitationGroup
+           -> CitationGroup
+reEvaluate Style{citation = ct, csMacros = ms , styleLocale = lo,
+                   styleAbbrevs = as} l cr (CG a f d os)
     = CG a f d . flip concatMap (zip cr os) $
       \((c,mbr),out) ->
          case mbr of
@@ -175,8 +183,8 @@ reEvaluate (Style {citation = ct, csMacros = ms , styleLocale = lo,
 -- disambiguation strategies have failed. To be used with the generic
 -- 'query' function.
 hasIfDis :: IfThen -> [Bool]
-hasIfDis (IfThen (Condition {disambiguation = (_:_)}) _ _) = [True]
-hasIfDis _                                                 = [False]
+hasIfDis (IfThen Condition{disambiguation = (_:_)} _ _) = [True]
+hasIfDis _                                              = [False]
 
 -- | Get the list of disambiguation options set in the 'Style' for
 -- citations.
@@ -194,13 +202,15 @@ getCitDisambOptions
 -- year-suffix option is set).
 getDuplCiteData :: GiveNameDisambiguation -> Bool -> Bool -> [CitationGroup] -> [[CiteData]]
 getDuplCiteData giveNameDisamb b1 b2 g
-    = groupBy (\x y -> collide x == collide y) . sortBy (comparing collide)
+    = groupBy (\x y -> collide x == collide y) . sortOn collide
       $ duplicates
     where
       whatToGet  = if b1 then collision else disambYS
-      collide    = proc (rmExtras giveNameDisamb) . proc rmHashAndGivenNames . whatToGet
+      collide    = proc (rmExtras giveNameDisamb) .
+                   proc rmHashAndGivenNames .
+                   whatToGet
       citeData   = nubBy (\a b -> collide a == collide b && key a == key b) $
-                   concatMap (mapGroupOutput $ getCiteData) g
+                   concatMap (mapGroupOutput getCiteData) g
       duplicates = [c | c <- citeData , d <- citeData , collides c d]
       collides x y = x /= y && (collide x == collide y)
                             && (not b2 || citYear x == citYear y)
@@ -252,15 +262,14 @@ getYears o
 
 getDuplNameData :: [CitationGroup] -> [[NameData]]
 getDuplNameData g
-    = groupBy (\a b -> collide a == collide b) . sortBy (comparing collide) $ duplicates
+    = groupBy (\a b -> collide a == collide b) . sortOn collide $ duplicates
     where
       collide    = nameCollision
       nameData   = nub $ concatMap (mapGroupOutput getName) g
       duplicates = filter (flip elem (getDuplNames g) . collide) nameData
 
 getDuplNames :: [CitationGroup] -> [[Output]]
-getDuplNames xs
-    = nub . catMaybes . snd . mapAccumL dupl [] . getData $ xs
+getDuplNames = ordNub . catMaybes . snd . mapAccumL dupl [] . getData
     where
       getData = concatMap (mapGroupOutput getName)
       dupl a c = if nameCollision c `elem` map nameCollision a
@@ -278,14 +287,14 @@ generateYearSuffix :: [Reference] -> [(String, [Output])] -> [(String,String)]
 generateYearSuffix refs
     = concatMap (`zip` suffs) .
       -- sort clashing cites using their position in the sorted bibliography
-      getFst . map (sort' . (filter ((/=) 0 . snd)) . (map getP)) .
+      getFst . map (sort' . filter ((/=) 0 . snd) . map getP) .
       -- group clashing cites
       getFst . filter (\grp -> length grp >= 2) . map nub .
       groupBy (\a b -> snd a == snd b) .
       sort' . filter (not . null . snd)
     where
       sort'  :: (Ord a, Ord b) => [(a,b)] -> [(a,b)]
-      sort'  = sortBy (comparing snd)
+      sort'  = sortOn snd
       getFst = map $ map fst
       getP k = case findIndex ((==) k . unLiteral . refId) refs of
                    Just x -> (k, x + 1)
@@ -294,16 +303,17 @@ generateYearSuffix refs
       letters = map (:[]) ['a'..'z']
 
 setYearSuffCollision :: Bool -> [CiteData] -> [Output] -> [Output]
-setYearSuffCollision b cs = proc (setYS cs) . (map $ \x -> if hasYearSuf x then x else addYearSuffix x)
+setYearSuffCollision b cs = proc (setYS cs) .
+    map (\x -> if hasYearSuf x then x else addYearSuffix x)
     where
       setYS c o
           | OYearSuf _ k _ f <- o = OYearSuf [] k (getCollision k c) f
           | otherwise             = o
       collide = if b then disambed else disambYS
       getCollision k c = case find ((==) k . key) c of
-                           Just x -> if collide x == []
-                                     then [OStr (citYear x) emptyFormatting]
-                                     else collide x
+                           Just x -> case collide x of
+                                        [] -> [OStr (citYear x) emptyFormatting]
+                                        ys -> ys
                            _      -> []
 
 updateYearSuffixes :: [(String, String)] -> Output -> Output
@@ -334,8 +344,8 @@ rmYearSuff :: [CitationGroup] -> [CitationGroup]
 rmYearSuff = proc rmYS
     where
       rmYS o
-          | OYearSuf _ _ _ _  <- o = ONull
-          | otherwise              = o
+          | OYearSuf{}   <- o = ONull
+          | otherwise         = o
 
 -- List Utilities
 
@@ -353,8 +363,7 @@ disambiguate l
       heads = map (take 1) l
       rest  = map (\(b,x) -> if b then tail_ x else take 1 x) . zip (same heads)
 
-      hasMult []     = False
-      hasMult (x:xs) = length x > 1 || hasMult xs
+      hasMult = foldr (\x -> (||) (length x > 1)) False
 
       tail_ [x] = [x]
       tail_  x  = if null x then x else tail x
@@ -396,16 +405,16 @@ addYearSuffix o
 hasYear :: Output -> Bool
 hasYear = not . null . query getYear
     where getYear o
-              | OYear _ _ _ <- o = [o]
-              | otherwise        = []
+              | OYear{}   <- o = [o]
+              | otherwise      = []
 
 
 hasYearSuf :: Output -> Bool
 hasYearSuf = not . null . query getYearSuf
     where getYearSuf :: Output -> [String]
           getYearSuf o
-              | OYearSuf _ _ _ _ <- o = ["a"]
-              | otherwise             = []
+              | OYearSuf{}   <- o = ["a"]
+              | otherwise         = []
 
 -- | Removes all given names and name hashes from OName elements.
 rmHashAndGivenNames :: Output -> Output
@@ -430,4 +439,4 @@ addGivenNames
 
 -- | Map the evaluated output of a citation group.
 mapGroupOutput :: (Output -> [a]) -> CitationGroup -> [a]
-mapGroupOutput f (CG _ _ _ os) = concatMap f $ map snd os
+mapGroupOutput f (CG _ _ _ os) = concatMap (f . snd) os
