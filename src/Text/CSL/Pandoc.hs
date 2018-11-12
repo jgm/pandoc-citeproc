@@ -90,8 +90,7 @@ mkNoteMap doc =
    splitUp :: [(Int, [String])] -> [(Int, String)]
    splitUp = concatMap (\(n,ss) -> map (n,) ss)
    go :: (Int, String) -> M.Map String Int -> M.Map String Int
-   go (notenumber, citeid) notemap =
-     M.insert citeid notenumber notemap
+   go (notenumber, citeid) = M.insert citeid notenumber
 
 -- if document contains a Div with id="refs", insert
 -- references as its contents.  Otherwise, insert references
@@ -157,8 +156,7 @@ isYesValue _ = False
 -- if the 'nocite' Meta field contains a citation with id = '*',
 -- create a cite with to all the references.
 mkNociteWildcards :: [Reference] -> [[Citation]] -> [[Citation]]
-mkNociteWildcards refs nocites =
-  map expandStar nocites
+mkNociteWildcards refs = map expandStar
   where expandStar cs =
          case [c | c <- cs
                  , citationId c == "*"] of
@@ -271,7 +269,7 @@ decodeEntities ('&':xs) =
 #if MIN_VERSION_tagsoup(0,13,0)
                                        Just s  -> s ++ decodeEntities ws
 #else
-                                       Just c  -> [c] ++ decodeEntities ws
+                                       Just c  -> c   : decodeEntities ws
 #endif
                                        Nothing -> '&' : decodeEntities xs
            _      -> '&' : decodeEntities xs
