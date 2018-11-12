@@ -375,7 +375,7 @@ formatNumber f fm v n
                     _           -> maybe "" show . (safeRead :: String -> Maybe Int)
 
       roman :: Int -> String
-      roman     = foldr (++) [] . reverse . map (uncurry (!!)) . zip romanList .
+      roman     = concat . reverse . zipWith (!!) romanList .
                   map (readNum . return) . take 4 .
                   reverse . show
       romanList = [[ "", "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix" ]
