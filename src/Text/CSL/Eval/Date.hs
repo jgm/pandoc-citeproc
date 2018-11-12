@@ -175,19 +175,23 @@ formatDate em k tm dp date
 ordinal :: [CslTerm] -> String -> Int -> String
 ordinal ts v s
     | s < 10        = let a = termPlural (getWith1 (show s)) in
-                      if  a == [] then setOrd (term []) else show s ++ a
+                      if  null a then setOrd (term []) else show s ++ a
     | s < 100       = let a = termPlural (getWith2 (show s))
                           b = getWith1 [last (show s)] in
-                      if  a /= []
+                      if  not (null a)
                       then show s ++ a
-                      else if termPlural b == [] || (termMatch b /= [] && termMatch b /= "last-digit")
-                           then setOrd (term []) else setOrd b
+                      else if null (termPlural b) ||
+                              (not (null (termMatch b)) &&
+                               termMatch b /= "last-digit")
+                           then setOrd (term [])
+                           else setOrd b
     | otherwise     = let a = getWith2  last2
                           b = getWith1 [last (show s)] in
-                      if termPlural a /= [] && termMatch a /= "whole-number"
+                      if not (null (termPlural a)) &&
+                         termMatch a /= "whole-number"
                       then setOrd a
                       else if null (termPlural b) ||
-                              (termMatch b /= [] &&
+                              (not (null (termMatch b)) &&
                                termMatch b /= "last-digit")
                            then setOrd (term [])
                            else setOrd b
