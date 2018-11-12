@@ -878,36 +878,72 @@ getReference  r c
 
 processCites :: [Reference] -> [[Cite]] -> [[(Cite, Maybe Reference)]]
 processCites rs cs
-    = procGr [[]] cs
+    = procGr [] cs
     where
       procRef r = case filter ((==) (unLiteral $ refId r) . citeId) $ concat cs of
                     x:_ -> r { firstReferenceNoteNumber = readNum $ citeNoteNumber x}
                     []  -> r
 
       procGr _ [] = []
-      procGr a (x:xs) = let (a',res) = procCs a x
-                        in res : procGr (a' ++ [[]]) xs
+      procGr acc (x:xs) = let (a',res) = procCs acc x
+                          in res : procGr ([] : a') xs
 
-      procCs a [] = (a,[])
-      procCs a (c:xs)
-          | isIbid,  isLocSet = go "ibid-with-locator"
-          | isIbid            = go "ibid"
-          | isElem            = go "subsequent"
-          | otherwise         = go "first"
+      -- process, given the accumulated history, the current group's cites
+      procCs acc [] = (acc,[])
+      procCs acc (c:xs) = let (a, rest) = procCs addCite xs
+                              ref       = procRef <$> getReference rs c
+                              c'        = c { citePosition = getCitePosition }
+                          in  (a, (c', ref) : rest)
           where
-            go s = let addCite    = init a ++ [last a ++ [c]]
-                       (a', rest) = procCs addCite xs
-                   in  (a', (c { citePosition = s},
-                             procRef <$> getReference rs c) : rest)
-            isElem   = citeId c `elem` map citeId (concat a)
-            isIbid   = case reverse (last a) of
-                            []    -> case reverse (init a) of
-                                          []     -> False
-                                          (zs:_) -> not (null zs) &&
-                                                    all (== citeId c)
-                                                        (map citeId zs)
-                            (x:_) -> citeId c == citeId x
-            isLocSet = citeLocator c /= ""
+            addCite = case acc of
+                        []     -> [[c]]
+                        (a:as) -> (c : a) : as
+
+            -- http://docs.citationstyles.org/en/stable/specification.html#locators
+            getCitePosition = fromMaybe notIbid (ibidPosition <$> prevSameCite)
+                where
+                    notIbid = if citeId c `elem` map citeId (concat acc)
+                                 then "subsequent"
+                                 else "first"
+
+            ibidPosition x = let hasL k   = citeLocator k /= ""
+                                 withIf b = if b then "ibid-with-locator" else "ibid"
+                                 diffLoc  = citeLocator x /= citeLocator c
+                                           || citeLabel x /= citeLabel c
+                             in  case (hasL x, hasL c) of
+                                   (False, cur)  -> withIf cur
+                                   (True, True)  -> withIf diffLoc
+                                   (True, False) -> "subsequent"
+
+            -- x is previous cite in current group
+            -- zs is the previous group
+            prevSameCite = case acc of
+                             []     -> Nothing
+                             (a:as) -> psc a as
+              where
+                -- you can't have an ibid at the start of your document
+                psc [] []     = Nothing
+
+                -- a. the current cite immediately follows on another cite,
+                --    within the same citation, that references the same item
+                psc (x:_) _   = if citeId c == citeId x
+                                   then Just x
+                                   else Nothing
+
+                -- b.  [] => the current cite is the first cite in the citation
+                --     zs => and the previous citation consists of a single cite
+                --           that refs the same item
+                -- The spec appears to be concerned that you cannot know the
+                -- correct one to match the locator against.
+                -- It is a super clunky if you have [@a, 1; @a, 2] then [@a, 3],
+                -- where the second citation gets "subsequent" even though there were
+                -- only @a keys.
+                -- This is silly. We will use the last one to match against.
+                psc [] (zs:_) = case zs of
+                                  [] -> Nothing
+                                  (z:_) -> if all (== citeId c) (map citeId zs)
+                                              then Just z
+                                              else Nothing
 
 setPageFirst :: Reference -> Reference
 setPageFirst ref =
