@@ -906,11 +906,13 @@ processCites rs cs
                                  then "subsequent"
                                  else "first"
 
-            ibidPosition x = let hasL k = citeLocator k /= ""
-                                 with b = if b then "ibid-with-locator" else "ibid"
+            ibidPosition x = let hasL k   = citeLocator k /= ""
+                                 withIf b = if b then "ibid-with-locator" else "ibid"
+                                 diffLoc  = citeLocator x /= citeLocator c
+                                           || citeLabel x /= citeLabel c
                              in  case (hasL x, hasL c) of
-                                   (False, cur) -> with cur
-                                   (True, True)  -> with (citeLocator x /= citeLocator c)
+                                   (False, cur)  -> withIf cur
+                                   (True, True)  -> withIf diffLoc
                                    (True, False) -> "subsequent"
 
             -- x is previous cite in current group
