@@ -878,27 +878,31 @@ getReference  r c
 
 processCites :: [Reference] -> [[Cite]] -> [[(Cite, Maybe Reference)]]
 processCites rs cs
-    = procGr [[]] cs
+    = procGr [] cs
     where
       procRef r = case filter ((==) (unLiteral $ refId r) . citeId) $ concat cs of
                     x:_ -> r { firstReferenceNoteNumber = readNum $ citeNoteNumber x}
                     []  -> r
 
       procGr _ [] = []
-      procGr a (x:xs) = let (a',res) = procCs a x
-                        in res : procGr (a' ++ [[]]) xs
+      procGr acc (x:xs) = let (a',res) = procCs acc x
+                          in res : procGr ([] : a') xs
 
-      procCs a [] = (a,[])
-      procCs a (c:xs) = let addCite    = init a ++ [last a ++ [c]]
-                            (a', rest) = procCs addCite xs
-                         in  (a', (c { citePosition = getCitePosition },
-                                  procRef <$> getReference rs c) : rest)
+      -- process, given the accumulated history, the current group's cites
+      procCs acc [] = (acc,[])
+      procCs acc (c:xs) = let (a, rest) = procCs addCite xs
+                              ref       = procRef <$> getReference rs c
+                              c'        = c { citePosition = getCitePosition }
+                          in  (a, (c', ref) : rest)
           where
+            addCite = case acc of
+                        []     -> [[c]]
+                        (a:as) -> (c : a) : as
 
             -- http://docs.citationstyles.org/en/stable/specification.html#locators
             getCitePosition = fromMaybe notIbid (ibidPosition <$> prevSameCite)
                 where
-                    notIbid = if citeId c `elem` map citeId (concat a)
+                    notIbid = if citeId c `elem` map citeId (concat acc)
                                  then "subsequent"
                                  else "first"
 
@@ -909,18 +913,20 @@ processCites rs cs
                                    (True, True)  -> with (citeLocator x /= citeLocator c)
                                    (True, False) -> "subsequent"
 
-            -- apply psc to the current group and the list of previous groups
-            -- reversed so it can find the head
             -- x is previous cite in current group
             -- zs is the previous group
-            prevSameCite = psc (reverse (last a)) (reverse (init a)) where
-
+            prevSameCite = case acc of
+                             []     -> Nothing
+                             (a:as) -> psc a as
+              where
                 -- you can't have an ibid at the start of your document
                 psc [] []     = Nothing
 
                 -- a. the current cite immediately follows on another cite,
                 --    within the same citation, that references the same item
-                psc (x:_) _   = if citeId c == citeId x then Just x else Nothing
+                psc (x:_) _   = if citeId c == citeId x
+                                   then Just x
+                                   else Nothing
 
                 -- b.  [] => the current cite is the first cite in the citation
                 --     zs => and the previous citation consists of a single cite
@@ -931,9 +937,11 @@ processCites rs cs
                 -- where the second citation gets "subsequent" even though there were
                 -- only @a keys.
                 -- This is silly. We will use the last one to match against.
-                psc [] (zs:_) = if (not (null zs)) && all (== citeId c) (map citeId zs)
-                                   then Just (last zs)
-                                   else Nothing
+                psc [] (zs:_) = case zs of
+                                  [] -> Nothing
+                                  (z:_) -> if all (== citeId c) (map citeId zs)
+                                              then Just z
+                                              else Nothing
 
 setPageFirst :: Reference -> Reference
 setPageFirst ref =
