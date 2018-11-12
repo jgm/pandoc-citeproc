@@ -478,11 +478,30 @@ pLocatorWords :: LocatorMap -> Parsec [Inline] st (String, String, [Inline])
 pLocatorWords locMap = do
   optional $ pMatchChar "," (== ',')
   optional pSpace
-  (la, lo) <- pLocatorIntegrated locMap
+  (la, lo) <- pLocatorDelimited locMap <|> pLocatorIntegrated locMap
   s <- getInput -- rest is suffix
   -- need to trim, otherwise "p. 9" and "9" will have 'different' locators later on
   -- i.e. the first one will be " 9"
   return (la, trim lo, s)
+
+pLocatorDelimited :: LocatorMap -> Parsec [Inline] st (String, String)
+pLocatorDelimited locMap = try $ do
+  pMatchChar "{" (== '{')
+  many pSpace -- gobble pre-spaces so the label doesn't try to include them
+  (la, _) <- pLocatorLabelDelimited locMap
+  -- we only care about balancing {} and [] (because of the outer [] scope);
+  -- the rest can be anything
+  let inner = do { t <- anyToken; return (True, stringify t) }
+  gs <- many (pBalancedBraces [('{','}'), ('[',']')] inner)
+  pMatchChar "}" (== '}')
+  let lo = concatMap snd gs
+  return (la, lo)
+
+pLocatorLabelDelimited :: LocatorMap -> Parsec [Inline] st (String, Bool)
+pLocatorLabelDelimited locMap
+  = pLocatorLabel' locMap lim <|> return ("page", True)
+    where
+        lim = stringify <$> anyToken
 
 pLocatorIntegrated :: LocatorMap -> Parsec [Inline] st (String, String)
 pLocatorIntegrated locMap = try $ do
