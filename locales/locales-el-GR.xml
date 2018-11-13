@@ -172,12 +172,12 @@
     <term name="note" form="short">σημ.</term>
     <term name="opus" form="short">έργ.</term>
     <term name="page" form="short">
-      <single>σ</single>
-      <multiple>σσ</multiple>
+      <single>σ.</single>
+      <multiple>σσ.</multiple>
     </term>
     <term name="number-of-pages" form="short">
-      <single>σ</single>
-      <multiple>σσ</multiple>
+      <single>σ.</single>
+      <multiple>σσ.</multiple>
     </term>
     <term name="paragraph" form="short">παρ.</term>
     <term name="part" form="short">μέρ.</term>

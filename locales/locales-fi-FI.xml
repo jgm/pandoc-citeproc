@@ -70,8 +70,8 @@
     <term name="version">versio</term>
 
     <!-- ANNO DOMINI; BEFORE CHRIST -->
-    <term name="ad">eaa.</term>
-    <term name="bc">jaa.</term>
+    <term name="ad">jaa.</term>
+    <term name="bc">eaa.</term>
 
     <!-- PUNCTUATION -->
     <term name="open-quote">”</term>
