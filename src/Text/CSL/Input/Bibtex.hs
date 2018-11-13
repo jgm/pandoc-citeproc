@@ -1227,6 +1227,8 @@ itemToReference lang locale bibtex caseTransform = bib $ do
                                          Lang "en" _ -> caseTransform
                                          _           -> False }
   id' <- asks identifier
+  otherIds <- (map trim . splitWhen (==',') <$> getRawField "ids")
+                <|> return []
   et <- asks entryType
   guard $ et /= "xdata"
   opts <- (parseOptions <$> getRawField "options") <|> return []
@@ -1521,6 +1523,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
 
   return $ emptyReference
          { refId               = Literal id'
+         , refOtherIds         = map Literal otherIds
          , refType             = reftype
          , author              = author'
          , editor              = editor'

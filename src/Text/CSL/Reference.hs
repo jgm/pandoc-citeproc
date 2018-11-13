@@ -66,7 +66,7 @@ import           Data.Char           (isDigit, toLower)
 import           Data.Either         (lefts, rights)
 import           Data.Generics       hiding (Generic)
 import qualified Data.HashMap.Strict as H
-import           Data.List           (elemIndex)
+import           Data.List           (findIndex, elemIndex)
 import           Data.List.Split     (splitWhen)
 import           Data.Maybe          (fromMaybe, isNothing)
 import           Data.String
@@ -408,6 +408,7 @@ instance ToYaml CLabel where
 data Reference =
     Reference
     { refId                    :: Literal
+    , refOtherIds              :: [Literal]
     , refType                  :: RefType
 
     , author                   :: [Agent]
@@ -493,6 +494,7 @@ instance FromJSON Reference where
      v <- parseSuppFields v' <|> return v'
      addPageFirst <$> (Reference <$>
        v .:? "id" .!= "" <*>
+       v .:? "other-ids" .!= [] <*>
        v .:? "type" .!= NoType <*>
        v .:? "author" .!= [] <*>
        v .:? "editor" .!= [] <*>
@@ -620,6 +622,7 @@ regText = (T.pack <$> P.many1 (P.noneOf "\n{")) <|> (T.singleton <$> P.anyChar)
 instance ToJSON Reference where
   toJSON ref = object' [
       "id" .= refId ref
+    , "other-ids" .= refOtherIds ref
     , "type" .= refType ref
     , "author" .= author ref
     , "editor" .= editor ref
@@ -699,6 +702,7 @@ instance ToJSON Reference where
 instance ToYaml Reference where
   toYaml ref = mapping' [
       "id" &= refId ref
+    , "other-ids" &= refOtherIds ref
     , (("type" Y..= refType ref) :)
     , "author" &= author ref
     , "editor" &= editor ref
@@ -786,6 +790,7 @@ emptyReference :: Reference
 emptyReference =
     Reference
     { refId               = mempty
+    , refOtherIds         = mempty
     , refType             = NoType
 
     , author              = []
@@ -871,10 +876,12 @@ numericVars = [ "edition", "volume", "number-of-volumes", "number", "issue", "ci
               , "chapter-number", "collection-number", "number-of-pages"]
 
 getReference :: [Reference] -> Cite -> Maybe Reference
-getReference  r c
-    = case citeId c `elemIndex` map (unLiteral . refId) r of
-        Just i  -> Just $ setPageFirst $ r !! i
+getReference  rs c
+    = case (hasId (citeId c)) `findIndex` rs of
+        Just i  -> Just $ setPageFirst $ rs !! i
         Nothing -> Nothing
+  where hasId :: String -> Reference -> Bool
+        hasId ident r = ident `elem` (map unLiteral (refId r : refOtherIds r))
 
 processCites :: [Reference] -> [[Cite]] -> [[(Cite, Maybe Reference)]]
 processCites rs cs

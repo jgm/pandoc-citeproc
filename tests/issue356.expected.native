@@ -1,0 +1,5 @@
+Pandoc (Meta {unMeta = fromList [("references",MetaList [MetaMap (fromList [("author",MetaList [MetaMap (fromList [("family",MetaInlines [Str "Alice"])])]),("id",MetaInlines [Str "foo"]),("issued",MetaList [MetaMap (fromList [("year",MetaInlines [Str "2042"])])]),("other-ids",MetaList [MetaInlines [Str "bar"],MetaInlines [Str "doz"]]),("type",MetaInlines [Str "book"])])])]})
+[Para [Cite [Citation {citationId = "bar", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 1}] [Str "(Alice",Space,Str "2042)"]]
+,Div ("refs",["references"],[])
+ [Div ("ref-foo",[],[])
+  [Para [Str "Alice.",Space,Str "2042."]]]]
