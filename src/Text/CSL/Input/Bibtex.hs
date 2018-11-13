@@ -38,7 +38,7 @@ import           Text.CSL.Compat.Pandoc (readLaTeX)
 import           Text.CSL.Exception     (CiteprocException (ErrorReadingBib, ErrorReadingBibFile))
 import           Text.CSL.Parser        (parseLocale)
 import           Text.CSL.Reference
-import           Text.CSL.Style         (Agent (..), CslTerm (..),
+import           Text.CSL.Style         (Agent (..), emptyAgent, CslTerm (..),
                                          Formatted (..), Locale (..))
 import           Text.CSL.Util          (onBlocks, protectCase, safeRead,
                                          splitStrWhen, trim, unTitlecase)
@@ -1009,7 +1009,7 @@ toLiteralList _ = mzero
 
 toAuthorList :: Options -> [Block] -> Bib [Agent]
 toAuthorList opts [Para xs] =
-  mapM (toAuthor opts) $ splitByAnd xs
+  filter (/= emptyAgent) <$> mapM (toAuthor opts) (splitByAnd xs)
 toAuthorList opts [Plain xs] = toAuthorList opts [Para xs]
 toAuthorList _ _ = mzero
 
@@ -1036,6 +1036,25 @@ toAuthor _ [Span ("",[],[]) ils] =
           , commaSuffix     = False
           , parseNames      = False
           }
+ -- extended BibLaTeX name format - see #266
+toAuthor opts ils@(Str xs:_) | '=' `elem` xs = do
+  let commaParts = splitWhen (== Str ",")
+                   $ splitStrWhen (\c -> c == ',' || c == '=' || c == '\160')
+                   $ ils
+  let addPart ag (Str "given" : Str "=" : xs) =
+        ag{ givenName = givenName ag ++ [Formatted xs] }
+      addPart ag (Str "family" : Str "=" : xs) =
+        ag{ familyName = Formatted xs }
+      addPart ag (Str "prefix" : Str "=" : xs) =
+        ag{ droppingPart = Formatted xs }
+      addPart ag (Str "useprefix" : Str "=" : Str "true" : _) =
+        ag{ nonDroppingPart = droppingPart ag, droppingPart = mempty }
+      addPart ag (Str "suffix" : Str "=" : xs) =
+        ag{ nameSuffix = Formatted xs }
+      addPart ag (Space : xs) = addPart ag xs
+      addPart ag _ = ag
+  return $ foldl' addPart emptyAgent commaParts
+
 -- First von Last
 -- von Last, First
 -- von Last, Jr ,First

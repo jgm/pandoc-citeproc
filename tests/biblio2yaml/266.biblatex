@@ -1,0 +1,28 @@
+@book{goethe2005,
+  langid = {german},
+  location = {{Frankfurt am Main}},
+  title = {Not A Real Book},
+  date = {2005},
+  author = {family=Goethe, given=Johann Wolfgang, prefix=von, useprefix=false and given=Antonie, prefix=van, family=Leeuwenhoek, useprefix=true}, editor = {Schöne, Albrecht}
+}
+
+---
+references:
+- id: goethe2005
+  type: book
+  author:
+  - family: Goethe
+    given: Johann Wolfgang
+    dropping-particle: von
+  - family: Leeuwenhoek
+    given: Antonie
+    non-dropping-particle: van
+  editor:
+  - family: Schöne
+    given: Albrecht
+  issued:
+  - year: 2005
+  title: Not A Real Book
+  publisher-place: Frankfurt am Main
+  language: de-DE
+...
