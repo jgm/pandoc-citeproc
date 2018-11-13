@@ -486,14 +486,14 @@ pLocatorWords locMap = do
 
 pLocatorDelimited :: LocatorMap -> Parsec [Inline] st (String, String)
 pLocatorDelimited locMap = try $ do
-  pMatchChar "{" (== '{')
-  many pSpace -- gobble pre-spaces so the label doesn't try to include them
+  _ <- pMatchChar "{" (== '{')
+  skipMany pSpace -- gobble pre-spaces so label doesn't try to include them
   (la, _) <- pLocatorLabelDelimited locMap
   -- we only care about balancing {} and [] (because of the outer [] scope);
   -- the rest can be anything
   let inner = do { t <- anyToken; return (True, stringify t) }
   gs <- many (pBalancedBraces [('{','}'), ('[',']')] inner)
-  pMatchChar "}" (== '}')
+  _ <- pMatchChar "}" (== '}')
   let lo = concatMap snd gs
   return (la, lo)
 
