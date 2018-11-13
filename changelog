@@ -1,3 +1,39 @@
+pandoc-citeproc (0.15)
+
+  * Support BibLaTeX extended name format (#266).
+  * Add refOtherIds field to Reference, and populate it with
+    the 'ids' field in biblatex (#356).  Search on refOtherIds
+    as well as refId when looking for references.
+  * Allow the extent of the locator to be explicitly indicated
+    using curly braces, as in:  [@key{67}], [@key, {p. 95 A 3}, suffix]
+    (Cormac Relf).
+  * Parse balanced brackets in locators like '1(2)(a)(i)' (Cormac Relf).
+    This is useful for citing legislation. It is necessary to be more liberal
+    in locator parsing because some styles put other elements after a locator,
+    like short titles in the case of AGLC, and if you can't parse a locator,
+    it gets rendered after, or worse, split in half.
+  * Drop ibid-with-locator when prev cite has same locator and label (#241,
+    Cormac Relf).
+    ```
+    [@key]      => "first"
+    [@key]      => "ibid"
+    [@key, 53]  => "ibid-with-locator"
+    [@key, 123] => "ibid-with-locator"
+    [@key, 123] => "ibid"
+    [@key]      => "subsequent"
+    ```
+    See http://docs.citationstyles.org/en/stable/specification.html#locators
+  * Fix bug wherein nonbreaking spaces classed a name as East Asian,
+    so that spaces aren't used between given and family (#365).
+    Also regularized logic for detecting "byzantine" names
+    (those that get the space).  Now a name is treated as
+    byzantine if there are any byzantine characters in it.
+    Previously some checks required all byzantine characters.
+  * Add mktest.sh for wrangling test cases (#364, Cormac Relf).
+  * Update pandoc-citeproc man page.
+  * Update locales el-GR, fi-FI.
+  * Add CONTRIBUTING.md.
+
 pandoc-citeproc (0.14.8.1)
 
   * Avoid putting a space after nonbreaking space at end of prefix.
