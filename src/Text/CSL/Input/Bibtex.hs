@@ -1037,7 +1037,7 @@ toAuthor _ [Span ("",[],[]) ils] =
           , parseNames      = False
           }
  -- extended BibLaTeX name format - see #266
-toAuthor opts ils@(Str xs:_) | '=' `elem` xs = do
+toAuthor _ ils@(Str ys:_) | '=' `elem` ys = do
   let commaParts = splitWhen (== Str ",")
                    $ splitStrWhen (\c -> c == ',' || c == '=' || c == '\160')
                    $ ils
