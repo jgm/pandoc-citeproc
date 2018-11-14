@@ -3,24 +3,19 @@ version:            0.15
 cabal-version:      1.12
 synopsis:           Supports using pandoc with citeproc
 
-description:        The pandoc-citeproc library exports functions for
-                    using the citeproc system with pandoc.  It relies on
-                    citeproc-hs, a library for rendering
-                    bibliographic reference citations into a variety
-                    of styles using a macro language called Citation
-                    Style Language (CSL). More details on CSL can be
-                    found here: <http://citationstyles.org/>.
+description:        The pandoc-citeproc library supports automatic
+                    generation of citations and a bibliography in pandoc
+                    documents using the Citation Style Language (CSL)
+                    macro language. More details on CSL can be found at
+                    <http://citationstyles.org/>.
                     .
-                    Currently this package includes a heavily revised
-                    copy of the citeproc-hs code. When citeproc-hs is
-                    updated to be compatible, this package will simply
-                    depend on citeproc-hs.
+                    In addition to a library, the package includes
+                    an executable, pandoc-citeproc, which works as a pandoc
+                    filter and also has a mode for converting bibliographic
+                    databases into CSL JSON and pandoc YAML metadata formats.
                     .
-                    This package also contains an executable: pandoc-citeproc,
-                    which works as a pandoc filter, and
-                    also has a mode for converting bibliographic databases
-                    a YAML format suitable for inclusion in pandoc YAML
-                    metadata.
+                    pandoc-citeproc originated as a fork of Andrea
+                    Rossato's citeproc-hs.
 
 homepage:           https://github.com/jgm/pandoc-citeproc
 category:           Text
