@@ -1,3 +1,8 @@
+pandoc-citeproc (0.15.0.1)
+
+
+  * Allow pandoc 2.5.
+
 pandoc-citeproc (0.15)
 
   * Support BibLaTeX extended name format (#266).
