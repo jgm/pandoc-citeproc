@@ -196,6 +196,7 @@ executable test-citeproc
   default-language: Haskell2010
   default-extensions: CPP, NoImplicitPrelude
   other-modules:  Text.CSL.Compat.Pandoc
+  build-tools: pandoc-citeproc
 
 test-suite test-pandoc-citeproc
   Type:           exitcode-stdio-1.0
@@ -217,3 +218,4 @@ test-suite test-pandoc-citeproc
   default-language: Haskell2010
   default-extensions: CPP, NoImplicitPrelude
   other-modules:  Text.CSL.Compat.Pandoc
+  build-tools: pandoc-citeproc
