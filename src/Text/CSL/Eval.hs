@@ -230,6 +230,12 @@ evalElement el
 
                "year-suffix" -> getStringVar "ref-id" >>= \k  ->
                                 return . return $ OYearSuf [] k [] fm
+               "status"      -> do
+                  (opts, as) <- gets (env >>> options &&& abbrevs)
+                  r <- getVar mempty (getFormattedValue opts as f fm s)
+                        "status"
+                  consumeVariable s
+                  return r
                "page"        -> getStringVar "page" >>= formatRange fm
                "locator"     -> getLocVar >>= formatRange fm . snd
                "url"         -> getStringVar "url" >>= \k ->
@@ -313,7 +319,9 @@ getFormattedValue o as f fm s val
                         $ getAbbr (stringify $ unFormatted v)
                in  if null ys
                       then []
-                      else [Output [OPan $ walk value' ys] fm]
+                      else [Output [(if s == "status"
+                                        then OStatus
+                                        else OPan) $ walk value' ys] fm]
     | Just v <- fromValue val :: Maybe String    = maybe [] (\x -> [OStr x fm]) . getAbbr $ value v
     | Just v <- fromValue val :: Maybe Literal   = maybe [] (\x -> [OStr x fm]) . getAbbr $ value $ unLiteral v
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)

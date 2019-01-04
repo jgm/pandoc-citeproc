@@ -87,6 +87,7 @@ rmEmptyOutput o
     | Output [] _ <- o = Nothing
     | OStr []   _ <- o = Nothing
     | OPan []     <- o = Nothing
+    | OStatus []  <- o = Nothing
     | ODel []     <- o = Nothing
     | otherwise        = Just o
 
@@ -131,6 +132,7 @@ formatOutput o =
   case o of
       OSpace              -> Formatted [Space]
       OPan     i          -> Formatted i
+      OStatus  i          -> Formatted i
       ODel     []         -> Formatted []
       ODel     " "        -> Formatted [Space]
       ODel     "\n"       -> Formatted [SoftBreak]

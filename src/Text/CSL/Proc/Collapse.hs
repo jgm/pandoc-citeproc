@@ -97,6 +97,7 @@ getYearAndSuf x
           | OYearSuf {} : _ <- o = [head o]
           | OLoc     {} : _ <- o = [head o]
           | ODel _ : OLoc {} : _ <- o = [head o]
+          | OStatus  {} : _ <- o = [head o]
           | otherwise = []
 
 collapseYear :: Style -> String -> CitationGroup -> CitationGroup

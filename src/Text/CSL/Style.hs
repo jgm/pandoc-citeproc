@@ -676,6 +676,7 @@ data Output
     = ONull
     | OSpace
     | OPan    [Inline]
+    | OStatus [Inline]
     | ODel     String                                   -- ^ A delimiter string.
     | OStr     String             Formatting            -- ^ A simple 'String'
     | OErr     CiteprocError                            -- ^ Warning message
