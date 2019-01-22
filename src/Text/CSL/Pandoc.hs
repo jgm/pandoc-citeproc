@@ -48,6 +48,9 @@ import           Text.Parsec              hiding (State, (<|>))
 -- | Process a 'Pandoc' document by adding citations formatted
 -- according to a CSL style.  Add a bibliography (if one is called
 -- for) at the end of the document.
+-- It is necessary that the 'Pandoc' input document is produced 
+-- with the Ext_citations extension
+-- otherwise references in the document are not recognized and processed
 processCites :: Style -> [Reference] -> Pandoc -> Pandoc
 processCites style refs (Pandoc m1 b1) =
   let metanocites   = lookupMeta "nocite" m1
@@ -179,6 +182,9 @@ removeNocaseSpans x                            = [x]
 -- the `csl` field of the metadata, and the references are taken
 -- from the `references` field or read from a file in the `bibliography`
 -- field.
+-- It is necessary that the 'Pandoc' input document is produced 
+-- with the Ext_citations extension
+-- otherwise references in the document are not recognized and processed
 processCites' :: Pandoc -> IO Pandoc
 processCites' (Pandoc meta blocks) = do
   mbcsldir <- E.catch (Just <$> getAppUserDataDirectory "csl") $ \e ->
