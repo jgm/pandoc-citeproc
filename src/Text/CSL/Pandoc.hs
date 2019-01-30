@@ -630,6 +630,7 @@ pRoman = try $ do
 
 isLocatorPunct :: Char -> Bool
 isLocatorPunct '-' = False -- page range
+isLocatorPunct '–' = False -- page range, en dash
 isLocatorPunct ':' = False -- vol:page-range hack
 isLocatorPunct c   = isPunctuation c -- includes [{()}]
 
