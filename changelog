@@ -1,3 +1,17 @@
+pandoc-citeproc (0.16)
+
+  * Detect en dash in page range (Andrew Dunning).  Ensure that `--` or `–`
+    are detected as page ranges. This fixes a regression that caused the
+    second half of the range to be appended to a URL in note styles.
+
+  * Fix collapsing behavior with items with status but no year (#371).
+
+  * Style: Add OStatus constructor to Output [API change].
+
+  * Allow pandoc 2.6.
+
+  * Added pandoc-citeproc to build-tools for test suite (#369).
+
 pandoc-citeproc (0.15.0.1)
 
 
