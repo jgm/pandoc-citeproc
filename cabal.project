@@ -1,0 +1,4 @@
+packages: pandoc-citeproc.cabal
+
+package pandoc-citeproc
+  flags: +bibutils +embed_data_files
