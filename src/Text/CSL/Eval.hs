@@ -312,18 +312,26 @@ evalIfThen (IfThen c' m' el') ei e = whenElse (evalCond m' c') (return el') rest
 
 getFormattedValue :: [Option] -> Abbreviations -> Form -> Formatting -> String -> Value -> [Output]
 getFormattedValue o as f fm s val
-    | Just v <- fromValue val :: Maybe Formatted =
-       if v == mempty
-          then []
-          else let ys = unFormatted . maybe v fromString
-                        $ getAbbr (stringify $ unFormatted v)
-               in  if null ys
-                      then []
-                      else [Output [(if s == "status"
-                                        then OStatus
-                                        else OPan) $ walk value' ys] fm]
-    | Just v <- fromValue val :: Maybe String    = maybe [] (\x -> [OStr x fm]) . getAbbr $ value v
-    | Just v <- fromValue val :: Maybe Literal   = maybe [] (\x -> [OStr x fm]) . getAbbr $ value $ unLiteral v
+    | Just (Formatted v) <- fromValue val :: Maybe Formatted =
+       case v of
+          [] -> []
+          _  -> case maybe v (unFormatted . fromString) $ getAbbr (stringify v) of
+                  [] -> []
+                  ys -> [Output [(if s == "status"
+                                     then OStatus
+                                     else OPan) $ walk value' ys] fm]
+    | Just v <- fromValue val :: Maybe String =
+         case value v of
+            [] -> []
+            xs -> case getAbbr xs of
+                    Nothing -> [OStr xs fm]
+                    Just ys -> [OStr ys fm]
+    | Just (Literal v) <- fromValue val :: Maybe Literal =
+         case value v of
+            [] -> []
+            xs -> case getAbbr xs of
+                    Nothing -> [OStr xs fm]
+                    Just ys -> [OStr ys fm]
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe CNum      = if v == 0 then [] else [OCitNum (unCNum v) fm]
     | Just v <- fromValue val :: Maybe CLabel    = if v == mempty then [] else [OCitLabel (unCLabel v) fm]
