@@ -325,7 +325,6 @@ getFormattedValue o as f fm s val
     | Just v <- fromValue val :: Maybe String    = maybe [] (\x -> [OStr x fm]) . getAbbr $ value v
     | Just v <- fromValue val :: Maybe Literal   = maybe [] (\x -> [OStr x fm]) . getAbbr $ value $ unLiteral v
     | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
-    | Just v <- fromValue val :: Maybe Int       = output  fm (if v == 0 then [] else show v)
     | Just v <- fromValue val :: Maybe CNum      = if v == 0 then [] else [OCitNum (unCNum v) fm]
     | Just v <- fromValue val :: Maybe CLabel    = if v == mempty then [] else [OCitLabel (unCLabel v) fm]
     | Just v <- fromValue val :: Maybe [RefDate] = formatDate (EvalSorting emptyCite) [] [] sortDate v
