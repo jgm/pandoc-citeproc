@@ -1,3 +1,7 @@
+pandoc-citeproc (0.16.0.2)
+
+  * Remove need for HTTP access in test for #213.
+
 pandoc-citeproc (0.16.0.1)
 
   * Fix regression on #213.  Literals without special handling
