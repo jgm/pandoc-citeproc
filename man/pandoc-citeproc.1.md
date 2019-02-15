@@ -191,6 +191,10 @@ by other CSL implementations.
     `biblatex`, `bibtex`, `ris`, `endnote`, `endnotexml`, `isi`,
     `medline`, `copac`, `mods`, `nbib`, and `json`.
 
+`-c` *NUMBER*, `--columns=`*NUMBER*
+:   Specify column to which to wrap YAML output produced using
+    `--bib2yaml`.  Default is 80.  To disable wrapping, set 0.
+
 `-h, --help`
 :   Print usage information.
 

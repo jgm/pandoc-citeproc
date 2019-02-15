@@ -18,7 +18,8 @@ import           Data.List                        (group, sort)
 import qualified Data.Text                        as T
 import           Data.Text.Encoding               (encodeUtf8)
 import           Data.Version                     (showVersion)
-import           Data.Yaml.Builder                (toByteString)
+import           Data.Yaml.Builder                (toByteStringWith, setWidth)
+import           Text.Libyaml                     (defaultFormatOptions)
 import           Paths_pandoc_citeproc            (version)
 import           System.Console.GetOpt
 import           System.Environment               (getArgs)
@@ -30,6 +31,7 @@ import           Text.CSL.Exception
 import           Text.CSL.Input.Bibutils          (BibFormat (..),
                                                    readBiblioString)
 import           Text.CSL.Pandoc                  (processCites')
+import           Safe                             (readMay)
 import           Text.CSL.Reference               (Literal (..),
                                                    Reference (refId))
 import           Text.Pandoc.JSON                 hiding (Format)
@@ -63,6 +65,16 @@ main = do
         exitWith (ExitFailure 1)) $
     if Bib2YAML `elem` flags || Bib2JSON `elem` flags
        then do
+         colwidth <- case Prelude.take 1 $
+                          reverse [readMay n | Columns n <- flags] of
+                          []        -> return $ Just 80
+                          [Just 0]  -> return $ Nothing
+                          [Just x]  -> return $ Just x
+                          _         -> do
+                            UTF8.hPutStrLn stderr $
+                              "--columns must be followed by a number"
+                            exitWith $ ExitFailure 7
+         let fmtOpts = setWidth colwidth defaultFormatOptions
          let mbformat = case [f | Format f <- flags] of
                              [x] -> readFormat x
                              _   -> Nothing
@@ -72,7 +84,7 @@ main = do
                            Nothing  -> do
                               UTF8.hPutStrLn stderr $ usageInfo
                                 ("Unknown format\n" ++ header) options
-                              exitWith $ ExitFailure 3
+                              exitWith $ ExitFailure 4
          bibstring <- case args of
                            [] -> UTF8.getContents
                            xs -> mconcat <$> mapM UTF8.readFile xs
@@ -81,7 +93,7 @@ main = do
            if Bib2YAML `elem` flags
               then outputYamlBlock .
                    B8.intercalate (B.singleton 10) .
-                   map (unescapeTags . toByteString . (:[]))
+                   map (unescapeTags . toByteStringWith fmtOpts . (:[]))
               else B8.putStrLn . unescapeUnicode . B.concat . BL.toChunks .
                 encodePretty' defConfig{ confIndent = Spaces 2
                                        , confCompare = compare
@@ -135,6 +147,7 @@ data Option =
     | Version
     | Convert
     | Format String
+    | Columns String
     | Bib2YAML
     | Bib2JSON
     | Quiet
@@ -150,6 +163,7 @@ options =
   , Option ['j'] ["bib2json"] (NoArg Bib2JSON) "convert bibliography to JSON"
   , Option ['q'] ["quiet"] (NoArg Quiet) "silence all warnings"
   , Option ['f'] ["format"] (ReqArg Format "FORMAT") "bibliography format"
+  , Option ['c'] ["columns"] (ReqArg Columns "NUMBER") "column width (or 0)"
   ]
 
 warnDuplicateKeys :: [Reference] -> IO [Reference]

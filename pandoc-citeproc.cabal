@@ -102,6 +102,7 @@ library
     ghc-prof-options: -fprof-auto-exported
     build-depends:    containers, directory, mtl,
                       bytestring, filepath,
+                      network < 3.0,
                       pandoc-types >= 1.17.3 && < 1.18,
                       pandoc >= 1.16 && < 2.7,
                       tagsoup,
@@ -112,7 +113,7 @@ library
                       unordered-containers >= 0.2 && < 0.3,
                       data-default,
                       setenv >= 0.1 && < 0.2,
-                      split, yaml >= 0.8.32
+                      split, yaml >= 0.11
     if impl(ghc < 8.0)
       build-depends: semigroups == 0.18.*
     if impl(ghc < 8.4)
@@ -155,8 +156,15 @@ executable pandoc-citeproc
                       pandoc-types >= 1.17.3 && < 1.18,
                       pandoc >= 1.16 && < 2.7,
                       aeson,
-                      aeson-pretty >= 0.8, yaml, bytestring, syb, attoparsec, text,
-                      filepath
+                      aeson-pretty >= 0.8,
+                      yaml >= 0.11,
+                      libyaml,
+                      bytestring,
+                      syb,
+                      attoparsec,
+                      text,
+                      filepath,
+                      safe
     if impl(ghc < 8.0)
       build-depends: semigroups == 0.18.*
     if impl(ghc < 8.4)
@@ -185,7 +193,7 @@ executable test-citeproc
                   pandoc >= 1.16 && < 2.7,
                   filepath, containers,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
-                  yaml >= 0.8.32, containers >= 0.4, vector >= 0.10
+                  yaml >= 0.11, containers >= 0.4, vector >= 0.10
   if impl(ghc < 8.0)
     build-depends: semigroups == 0.18.*
   if impl(ghc < 8.4)
@@ -207,7 +215,7 @@ test-suite test-pandoc-citeproc
                   pandoc-types >= 1.17.3 && < 1.18, mtl,
                   pandoc >= 1.16 && < 2.7, filepath, containers,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
-                  yaml >= 0.8.32
+                  yaml >= 0.11
   ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind -threaded
   if impl(ghc < 8.0)
     build-depends: semigroups == 0.18.*
