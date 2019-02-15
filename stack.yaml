@@ -8,7 +8,9 @@ flags:
     static: false
 packages:
 - '.'
-extra-deps: []
+extra-deps:
+- pandoc-2.6
+- ipynb-0.1
 ghc-options:
    "$locals": -fhide-source-paths
 resolver: lts-13.5
