@@ -127,7 +127,8 @@ biblio2yamlTest regenerate fp = do
   (ec, result') <- pipeProcess
                      (Just [("LANG","en_US.UTF-8"),("HOME",".")])
                      pandocCiteprocPath
-                     ["--bib2yaml", "-f", drop 1 $ takeExtension fp]
+                     ["--bib2yaml", "-f", drop 1 $ takeExtension fp,
+                      "--columns=80"]
                      (UTF8.fromStringLazy bib)
   let result = UTF8.toStringLazy result'
   if ec == ExitSuccess
