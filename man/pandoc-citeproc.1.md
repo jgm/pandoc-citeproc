@@ -25,7 +25,7 @@ exists, one will be created and appended to the end of the document
 (unless the `suppress-bibliography` metadata field is set to a
 true value).  If you wish the bibliography to have a section
 header, put the section header at the end of your document.
-(See the `pandoc_markdown` (5) man page under "Citations" for
+(See the `pandoc` (1) man page under "Citations" for
 details on how to encode citations in pandoc's markdown.)
 
 To process citations with pandoc, call pandoc-citeproc as a filter:
@@ -288,7 +288,7 @@ Andrea Rossato and John MacFarlane.
 
 # SEE ALSO
 
-`pandoc` (1), `pandoc_markdown` (5).
+`pandoc` (1).
 
 The pandoc-citeproc source code and all documentation may be downloaded
 from <http://github.com/jgm/pandoc-citeproc/>.
