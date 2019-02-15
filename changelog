@@ -2,6 +2,8 @@ pandoc-citeproc (0.16.1)
 
   * Add --columns option.  This allows users to specify the column
     width for text wrapping in --bib2yaml output.
+  * Use --columns=0 in biblio2yaml tests to avoid problems with
+    different wrapping in different libyaml versions.
   * man page: remove references to obsolete pandoc_markdown(5) man page.
   * man page: add info on how to set metadata (#378).
 
