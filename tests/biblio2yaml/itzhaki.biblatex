@@ -62,17 +62,10 @@ references:
   - year: 1996
     month: 3
     day: 11
-  title: Some remarks on ’<span class="nocase">t Hooft’s</span> S-matrix for black
-    holes
+  title: Some remarks on ’<span class="nocase">t Hooft’s</span> S-matrix for black holes
   version: '1'
-  annote: An online reference from arXiv. Note the eprint and eprinttype fields. Also
-    note that the arXiv reference is transformed into a clickable link if hyperref
-    support has been enabled
-  abstract: We discuss the limitations of ’t Hooft’s proposal for the black hole S-matrix.
-    We find that the validity of the S-matrix implies violation of the semi-classical
-    approximation at scales large compared to the Planck scale. We also show that
-    the effect of the centrifugal barrier on the S-matrix is crucial even for large
-    transverse distances.
+  annote: An online reference from arXiv. Note the eprint and eprinttype fields. Also note that the arXiv reference is transformed into a clickable link if hyperref support has been enabled
+  abstract: We discuss the limitations of ’t Hooft’s proposal for the black hole S-matrix. We find that the validity of the S-matrix implies violation of the semi-classical approximation at scales large compared to the Planck scale. We also show that the effect of the centrifugal barrier on the S-matrix is crucial even for large transverse distances.
   URL: http://arxiv.org/abs/hep-th/9603067
   language: en-US
 ...

@@ -57,9 +57,7 @@ references:
   - year: 1998
   title: Elektromagnetisches Signalhorn
   jurisdiction: France; United Kingdom; Germany
-  annote: This is a patent entry with a location field. The number is given in the
-    number field. Note the format of the location field in the database file. Compare
-    laufenberg, sorace, and kowalik
+  annote: This is a patent entry with a location field. The number is given in the number field. Note the format of the location field in the database file. Compare laufenberg, sorace, and kowalik
   number: EU-29702195U
   language: de-DE
 ...

@@ -65,14 +65,11 @@ references:
     given: J.
   issued:
   - year: 1869
-  title: 'Drei Abhandlungen über die Conjunction des separaten Intellects mit dem
-    Menschen: Von Averroes (Vater und Sohn), aus dem Arabischen übersetzt von Samuel
-    Ibn Tibbon'
+  title: 'Drei Abhandlungen über die Conjunction des separaten Intellects mit dem Menschen: Von Averroes (Vater und Sohn), aus dem Arabischen übersetzt von Samuel Ibn Tibbon'
   title-short: Drei Abhandlungen
   publisher: S. Hermann
   publisher-place: Berlin
-  annote: A book entry. Note the concatenation of the editor and translator fields
-    as well as the indextitle and indexsorttitle fields
+  annote: A book entry. Note the concatenation of the editor and translator fields as well as the indextitle and indexsorttitle fields
   keyword: primary
   language: de-DE
 ...

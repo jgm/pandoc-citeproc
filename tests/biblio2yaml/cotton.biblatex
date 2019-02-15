@@ -56,7 +56,6 @@ references:
   publisher: Wiley
   publisher-place: Chichester
   edition: '6'
-  annote: A book entry with author authors and an edition field. By default, long
-    author and editor lists are automatically truncated. This is configurable
+  annote: A book entry with author authors and an edition field. By default, long author and editor lists are automatically truncated. This is configurable
   language: en-GB
 ...

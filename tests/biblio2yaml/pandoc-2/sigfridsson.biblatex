@@ -73,25 +73,13 @@ references:
     given: Ulf
   issued:
   - year: 1998
-  title: Comparison of methods for deriving atomic charges from the electrostatic
-    potential and moments
+  title: Comparison of methods for deriving atomic charges from the electrostatic potential and moments
   container-title: Journal of Computational Chemistry
   page: 377-395
   volume: '19'
   issue: '4'
-  annote: An article entry with volume, number, and doi fields. Note that the <span
-    class="smallcaps">doi</span> is transformed into a clickable link if hyperref
-    support has been enabled
-  abstract: 'Four methods for deriving partial atomic charges from the quantum chemical
-    electrostatic potential (CHELP, CHELPG, Merz-Kollman, and RESP) have been compared
-    and critically evaluated. It is shown that charges strongly depend on how and
-    where the potential points are selected. Two alternative methods are suggested
-    to avoid the arbitrariness in the point-selection schemes and van der Waals exclusion
-    radii: CHELP-BOW, which also estimates the charges from the electrostatic potential,
-    but with potential points that are Boltzmann-weighted after their occurrence in
-    actual simulations using the energy function of the program in which the charges
-    will be used, and CHELMO, which estimates the charges directly from the electrostatic
-    multipole moments. Different criteria for the quality of the charges are discussed.'
+  annote: An article entry with volume, number, and doi fields. Note that the <span class="smallcaps">doi</span> is transformed into a clickable link if hyperref support has been enabled
+  abstract: 'Four methods for deriving partial atomic charges from the quantum chemical electrostatic potential (CHELP, CHELPG, Merz-Kollman, and RESP) have been compared and critically evaluated. It is shown that charges strongly depend on how and where the potential points are selected. Two alternative methods are suggested to avoid the arbitrariness in the point-selection schemes and van der Waals exclusion radii: CHELP-BOW, which also estimates the charges from the electrostatic potential, but with potential points that are Boltzmann-weighted after their occurrence in actual simulations using the energy function of the program in which the charges will be used, and CHELMO, which estimates the charges directly from the electrostatic multipole moments. Different criteria for the quality of the charges are discussed.'
   DOI: 10.1002/(SICI)1096-987X(199803)19:4<377::AID-JCC1>3.0.CO;2-P
   language: en-US
 ...

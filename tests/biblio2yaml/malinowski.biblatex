@@ -48,13 +48,11 @@ references:
     given: Bronisław
   issued:
   - year: 1972
-  title: 'Argonauts of the Western Pacific: An account of native enterprise and
-    adventure in the <span class="nocase">Archipelagoes of Melanesian New Guinea</span>'
+  title: 'Argonauts of the Western Pacific: An account of native enterprise and adventure in the <span class="nocase">Archipelagoes of Melanesian New Guinea</span>'
   title-short: Argonauts
   publisher: Routledge and Kegan Paul
   publisher-place: London
   edition: '8'
-  annote: This is a book entry. Note the format of the publisher and edition fields
-    as well as the subtitle field
+  annote: This is a book entry. Note the format of the publisher and edition fields as well as the subtitle field
   language: en-GB
 ...

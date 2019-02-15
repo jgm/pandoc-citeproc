@@ -58,7 +58,6 @@ references:
   publisher: Addison-Wesley
   publisher-place: Reading, Mass.
   volume: B
-  annote: The second volume of a five-volume book. Note the sorttitle and sortyear
-    fields. Also note the indexsorttitle field
+  annote: The second volume of a five-volume book. Note the sorttitle and sortyear fields. Also note the indexsorttitle field
   language: en-US
 ...

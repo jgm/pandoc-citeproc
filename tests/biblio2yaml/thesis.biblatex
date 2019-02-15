@@ -35,15 +35,12 @@ references:
     dropping-particle: de
   issued:
   - year: 1985
-  title: 'Earl, saint, bishop, skald – and music: The Orkney earldom of the twelfth
-    century. A musicological study'
+  title: 'Earl, saint, bishop, skald – and music: The Orkney earldom of the twelfth century. A musicological study'
   title-short: Earl, saint, bishop, skald – and music
   publisher: Uppsala Universitet
   publisher-place: Uppsala
   genre: PhD thesis
-  annote: This is a typical thesis entry for a PhD thesis. Note the type field in
-    the database file which uses a localization key. Also note the format of the printed
-    name and compare the useprefix option in the options field as well as vangennep
+  annote: This is a typical thesis entry for a PhD thesis. Note the type field in the database file which uses a localization key. Also note the format of the printed name and compare the useprefix option in the options field as well as vangennep
   language: en-GB
 
 - id: loh
@@ -57,7 +54,6 @@ references:
   publisher: Massachusetts Institute of Technology
   publisher-place: Cambridge, Mass.
   genre: Master’s thesis
-  annote: This is a typical thesis entry for an MA thesis. Note the type field in
-    the database file which uses a localization key
+  annote: This is a typical thesis entry for an MA thesis. Note the type field in the database file which uses a localization key
   language: en-US
 ...

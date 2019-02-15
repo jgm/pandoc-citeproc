@@ -63,7 +63,6 @@ references:
   publisher-place: Pamplona
   number-of-volumes: '3'
   note: Ed. facs. de la realizada en 1948–49
-  annote: A multivolume book cited as a whole. This is a book entry with volumes,
-    note, sorttitle, and indextitle fields
+  annote: A multivolume book cited as a whole. This is a book entry with volumes, note, sorttitle, and indextitle fields
   language: es-ES
 ...

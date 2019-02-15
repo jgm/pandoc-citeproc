@@ -57,7 +57,6 @@ references:
   publisher: Addison-Wesley
   publisher-place: Reading, Mass.
   volume: C
-  annote: The third volume of a five-volume book. Note the sorttitle and sortyear
-    fields as well as the indextitle field
+  annote: The third volume of a five-volume book. Note the sorttitle and sortyear fields as well as the indextitle field
   language: en-US
 ...

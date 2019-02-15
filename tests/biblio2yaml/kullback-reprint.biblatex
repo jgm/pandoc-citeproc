@@ -59,7 +59,6 @@ references:
   publisher: Dover Publications
   original-publisher: John Wiley & Sons
   publisher-place: New York
-  annote: A reprint of the kullback entry. Note the format of origyear and origpublisher.
-    These fields are not used by the standard bibliography styles
+  annote: A reprint of the kullback entry. Note the format of origyear and origpublisher. These fields are not used by the standard bibliography styles
   language: en-US
 ...

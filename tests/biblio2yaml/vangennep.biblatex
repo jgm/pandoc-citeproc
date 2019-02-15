@@ -49,7 +49,6 @@ references:
   title-short: Rites de passage
   publisher: Nourry
   publisher-place: Paris
-  annote: A book entry. Note the format of the printed name and compare the useprefix
-    option in the options field as well as brandt and geer
+  annote: A book entry. Note the format of the printed name and compare the useprefix option in the options field as well as brandt and geer
   language: fr-FR
 ...

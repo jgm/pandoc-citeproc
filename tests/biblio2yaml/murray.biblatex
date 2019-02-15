@@ -84,15 +84,12 @@ references:
     given: Royce W.
   issued:
   - year: 1998
-  title: 'Alkanethiolate gold cluster molecules with core diameters from 1.5 to
-    5.2 <span class="nocase">nm</span>: Core and monolayer properties as a function
-    of core size'
+  title: 'Alkanethiolate gold cluster molecules with core diameters from 1.5 to 5.2 <span class="nocase">nm</span>: Core and monolayer properties as a function of core size'
   title-short: Alkanethiolate gold cluster molecules
   container-title: Langmuir
   page: 17-30
   volume: '14'
   issue: '1'
-  annote: An article entry with author authors. By default, long author and editor
-    lists are automatically truncated. This is configurable
+  annote: An article entry with author authors. By default, long author and editor lists are automatically truncated. This is configurable
   language: en-US
 ...

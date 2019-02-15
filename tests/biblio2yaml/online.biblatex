@@ -42,8 +42,7 @@ references:
   title: 'Tame the BeaST: The B to X of BibTeX'
   title-short: Tame the BeaST
   version: '1.3'
-  annote: An online entry for a tutorial. Note the format of the date field (yyyy-mm-dd)
-    in the database file.
+  annote: An online entry for a tutorial. Note the format of the date field (yyyy-mm-dd) in the database file.
   URL: http://tug.ctan.org/tex-archive/info/bibtex/tamethebeast/ttb_en.pdf
   language: en-US
 
@@ -57,11 +56,7 @@ references:
     day: 1
   title: 'CTAN: The Comprehensive TeX Archive Network'
   title-short: CTAN
-  annote: This is an online entry. The <span style="font-variant:small-caps;">url</span>,
-    which is given in the url field, is transformed into a clickable link if hyperref
-    support has been enabled. Note the format of the urldate field (yyyy-mm-dd) in
-    the database file. Also note the label field which may be used as a fallback by
-    citation styles which need an author and/or a year
+  annote: This is an online entry. The <span style="font-variant:small-caps;">url</span>, which is given in the url field, is transformed into a clickable link if hyperref support has been enabled. Note the format of the urldate field (yyyy-mm-dd) in the database file. Also note the label field which may be used as a fallback by citation styles which need an author and/or a year
   URL: http://www.ctan.org
   language: en-US
 ...

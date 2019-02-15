@@ -60,13 +60,10 @@ references:
     given: We Min
   issued:
   - year: 1978
-  title: A hybrid hierarchical model of a Multiple Virtual Storage (MVS) operating
-    system
+  title: A hybrid hierarchical model of a Multiple Virtual Storage (MVS) operating system
   publisher: IBM
   genre: research report
-  annote: This is a report entry for a research report. Note the format of the type
-    field in the database file which uses a localization key. The number of the report
-    is given in the number field. Also note the sorttitle and indextitle fields
+  annote: This is a report entry for a research report. Note the format of the type field in the database file which uses a localization key. The number of the report is given in the number field. Also note the sorttitle and indextitle fields
   number: RC-6947
   language: en-US
 
@@ -85,25 +82,8 @@ references:
   publisher: University of Massachusetts
   publisher-place: Amherst, Mass.
   genre: technical report
-  annote: This is a report entry for a technical report. Note the format of the type
-    field in the database file which uses a localization key. The number of the report
-    is given in the number field. Also note the sorttitle and indextitle fields
-  abstract: The steady state performance of a bulk transfer TCP flow (i.e. a flow
-    with a large amount of data to send, such as FTP transfers) may be characterized
-    by three quantities. The first is the send rate, which is the amount of data sent
-    by the sender in unit time. The second is the throughput, which is the amount
-    of data received by the receiver in unit time. Note that the throughput will always
-    be less than or equal to the send rate due to losses. Finally, the number of non-duplicate
-    packets received by the receiver in unit time gives us the goodput of the connection.
-    The goodput is always less than or equal to the throughput, since the receiver
-    may receive two copies of the same packet due to retransmissions by the sender.
-    In a previous paper, we presented a simple model for predicting the steady state
-    send rate of a bulk transfer TCP flow as a function of loss rate and round trip
-    time. In this paper, we extend that work in two ways. First, we analyze the performance
-    of bulk transfer TCP flows using more precise, stochastic analysis. Second, we
-    build upon the previous analysis to provide both an approximate formula as well
-    as a more accurate stochastic model for the steady state throughput of a bulk
-    transfer TCP flow.
+  annote: This is a report entry for a technical report. Note the format of the type field in the database file which uses a localization key. The number of the report is given in the number field. Also note the sorttitle and indextitle fields
+  abstract: The steady state performance of a bulk transfer TCP flow (i.e. a flow with a large amount of data to send, such as FTP transfers) may be characterized by three quantities. The first is the send rate, which is the amount of data sent by the sender in unit time. The second is the throughput, which is the amount of data received by the receiver in unit time. Note that the throughput will always be less than or equal to the send rate due to losses. Finally, the number of non-duplicate packets received by the receiver in unit time gives us the goodput of the connection. The goodput is always less than or equal to the throughput, since the receiver may receive two copies of the same packet due to retransmissions by the sender. In a previous paper, we presented a simple model for predicting the steady state send rate of a bulk transfer TCP flow as a function of loss rate and round trip time. In this paper, we extend that work in two ways. First, we analyze the performance of bulk transfer TCP flows using more precise, stochastic analysis. Second, we build upon the previous analysis to provide both an approximate formula as well as a more accurate stochastic model for the steady state throughput of a bulk transfer TCP flow.
   number: 99-02
   language: en-US
 ...

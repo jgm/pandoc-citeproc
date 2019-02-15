@@ -128,7 +128,7 @@ biblio2yamlTest regenerate fp = do
                      (Just [("LANG","en_US.UTF-8"),("HOME",".")])
                      pandocCiteprocPath
                      ["--bib2yaml", "-f", drop 1 $ takeExtension fp,
-                      "--columns=80"]
+                      "--columns=0"]
                      (UTF8.fromStringLazy bib)
   let result = UTF8.toStringLazy result'
   if ec == ExitSuccess

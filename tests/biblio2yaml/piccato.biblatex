@@ -47,7 +47,6 @@ references:
   title-short: City of suspects
   publisher: Duke University Press
   publisher-place: Durham; London
-  annote: This is a book entry. Note the format of the location field in the database
-    file
+  annote: This is a book entry. Note the format of the location field in the database file
   language: en-US
 ...

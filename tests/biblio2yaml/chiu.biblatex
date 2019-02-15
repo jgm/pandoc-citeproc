@@ -58,13 +58,10 @@ references:
     given: We Min
   issued:
   - year: 1978
-  title: A hybrid hierarchical model of a multiple virtual storage (MVS) operating
-    system
+  title: A hybrid hierarchical model of a multiple virtual storage (MVS) operating system
   publisher: IBM
   genre: research report
-  annote: This is a report entry for a research report. Note the format of the type
-    field in the database file which uses a localization key. The number of the report
-    is given in the number field. Also note the sorttitle and indextitle fields
+  annote: This is a report entry for a research report. Note the format of the type field in the database file which uses a localization key. The number of the report is given in the number field. Also note the sorttitle and indextitle fields
   number: RC-6947
   language: en-US
 ...

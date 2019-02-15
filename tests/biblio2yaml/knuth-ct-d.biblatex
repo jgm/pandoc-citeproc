@@ -59,7 +59,6 @@ references:
   publisher: Addison-Wesley
   publisher-place: Reading, Mass.
   volume: D
-  annote: The fourth volume of a five-volume book. Note the sorttitle and sortyear
-    fields
+  annote: The fourth volume of a five-volume book. Note the sorttitle and sortyear fields
   language: en-US
 ...

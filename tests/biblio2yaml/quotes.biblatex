@@ -31,8 +31,7 @@ references:
   title: Aristotle’s “De Motu Animalium”
   publisher: Princeton University Press
   publisher-place: Princeton
-  annote: A book entry. Note the sorttitle and indexsorttitle fields and the markup
-    of the quotes in the database file
+  annote: A book entry. Note the sorttitle and indexsorttitle fields and the markup of the quotes in the database file
   keyword: secondary
   language: en-US
 ...

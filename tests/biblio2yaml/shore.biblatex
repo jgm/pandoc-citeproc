@@ -55,6 +55,5 @@ references:
   page: 9-27
   volume: '93'
   issue: '1'
-  annote: An article entry with series, volume, and number fields. Note the format
-    of the series which is a localization key
+  annote: An article entry with series, volume, and number fields. Note the format of the series which is a localization key
 ...

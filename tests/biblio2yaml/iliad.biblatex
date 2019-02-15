@@ -55,8 +55,6 @@ references:
   publisher: Artemis & Winkler
   publisher-place: Düsseldorf; Zürich
   edition: '3'
-  annote: A German translation of the *Iliad*. Note the translator and introduction
-    fields and the format of the location field in the database file. Also note the
-    sorttitle and indextitle fields
+  annote: A German translation of the *Iliad*. Note the translator and introduction fields and the format of the location field in the database file. Also note the sorttitle and indextitle fields
   language: de-DE
 ...

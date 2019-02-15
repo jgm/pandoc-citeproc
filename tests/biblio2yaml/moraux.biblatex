@@ -73,16 +73,13 @@ references:
   - year: 1979
   event-date:
   - year: 1975
-  title: 'Le *De Anima* dans la tradition grècque: Quelques aspects de l’interpretation
-    du traité, de Theophraste à Themistius'
+  title: 'Le *De Anima* dans la tradition grècque: Quelques aspects de l’interpretation du traité, de Theophraste à Themistius'
   title-short: '*De Anima* dans la tradition grècque'
-  container-title: Aristotle on Mind and the Senses. Proceedings of the Seventh Symposium
-    Aristotelicum
+  container-title: Aristotle on Mind and the Senses. Proceedings of the Seventh Symposium Aristotelicum
   publisher: Cambridge University Press
   publisher-place: Cambridge
   page: 281-324
-  annote: This is a typical inproceedings entry. Note the booksubtitle, shorttitle,
-    indextitle, and indexsorttitle fields. Also note the eventdate field.
+  annote: This is a typical inproceedings entry. Note the booksubtitle, shorttitle, indextitle, and indexsorttitle fields. Also note the eventdate field.
   keyword: secondary
   language: fr-FR
 ...

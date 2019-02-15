@@ -57,8 +57,6 @@ references:
   collection-title: 3rd ser.
   page: 168-190
   volume: '15'
-  annote: An article entry with a series and a volume field. Note the format of the
-    series. If the value of the series field is an integer, this number is printed
-    as an ordinal and the string ‘series’ is appended automatically
+  annote: An article entry with a series and a volume field. Note the format of the series. If the value of the series field is an integer, this number is printed as an ordinal and the string ‘series’ is appended automatically
   language: en-US
 ...

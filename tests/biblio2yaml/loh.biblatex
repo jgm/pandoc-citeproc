@@ -53,7 +53,6 @@ references:
   publisher: Massachusetts Institute of Technology
   publisher-place: Cambridge, Mass.
   genre: Master’s thesis
-  annote: This is a typical thesis entry for an MA thesis. Note the type field in
-    the database file which uses a localization key
+  annote: This is a typical thesis entry for an MA thesis. Note the type field in the database file which uses a localization key
   language: en-US
 ...

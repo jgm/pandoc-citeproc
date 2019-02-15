@@ -65,8 +65,7 @@ references:
   title-short: Rhetoric
   publisher: Cambridge University Press
   number-of-volumes: '3'
-  annote: A commented edition. Note the concatenation of the editor and commentator
-    fields as well as the volumes, sorttitle, and indextitle fields
+  annote: A commented edition. Note the concatenation of the editor and commentator fields as well as the volumes, sorttitle, and indextitle fields
   keyword: primary
   language: en-GB
 ...

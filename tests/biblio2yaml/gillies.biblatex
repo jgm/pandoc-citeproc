@@ -57,7 +57,6 @@ references:
   collection-title: new series
   page: 46-67
   volume: '9'
-  annote: An article entry with a series and a volume field. Note that format of the
-    series field in the database file
+  annote: An article entry with a series and a volume field. Note that format of the series field in the database file
   language: en-GB
 ...

@@ -50,7 +50,6 @@ references:
   title-short: Crystallography and diffraction
   publisher: International Union of Crystallography; Oxford University Press
   publisher-place: Oxford
-  annote: A book entry. Note the sorttitle and indextitle fields as well as the format
-    of the publisher field
+  annote: A book entry. Note the sorttitle and indextitle fields as well as the format of the publisher field
   language: en-GB
 ...

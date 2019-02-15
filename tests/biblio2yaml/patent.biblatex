@@ -68,9 +68,7 @@ references:
   - year: 1998
   title: Elektromagnetisches Signalhorn
   jurisdiction: France; United Kingdom; Germany
-  annote: This is a patent entry with a location field. The number is given in the
-    number field. Note the format of the location field in the database file. Compare
-    laufenberg, sorace, and kowalik
+  annote: This is a patent entry with a location field. The number is given in the number field. Note the format of the location field in the database file. Compare laufenberg, sorace, and kowalik
   number: EU-29702195U
   language: de-DE
 
@@ -85,12 +83,9 @@ references:
   - year: 1995
     month: 1
     day: 11
-  title: Estimateur d’un défaut de fonctionnement d’un modulateur en quadrature et
-    étage de modulation l’utilisant
+  title: Estimateur d’un défaut de fonctionnement d’un modulateur en quadrature et étage de modulation l’utilisant
   genre: French patent request
-  annote: This is a patent entry for a French patent request with a full date. The
-    number is given in the number field. Note the format of the type and date fields
-    in the database file. Compare almendro, laufenberg, and sorace
+  annote: This is a patent entry for a French patent request with a full date. The number is given in the number field. Note the format of the type and date fields in the database file. Compare almendro, laufenberg, and sorace
   number: '9500261'
   language: fr-FR
 
@@ -127,13 +122,8 @@ references:
     day: 13
   title: Elektrische Einrichtung und Betriebsverfahren
   genre: European patent
-  annote: This is a patent entry with a holder field. Note the format of the type
-    and location fields in the database file. Compare almendro, sorace, and kowalik
-  abstract: The invention relates to an electric device comprising a generator, in
-    particular for use in the vehicle electric system of a motor vehicle and a controller
-    for controlling the generator voltage. The device is equipped with a control zone,
-    in which the voltage is controlled and zones, in which the torque is controlled.
-    The invention also relates to methods for operating a device of this type.
+  annote: This is a patent entry with a holder field. Note the format of the type and location fields in the database file. Compare almendro, sorace, and kowalik
+  abstract: The invention relates to an electric device comprising a generator, in particular for use in the vehicle electric system of a motor vehicle and a controller for controlling the generator voltage. The device is equipped with a control zone, in which the voltage is controlled and zones, in which the torque is controlled. The invention also relates to methods for operating a device of this type.
   number: '1700367'
   language: de-DE
 
@@ -152,8 +142,7 @@ references:
     day: 16
   title: High-speed digital-to-RF converter
   genre: U.S. patent
-  annote: This is a patent entry with a holder field. Note the format of the type
-    and date fields in the database file. Compare almendro, laufenberg, and kowalik
+  annote: This is a patent entry with a holder field. Note the format of the type and date fields in the database file. Compare almendro, laufenberg, and kowalik
   number: '5668842'
   language: en-US
 ...

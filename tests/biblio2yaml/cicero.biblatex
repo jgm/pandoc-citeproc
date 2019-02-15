@@ -68,8 +68,6 @@ references:
   title-short: De natura deorum
   publisher: Reclam
   publisher-place: Stuttgart
-  annote: A bilingual edition of Cicero’s *De natura deorum*, with a German translation.
-    Note the format of the language field in the database file, the concatenation
-    of the editor and translator fields, and the afterword field
+  annote: A bilingual edition of Cicero’s *De natura deorum*, with a German translation. Note the format of the language field in the database file, the concatenation of the editor and translator fields, and the afterword field
   language: de-DE
 ...

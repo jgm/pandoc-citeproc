@@ -75,20 +75,14 @@ references:
     given: Friedrich
   issued:
   - year: 1988
-  title: 'Unzeitgemässe Betrachtungen. Zweites Stück: Vom Nutzen und Nachtheil der
-    Historie für das Leben'
+  title: 'Unzeitgemässe Betrachtungen. Zweites Stück: Vom Nutzen und Nachtheil der Historie für das Leben'
   title-short: Vom Nutzen und Nachtheil der Historie
   container-title: 'Sämtliche Werke: Kritische Studienausgabe'
-  volume-title: Die Geburt der Tragödie. Unzeitgemäße Betrachtungen I–IV. Nachgelassene
-    Schriften 1870–1973
+  volume-title: Die Geburt der Tragödie. Unzeitgemäße Betrachtungen I–IV. Nachgelassene Schriften 1870–1973
   publisher: Deutscher Taschenbuch-Verlag; Walter de Gruyter
   publisher-place: München; Berlin; New York
   page: 243-334
   volume: '1'
-  annote: A single essay from the critical edition of Nietzsche’s works. This inbook
-    entry explicitly refers to an essay found in the first volume. Note the title,
-    booktitle, and maintitle fields. Also note the sorttitle and sortyear fields.
-    We want this entry to be listed after the entry referring to the entire first
-    volume
+  annote: A single essay from the critical edition of Nietzsche’s works. This inbook entry explicitly refers to an essay found in the first volume. Note the title, booktitle, and maintitle fields. Also note the sorttitle and sortyear fields. We want this entry to be listed after the entry referring to the entire first volume
   language: de-DE
 ...

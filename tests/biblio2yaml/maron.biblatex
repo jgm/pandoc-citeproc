@@ -57,8 +57,6 @@ references:
   title-short: Animal triste
   publisher: University of Nebraska Press
   publisher-place: Lincoln
-  annote: 'An English translation of a German novel with a French title. In other
-    words: a book entry with a translator field. Note the origlanguage field which
-    is concatenated with the translator'
+  annote: 'An English translation of a German novel with a French title. In other words: a book entry with a translator field. Note the origlanguage field which is concatenated with the translator'
   language: en-US
 ...

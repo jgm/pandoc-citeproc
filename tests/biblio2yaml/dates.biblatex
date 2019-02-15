@@ -97,8 +97,7 @@ references:
   issued:
   - year: 1999
     month: 8
-  title: Year and month, biblatex style; note that biblatex does not have a “day”
-    field
+  title: Year and month, biblatex style; note that biblatex does not have a “day” field
   container-title: Journal
 
 - id: dates

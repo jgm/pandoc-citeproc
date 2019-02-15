@@ -75,9 +75,7 @@ references:
   publisher: Klett-Cotta
   publisher-place: Stuttgart
   page: 884-917
-  annote: An incollection entry with a series and a number. Note the format of the
-    printed name and compare the useprefix option in the options field as well as
-    vangennep. Also note the indextitle, and indexsorttitle fields
+  annote: An incollection entry with a series and a number. Note the format of the printed name and compare the useprefix option in the options field as well as vangennep. Also note the indextitle, and indexsorttitle fields
   language: de-DE
 
 - id: hyman
@@ -112,8 +110,7 @@ references:
     given: Isadore
   issued:
   - year: 1979
-  title: The limitations of human knowledge according to Al-Farabi, <span class="nocase">ibn
-    Bajja</span>, and Maimonides
+  title: The limitations of human knowledge according to Al-Farabi, <span class="nocase">ibn Bajja</span>, and Maimonides
   title-short: Limitations of human knowledge
   container-title: Studies in medieval Jewish history and literature
   publisher: Harvard University Press

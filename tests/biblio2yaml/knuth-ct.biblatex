@@ -55,7 +55,6 @@ references:
   publisher: Addison-Wesley
   publisher-place: Reading, Mass.
   number-of-volumes: '5'
-  annote: A five-volume book cited as a whole. This is a book entry, note the volumes
-    field
+  annote: A five-volume book cited as a whole. This is a book entry, note the volumes field
   language: en-US
 ...

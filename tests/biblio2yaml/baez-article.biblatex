@@ -61,9 +61,7 @@ references:
   page: 423-491
   version: '3'
   volume: '12'
-  annote: An article with eprint and eprinttype fields. Note that the arXiv reference
-    is transformed into a clickable link if hyperref support has been enabled. Compare
-    baez/online, which is the same item given as an online entry
+  annote: An article with eprint and eprinttype fields. Note that the arXiv reference is transformed into a clickable link if hyperref support has been enabled. Compare baez/online, which is the same item given as an online entry
   URL: http://arxiv.org/abs/math/0307200v3
   language: en-US
 ...

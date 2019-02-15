@@ -48,8 +48,7 @@ references:
   title-short: Ghost of John Wayne
   publisher: The University of Arizona Press
   publisher-place: Tucson
-  annote: A collection of short stories. This is a book entry. Note the sorttitle
-    and indextitle fields in the database file. There’s also an isbn field
+  annote: A collection of short stories. This is a book entry. Note the sorttitle and indextitle fields in the database file. There’s also an isbn field
   ISBN: 0-816-52066-6
   language: en-US
 ...

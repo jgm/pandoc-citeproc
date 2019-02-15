@@ -73,10 +73,6 @@ references:
   publisher-place: München; Berlin; New York
   number-of-volumes: '15'
   edition: '2'
-  annote: The critical edition of Nietzsche’s works. This is a book entry referring
-    to a 15-volume work as a whole. Note the volumes field and the format of the publisher
-    and location fields in the database file. Also note the sorttitle and sortyear
-    fields which are used to fine-tune the sorting order of the bibliography. We want
-    this item listed first in the bibliography
+  annote: The critical edition of Nietzsche’s works. This is a book entry referring to a 15-volume work as a whole. Note the volumes field and the format of the publisher and location fields in the database file. Also note the sorttitle and sortyear fields which are used to fine-tune the sorting order of the bibliography. We want this item listed first in the bibliography
   language: de-DE
 ...

@@ -75,8 +75,7 @@ references:
   page: 212-225
   volume: '4'
   issue: '3'
-  annote: An article entry cited as an excerpt from a collection entry. Note the format
-    of the related and relatedstring fields
+  annote: An article entry cited as an excerpt from a collection entry. Note the format of the related and relatedstring fields
   language: en-US
 
 - id: matuz:doody
@@ -91,7 +90,6 @@ references:
   publisher-place: Detroit
   page: 204-208
   volume: '61'
-  annote: A collection entry providing the excerpt information for the doody entry.
-    Note the format of the pages field
+  annote: A collection entry providing the excerpt information for the doody entry. Note the format of the pages field
   language: en-US
 ...

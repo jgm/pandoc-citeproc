@@ -61,7 +61,6 @@ references:
   container-title: Studia Philosophica
   page: 189-216
   volume: '29'
-  annote: An article entry. Note the sorttitle and indexsorttitle fields and the markup
-    of the quotes in the database file
+  annote: An article entry. Note the sorttitle and indexsorttitle fields and the markup of the quotes in the database file
   language: de-DE
 ...

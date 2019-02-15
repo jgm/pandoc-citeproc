@@ -112,8 +112,7 @@ references:
   - year: 2013
     month: 7
     day: 29
-  title: 'An article entry with the required and all optional fields: The subtitle.
-    The titleaddon'
+  title: 'An article entry with the required and all optional fields: The subtitle. The titleaddon'
   title-short: An article entry with the required and all optional fields
   container-title: 'The Journaltitle: The Journalsubtitle'
   collection-title: new series

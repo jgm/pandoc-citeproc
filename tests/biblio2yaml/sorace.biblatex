@@ -53,8 +53,7 @@ references:
     day: 16
   title: High-speed digital-to-RF converter
   genre: U.S. patent
-  annote: This is a patent entry with a holder field. Note the format of the type
-    and date fields in the database file. Compare almendro, laufenberg, and kowalik
+  annote: This is a patent entry with a holder field. Note the format of the type and date fields in the database file. Compare almendro, laufenberg, and kowalik
   number: '5668842'
   language: en-US
 ...

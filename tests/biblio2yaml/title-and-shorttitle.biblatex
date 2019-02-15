@@ -40,14 +40,12 @@ CSL “container-title-short” could also be set
 references:
 - id: item4
   type: book
-  title: 'The title: With a colon in the “title” field: And a subtitle, in two separate
-    fields; plus a separate “shorttitle” field'
+  title: 'The title: With a colon in the “title” field: And a subtitle, in two separate fields; plus a separate “shorttitle” field'
   title-short: The shorttitle
 
 - id: item3
   type: book
-  title: 'The title: With a colon in the “title” field: And a subtitle, in two separate
-    fields'
+  title: 'The title: With a colon in the “title” field: And a subtitle, in two separate fields'
   title-short: The title
 
 - id: item2
