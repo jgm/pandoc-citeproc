@@ -33,7 +33,9 @@ To process citations with pandoc, call pandoc-citeproc as a filter:
     pandoc --filter pandoc-citeproc input.md -s -o output.html
 
 pandoc-citeproc will look for the following metadata fields in
-the input:
+the input.  (For details on how to set metadata fields in
+pandoc's markdown, see the `pandoc` (1) man page under
+`--metadata`, `--metadata-file`, and `Extension: yaml_metadata_block`.)
 
 `bibliography`
 :   A path, or YAML list of paths, of bibliography
