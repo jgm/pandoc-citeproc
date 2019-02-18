@@ -297,6 +297,7 @@ getNoteCitationIds _        = []
 isNote :: Inline -> Bool
 isNote (Note _)          = True
 isNote (Cite _ [Note _]) = True
+isNote (Cite _ [Superscript _]) = True
 isNote _                 = False
 
 mvPunctInsideQuote :: Inline -> Inline -> [Inline]
