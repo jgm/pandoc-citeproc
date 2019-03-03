@@ -1,3 +1,7 @@
+pandoc-citeproc (0.16.1.1)
+
+  * Bump version bounds for pandoc, network.
+
 pandoc-citeproc (0.16.1)
 
   * Add --columns option.  This allows users to specify the column
