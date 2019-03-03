@@ -1,5 +1,5 @@
 name:               pandoc-citeproc
-version:            0.16.1
+version:            0.16.1.1
 cabal-version:      1.12
 synopsis:           Supports using pandoc with citeproc
 
@@ -104,7 +104,7 @@ library
                       bytestring, filepath,
                       network < 3.0,
                       pandoc-types >= 1.17.3 && < 1.18,
-                      pandoc >= 1.16 && < 2.7,
+                      pandoc >= 1.16 && < 2.8,
                       tagsoup,
                       aeson >= 0.7 && < 1.5,
                       text,
@@ -154,7 +154,7 @@ executable pandoc-citeproc
     ghc-prof-options: -fprof-auto-exported -rtsopts
     build-depends:    base >= 4, pandoc-citeproc,
                       pandoc-types >= 1.17.3 && < 1.18,
-                      pandoc >= 1.16 && < 2.7,
+                      pandoc >= 1.16 && < 2.8,
                       aeson,
                       aeson-pretty >= 0.8,
                       yaml >= 0.11,
@@ -190,7 +190,7 @@ executable test-citeproc
     Buildable:    False
   build-depends:  base >= 4, aeson, directory, text, mtl,
                   pandoc-types >= 1.17.3 && < 1.18,
-                  pandoc >= 1.16 && < 2.7,
+                  pandoc >= 1.16 && < 2.8,
                   filepath, containers,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.11, containers >= 0.4, vector >= 0.10
@@ -213,7 +213,7 @@ test-suite test-pandoc-citeproc
   Hs-Source-Dirs: tests, compat
   build-depends:  base >= 4, aeson, directory, text,
                   pandoc-types >= 1.17.3 && < 1.18, mtl,
-                  pandoc >= 1.16 && < 2.7, filepath, containers,
+                  pandoc >= 1.16 && < 2.8, filepath, containers,
                   bytestring, pandoc-citeproc, process, temporary >= 1.1,
                   yaml >= 0.11
   ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind -threaded
