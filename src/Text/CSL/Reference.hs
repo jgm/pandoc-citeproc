@@ -66,7 +66,7 @@ import           Data.Char           (isDigit, toLower)
 import           Data.Either         (lefts, rights)
 import           Data.Generics       hiding (Generic)
 import qualified Data.HashMap.Strict as H
-import           Data.List           (findIndex, elemIndex)
+import           Data.List           (find, elemIndex)
 import           Data.List.Split     (splitWhen)
 import           Data.Maybe          (fromMaybe, isNothing)
 import           Data.String
@@ -877,8 +877,8 @@ numericVars = [ "edition", "volume", "number-of-volumes", "number", "issue", "ci
 
 getReference :: [Reference] -> Cite -> Maybe Reference
 getReference  rs c
-    = case (hasId (citeId c)) `findIndex` rs of
-        Just i  -> Just $ setPageFirst $ rs !! i
+    = case (hasId (citeId c)) `find` rs of
+        Just r  -> Just $ setPageFirst r
         Nothing -> Nothing
   where hasId :: String -> Reference -> Bool
         hasId ident r = ident `elem` (map unLiteral (refId r : refOtherIds r))
