@@ -369,8 +369,12 @@ deNote = topDown go
         specialSpan cs =
           Span ("",["reference-id-list"],
             [("refids", unwords (map citationId cs))]) []
+        go' (Str "(" : Cite cs [Note [Para xs]] : Str ")" : ys) =
+             Str "(" : Cite cs xs : Str ")" : ys
         go' (x : Cite cs [Note [Para xs]] : ys) | not (isSpacy x) =
              x : Str "," : Space : comb (\zs -> [Cite cs zs]) xs ys
+        go' (Str "(" : Note [Para xs] : Str ")" : ys) =
+             Str "(" : xs ++ (Str ")" : ys)
         go' (x : Note [Para xs] : ys) | not (isSpacy x) =
              x : Str "," : Space : comb id xs ys
         go' (Cite cs [Note [Para xs]] : ys) = comb (\zs -> [Cite cs zs]) xs ys
