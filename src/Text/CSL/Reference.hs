@@ -62,7 +62,7 @@ import           Control.Monad       (guard, mplus, msum)
 import           Data.Aeson          hiding (Value)
 import qualified Data.Aeson          as Aeson
 import           Data.Aeson.Types    (Parser)
-import           Data.Char           (isDigit, toLower)
+import           Data.Char           (isDigit, toLower, isPunctuation)
 import           Data.Either         (lefts, rights)
 import           Data.Generics       hiding (Generic)
 import qualified Data.HashMap.Strict as H
@@ -80,7 +80,7 @@ import           Text.CSL.Style      hiding (Number)
 import           Text.CSL.Util       (camelize, capitalize, inlinesToString,
                                       mapping', parseBool, parseInt, parseMaybeInt,
                                       parseString, readNum, safeRead, trim,
-                                      uncamelize, AddYaml(..))
+                                      uncamelize, AddYaml(..), splitStrWhen)
 import           Text.Pandoc         (Inline (Str))
 import qualified Text.Parsec         as P
 import qualified Text.Parsec.String  as P
@@ -492,7 +492,7 @@ data Reference =
 instance FromJSON Reference where
   parseJSON (Object v') = do
      v <- parseSuppFields v' <|> return v'
-     addPageFirst <$> (Reference <$>
+     (Reference <$>
        v .:? "id" .!= "" <*>
        v .:? "other-ids" .!= [] <*>
        v .:? "type" .!= NoType <*>
@@ -569,15 +569,6 @@ instance FromJSON Reference where
        v .:? "citation-number" .!= CNum 0 <*>
        ((v .: "first-reference-note-number" >>= parseInt) <|> return 0) <*>
        v .:? "citation-label" .!= mempty)
-    where takeFirstNum (Formatted (Str xs : _)) =
-            case takeWhile isDigit xs of
-                   [] -> mempty
-                   ds -> Formatted [Str ds]
-          takeFirstNum x = x
-          addPageFirst ref = if pageFirst ref == mempty && page ref /= mempty
-                                then ref{ pageFirst =
-                                            takeFirstNum (page ref) }
-                                else ref
   parseJSON _ = fail "Could not parse Reference"
 
 -- Syntax for adding supplementary fields in note variable
@@ -955,7 +946,8 @@ processCites rs cs
 setPageFirst :: Reference -> Reference
 setPageFirst ref =
   let Formatted ils = page ref
-      ils' = takeWhile (\i -> i /= Str "–" && i /= Str "-") ils
+      ils' = takeWhile (\i -> i /= Str "–" && i /= Str "-") $
+              splitStrWhen isPunctuation ils
   in  if ils == ils'
          then ref
          else ref{ pageFirst = Formatted ils' }
