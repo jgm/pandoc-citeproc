@@ -297,6 +297,9 @@ getNoteCitationIds _        = []
 isNote :: Inline -> Bool
 isNote (Note _)          = True
 isNote (Cite _ [Note _]) = True
+ -- the following allows citation styles that are "in-text" but use superscript
+ -- references to be treated as if they are "notes" for the purposes of moving
+ -- the citations after trailing punctuation (see <https://github.com/jgm/pandoc-citeproc/issues/382>):
 isNote (Cite _ [Superscript _]) = True
 isNote _                 = False
 
