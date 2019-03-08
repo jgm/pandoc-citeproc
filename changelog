@@ -1,3 +1,10 @@
+pandoc-citeproc (0.16.1.2)
+
+  * Fix extraction page-first when page is not fully numeric (#386).
+  * For cites in notes in a footnote style, don't add comma right after
+    open parentheses.  Partially addresses #389.
+  * Ensure that URIs (e.g. in DOIs) are properly escaped (#391).
+
 pandoc-citeproc (0.16.1.1)
 
   * Bump version bounds for pandoc, network.
