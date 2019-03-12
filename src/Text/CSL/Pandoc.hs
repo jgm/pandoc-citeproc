@@ -322,16 +322,22 @@ mvPunct moveNotes sty (q : s : x : ys)
   , startWithPunct ys
   = if moveNotes
        then mvPunct moveNotes sty $
-            q : Str (headInline ys) : x : tailInline ys
+             case headInline ys of
+               "" -> q : x : tailInline ys
+               w  -> q : Str w : x : tailInline ys
        else q : x : mvPunct moveNotes sty ys
 mvPunct moveNotes sty (Cite cs ils : ys)
    | length ils > 1
    , isNote (last ils)
    , startWithPunct ys
    , moveNotes
-   = Cite cs (init ils
-     ++ [Str (headInline ys) | not (endWithPunct False (init ils))]
-     ++ [last ils]) : mvPunct moveNotes sty (tailInline ys)
+   = Cite cs
+      (init ils ++
+         (case headInline ys of
+               "" -> []
+               s' | not (endWithPunct False (init ils)) -> [Str s']
+                  | otherwise                           -> [])
+       ++ [last ils]) : mvPunct moveNotes sty (tailInline ys)
 mvPunct moveNotes sty (q@(Quoted _ _) : w@(Str _) : x : ys)
   | isNote x
   , isPunctuationInQuote sty
@@ -567,7 +573,7 @@ pLocatorWordIntegrated :: Bool -> Parsec [Inline] st (Bool, String)
 pLocatorWordIntegrated isFirst = try $ do
   punct <- if isFirst
               then return ""
-              else stringify <$> option (Str "") pLocatorSep
+              else (stringify <$> pLocatorSep) <|> return ""
   sp <- option "" (pSpace >> return " ")
   (dig, s) <- pBalancedBraces [('(',')'), ('[',']'), ('{','}')] pPageSeq
   return (dig, punct ++ sp ++ s)

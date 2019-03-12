@@ -407,7 +407,8 @@ lastInline xs = case stringify xs of
 initInline :: [Inline] -> [Inline]
 initInline [] = []
 initInline [i]
-    | Str          s <- i = return $ Str         (init'       s)
+    | Str          s <- i
+    , not (null s)        = return $ Str         (init        s)
     | Emph        is <- i = return $ Emph        (initInline is)
     | Strong      is <- i = return $ Strong      (initInline is)
     | Superscript is <- i = return $ Superscript (initInline is)
@@ -421,10 +422,9 @@ initInline [i]
 initInline (i:xs) = i : initInline xs
 
 tailInline :: [Inline] -> [Inline]
-tailInline (Space:xs) = xs
+tailInline (Space:xs)     = xs
 tailInline (SoftBreak:xs) = xs
-tailInline xs         = removeEmpty $ tailFirstInlineStr xs
-  where removeEmpty   = dropWhile (== Str "")
+tailInline xs             = tailFirstInlineStr xs
 
 tailFirstInlineStr :: [Inline] -> [Inline]
 tailFirstInlineStr = mapHeadInline (drop 1)
@@ -437,7 +437,9 @@ mapHeadInline :: (String -> String) -> [Inline] -> [Inline]
 mapHeadInline _ [] = []
 mapHeadInline f (i:xs)
     | Str         [] <- i =                      mapHeadInline f xs
-    | Str          s <- i = Str         (f                s)   : xs
+    | Str          s <- i = case f s of
+                              "" -> xs
+                              _  -> Str (f                s)   : xs
     | Emph        is <- i = Emph        (mapHeadInline f is)   : xs
     | Strong      is <- i = Strong      (mapHeadInline f is)   : xs
     | Superscript is <- i = Superscript (mapHeadInline f is)   : xs
