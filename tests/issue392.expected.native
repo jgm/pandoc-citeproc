@@ -1,0 +1,7 @@
+Pandoc (Meta {unMeta = fromList [("csl",MetaInlines [Str "tests/apa.csl"]),("references",MetaList [MetaMap (fromList [("author",MetaList [MetaMap (fromList [("family",MetaInlines [Str "James"]),("given",MetaInlines [Str "M.R."])])]),("id",MetaInlines [Str "james"])]),MetaMap (fromList [("author",MetaList [MetaMap (fromList [("family",MetaInlines [Str "MacFarlane"]),("given",MetaInlines [Str "J.",Space,Str "G."])])]),("id",MetaInlines [Str "macfarlane"])])])]})
+[Para [Cite [Citation {citationId = "james", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 1}] [Str "James",Space,Str "(n.d.)"],Str ";",Space,Cite [Citation {citationId = "macfarlane", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 2}] [Str "MacFarlane",Space,Str "(n.d.)"]]
+,Div ("refs",["references"],[])
+ [Div ("ref-james",[],[])
+  [Para [Str "James,",Space,Str "M.",Space,Str "(n.d.)."]]
+ ,Div ("ref-macfarlane",[],[])
+  [Para [Str "MacFarlane,",Space,Str "J.",Space,Str "G.",Space,Str "(n.d.)."]]]]
