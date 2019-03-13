@@ -118,7 +118,7 @@ import           Text.CSL.Util          (orIfNull, headInline, initInline,
                                          lastInline, mapping', mb, parseBool,
                                          parseString, query, splitStrWhen,
                                          tailInline, trimr, (.#:), (.#?),
-                                         AddYaml(..))
+                                         AddYaml(..), addSpaceAfterPeriod)
 import qualified Text.Pandoc.Builder    as B
 import           Text.Pandoc.Definition hiding (Citation, Cite)
 import qualified Text.Pandoc.Walk       as Walk
@@ -819,7 +819,9 @@ removeQuoted (Formatted ils) = Formatted (go ils)
 
 instance FromJSON Agent where
   parseJSON (Object v) = nameTransform <$> (Agent <$>
-              (v .: "given" <|> ((map Formatted . wordsBy isSpace . unFormatted) <$> v .: "given") <|> pure []) <*>
+              (v .: "given" <|> ((map Formatted . wordsBy isSpace .
+                                  addSpaceAfterPeriod . unFormatted) <$>
+                                  v .: "given") <|> pure []) <*>
               v .:?  "dropping-particle" .!= mempty <*>
               v .:? "non-dropping-particle" .!= mempty <*>
               (removeQuoted <$> (v .:? "family" .!= mempty)) <*>

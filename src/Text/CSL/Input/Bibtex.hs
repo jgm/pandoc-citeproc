@@ -41,7 +41,8 @@ import           Text.CSL.Reference
 import           Text.CSL.Style         (Agent (..), emptyAgent, CslTerm (..),
                                          Formatted (..), Locale (..))
 import           Text.CSL.Util          (onBlocks, protectCase, safeRead,
-                                         splitStrWhen, trim, unTitlecase)
+                                         splitStrWhen, trim, unTitlecase,
+                                         addSpaceAfterPeriod)
 import           Text.Pandoc.Definition
 import qualified Text.Pandoc.UTF8       as UTF8
 import qualified Text.Pandoc.Walk       as Walk
@@ -1009,7 +1010,8 @@ toLiteralList _ = mzero
 
 toAuthorList :: Options -> [Block] -> Bib [Agent]
 toAuthorList opts [Para xs] =
-  filter (/= emptyAgent) <$> mapM (toAuthor opts) (splitByAnd xs)
+  filter (/= emptyAgent) <$> mapM (toAuthor opts . addSpaceAfterPeriod)
+                                    (splitByAnd xs)
 toAuthorList opts [Plain xs] = toAuthorList opts [Para xs]
 toAuthorList _ _ = mzero
 

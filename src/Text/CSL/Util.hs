@@ -50,13 +50,14 @@ module Text.CSL.Util
   , mapping'
   , parseRomanNumeral
   , isRange
+  , addSpaceAfterPeriod
   ) where
 import Prelude
 import           Control.Monad.State
 import           Data.Aeson
 import           Data.Aeson.Types    (Parser)
-import           Data.Char           (isAscii, isLower, isPunctuation, isUpper,
-                                      toLower, toUpper)
+import           Data.Char           (isAscii, isLower, isPunctuation,
+                                      isUpper, isLetter, toLower, toUpper)
 import           Data.Generics       (Data, Typeable, everything, everywhere,
                                       everywhere', everywhereM, mkM, mkQ, mkT)
 import           Data.List.Split     (wordsBy)
@@ -532,3 +533,16 @@ pRomanNumeral = do
 
 isRange :: String -> Bool
 isRange s = ',' `elem` s || '-' `elem` s || '\x2013' `elem` s
+
+-- see issue 392 for motivation.  We want to treat
+-- "J.G. Smith" and "J. G. Smith" the same.
+addSpaceAfterPeriod :: [Inline] -> [Inline]
+addSpaceAfterPeriod = go . splitStrWhen (=='.')
+  where
+    go [] = []
+    go (Str [c]:Str ".":Str [d]:xs)
+      | isLetter d
+      , isLetter c
+      , isUpper c
+      , isUpper d   = Str [c]:Str ".":Space:Str [d]:go xs
+    go (x:xs) = x:go xs
