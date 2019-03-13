@@ -1,3 +1,11 @@
+pandoc-citeproc (0.16.1.3)
+
+  * Correctly handle initials even when
+    presented without a space, as in "J.G. Smith" (#392).
+  * Avoid generating Str "" when possible.
+  * Allow superscript in-text styles to be treated as "notes"
+    for purposes of moving punctuation (George Pollard, #382).
+
 pandoc-citeproc (0.16.1.2)
 
   * Fix extraction page-first when page is not fully numeric (#386).
