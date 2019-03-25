@@ -544,5 +544,5 @@ addSpaceAfterPeriod = go . splitStrWhen (=='.')
       | isLetter d
       , isLetter c
       , isUpper c
-      , isUpper d   = Str [c]:Str ".":Space:Str [d]:go xs
+      , isUpper d   = Str [c]:Str ".":Space:go (Str [d]:xs)
     go (x:xs) = x:go xs
