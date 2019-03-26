@@ -202,8 +202,8 @@ by other CSL implementations.
 
 `--man`
 :   Print the man page in groff man format.  To get a plain text
-    version, `pandoc-citeproc --man | groff -mman -Tutf8`.  To
-    `pandoc-citeproc --man | groff -mman -Thtml`.
+    version, `pandoc-citeproc --man | groff -mman -Tutf8`.  To get an HTML
+    version, `pandoc-citeproc --man | groff -mman -Thtml`.
 
 `--license`
 :   Print the license.
