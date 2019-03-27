@@ -279,12 +279,9 @@ formatName m b f fm ops np n
 
       sortSep g s = when_ g $ separator ++ addAffixes (g <+> s) "given" mempty
       separator   = if isByzantineFamily
-                       then
-                         if null (getOptionVal "sort-separator" ops)
-                            then [OPan [Str ",", Space]]
-                            else [OPan $ B.toList $ B.text $ getOptionVal "sort-separator" ops]
+                       then [OPan (B.toList (B.text
+                              (getOptionValWithDefault "sort-separator" ", " ops)))]
                        else []
-
       suff      = if commaSuffix n && nameSuffix n /= mempty
                   then suffCom
                   else suffNoCom

@@ -134,6 +134,9 @@ getStringValue val =
 getOptionVal :: String -> [Option] -> String
 getOptionVal s = fromMaybe [] . lookup s
 
+getOptionValWithDefault :: String -> String -> [Option] -> String
+getOptionValWithDefault s defvalue = fromMaybe defvalue . lookup s
+
 isOptionSet :: String -> [Option] -> Bool
 isOptionSet s = maybe False (not . null) . lookup s
 
