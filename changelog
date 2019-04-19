@@ -1,3 +1,18 @@
+pandoc-citeproc (0.16.2)
+
+  * Normalize for sorting by padding numerical strings with 0s (#399).
+    This is a somewhat ugly fix to #399, and might be wrong
+    if there are strings that may be numerical and should not
+    be sorted in numerical order.  But this is the best we can
+    do right now without major archictectural changes.
+  * Add Ord instance for CNum.  [Minor API change.]
+  * Allow empty sort-separator.
+    Previously this was overridden with the default.
+    Text.CSL.Common: export getOptionValWithDefault [API change].
+  * Fix omitted phrase in --man documentation (#394, Daniel Himmelstein).
+  * Amend fix to #392 (#393).  Initials were being dropped when there were
+    more than two unspaced initials.
+
 pandoc-citeproc (0.16.1.3)
 
   * Correctly handle initials even when
