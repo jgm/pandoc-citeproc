@@ -100,7 +100,7 @@ import           Control.Monad          (mplus)
 import           Data.Aeson             hiding (Number)
 import qualified Data.Aeson             as Aeson
 import           Data.Aeson.Types       (Pair)
-import           Data.Char              (isLetter, isPunctuation, isUpper, toLower)
+import           Data.Char              (isLetter, isPunctuation, isUpper, toLower, isDigit)
 import qualified Data.Char              as Char
 import           Data.Generics          (Data, Typeable)
 import           Data.List              (intercalate, intersperse, isInfixOf,
@@ -491,7 +491,13 @@ compare' x y
         (_  ,'-':_)   -> GT
         _             -> comp (normalize x) (normalize y)
       where
-        normalize = map (\c -> if c == ',' || c == '.' then ' ' else c) .
+        -- we zero pad numbers so they're sorted numerically, see #399
+        zeropad [] = []
+        zeropad xs = if all isDigit xs
+                        then replicate (10 - length xs) '0' ++ xs
+                        else xs
+        normalize = zeropad .
+                    map (\c -> if c == ',' || c == '.' then ' ' else c) .
                     filter (\c -> c == ',' ||
                                   not (isPunctuation c || Char.isSpace c
                                       -- ayn/hamza in transliterated arabic:
