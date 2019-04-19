@@ -382,8 +382,7 @@ handleSpecialCases "personal-communication" = "personal_communication"
 handleSpecialCases "legal-case"             = "legal_case"
 handleSpecialCases x                        = x
 
-newtype CNum = CNum { unCNum :: Int }
-  deriving ( Show, Read, Eq, Ord, Num, Typeable, Data, Generic )
+newtype CNum = CNum { unCNum :: Int } deriving ( Show, Read, Eq, Num, Typeable, Data, Generic )
 
 instance FromJSON CNum where
   parseJSON x = CNum `fmap` parseInt x
