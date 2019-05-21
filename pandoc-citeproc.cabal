@@ -109,7 +109,7 @@ library
                       aeson >= 0.7 && < 1.5,
                       text,
                       vector,
-                      xml-conduit >= 1.2 && < 1.9,
+                      xml-conduit >= 1.2 && < 1.10,
                       unordered-containers >= 0.2 && < 0.3,
                       data-default,
                       setenv >= 0.1 && < 0.2,
