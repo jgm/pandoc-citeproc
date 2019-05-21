@@ -100,7 +100,14 @@ library
                       Text.CSL.Compat.Pandoc
     ghc-options:      -funbox-strict-fields -Wall -fno-warn-unused-do-bind
     ghc-prof-options: -fprof-auto-exported
-    build-depends:    containers, directory, mtl,
+    build-depends:    base >= 4 && < 5,
+                      syb,
+                      parsec,
+                      old-locale,
+                      time,
+                      containers,
+                      directory,
+                      mtl,
                       bytestring, filepath,
                       network < 3.2,
                       pandoc-types >= 1.17.3 && < 1.18,
@@ -142,17 +149,13 @@ library
     else
        build-depends: rfc5051
 
-    if impl(ghc >= 6.10)
-       build-depends: base >= 4, syb, parsec, old-locale, time
-    else
-       build-depends: base >= 3 && < 4
-
 executable pandoc-citeproc
     main-is:          pandoc-citeproc.hs
     hs-source-dirs:   .
     ghc-options:      -funbox-strict-fields -Wall
     ghc-prof-options: -fprof-auto-exported -rtsopts
-    build-depends:    base >= 4, pandoc-citeproc,
+    build-depends:    base >= 4 && < 5,
+                      pandoc-citeproc,
                       pandoc-types >= 1.17.3 && < 1.18,
                       pandoc >= 1.16 && < 2.8,
                       aeson,
@@ -188,12 +191,21 @@ executable test-citeproc
     Buildable:    True
   else
     Buildable:    False
-  build-depends:  base >= 4, aeson, directory, text, mtl,
+  build-depends:  base >= 4 && < 5,
+                  pandoc-citeproc,
+                  aeson,
+                  directory,
+                  text,
+                  mtl,
                   pandoc-types >= 1.17.3 && < 1.18,
                   pandoc >= 1.16 && < 2.8,
-                  filepath, containers,
-                  bytestring, pandoc-citeproc, process, temporary >= 1.1,
-                  yaml >= 0.11, containers >= 0.4, vector >= 0.10
+                  filepath,
+                  bytestring,
+                  process,
+                  temporary >= 1.1,
+                  yaml >= 0.11,
+                  containers >= 0.4,
+                  vector >= 0.10
   if impl(ghc < 8.0)
     build-depends: semigroups == 0.18.*
   if impl(ghc < 8.4)
@@ -211,10 +223,19 @@ test-suite test-pandoc-citeproc
   Main-Is:        test-pandoc-citeproc.hs
   Other-Modules:  JSON
   Hs-Source-Dirs: tests, compat
-  build-depends:  base >= 4, aeson, directory, text,
-                  pandoc-types >= 1.17.3 && < 1.18, mtl,
-                  pandoc >= 1.16 && < 2.8, filepath, containers,
-                  bytestring, pandoc-citeproc, process, temporary >= 1.1,
+  build-depends:  base >= 4 && < 5,
+                  aeson,
+                  directory,
+                  text,
+                  pandoc-types >= 1.17.3 && < 1.18,
+                  mtl,
+                  pandoc >= 1.16 && < 2.8,
+                  filepath,
+                  containers,
+                  bytestring,
+                  pandoc-citeproc,
+                  process,
+                  temporary >= 1.1,
                   yaml >= 0.11
   ghc-options:    -funbox-strict-fields -Wall -fno-warn-unused-do-bind -threaded
   if impl(ghc < 8.0)
