@@ -15,6 +15,7 @@ extra-deps:
 - skylighting-0.7.7
 - ipynb-0.1
 - cmark-gfm-0.2.0
+- doctemplates-0.3
 ghc-options:
    "$locals": -fhide-source-paths
 resolver: lts-13.9
