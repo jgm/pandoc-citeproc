@@ -9,12 +9,21 @@ flags:
 packages:
 - '.'
 extra-deps:
-- pandoc-2.7.2
-- texmath-0.11.2.2
-- skylighting-core-0.7.7
-- skylighting-0.7.7
+- skylighting-core-0.8.2
+- skylighting-0.8.2
 - ipynb-0.1
 - cmark-gfm-0.2.0
+- HsYAML-0.2.0.0
+- doctemplates-0.6.1
+- doclayout-0.1
+- hslua-1.0.3.1
+- hslua-module-system-0.2.0
+- pandoc-types-1.17.6
+- git: https://github.com/vijayphoenix/HsYAML-aeson.git
+  commit: 0d6bc91c536164bbca8e259551c970edd1aa395f
+- git: https://github.com/jgm/pandoc.git
+  commit: b64410ff9ce64d6a2c7e09b43694b6f4245f9129
+
 ghc-options:
    "$locals": -fhide-source-paths
-resolver: lts-13.9
+resolver: lts-13.17
