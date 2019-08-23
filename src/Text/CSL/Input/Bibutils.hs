@@ -24,11 +24,12 @@ module Text.CSL.Input.Bibutils
 import Prelude
 import qualified Control.Exception      as E
 import           Data.Aeson
+import           Data.Aeson.Types       (parseMaybe)
 import qualified Data.ByteString.Lazy   as BL
 import qualified Data.ByteString        as BS
 import qualified Data.HashMap.Strict    as HM
 import qualified Data.Text              as T
-import qualified Data.Yaml              as Yaml
+import qualified Data.YAML.Aeson        as YAML
 import qualified Data.Vector            as V
 import           Data.Char
 import qualified Data.Map               as M
@@ -182,23 +183,22 @@ readYamlBib idpred s =
 
 selectEntries :: (String -> Bool) -> BS.ByteString -> BS.ByteString
 selectEntries idpred bs =
-  case Yaml.decodeEither' bs of
-       Right (Array vs) -> Yaml.encode (filterObjects $ V.toList vs)
+  case YAML.decode1Strict bs of
+       Right (Array vs) -> YAML.encode1Strict (filterObjects $ V.toList vs)
        Right (Object o) ->
               case HM.lookup (T.pack "references") o of
                    Just (Array vs) ->
-                     Yaml.encode (HM.insert (T.pack "references")
+                     YAML.encode1Strict (HM.insert (T.pack "references")
                                     (filterObjects $ V.toList vs) mempty)
                    _ -> BS.empty
        Right _ -> BS.empty
-       Left e  -> E.throw $ ErrorParsingReferences
-                              (Yaml.prettyPrintParseException e)
+       Left e  -> E.throw $ ErrorParsingReferences e
     where filterObjects = filter
                (\x -> case x of
                         Object o ->
                             case HM.lookup (T.pack "id") o of
                                  Just i ->
-                                  case Yaml.parseMaybe parseString i of
+                                  case parseMaybe parseString i of
                                        Just s -> idpred s
                                        Nothing -> False
                                  _ -> False

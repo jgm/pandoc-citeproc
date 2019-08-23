@@ -7,3 +7,4 @@ cabal-dev
 .virthualenv
 .stack-work
 test-diffs
+/dist-newstyle/

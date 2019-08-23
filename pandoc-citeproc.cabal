@@ -120,7 +120,11 @@ library
                       unordered-containers >= 0.2 && < 0.3,
                       data-default,
                       setenv >= 0.1 && < 0.2,
-                      split, yaml >= 0.11
+                      split, 
+                      yaml >= 0.11,
+                      HsYAML >= 0.2,
+                      HsYAML-aeson >= 0.2
+
     if impl(ghc < 8.0)
       build-depends: semigroups == 0.18.*
     if impl(ghc < 8.4)
