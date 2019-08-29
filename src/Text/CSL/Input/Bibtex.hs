@@ -109,7 +109,7 @@ getLangFromEnv = do
 -- | Parse a BibTeX or BibLaTeX file into a list of 'Reference's.
 -- The first parameter is a predicate to filter identifiers.
 -- If the second parameter is true, the file will be treated as
--- BibTeX; otherwse as BibLaTeX.  If the third parameter is
+-- BibTeX; otherwise as BibLaTeX.  If the third parameter is
 -- true, an "untitlecase" transformation will be performed.
 readBibtex :: (String -> Bool) -> Bool -> Bool -> FilePath -> IO [Reference]
 readBibtex idpred isBibtex caseTransform f = do
@@ -1269,6 +1269,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
        "booklet"         -> (Pamphlet,mempty)
        "bookinbook"      -> (Chapter,mempty)
        "collection"      -> (Book,mempty)
+       "dataset"         -> (Dataset,mempty)
        "electronic"      -> (Webpage,mempty)
        "inbook"          -> (Chapter,mempty)
        "incollection"    -> (Chapter,mempty)
@@ -1295,6 +1296,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
        "proceedings"     -> (Book,mempty)
        "reference"       -> (Book,mempty)
        "report"          -> (Report,mempty)
+       "software"        -> (Book,mempty)         -- no "software" type in CSL
        "suppbook"        -> (Chapter,mempty)
        "suppcollection"  -> (Chapter,mempty)
        "suppperiodical"
@@ -1318,7 +1320,6 @@ itemToReference lang locale bibtex caseTransform = bib $ do
        "music"           -> (Song,mempty)         -- for musical *recordings*
        "performance"     -> (Speech,mempty)
        "review"          -> (Review,mempty)       -- or "review-book" ?
-       "software"        -> (Book,mempty)         -- for lack of any better match
        "standard"        -> (Legislation,mempty)
        "video"           -> (MotionPicture,mempty)
        -- biblatex-apa:
