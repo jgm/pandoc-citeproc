@@ -6,7 +6,7 @@ Pandoc (Meta {unMeta = fromList [("references",MetaList [MetaMap (fromList [("UR
 ,Para [Cite [Citation {citationId = "item3", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 5}] [Str "Doe",Space,Str "(2006e)"],Space,Str "\8211",Space,Str "article-newspaper"]
 ,Para [Cite [Citation {citationId = "item3b", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 6}] [Str "Doe",Space,Str "(2006b)"],Space,Str "\8211",Space,Str "article-newspaper",Space,Str "YM"]
 ,Header 1 ("references",["unnumbered"],[]) [Str "References"]
-,Div ("refs",["references"],[])
+,Div ("refs",["references","hanging-indent"],[])
  [Div ("ref-item2a",[],[])
   [Para [Str "Doe,",Space,Str "John.",Space,Str "2006a.",Space,Str "\8220Title.\8221",Space,Str "The",Space,Str "Web",Space,Str "Site.",Space,Str "October\8211November",Space,Str "2006.",Space,Link ("",[],[]) [Str "http://www.example.com"] ("http://www.example.com",""),Str "."]]
  ,Div ("ref-item3b",[],[])

@@ -1,5 +1,5 @@
 Pandoc (Meta {unMeta = fromList [("references",MetaList [MetaMap (fromList [("author",MetaList [MetaMap (fromList [("family",MetaInlines [Str "Doe"]),("given",MetaInlines [Str "Ann"])]),MetaMap (fromList [("family",MetaInlines [Str "Doe"]),("given",MetaInlines [Str "Ben"])]),MetaMap (fromList [("family",MetaInlines [Str "Roe"]),("given",MetaInlines [Str "Ron"])])]),("id",MetaInlines [Str "a"]),("issued",MetaMap (fromList [("date-parts",MetaList [MetaList [MetaString "2007"]])])),("title",MetaInlines [Str "Title"]),("type",MetaInlines [Str "article-journal"])])])]})
 [Para [Cite [Citation {citationId = "a", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 1}] [Str "Doe,",Space,Str "Doe,",Space,Str "and",Space,Str "Roe",Space,Str "(2007)"]]
-,Div ("refs",["references"],[])
+,Div ("refs",["references","hanging-indent"],[])
  [Div ("ref-a",[],[])
   [Para [Str "Doe,",Space,Str "Ann,",Space,Str "Ben",Space,Str "Doe,",Space,Str "and",Space,Str "Ron",Space,Str "Roe.",Space,Str "2007.",Space,Str "\8220Title.\8221"]]]]

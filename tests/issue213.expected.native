@@ -1,6 +1,6 @@
 Pandoc (Meta {unMeta = fromList [("csl",MetaInlines [Str "tests/harvard-university-of-kent.csl"]),("references",MetaList [MetaMap (fromList [("author",MetaList [MetaMap (fromList [("family",MetaInlines [Str "Doe"]),("given",MetaInlines [Str "Ann"])])]),("collection-title",MetaInlines [Str "The",Space,Str "collection",Space,Str "title"]),("dimensions",MetaInlines [Str "789",Space,Str "pp."]),("id",MetaInlines [Str "doe1"]),("issued",MetaList [MetaMap (fromList [("year",MetaInlines [Str "1999"])])]),("publisher",MetaInlines [Str "The",Space,Str "publisher"]),("title",MetaInlines [Str "Title"]),("type",MetaInlines [Str "book"])])])]})
 [Para [Str "Foo",Space,Cite [Citation {citationId = "doe1", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 1}] [Str "(Doe",Space,Str "1999)"],Str "."]
 ,Header 1 ("references",["unnumbered"],[]) [Str "References"]
-,Div ("refs",["references"],[])
+,Div ("refs",["references","hanging-indent"],[])
  [Div ("ref-doe1",[],[])
   [Para [Str "Doe,",Space,Str "A.",Space,Str "(1999).",Space,Emph [Str "Title"],Str ".",Space,Str "The",Space,Str "collection",Space,Str "title.",Space,Str "The",Space,Str "publisher.",Space,Str "789",Space,Str "pp."]]]]

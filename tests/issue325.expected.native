@@ -1,6 +1,6 @@
 Pandoc (Meta {unMeta = fromList [("references",MetaList [MetaMap (fromList [("author",MetaList [MetaMap (fromList [("family",MetaInlines [Str "Smith"]),("given",MetaInlines [Str "John"])])]),("id",MetaInlines [Str "item1"]),("type",MetaInlines [Str "book"])]),MetaMap (fromList [("author",MetaList [MetaMap (fromList [("family",MetaInlines [Str "Smith"]),("given",MetaInlines [Str "John"])])]),("id",MetaInlines [Str "item2"]),("type",MetaInlines [Str "book"])])])]})
 [Para [Cite [Citation {citationId = "item1", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 1},Citation {citationId = "item2", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 2}] [Str "(Smith,",Space,Str "n.d.a,",Space,Str "n.d.b)"]]
-,Div ("refs",["references"],[])
+,Div ("refs",["references","hanging-indent"],[])
  [Div ("ref-item1",[],[])
   [Para [Str "Smith,",Space,Str "John.",Space,Str "n.d.a."]]
  ,Div ("ref-item2",[],[])

@@ -1,7 +1,7 @@
 Pandoc (Meta {unMeta = fromList [("bibliography",MetaInlines [Str "tests/biblatex-examples.bib"]),("csl",MetaInlines [Str "tests/apa.csl"])]})
 [Para [Cite [Citation {citationId = "averroes/bland", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 1}] [Str "Averroes",Space,Str "(1982)"],Str ";",Space,Cite [Citation {citationId = "averroes/hannes", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 2}] [Str "Averroes",Space,Str "(1892)"],Str ";",Space,Cite [Citation {citationId = "averroes/hercz", citationPrefix = [], citationSuffix = [], citationMode = AuthorInText, citationNoteNum = 0, citationHash = 3}] [Str "Averroes",Space,Str "(1869)"]]
 ,Header 1 ("references",["unnumbered"],[]) [Str "References"]
-,Div ("refs",["references"],[])
+,Div ("refs",["references","hanging-indent"],[])
  [Div ("ref-averroes/hercz",[],[])
   [Para [Str "Averroes.",Space,Str "(1869).",Space,Emph [Str "Drei",Space,Str "Abhandlungen",Space,Str "\252ber",Space,Str "die",Space,Str "Conjunction",Space,Str "des",Space,Str "separaten",Space,Str "Intellects",Space,Str "mit",Space,Str "dem",Space,Str "Menschen:",Space,Str "Von",Space,Str "Averroes",Space,Str "(Vater",Space,Str "und",Space,Str "Sohn),",Space,Str "aus",Space,Str "dem",Space,Str "Arabischen",Space,Str "\252bersetzt",Space,Str "von",Space,Str "Samuel",Space,Str "Ibn",Space,Str "Tibbon"],Str ".",Space,Str "(J.",Space,Str "Hercz,",Space,Str "Trans.,",Space,Str "J.",Space,Str "Hercz,",Space,Str "Ed.).",Space,Str "Berlin:",Space,Str "S.\160Hermann."]]
  ,Div ("ref-averroes/hannes",[],[])

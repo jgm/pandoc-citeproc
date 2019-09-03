@@ -2,7 +2,7 @@ Pandoc (Meta {unMeta = fromList [("csl",MetaInlines [Str "tests/apa.csl"]),("ref
 [Header 1 ("test",[],[]) [Str "Test"]
 ,Para [Str "I",Space,Str "have",Space,Str "two",Space,Str "citations",Space,Cite [Citation {citationId = "Feminism2013gf", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 1},Citation {citationId = "Feminism2011ces", citationPrefix = [], citationSuffix = [], citationMode = NormalCitation, citationNoteNum = 0, citationHash = 2}] [Str "(",Str "\8220Communities,\8221",Space,Str "2011;",Space,Str "\8220Geek",Space,Str "Feminism,\8221",Space,Str "2013)"],Str "."]
 ,Header 1 ("references",["unnumbered"],[]) [Str "References"]
-,Div ("refs",["references"],[])
+,Div ("refs",["references","hanging-indent"],[])
  [Div ("ref-Feminism2011ces",[],[])
   [Para [Str "Communities.",Space,Str "(2011,",Space,Str "August",Space,Str "14).",Space,Str "In",Space,Emph [Str "Geek",Space,Str "Feminism"],Str ".",Space,Str "Retrieved",Space,Str "from",Space,Link ("",[],[]) [Str "http://geekfeminism.wikia.com/wiki/Category:Communities"] ("http://geekfeminism.wikia.com/wiki/Category:Communities","")]]
  ,Div ("ref-Feminism2013gf",[],[])

@@ -41,7 +41,7 @@ import           Text.CSL.Util            (findFile, lastInline,
 import           Text.HTML.TagSoup.Entity (lookupEntity)
 import           Text.Pandoc
 import           Text.Pandoc.Builder      (deleteMeta, setMeta)
-import           Text.Pandoc.Shared       (stringify)
+import           Text.Pandoc.Shared       (stringify, ordNub)
 import           Text.Pandoc.Walk
 import           Text.Parsec              hiding (State, (<|>))
 
@@ -68,9 +68,12 @@ processCites style refs (Pandoc m1 b1) =
                             Nothing -> m3
                             Just x  -> setMeta "nocite" x m3
       notemap       = mkNoteMap (Pandoc m3 bs)
+      hanging       = maybe False (== "true")
+                       (biblio style >>=
+                        lookup "hanging-indent" . bibOptions)
   in  Pandoc m $ walk (addFirstNoteNumber notemap)
                $ walk (concatMap removeNocaseSpans)
-               $ insertRefs m biblioList bs
+               $ insertRefs hanging m biblioList bs
 
 addFirstNoteNumber :: M.Map String Int -> Inline -> Inline
 addFirstNoteNumber notemap
@@ -95,9 +98,9 @@ mkNoteMap doc =
 -- if document contains a Div with id="refs", insert
 -- references as its contents.  Otherwise, insert references
 -- at the end of the document in a Div with id="refs"
-insertRefs :: Meta -> [Block] -> [Block] -> [Block]
-insertRefs _    []   bs = bs
-insertRefs meta refs bs =
+insertRefs :: Bool -> Meta -> [Block] -> [Block] -> [Block]
+insertRefs _ _  []   bs = bs
+insertRefs hanging meta refs bs =
   if isRefRemove meta
      then bs
      else case runState (walkM go bs) False of
@@ -107,20 +110,23 @@ insertRefs meta refs bs =
                         Header lev (id',classes,kvs) ys : xs ->
                           reverse xs ++
                             [Header lev (id',addUnNumbered classes,kvs) ys,
-                             Div ("refs",["references"],[]) refs]
+                             Div ("refs",refclasses,[]) refs]
                         _   -> bs ++ refHeader ++
-                                [Div ("refs",["references"],[]) refs]
-  where go :: Block -> State Bool Block
-        go (Div attr@("refs",_,_) xs) = do
-          put True
-          -- refHeader isn't used if you have an explicit references div
-          return $ Div attr (xs ++ refs)
-        go x = return x
-        addUnNumbered cs = "unnumbered" : [c | c <- cs, c /= "unnumbered"]
-        refHeader = case refTitle meta of
-                     Just ils ->
-                       [Header 1 ("bibliography", ["unnumbered"], []) ils]
-                     _        -> []
+                                [Div ("refs",refclasses,[]) refs]
+  where
+   refclasses = "references" : if hanging then ["hanging-indent"] else []
+   go :: Block -> State Bool Block
+   go (Div ("refs",cs,kvs) xs) = do
+     put True
+     -- refHeader isn't used if you have an explicit references div
+     let cs' = ordNub $ cs ++ refclasses
+     return $ Div ("refs",cs',kvs) (xs ++ refs)
+   go x = return x
+   addUnNumbered cs = "unnumbered" : [c | c <- cs, c /= "unnumbered"]
+   refHeader = case refTitle meta of
+                Just ils ->
+                  [Header 1 ("bibliography", ["unnumbered"], []) ils]
+                _        -> []
 
 refTitle :: Meta -> Maybe [Inline]
 refTitle meta =
