@@ -10,10 +10,9 @@ packages:
 - '.'
 extra-deps:
 - HsYAML-0.2.0.0
+- HsYAML-aeson-0.2.0.0
 - doctemplates-0.6.1
 - doclayout-0.1
-- git: https://github.com/vijayphoenix/HsYAML-aeson.git
-  commit: 0d6bc91c536164bbca8e259551c970edd1aa395f
 - git: https://github.com/jgm/pandoc.git
   commit: ad64ec613d5bb5a2350c1c5108cfbd0ac8872937
 

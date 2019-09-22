@@ -30,6 +30,7 @@ import qualified Data.ByteString        as BS
 import qualified Data.HashMap.Strict    as HM
 import qualified Data.Text              as T
 import qualified Data.YAML.Aeson        as YA
+import qualified Data.YAML              as Y
 import qualified Data.Vector            as V
 import           Data.Char
 import qualified Data.Map               as M
@@ -192,7 +193,10 @@ selectEntries idpred bs =
                                     (filterObjects $ V.toList vs) mempty)
                    _ -> BS.empty
        Right _ -> BS.empty
-       Left e  -> E.throw $ ErrorParsingReferences e
+       Left (pos,e) -> E.throw $ ErrorParsingReferences
+                           $ e ++ " (line " ++ show (Y.posLine pos) ++
+                                  " column " ++ show (Y.posColumn pos) ++
+                                  ")"
     where filterObjects = filter
                (\x -> case x of
                         Object o ->

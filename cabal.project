@@ -2,11 +2,6 @@ packages: pandoc-citeproc.cabal
 
 source-repository-package
     type: git
-    location: https://github.com/vijayphoenix/HsYAML-aeson.git
-    tag: 0d6bc91c536164bbca8e259551c970edd1aa395f
-
-source-repository-package
-    type: git
     location: https://github.com/jgm/pandoc.git
     tag: b64410ff9ce64d6a2c7e09b43694b6f4245f9129
 
