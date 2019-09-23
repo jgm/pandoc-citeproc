@@ -14,7 +14,7 @@ extra-deps:
 - doctemplates-0.6.1
 - doclayout-0.1
 - git: https://github.com/jgm/pandoc.git
-  commit: ad64ec613d5bb5a2350c1c5108cfbd0ac8872937
+  commit: b64410ff9ce64d6a2c7e09b43694b6f4245f9129
 
 ghc-options:
    "$locals": -fhide-source-paths
