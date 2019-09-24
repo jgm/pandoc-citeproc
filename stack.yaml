@@ -9,6 +9,7 @@ flags:
 packages:
 - '.'
 extra-deps:
+- pandoc-types-1.17.6.1
 - HsYAML-0.2.0.0
 - HsYAML-aeson-0.2.0.0
 - doctemplates-0.6.1
