@@ -1,3 +1,17 @@
+pandoc-citeproc (0.16.3)
+
+  * Set `hanging-indent` class on `refs` Div if specified by the style (#410).
+    This depends on whether the `hanging-indent` attribute of
+    `<bibliography>` is true.
+  * Update chicago-author-date.csl and locales.
+  * Add new biblatex @dataset entry type (#413).
+  * Cleanup cabal file and remove old ghc 6.10 conditional.
+  * Replace some of the yaml use with HsYAML-aeson (vijayphoenix).
+  * Allow xml-conduit 1.9.
+  * Allow network 3.1.
+  * Allow pandoc 2.8.
+  * Use pandoc-types 1.17.6.1
+
 pandoc-citeproc (0.16.2)
 
   * Normalize for sorting by padding numerical strings with 0s (#399).
