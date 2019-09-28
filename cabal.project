@@ -1,9 +1,4 @@
 packages: pandoc-citeproc.cabal
 
-source-repository-package
-    type: git
-    location: https://github.com/jgm/pandoc.git
-    tag: ba146499452fc4c1829ef81a3c376a0d90a145c7
-
 package pandoc-citeproc
   flags: +embed_data_files +bibutils -unicode_collation -test_citeproc -debug
