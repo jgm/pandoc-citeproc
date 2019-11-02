@@ -222,8 +222,8 @@ processCites' (Pandoc meta blocks) = do
          if null envlang
             then do
               -- Note that LANG needs to be set for bibtex conversion:
-              setEnv "LANG" "en-US.UTF-8"
-              setEnv "LC_ALL" "en-US.UTF-8"
+              setEnv "LANG" "en_US.UTF-8"
+              setEnv "LC_ALL" "en_US.UTF-8"
             else
               setEnv "LC_ALL" envlang
   let citids = query getCitationIds (Pandoc meta blocks)
