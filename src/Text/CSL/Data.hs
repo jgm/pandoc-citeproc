@@ -48,33 +48,37 @@ instance E.Exception CSLLocaleException
 -- | Raises 'CSLLocaleException' on error.
 getLocale :: String -> IO L.ByteString
 getLocale s = do
+  let baseLocale = takeWhile (/='.') s
 #ifdef EMBED_DATA_FILES
   let toLazy x = L.fromChunks [x]
-  case length s of
-      0 -> maybe (E.throwIO $ CSLLocaleNotFound "en-US")
-                 (return . toLazy)
+  let returnDefaultLocale =
+        maybe (E.throwIO $ CSLLocaleNotFound "en-US") (return . toLazy)
            $ lookup "locales-en-US.xml" localeFiles
-      2 -> let fn = ("locales-" ++ fromMaybe s (lookup s langBase) ++ ".xml")
-           in case lookup fn localeFiles of
-                Just x' -> return $ toLazy x'
-                _       -> E.throwIO $ CSLLocaleNotFound s
-      _ -> case lookup ("locales-" ++ take 5 s ++ ".xml") localeFiles of
+  case length baseLocale of
+      0 -> returnDefaultLocale
+      1 | baseLocale == "C" -> returnDefaultLocale
+      _ -> case lookup ("locales-" ++ baseLocale ++ ".xml") localeFiles of
                  Just x' -> return $ toLazy x'
-                 _       -> -- try again with 2-letter locale
-                    let s' = take 2 s in
-                    case lookup ("locales-" ++ fromMaybe s'
-                           (lookup s' langBase) ++ ".xml") localeFiles of
-                          Just x'' -> return $ toLazy x''
-                          _        -> E.throwIO $ CSLLocaleNotFound s
+                 Nothing ->
+                       -- try again with 2-letter locale (lang only)
+                       let shortLocale = takeWhile (/='-') baseLocale in
+                       case lookup ("locales-" ++ fromMaybe shortLocale
+                              (lookup shortLocale langBase) ++ ".xml")
+                              localeFiles of
+                             Just x'' -> return $ toLazy x''
+                             _        -> E.throwIO $ CSLLocaleNotFound s
 #else
-  f <- case length s of
-             0 -> return "locales/locales-en-US.xml"
-             2 -> getDataFileName ("locales/locales-" ++
-                                fromMaybe s (lookup s langBase) ++ ".xml")
-             _ -> getDataFileName ("locales/locales-" ++ take 5 s ++ ".xml")
+  f <- getDataFileName $
+         case length baseLocale of
+             0 -> "locales/locales-en-US.xml"
+             1 | baseLocale == "C" -> "locales/locales-en-US.xml"
+             2 -> "locales/locales-" ++
+                    fromMaybe s (lookup s langBase) ++ ".xml"
+             _ -> "locales/locales-" ++ take 5 s ++ ".xml"
   exists <- doesFileExist f
-  if not exists && length s > 2
-     then getLocale $ take 2 s  -- try again with base locale
+  if not exists && length baseLocale > 2
+     then getLocale $ dropWhile (/='-') baseLocale
+          -- try again with lang only
      else E.handle (E.throwIO . CSLLocaleReadError) $ L.readFile f
 #endif
 

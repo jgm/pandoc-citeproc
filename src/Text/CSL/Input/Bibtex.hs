@@ -100,7 +100,8 @@ getLangFromEnv :: IO Lang
 getLangFromEnv = do
   env <- getEnvironment
   return $ case lookup "LANG" env of
-                  Just x  -> case splitWhen (\c -> c == '.' || c == '_' || c == '-') x of
+                  Just x  -> case splitWhen (\c -> c == '_' || c == '-')
+                                  (takeWhile (/='.') x) of
                                    (w:z:_) -> Lang w z
                                    [w]     | not (null w) -> Lang w mempty
                                    _       -> Lang "en" "US"
@@ -368,7 +369,7 @@ data Lang = Lang String String  -- e.g. "en" "US"
 
 -- | Prints a 'Lang' in BCP 47 format.
 langToLocale :: Lang -> String
-langToLocale (Lang x y) = x ++ ('-':y)
+langToLocale (Lang x y) = x ++ (if null y then [] else '-':y)
 
 -- Biblatex Localization Keys (see Biblatex manual)
 -- Currently we only map a subset likely to be used in Biblatex *databases*
