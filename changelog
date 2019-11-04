@@ -1,3 +1,11 @@
+pandoc-citeproc (0.16.3.1)
+
+  * Fix how LANG is set for bibtex conversion.
+    We were using a `-` where `_` is standard.
+  * Make locale retrieval more robust (#420).
+    Previously an error was raised if the locale was 'C'.
+    Now 'C' is treated as default (en-US locale is used).
+
 pandoc-citeproc (0.16.3)
 
   * Set `hanging-indent` class on `refs` Div if specified by the style (#410).
