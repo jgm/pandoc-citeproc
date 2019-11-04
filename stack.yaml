@@ -12,10 +12,10 @@ extra-deps:
 - pandoc-types-1.17.6.1
 - HsYAML-0.2.0.0
 - HsYAML-aeson-0.2.0.0
-- doctemplates-0.6.1
-- doclayout-0.1
+- doctemplates-0.7
+- doclayout-0.2.0.1
 - git: https://github.com/jgm/pandoc.git
-  commit: b64410ff9ce64d6a2c7e09b43694b6f4245f9129
+  commit: 8f3b3afc70d163afe5e103abec77a4ffafb995bd
 
 ghc-options:
    "$locals": -fhide-source-paths
