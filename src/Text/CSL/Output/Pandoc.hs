@@ -1,4 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 {-# LANGUAGE PatternGuards      #-}
 -----------------------------------------------------------------------------
@@ -28,6 +30,7 @@ module Text.CSL.Output.Pandoc
 
 import Prelude
 import           Data.Maybe             (fromMaybe)
+import qualified Data.Text              as T
 import           Text.CSL.Style
 import           Text.CSL.Util          (headInline, initInline, lastInline,
                                          proc, proc', tailFirstInlineStr,
@@ -46,26 +49,27 @@ fixBreaks =
   dropWhile (== LineBreak) . reverse . dropWhile (== LineBreak) . reverse
 
 renderPandoc' :: Style -> (Formatted, String) -> Block
-renderPandoc' sty (form, citId) = Div ("ref-" ++ citId, [], []) [Para $ renderPandoc sty form]
+renderPandoc' sty (form, citId) = Div (T.pack $ "ref-" <> citId, [], []) [Para $ renderPandoc sty form]
 
 clean' :: Style -> [Inline] -> [Inline]
 clean' _   []  = []
 clean' sty (i:is) =
   case i:is of
       (Str "" : rest) -> clean' sty rest
-      (Str xs : Str ys : rest) -> clean' sty $ Str (xs ++ ys) : rest
-      (Link a1 lab1 ('#':r1, "") : Str "\8211" : Link a2 lab2 ('#':r2, "") : rest)
+      (Str xs : Str ys : rest) -> clean' sty $ Str (xs <> ys) : rest
+      (Link a1 lab1 (T.uncons -> Just ('#',r1), "")
+       : Str "\8211" : Link a2 lab2 (T.uncons -> Just ('#',r2), "") : rest)
         | r1 == r2, a1 == a2 ->
-           Link a1 (lab1 ++ [Str "\8211"] ++ lab2) ('#':r1, "") : clean' sty rest
+           Link a1 (lab1 ++ [Str "\8211"] ++ lab2) (T.cons '#' r1, "") : clean' sty rest
       (Span ("",[],[]) inls : _) -> inls ++ clean' sty is
       (Span ("",["csl-inquote"],kvs) inls : _) ->
          let isOuter = lookup "position" kvs == Just "outer"
          in  case headInline is of
-                    [x] -> if x `elem` ".," && isPunctuationInQuote sty
+                    [x] -> if x `elem` (".," :: String) && isPunctuationInQuote sty
                            then if lastInline inls `elem` [".",",",";",":","!","?"]
                                 then quoted isOuter inls ++
                                      clean' sty (tailInline is)
-                                else quoted isOuter (inls ++ [Str [x]]) ++
+                                else quoted isOuter (inls ++ [Str (T.singleton x)]) ++
                                      clean' sty (tailInline is)
                            else quoted isOuter inls ++ clean' sty is
                     _   ->      quoted isOuter inls ++ clean' sty is
@@ -74,12 +78,12 @@ clean' sty (i:is) =
                    then i : clean' sty (tailInline is)
                    else i : clean' sty is
     where
-      isPunct = all (`elem` ".,;:!? ") $ headInline is
+      isPunct = all (`elem` (".,;:!? " :: String)) $ headInline is
       locale  = case styleLocale sty of
                      (x:_) -> x
                      []    -> Locale [] [] [] [] [] -- should not happen
       getQuote s d     = case [term | term <- localeTerms locale, cslTerm term == s] of
-                               (x:_) -> Str (termSingular x)
+                               (x:_) -> Str $ T.pack $ termSingular x
                                _     -> Str d
       openQuoteOuter   = getQuote "open-quote" "“"
       openQuoteInner   = getQuote "open-inner-quote" "‘"
@@ -92,7 +96,7 @@ convertQuoted :: Style -> [Inline] -> [Inline]
 convertQuoted s = convertQuoted'
     where
       locale = let l = styleLocale s in case l of [x] -> x; _   -> Locale [] [] [] [] []
-      getQuote  x y = fromEntities . termSingular . fromMaybe newTerm {termSingular = x} .
+      getQuote  x y = fromEntities . T.pack . termSingular . fromMaybe newTerm {termSingular = x} .
                       findTerm y Long . localeTerms $ locale
       doubleQuotesO = getQuote "\"" "open-quote"
       doubleQuotesC = getQuote "\"" "close-quote"

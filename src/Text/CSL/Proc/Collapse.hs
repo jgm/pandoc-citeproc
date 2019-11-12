@@ -1,5 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternGuards     #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Proc.Collapse
@@ -23,6 +25,7 @@ import           Data.Char
 import           Data.List              (groupBy, sortBy)
 import           Data.Monoid            (Any (..))
 import           Data.Ord               (comparing)
+import qualified Data.Text              as T
 import           Text.CSL.Eval
 import           Text.CSL.Proc.Disamb
 import           Text.CSL.Style         hiding (Any)
@@ -208,11 +211,11 @@ addCiteAffixes c x =
             Formatted  []    -> []
             Formatted ils
               | isprefix  -> case reverse ils of
-                                  (Str zs@(_:_):_) |
-                                    last zs == '\160' -> [OPan ils]
+                                  (Str zs@(T.uncons -> Just (_,_)):_) |
+                                    T.last zs == '\160' -> [OPan ils]
                                   _ -> [OPan ils, OSpace]
               | otherwise -> case ils of
-                                  (Str (z:_):_)
+                                  (Str (T.uncons -> Just (z,_)):_)
                                     | isAlphaNum z ||
                                       z == '(' -> [OSpace, OPan ils]
                                   _            -> [OPan ils]

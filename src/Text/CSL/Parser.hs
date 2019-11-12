@@ -131,7 +131,7 @@ string = unpack . T.concat . content
 
 attrWithDefault :: Read a => Text -> a -> Cursor -> a
 attrWithDefault t d cur =
-  fromMaybe d $ safeRead (toRead $ stringAttr t cur)
+  fromMaybe d $ safeRead (T.pack $ toRead $ stringAttr t cur)
 
 stringAttr :: Text -> Cursor -> String
 stringAttr t cur =

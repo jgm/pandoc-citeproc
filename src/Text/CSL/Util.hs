@@ -1,8 +1,11 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE ViewPatterns          #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PatternGuards         #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
 module Text.CSL.Util
   ( safeRead
@@ -98,7 +101,7 @@ readNum s = case reads s of
 sa <^> []         = sa
 sa <^> (s:xs)
   | s `elem` puncts && last sa `elem` puncts = sa ++ xs
-  where puncts = ";:,. "
+  where puncts = ";:,. " :: String
 sa <^> sb         = sa ++ sb
 
 capitalize :: String -> String
@@ -106,7 +109,7 @@ capitalize []     = []
 capitalize (c:cs) = toUpper c : cs
 
 isPunct :: Char -> Bool
-isPunct c = c `elem` ".;?!"
+isPunct c = c `elem` (".;?!" :: String)
 
 camelize :: String -> String
 camelize ('-':y:ys) = toUpper y : camelize ys
@@ -137,7 +140,7 @@ trim :: String -> String
 trim = triml . trimr
 
 triml :: String -> String
-triml = dropWhile (`elem` " \r\n\t")
+triml = dropWhile (`elem` (" \r\n\t" :: String))
 
 trimr :: String -> String
 trimr = reverse . triml . reverse
@@ -169,7 +172,7 @@ parseInt (Number n) = case fromJSON (Number n) of
                             Success (x :: Int) -> return x
                             Error e -> fail $ "Could not read Int: " ++ e
 parseInt x = parseString x >>= \s ->
-              case safeRead s of
+              case safeRead (T.pack s) of
                    Just n  -> return n
                    Nothing -> fail "Could not read Int"
 
@@ -183,7 +186,7 @@ parseMaybeInt (Just x) =
   parseString x >>= \s ->
                    if null s
                       then return Nothing
-                      else case safeRead s of
+                      else case safeRead (T.pack s) of
                                 Just n  -> return (Just n)
                                 Nothing -> fail $ "Could not read as Int: " ++ show s
 
@@ -205,7 +208,7 @@ onBlocks f = walk f'
 
 hasLowercaseWord :: [Inline] -> Bool
 hasLowercaseWord = any startsWithLowercase . splitStrWhen isPunctuation
-  where startsWithLowercase (Str (x:_)) = isLower x
+  where startsWithLowercase (Str (T.uncons -> Just (x,_))) = isLower x
         startsWithLowercase _           = False
 
 splitUpStr :: [Inline] -> [Inline]
@@ -220,7 +223,7 @@ splitUpStr ils =
 combineInternalPeriods :: [Inline] -> [Inline]
 combineInternalPeriods [] = []
 combineInternalPeriods (Str xs:Str ".":Str ys:zs) =
-  combineInternalPeriods $ Str (xs ++ "." ++ ys) : zs
+  combineInternalPeriods $ Str (xs <> "." <> ys) : zs
 combineInternalPeriods (x:xs) = x : combineInternalPeriods xs
 
 unTitlecase :: [Inline] -> [Inline]
@@ -229,12 +232,12 @@ unTitlecase zs = evalState (caseTransform untc zs) SentenceBoundary
           st <- get
           case (w, st) of
                (y, NoBoundary) -> return y
-               (Str (x:xs), LastWordBoundary) | isUpper x ->
-                 return $ Str (map toLower (x:xs))
-               (Str (x:xs), WordBoundary) | isUpper x ->
-                 return $ Str (map toLower (x:xs))
-               (Str (x:xs), SentenceBoundary) | isLower x ->
-                 return $ Str (toUpper x : xs)
+               (Str (T.uncons -> Just (x,xs)), LastWordBoundary) | isUpper x ->
+                 return $ Str (T.toLower (T.cons x xs))
+               (Str (T.uncons -> Just (x,xs)), WordBoundary) | isUpper x ->
+                 return $ Str (T.toLower (T.cons x xs))
+               (Str (T.uncons -> Just (x,xs)), SentenceBoundary) | isLower x ->
+                 return $ Str (T.cons (toUpper x) xs)
                (Span ("",[],[]) xs, _) | hasLowercaseWord xs ->
                  return $ Span ("",["nocase"],[]) xs
                _ -> return w
@@ -264,28 +267,28 @@ protectCase zs = evalState (caseTransform protect zs) SentenceBoundary
 -- and “yet”.
 titlecase :: [Inline] -> [Inline]
 titlecase zs = evalState (caseTransform tc zs) SentenceBoundary
-  where tc (Str (x:xs)) = do
+  where tc (Str (T.unpack -> (x:xs))) = do
           st <- get
           return $ case st of
                         LastWordBoundary ->
                           case (x:xs) of
-                           s | not (isAscii x) -> Str s
-                             | isShortWord s   -> Str s
-                             | all isUpperOrPunct s   -> Str s
-                             | isMixedCase s   -> Str s
-                             | otherwise       -> Str (toUpper x:xs)
+                           s | not (isAscii x) -> Str $ T.pack s
+                             | isShortWord s   -> Str $ T.pack s
+                             | all isUpperOrPunct s   -> Str $ T.pack s
+                             | isMixedCase s   -> Str $ T.pack s
+                             | otherwise       -> Str $ T.pack (toUpper x:xs)
                         WordBoundary ->
                           case (x:xs) of
-                           s | not (isAscii x) -> Str s
-                             | all isUpperOrPunct s   -> Str s
-                             | isShortWord s   -> Str (map toLower s)
-                             | isMixedCase s   -> Str s
-                             | otherwise       -> Str (toUpper x:xs)
+                           s | not (isAscii x) -> Str $ T.pack s
+                             | all isUpperOrPunct s   -> Str $ T.pack s
+                             | isShortWord s   -> Str $ T.pack (map toLower s)
+                             | isMixedCase s   -> Str $ T.pack s
+                             | otherwise       -> Str $ T.pack (toUpper x:xs)
                         SentenceBoundary ->
                            if isMixedCase (x:xs) || all isUpperOrPunct (x:xs)
-                              then Str (x:xs)
-                              else Str (toUpper x : xs)
-                        _ -> Str (x:xs)
+                              then Str $ T.pack (x:xs)
+                              else Str $ T.pack (toUpper x : xs)
+                        _ -> Str $ T.pack (x:xs)
         tc (Span ("",["nocase"],[]) xs) = return $ Span ("",["nocase"],[]) xs
         tc x = return x
         isShortWord  s = map toLower s `Set.member` shortWords
@@ -320,15 +323,15 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
         go acc LineBreak = do
                put WordBoundary
                return $ Space : acc
-        go acc (Str [c])
-          | c `elem` ".?!:" = do
+        go acc (Str (T.unpack -> [c]))
+          | c `elem` (".?!:" :: String) = do
                put SentenceBoundary
-               return $ Str [c] : acc
-          | c `elem` "-/\x2013\x2014\160" = do
+               return $ Str (T.singleton c) : acc
+          | c `elem` ("-/\x2013\x2014\160" :: String) = do
                put WordBoundary
-               return $ Str [c] : acc
-          | isPunctuation c = return $ Str [c] : acc -- leave state unchanged
-        go acc (Str []) = return acc
+               return $ Str (T.singleton c) : acc
+          | isPunctuation c = return $ Str (T.singleton c) : acc -- leave state unchanged
+        go acc (Str "") = return acc
         go acc (Str xs) = do
                res <- xform (Str xs)
                put NoBoundary
@@ -354,13 +357,13 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
 
 splitStrWhen :: (Char -> Bool) -> [Inline] -> [Inline]
 splitStrWhen _ [] = []
-splitStrWhen p (Str xs : ys) = go xs ++ splitStrWhen p ys
+splitStrWhen p (Str xs : ys) = go (T.unpack xs) ++ splitStrWhen p ys
   where go [] = []
         go s = case break p s of
                      ([],[])     -> []
-                     (zs,[])     -> [Str zs]
-                     ([],(w:ws)) -> Str [w] : go ws
-                     (zs,(w:ws)) -> Str zs : Str [w] : go ws
+                     (zs,[])     -> [Str $ T.pack zs]
+                     ([],(w:ws)) -> Str (T.singleton w) : go ws
+                     (zs,(w:ws)) -> Str (T.pack zs) : Str (T.singleton w) : go ws
 splitStrWhen p (x : ys) = x : splitStrWhen p ys
 
 -- | A generic processing function.
@@ -395,13 +398,13 @@ toRead (s:ss) = toUpper s : camel ss
           | otherwise     = []
 
 inlinesToString :: [Inline] -> String
-inlinesToString = stringify
+inlinesToString = T.unpack . stringify
 
 headInline :: [Inline] -> String
-headInline = take 1 . stringify
+headInline = take 1 . T.unpack . stringify
 
 lastInline :: [Inline] -> String
-lastInline xs = case stringify xs of
+lastInline xs = case T.unpack $ stringify xs of
                       [] -> []
                       ys -> [last ys]
 
@@ -409,7 +412,7 @@ initInline :: [Inline] -> [Inline]
 initInline [] = []
 initInline [i]
     | Str          s <- i
-    , not (null s)        = return $ Str         (init        s)
+    , not (T.null s)      = return $ Str         (T.init      s)
     | Emph        is <- i = return $ Emph        (initInline is)
     | Strong      is <- i = return $ Strong      (initInline is)
     | Superscript is <- i = return $ Superscript (initInline is)
@@ -437,19 +440,19 @@ toCapital ils                             = mapHeadInline capitalize ils
 mapHeadInline :: (String -> String) -> [Inline] -> [Inline]
 mapHeadInline _ [] = []
 mapHeadInline f (i:xs)
-    | Str         [] <- i =                      mapHeadInline f xs
-    | Str          s <- i = case f s of
+    | Str         "" <- i =                      mapHeadInline f xs
+    | Str          s <- i = case f (T.unpack s) of
                               "" -> xs
-                              _  -> Str (f                s)   : xs
-    | Emph        is <- i = Emph        (mapHeadInline f is)   : xs
-    | Strong      is <- i = Strong      (mapHeadInline f is)   : xs
-    | Superscript is <- i = Superscript (mapHeadInline f is)   : xs
-    | Subscript   is <- i = Subscript   (mapHeadInline f is)   : xs
-    | Quoted q    is <- i = Quoted q    (mapHeadInline f is)   : xs
-    | SmallCaps   is <- i = SmallCaps   (mapHeadInline f is)   : xs
-    | Strikeout   is <- i = Strikeout   (mapHeadInline f is)   : xs
-    | Link   at is t <- i = Link at     (mapHeadInline f is) t : xs
-    | Span     at is <- i = Span at     (mapHeadInline f is)   : xs
+                              _  -> Str (T.pack $ f $ T.unpack s) : xs
+    | Emph        is <- i = Emph        (mapHeadInline f is)      : xs
+    | Strong      is <- i = Strong      (mapHeadInline f is)      : xs
+    | Superscript is <- i = Superscript (mapHeadInline f is)      : xs
+    | Subscript   is <- i = Subscript   (mapHeadInline f is)      : xs
+    | Quoted q    is <- i = Quoted q    (mapHeadInline f is)      : xs
+    | SmallCaps   is <- i = SmallCaps   (mapHeadInline f is)      : xs
+    | Strikeout   is <- i = Strikeout   (mapHeadInline f is)      : xs
+    | Link   at is t <- i = Link at     (mapHeadInline f is) t    : xs
+    | Span     at is <- i = Span at     (mapHeadInline f is)      : xs
     | otherwise           = i : xs
 
 findFile :: [FilePath] -> FilePath -> IO (Maybe FilePath)
@@ -540,9 +543,9 @@ addSpaceAfterPeriod :: [Inline] -> [Inline]
 addSpaceAfterPeriod = go . splitStrWhen (=='.')
   where
     go [] = []
-    go (Str [c]:Str ".":Str [d]:xs)
+    go (Str (T.unpack -> [c]):Str ".":Str (T.unpack -> [d]):xs)
       | isLetter d
       , isLetter c
       , isUpper c
-      , isUpper d   = Str [c]:Str ".":Space:go (Str [d]:xs)
+      , isUpper d   = Str (T.singleton c):Str ".":Space:go (Str (T.singleton d):xs)
     go (x:xs) = x:go xs

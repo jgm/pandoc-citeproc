@@ -3,6 +3,7 @@
 {-# LANGUAGE DeriveDataTypeable         #-}
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE ViewPatterns               #-}
 
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedStrings          #-}
@@ -147,7 +148,7 @@ readCSLString s = Walk.walk handleSmallCapsSpans
   -- this is needed for versions of pandoc that don't turn
   -- a span with font-variant:small-caps into a SmallCaps element:
   where handleSmallCapsSpans (Span ("",[],[("style",sty)]) ils)
-            | filter (`notElem` (" \t;" :: String)) sty == "font-variant:small-caps" =
+            | T.filter (`notElem` (" \t;" :: String)) sty == "font-variant:small-caps" =
               SmallCaps ils
         handleSmallCapsSpans x = x
 
@@ -245,7 +246,7 @@ instance Walk.Walkable Formatted Formatted where
 
 toStr :: String -> [Inline]
 toStr = intercalate [Str "\n"] .
-        map (B.toList . B.text . tweak . fromEntities) .
+        map (B.toList . B.text . T.pack . tweak . T.unpack . fromEntities . T.pack) .
         splitWhen (=='\n')
     where
       tweak ('«':' ':xs) = "«\8239" ++ tweak xs
@@ -898,7 +899,7 @@ droppingPartTransform ag
   | otherwise = ag
 
 startWithCapital' :: Inline -> Bool
-startWithCapital' (Str (c:_)) = isUpper c && isLetter c
+startWithCapital' (Str (T.uncons -> Just (c,_))) = isUpper c && isLetter c
 startWithCapital' _           = False
 
 startWithCapital :: Formatted -> Bool
