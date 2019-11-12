@@ -182,7 +182,7 @@ adjustSpans (Span ("",["citeproc-no-output"],[]) _) =
 adjustSpans (Span (id',classes,kvs) ils) =
   [Span (id',classes',kvs') ils]
   where classes' = filter (`notElem` ["csl-no-emph","csl-no-strong","csl-no-smallcaps"]) classes
-        kvs' = if null styles then kvs else (("style", concat styles) : kvs)
+        kvs' = if null styles then kvs else (("style", mconcat styles) : kvs)
         styles = ["font-style:normal;" | "csl-no-emph" `elem` classes]
               ++ ["font-weight:normal;" | "csl-no-strong" `elem` classes]
               ++ ["font-variant:normal;" | "csl-no-smallcaps" `elem` classes]
