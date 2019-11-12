@@ -26,6 +26,7 @@ import           Data.Char           (toLower)
 import           Data.List           (elemIndex)
 import qualified Data.Map            as M
 import           Data.Maybe
+import qualified Data.Text           as T
 
 import           Text.CSL.Reference
 import           Text.CSL.Style
@@ -125,7 +126,7 @@ getStringValue val =
   -- but need a String.  This is currently needed for "page".  It's a bit
   -- hackish; we should probably change the type in Reference for
   -- page to String.
-  case fromValue val `mplus` ((stringify . unFormatted) `fmap` fromValue val)
+  case fromValue val `mplus` ((T.unpack . stringify . unFormatted) `fmap` fromValue val)
        `mplus` (unLiteral `fmap` fromValue val) of
        Just v   -> v
        Nothing  -> Debug.Trace.trace ("Expecting string value, got " ++

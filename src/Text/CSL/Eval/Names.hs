@@ -1,4 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ViewPatterns      #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE PatternGuards    #-}
 -----------------------------------------------------------------------------
@@ -23,6 +25,7 @@ import           Data.Char              (isLower, isUpper)
 import           Data.List              (intersperse, nub)
 import           Data.List.Split        (wordsBy)
 import           Data.Maybe             (isJust)
+import qualified Data.Text              as T
 
 import           Text.CSL.Eval.Common
 import           Text.CSL.Eval.Output
@@ -261,25 +264,25 @@ formatName m b f fm ops np n
                   if getOptionVal "initialize-with-hyphen" ops == "false"
                   then new ++ accum
                   else trimsp new ++ [Str "-"] ++ accum
-      isInit [Str [c]] = isUpper c
+      isInit [Str (T.unpack -> [c])] = isUpper c
       isInit _         = False
       initial (Formatted x) =
                   case lookup "initialize-with" ops of
                        Just iw
                          | getOptionVal "initialize" ops == "false"
-                         , isInit x  -> addIn x $ B.toList $ B.text iw
+                         , isInit x  -> addIn x $ B.toList $ B.text $ T.pack iw
                          | getOptionVal "initialize" ops /= "false"
-                         , not (all isLower $ query (:[]) x) -> addIn x $ B.toList $ B.text iw
+                         , not (all isLower $ query (:[]) x) -> addIn x $ B.toList $ B.text $ T.pack iw
                        Nothing
                          | isInit x  -> addIn x [Space] -- default
                        _ -> Space : x ++ [Space]
-      addIn x i = foldr (hyphenate . (\z -> Str (headInline z) : i)) []
+      addIn x i = foldr (hyphenate . (\z -> Str (T.pack $ headInline z) : i)) []
                      $ wordsBy (== Str "-")
                      $ splitStrWhen (=='-') x
 
       sortSep g s = when_ g $ separator ++ addAffixes (g <+> s) "given" mempty
       separator   = if isByzantineFamily
-                       then [OPan (B.toList (B.text
+                       then [OPan (B.toList (B.text $ T.pack
                               (getOptionValWithDefault "sort-separator" ", " ops)))]
                        else []
       suff      = if commaSuffix n && nameSuffix n /= mempty
@@ -320,7 +323,7 @@ formatName m b f fm ops np n
                       (c >= '\x021a' && c <= '\x021b') ||
                       (c >= '\x202a' && c <= '\x202e')
 
-      isByzantineFamily = any isByzantine (stringify family)
+      isByzantineFamily = T.any isByzantine (stringify family)
       shortName = oPan' (unFormatted $ nondropping <+> family) (form "family")
 
       longName g

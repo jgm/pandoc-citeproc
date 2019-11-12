@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternGuards #-}
 -----------------------------------------------------------------------------
 -- |
@@ -17,9 +18,9 @@
 module Text.CSL.Eval.Output where
 
 import Prelude
-import           Data.Char              (toLower, toUpper)
 import           Data.Maybe             (mapMaybe)
 import           Data.String            (fromString)
+import qualified Data.Text              as T
 import           Text.CSL.Output.Pandoc (lastInline)
 import           Text.CSL.Style
 import           Text.CSL.Util          (capitalize, isPunct, titlecase,
@@ -45,10 +46,10 @@ pRaw = try $ do
   format <- many1 letter
   _ <- string "}}"
   contents <- manyTill anyChar (try (string ("{{/" ++ format ++ "}}")))
-  return $ RawInline (Format format) contents
+  return $ RawInline (Format $ T.pack format) $ T.pack contents
 
 pString :: Parsec String () Inline
-pString = Str <$> (many1 (noneOf " \t\n\r{}") <|> count 1 (oneOf "{}"))
+pString = Str . T.pack <$> (many1 (noneOf " \t\n\r{}") <|> count 1 (oneOf "{}"))
 
 pSpace :: Parsec String () Inline
 pSpace = Space <$ many1 (oneOf " \t\n\r")
@@ -143,7 +144,7 @@ formatOutput o =
                                      [Strong [Str "???"]]]
       OErr (ReferenceNotFound r)
                           -> Formatted [Span ("",["citeproc-not-found"],
-                                            [("data-reference-id",r)])
+                                            [("data-reference-id",T.pack r)])
                                      [Strong [Str "???"]]]
       OLabel   []      _  -> Formatted []
       OLabel   s       f  -> addFormatting f $ formatString s
@@ -169,7 +170,7 @@ addFormatting f =
   addDisplay . addLink . addSuffix . pref . quote . font . text_case . strip_periods
   where addLink i = case hyperlink f of
                          ""  -> i
-                         url -> Formatted [Link nullAttr (unFormatted i) (url, "")]
+                         url -> Formatted [Link nullAttr (unFormatted i) (T.pack url, "")]
         pref i = case prefix f of
                       "" -> i
                       x  -> formatString x <> i
@@ -181,7 +182,7 @@ addFormatting f =
           | otherwise             = i <> formatString (suffix f)
 
         strip_periods (Formatted ils) = Formatted (walk removePeriod ils)
-        removePeriod (Str xs) | stripPeriods f = Str (filter (/='.') xs)
+        removePeriod (Str xs) | stripPeriods f = Str (T.filter (/='.') xs)
         removePeriod x        = x
 
         quote (Formatted [])  = Formatted []
@@ -227,16 +228,16 @@ addFormatting f =
                    "title"            -> titlecase ils
                    "capitalize-first"
                      -> case i of
-                             Str cs -> Str (capitalize cs) : is'
+                             Str cs -> Str (T.pack $ capitalize $ T.unpack cs) : is'
                              _ -> unTitlecase [i] ++ is'
                    "sentence"         -> unTitlecase ils
                    _                  -> ils
 
-        lowercaseStr (Str xs) = Str $ map toLower xs
+        lowercaseStr (Str xs) = Str $ T.toLower xs
         lowercaseStr x        = x
-        uppercaseStr (Str xs) = Str $ map toUpper xs
+        uppercaseStr (Str xs) = Str $ T.toUpper xs
         uppercaseStr x        = x
-        capitalizeStr (Str xs) = Str $ capitalize xs
+        capitalizeStr (Str xs) = Str $ T.pack $ capitalize $ T.unpack xs
         capitalizeStr x        = x
 
         valign [] = []

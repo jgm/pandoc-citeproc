@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE PatternGuards     #-}
+{-# LANGUAGE ViewPatterns      #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Proc
@@ -28,6 +29,7 @@ import           Data.Char              (isDigit, isLetter, toLower)
 import           Data.List
 import           Data.Maybe             (mapMaybe)
 import           Data.Ord               (comparing)
+import qualified Data.Text              as T
 import           Text.CSL.Eval
 import           Text.CSL.Proc.Collapse
 import           Text.CSL.Proc.Disamb
@@ -340,7 +342,7 @@ formatCitLayout s (CG co f d cs)
         case ys of
              Formatted []           -> xs
              Formatted (Note _ : _) -> xs <> ys
-             Formatted (Str [c]:_)  | c `elem` (", ;:" :: String) -> xs <> ys
+             Formatted (Str (T.unpack -> [c]):_)  | c `elem` (", ;:" :: String) -> xs <> ys
              _                      -> xs <> Formatted [Space] <> ys
       formatAuth   = formatOutput . localMod
       formatCits   = (if isNote then toNote else id) .

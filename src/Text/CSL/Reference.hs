@@ -303,8 +303,8 @@ handleLiteral d@(RefDate Nothing Nothing Nothing Nothing (Literal xs) b)
   = case splitWhen (=='_') xs of
          [x,y] | all isDigit x && all isDigit y &&
                  not (null x) ->
-                 [RefDate (safeRead x) Nothing Nothing Nothing mempty b,
-                  RefDate (safeRead y) Nothing Nothing Nothing mempty b]
+                 [RefDate (safeRead $ T.pack x) Nothing Nothing Nothing mempty b,
+                  RefDate (safeRead $ T.pack y) Nothing Nothing Nothing mempty b]
          _ -> [d]
 handleLiteral d = [d]
 
@@ -360,11 +360,11 @@ instance FromJSON RefType where
   -- found in one of the test cases:
   parseJSON (String "film") = return MotionPicture
   parseJSON (String t) =
-    safeRead (capitalize . camelize . T.unpack $ t) <|>
+    safeRead (T.pack . capitalize . camelize . T.unpack $ t) <|>
     fail ("'" ++ T.unpack t ++ "' is not a valid reference type")
   parseJSON v@(Array _) =
     fmap (capitalize . camelize . inlinesToString) (parseJSON v) >>= \t ->
-      safeRead t <|>
+      safeRead (T.pack t) <|>
        fail ("'" ++ t ++ "' is not a valid reference type")
   parseJSON _ = fail "Could not parse RefType"
 
@@ -1017,18 +1017,18 @@ isoDate = P.try $ do
     extended <- if extyear
                    then P.many P.digit
                    else return []
-    return $ case safeRead (sign ++ rest ++ extended) of
+    return $ case safeRead (T.pack $ sign ++ rest ++ extended) of
                     Just x | x <= 0 -> Just (x - 1)  -- 0 = -1 AD
                     x               -> x
   m' <- P.option Nothing $ Just <$> P.try (P.char '-' >> P.many1 P.digit)
-  (m,s) <- case m' >>= safeRead of
+  (m,s) <- case m' >>= safeRead . T.pack of
                    Just (n::Int)
                           | n >= 1 && n <= 12  -> return (Just n, Nothing)
                           | n >= 13 && n <= 16 -> return (Nothing, pseudoMonthToSeason n)
                           | n >= 21 && n <= 24 -> return (Nothing, pseudoMonthToSeason n)
                    Nothing | isNothing m' -> return (Nothing, Nothing)
                    _ -> fail "Improper month"
-  d <- P.option Nothing $ safeRead <$> P.try (P.char '-' >> P.many1 P.digit)
+  d <- P.option Nothing $ safeRead . T.pack <$> P.try (P.char '-' >> P.many1 P.digit)
   guard $ case d of
            Nothing -> True
            Just (n::Int) | n >= 1 && n <= 31 -> True
@@ -1052,7 +1052,7 @@ rawDateOld = do
   let pmonth = P.try $ do
         xs <- P.many1 P.letter <|> P.many1 P.digit
         if all isDigit xs
-           then case safeRead xs of
+           then case safeRead (T.pack xs) of
                       Just (n::Int) | n >= 1 && n <= 12 -> return (Just n)
                       _ -> fail "Improper month"
            else case elemIndex (map toLower $ take 3 xs) months of
@@ -1068,10 +1068,10 @@ rawDateOld = do
              _       -> fail "Improper season"
   let pday = P.try $ do
         xs <- P.many1 P.digit
-        case safeRead xs of
+        case safeRead (T.pack xs) of
              Just (n::Int) | n >= 1 && n <= 31 -> return (Just n)
              _ -> fail "Improper day"
-  let pyear = safeRead <$> P.many1 P.digit
+  let pyear = safeRead . T.pack <$> P.many1 P.digit
   let sep = P.oneOf [' ','/',','] >> P.spaces
   let rangesep = P.try $ P.spaces >> P.char '-' >> P.spaces
   let refDate = RefDate Nothing Nothing Nothing Nothing mempty False

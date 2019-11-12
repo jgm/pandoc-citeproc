@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE CPP                      #-}
 {-# LANGUAGE ScopedTypeVariables      #-}
 {-# LANGUAGE PatternGuards            #-}
@@ -221,7 +222,7 @@ convertRefs (Just v) =
          -- references:
          -- ...
          case fromJSON (metaValueToJSON v) of
-               Success "" -> Right []
+               Success ("" :: String) -> Right []
                _          -> Left s
        Success x            -> Right x
 

@@ -1,4 +1,5 @@
-{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoImplicitPrelude   #-}
+{-# LANGUAGE ViewPatterns        #-}
 {-# LANGUAGE CPP                 #-}
 {-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE OverloadedStrings   #-}
@@ -15,10 +16,10 @@ import           Control.Monad
 import           Control.Monad.State
 import           Data.Aeson
 import qualified Data.ByteString.Lazy     as L
-import           Data.Char                (isDigit, isPunctuation, isSpace,
-                                           toLower)
+import           Data.Char                (isDigit, isPunctuation, isSpace)
 import qualified Data.Map                 as M
 import qualified Data.Set                 as Set
+import qualified Data.Text                as T
 import           Data.Maybe               (fromMaybe)
 import           System.Directory         (getAppUserDataDirectory)
 import           System.Environment       (getEnv)
@@ -78,9 +79,9 @@ processCites style refs (Pandoc m1 b1) =
 addFirstNoteNumber :: M.Map String Int -> Inline -> Inline
 addFirstNoteNumber notemap
   s@(Span ("",["first-reference-note-number"],[("refid",refid)]) _)
-  = case M.lookup refid notemap of
+  = case M.lookup (T.unpack refid) notemap of
          Nothing -> s
-         Just n  -> Str (show n)
+         Just n  -> Str $ T.pack (show n)
 addFirstNoteNumber _ -- see below, these spans added by deNote
   (Note [Para (Span ("",["reference-id-list"],_) [] : ils)])
   = Note [Para ils]
@@ -147,9 +148,9 @@ isLinkCitations meta =
 
 truish :: MetaValue -> Bool
 truish (MetaBool t) = t
-truish (MetaString s) = isYesValue (map toLower s)
-truish (MetaInlines ils) = isYesValue (map toLower (stringify ils))
-truish (MetaBlocks [Plain ils]) = isYesValue (map toLower (stringify ils))
+truish (MetaString s) = isYesValue (T.unpack $ T.toLower s)
+truish (MetaInlines ils) = isYesValue (T.unpack $ T.toLower (stringify ils))
+truish (MetaBlocks [Plain ils]) = isYesValue (T.unpack $ T.toLower (stringify ils))
 truish _ = False
 
 isYesValue :: String -> Bool
@@ -169,7 +170,7 @@ mkNociteWildcards refs = map expandStar
               [] -> cs
               _  -> allcites
         allcites = map (\ref -> Citation{
-                                  citationId = unLiteral (refId ref),
+                                  citationId = T.pack $ unLiteral (refId ref),
                                   citationPrefix = [],
                                   citationSuffix = [],
                                   citationMode = NormalCitation,
@@ -245,19 +246,19 @@ processCites' (Pandoc meta blocks) = do
   return $ processCites (tr' "CSL" csl') refs $ Pandoc meta blocks
 
 toPath :: MetaValue -> Maybe String
-toPath (MetaString s) = Just s
+toPath (MetaString s) = Just $ T.unpack s
 -- take last in a list
 toPath (MetaList xs) = case reverse xs of
                              []    -> Nothing
                              (x:_) -> toPath x
-toPath (MetaInlines ils) = Just $ stringify ils
+toPath (MetaInlines ils) = Just $ T.unpack $ stringify ils
 toPath _ = Nothing
 
 getBibRefs :: (String -> Bool) -> MetaValue -> IO [Reference]
 getBibRefs idpred (MetaList xs) = concat `fmap` mapM (getBibRefs idpred) xs
 getBibRefs idpred (MetaInlines xs) = getBibRefs idpred (MetaString $ stringify xs)
 getBibRefs idpred (MetaString s) = do
-  path <- findFile ["."] s >>= maybe (E.throwIO $ CouldNotFindBibFile s) return
+  path <- findFile ["."] (T.unpack s) >>= maybe (E.throwIO $ CouldNotFindBibFile $ T.unpack s) return
   map unescapeRefId `fmap` readBiblioFile idpred path
 getBibRefs _ _ = return []
 
@@ -296,7 +297,7 @@ getNoteCitationIds :: Inline -> [[String]]
 getNoteCitationIds (Note [Para (Span ("",["reference-id-list"]
                                       ,[("refids",refids)]) [] : _)])
   -- see deNote below which inserts this special Span
-  = [words refids]
+  = [words $ T.unpack refids]
 getNoteCitationIds (Note _) = [[]]
 getNoteCitationIds _        = []
 
@@ -330,7 +331,7 @@ mvPunct moveNotes sty (q : s : x : ys)
        then mvPunct moveNotes sty $
              case headInline ys of
                "" -> q : x : tailInline ys
-               w  -> q : Str w : x : tailInline ys
+               w  -> q : Str (T.pack w) : x : tailInline ys
        else q : x : mvPunct moveNotes sty ys
 mvPunct moveNotes sty (Cite cs ils : ys)
    | length ils > 1
@@ -341,7 +342,7 @@ mvPunct moveNotes sty (Cite cs ils : ys)
       (init ils ++
          (case headInline ys of
                "" -> []
-               s' | not (endWithPunct False (init ils)) -> [Str s']
+               s' | not (endWithPunct False (init ils)) -> [Str $ T.pack s']
                   | otherwise                           -> [])
        ++ [last ils]) : mvPunct moveNotes sty (tailInline ys)
 mvPunct moveNotes sty (q@(Quoted _ _) : w@(Str _) : x : ys)
@@ -362,7 +363,7 @@ mvPunct _ _ [] = []
 endWithPunct :: Bool -> [Inline] -> Bool
 endWithPunct _ [] = True
 endWithPunct onlyFinal xs@(_:_) =
-  case reverse (stringify xs) of
+  case reverse (T.unpack $ stringify xs) of
        []                       -> True
        -- covers .), .", etc.:
        (d:c:_) | isPunctuation d
@@ -384,7 +385,7 @@ deNote = topDown go
         -- we insert this to help getNoteCitationIds:
         specialSpan cs =
           Span ("",["reference-id-list"],
-            [("refids", unwords (map citationId cs))]) []
+            [("refids", T.unwords (map citationId cs))]) []
         go' (Str "(" : Cite cs [Note [Para xs]] : Str ")" : ys) =
              Str "(" : Cite cs xs : Str ")" : ys
         go' (x : Cite cs [Note [Para xs]] : ys) | not (isSpacy x) =
@@ -402,7 +403,7 @@ comb f xs ys =
   let xs' = if startWithPunct ys && endWithPunct True xs
                then initInline $ removeLeadingPunct xs
                else removeLeadingPunct xs
-      removeLeadingPunct (Str [c] : s : zs)
+      removeLeadingPunct (Str (T.unpack -> [c]) : s : zs)
           | isSpacy s && (c == ',' || c == '.' || c == ':') = zs
       removeLeadingPunct zs = zs
   in  f xs' ++ ys
@@ -414,7 +415,7 @@ getCitation i | Cite t _ <- i = [t]
               | otherwise     = []
 
 getCitationIds :: Inline -> Set.Set String
-getCitationIds (Cite cs _) = Set.fromList (map citationId cs)
+getCitationIds (Cite cs _) = Set.map T.unpack $ Set.fromList (map citationId cs)
 getCitationIds _ = mempty
 
 setHashes :: Inline -> State Int Inline
@@ -437,9 +438,9 @@ toCslCite locMap c
                          ("","",x:_)
                            | not (isPunct x) -> Space : s
                          _                   -> s
-          isPunct (Str (x:_)) = isPunctuation x
+          isPunct (Str (T.uncons -> Just (x,_))) = isPunctuation x
           isPunct _           = False
-      in   emptyCite { CSL.citeId         = citationId c
+      in   emptyCite { CSL.citeId         = T.unpack $ citationId c
                      , CSL.citePrefix     = Formatted $ citationPrefix c
                      , CSL.citeSuffix     = Formatted s'
                      , CSL.citeLabel      = la
@@ -511,7 +512,7 @@ pLocatorDelimited locMap = try $ do
   (la, _) <- pLocatorLabelDelimited locMap
   -- we only care about balancing {} and [] (because of the outer [] scope);
   -- the rest can be anything
-  let inner = do { t <- anyToken; return (True, stringify t) }
+  let inner = do { t <- anyToken; return (True, T.unpack $ stringify t) }
   gs <- many (pBalancedBraces [('{','}'), ('[',']')] inner)
   _ <- pMatchChar "}" (== '}')
   let lo = concatMap snd gs
@@ -521,7 +522,7 @@ pLocatorLabelDelimited :: LocatorMap -> Parsec [Inline] st (String, Bool)
 pLocatorLabelDelimited locMap
   = pLocatorLabel' locMap lim <|> return ("page", True)
     where
-        lim = stringify <$> anyToken
+        lim = T.unpack . stringify <$> anyToken
 
 pLocatorIntegrated :: LocatorMap -> Parsec [Inline] st (String, String)
 pLocatorIntegrated locMap = try $ do
@@ -554,7 +555,7 @@ pLocatorLabel' locMap lim = go ""
           -- the pathological case is "p.3"
           t <- anyToken
           ts <- manyTill anyToken (try $ lookAhead lim)
-          let s = acc ++ stringify (t:ts)
+          let s = acc ++ T.unpack (stringify (t:ts))
           case M.lookup (trim s) locMap of
             -- try to find a longer one, or return this one
             Just l -> go s <|> return (l, False)
@@ -582,7 +583,7 @@ pLocatorWordIntegrated isFirst = try $ do
               else (stringify <$> pLocatorSep) <|> return ""
   sp <- option "" (pSpace >> return " ")
   (dig, s) <- pBalancedBraces [('(',')'), ('[',']'), ('{','}')] pPageSeq
-  return (dig, punct ++ sp ++ s)
+  return (dig, T.unpack punct ++ sp ++ s)
 
 -- we want to capture:  123, 123A, C22, XVII, 33-44, 22-33; 22-11
 --                      34(1), 34A(A), 34(1)(i)(i), (1)(a)
@@ -621,7 +622,7 @@ pPageSeq = oneDotTwo <|> withPeriod
           -- .2
           p <- pMatchChar "." (== '.')
           u <- try pPageUnit
-          return (fst u, stringify p ++ snd u)
+          return (fst u, T.unpack (stringify p) ++ snd u)
 
 anyWereDigitLike :: [(Bool, String)] -> (Bool, String)
 anyWereDigitLike as = (any fst as, concatMap snd as)
@@ -635,7 +636,7 @@ pPageUnit = roman <|> plainUnit
           ts <- many1 (notFollowedBy pSpace >>
                        notFollowedBy pLocatorPunct >>
                        anyToken)
-          let s = stringify ts
+          let s = T.unpack $ stringify ts
           -- otherwise look for actual digits or -s
           return (any isDigit s, s)
 
@@ -643,9 +644,9 @@ pRoman :: Parsec [Inline] st String
 pRoman = try $ do
   t <- anyToken
   case t of
-       Str xs -> case parseRomanNumeral xs of
+       Str xs -> case parseRomanNumeral (T.unpack xs) of
                       Nothing -> mzero
-                      Just _  -> return xs
+                      Just _  -> return $ T.unpack xs
        _      -> mzero
 
 isLocatorPunct :: Char -> Bool
@@ -668,7 +669,7 @@ isLocatorSep _   = False
 pMatchChar :: String -> (Char -> Bool) -> Parsec [Inline] st Inline
 pMatchChar msg f = pMatch msg mc
     where
-        mc (Str [c]) = f c
+        mc (Str (T.unpack -> [c])) = f c
         mc _         = False
 
 pSpace :: Parsec [Inline] st Inline

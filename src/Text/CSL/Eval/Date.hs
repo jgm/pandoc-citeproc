@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternGuards #-}
 -----------------------------------------------------------------------------
 -- |
@@ -23,6 +24,7 @@ import           Control.Monad.State
 import           Data.List
 import           Data.List.Split
 import           Data.Maybe (fromMaybe, isNothing)
+import qualified Data.Text              as T
 
 import           Text.CSL.Exception
 import           Text.CSL.Eval.Common
@@ -144,7 +146,7 @@ formatDate em k tm dp date
         | null (concat o1 ++ concat o2) = []
         | otherwise = o1 ++ (case dpRangeDelim <$> last' xs of
                               ["-"] -> [[OPan [Str "\x2013"]]]
-                              [s]   -> [[OPan [Str s]]]
+                              [s]   -> [[OPan [Str $ T.pack s]]]
                               _     -> []) ++ o2
 
       formatYear f y

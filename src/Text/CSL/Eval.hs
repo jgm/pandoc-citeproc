@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE PatternGuards       #-}
 {-# LANGUAGE LambdaCase          #-}
@@ -98,6 +99,7 @@ evalSorting m l ms opts ss as mbr
           | Ascending {} <- c = Ascending  s
           | otherwise         = Descending s
 
+      unsetOpts :: (String, String) -> (String, String)
       unsetOpts ("et-al-min"                 ,_) = ("et-al-min"           ,"")
       unsetOpts ("et-al-use-first"           ,_) = ("et-al-use-first"     ,"")
       unsetOpts ("et-al-subsequent-min"      ,_) = ("et-al-subsequent-min","")
@@ -226,7 +228,7 @@ evalElement el
              case map toLower s of
                "first-reference-note-number"
                              -> do refid <- getStringVar "ref-id"
-                                   return [Output [OPan [Span ("",["first-reference-note-number"],[("refid",refid)]) [Str "0"]]] fm]
+                                   return [Output [OPan [Span ("",["first-reference-note-number"],[("refid",T.pack refid)]) [Str "0"]]] fm]
 
                "year-suffix" -> getStringVar "ref-id" >>= \k  ->
                                 return . return $ OYearSuf [] k [] fm
@@ -239,7 +241,7 @@ evalElement el
                "page"        -> getStringVar "page" >>= formatRange fm
                "locator"     -> getLocVar >>= formatRange fm . snd
                "url"         -> getStringVar "url" >>= \k ->
-                                if null k then return [] else return [Output [OPan [Link nullAttr [Str k] (escapeURI k,"")]] fm]
+                                if null k then return [] else return [Output [OPan [Link nullAttr [Str $ T.pack k] (escapeURI $ T.pack k,"")]] fm]
                "doi"         -> do d <- getStringVar "doi"
                                    let (prefixPart, linkPart) = T.breakOn (T.pack "http") (T.pack (prefix fm))
                                    let u = if T.null linkPart
@@ -247,20 +249,20 @@ evalElement el
                                               else T.unpack linkPart ++ d
                                    if null d
                                       then return []
-                                      else return [Output [OPan [Link nullAttr [Str (T.unpack linkPart ++ d)] (escapeURI u, "")]]
+                                      else return [Output [OPan [Link nullAttr [Str (linkPart <> T.pack d)] (escapeURI $ T.pack u, "")]]
                                             fm{ prefix = T.unpack prefixPart, suffix = suffix fm }]
                "isbn"        -> getStringVar "isbn" >>= \d ->
                                 if null d
                                    then return []
-                                   else return [Output [OPan [Link nullAttr [Str d] ("https://worldcat.org/isbn/" ++ escapeURI d, "")]] fm]
+                                   else return [Output [OPan [Link nullAttr [Str $ T.pack d] ("https://worldcat.org/isbn/" <> escapeURI (T.pack d), "")]] fm]
                "pmid"        -> getStringVar "pmid" >>= \d ->
                                 if null d
                                    then return []
-                                   else return [Output [OPan [Link nullAttr [Str d] ("https://www.ncbi.nlm.nih.gov/pubmed/" ++ escapeURI d, "")]] fm]
+                                   else return [Output [OPan [Link nullAttr [Str $ T.pack d] ("https://www.ncbi.nlm.nih.gov/pubmed/" <> escapeURI (T.pack d), "")]] fm]
                "pmcid"       -> getStringVar "pmcid" >>= \d ->
                                 if null d
                                    then return []
-                                   else return [Output [OPan [Link nullAttr [Str d] ("https://www.ncbi.nlm.nih.gov/pmc/articles/" ++ escapeURI d, "")]] fm]
+                                   else return [Output [OPan [Link nullAttr [Str $ T.pack d] ("https://www.ncbi.nlm.nih.gov/pmc/articles/" <> escapeURI (T.pack d), "")]] fm]
                _ -> do (opts, as) <- gets (env >>> options &&& abbrevs)
                        r <- getVar []
                               (getFormattedValue opts as f fm s) s
@@ -315,7 +317,7 @@ getFormattedValue o as f fm s val
     | Just (Formatted v) <- fromValue val :: Maybe Formatted =
        case v of
           [] -> []
-          _  -> case maybe v (unFormatted . fromString) $ getAbbr (stringify v) of
+          _  -> case maybe v (unFormatted . fromString) $ getAbbr (T.unpack $ stringify v) of
                   [] -> []
                   ys -> [Output [(if s == "status"
                                      then OStatus
@@ -341,7 +343,7 @@ getFormattedValue o as f fm s val
     | otherwise                                  = []
     where
       value     = if stripPeriods fm then filter (/= '.') else id
-      value' (Str x) = Str (value x)
+      value' (Str x) = Str $ T.pack $ value $ T.unpack x
       value' x       = x
       getAbbr v = if f == Short
                   then case getAbbreviation as s v of
@@ -379,7 +381,7 @@ formatNumber f fm v n
       checkRange'   ts   = if v == "page" then checkRange ts else id
       process       ts   = checkRange' ts . printNumStr . map (renderNumber ts) .
                            breakNumericString . words
-      renderNumber  ts x = if isTransNumber x then format ts x else x
+      renderNumber  ts x = if isTransNumber x then format ts (T.pack x) else x
 
       format tm = case f of
                     Ordinal     -> maybe "" (ordinal     tm v) . safeRead
@@ -387,7 +389,7 @@ formatNumber f fm v n
                     Roman       -> maybe ""
                                    (\x -> if x < 6000 then roman x else show x) .
                                    safeRead
-                    _           -> maybe "" show . (safeRead :: String -> Maybe Int)
+                    _           -> maybe "" show . (safeRead :: T.Text -> Maybe Int)
 
       roman :: Int -> String
       roman     = concat . reverse . zipWith (!!) romanList .
@@ -424,10 +426,10 @@ isNumericString s  = all (\c -> isNumber c || isSpecialChar c) $ words s
 
 isTransNumber, isSpecialChar,isNumber :: String -> Bool
 isTransNumber = all isDigit
-isSpecialChar = all (`elem` "&-,.\x2013")
+isSpecialChar = all (`elem` ("&-,.\x2013" :: String))
 isNumber   cs = case [c | c <- cs
                         , not (isLetter c)
-                        , c `notElem` "&-.,\x2013"] of
+                        , c `notElem` ("&-.,\x2013" :: String)] of
                      [] -> False
                      xs -> all isDigit xs
 
@@ -435,10 +437,10 @@ breakNumericString :: [String] -> [String]
 breakNumericString [] = []
 breakNumericString (x:xs)
     | isTransNumber x = x : breakNumericString xs
-    | otherwise       = let (a,b) = break (`elem` "&-\x2013,") x
+    | otherwise       = let (a,b) = break (`elem` ("&-\x2013," :: String)) x
                             (c,d) = if null b
                                        then ("","")
-                                       else span (`elem` "&-\x2013,") b
+                                       else span (`elem` ("&-\x2013," :: String)) b
                         in filter (/= []) $  a : c : breakNumericString (d : xs)
 
 formatRange :: Formatting -> String -> State EvalState [Output]
@@ -473,7 +475,7 @@ expandedRange :: (String, String) -> (String, String)
 expandedRange (sa, []) = (sa,[])
 expandedRange (sa, sb)
   | length sb < length sa =
-      case (safeRead sa, safeRead sb) of
+      case (safeRead (T.pack sa), safeRead (T.pack sb)) of
            -- check to make sure we have regular numbers
            (Just (_ :: Int), Just (_ :: Int)) ->
              (sa, take (length sa - length sb) sa ++ sb)
@@ -503,7 +505,7 @@ minimalRange _ (as, bs) = (as, bs)
 --         1496-1504
 chicagoRange :: (String, String) -> (String, String)
 chicagoRange (sa, sb)
-    = case (safeRead sa :: Maybe Int) of
+    = case (safeRead (T.pack sa) :: Maybe Int) of
           Just n | n < 100 -> expandedRange (sa, sb)
                  | n `mod` 100 == 0 -> expandedRange (sa, sb)
                  | n >= 1000 -> let (sa', sb') = minimalRange 1 (sa, sb)

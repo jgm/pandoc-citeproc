@@ -117,7 +117,7 @@ fetchItem :: String
           -> IO (Either E.SomeException (B.ByteString, Maybe MimeType))
 #if MIN_VERSION_pandoc(2,0,0)
 fetchItem s = do
-  res <- runIO $ runExceptT $ lift $ Text.Pandoc.Class.fetchItem s
+  res <- runIO $ runExceptT $ lift $ Text.Pandoc.Class.fetchItem $ T.pack s
   return $ case res of
        Left e          -> Left (E.toException e)
        Right (Left (e :: PandocError))  -> Left (E.toException e)

@@ -1,4 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
@@ -33,6 +35,7 @@ import           Data.List              (foldl', intercalate)
 import           Data.List.Split        (splitOn, splitWhen, wordsBy)
 import qualified Data.Map               as Map
 import           Data.Maybe
+import qualified Data.Text              as T
 import           System.Environment     (getEnvironment)
 import           Text.CSL.Compat.Pandoc (readLaTeX)
 import           Text.CSL.Exception     (CiteprocException (ErrorReadingBib, ErrorReadingBibFile))
@@ -60,7 +63,7 @@ adjustSpans _ (Span ("",[],[]) xs) = xs
 adjustSpans lang (RawInline (Format "latex") s)
   | s == "\\hyphen" || s == "\\hyphen " = [Str "-"]
   | otherwise = Walk.walk (concatMap (adjustSpans lang))
-                $ parseRawLaTeX lang s
+                $ parseRawLaTeX lang (T.unpack s)
 adjustSpans _ x = [x]
 
 parseRawLaTeX :: Lang -> String -> [Inline]
@@ -81,7 +84,7 @@ parseRawLaTeX lang ('\\':xs) =
          -- ... both should be nestable & should work in year fields
          f "autocap"    ils    = ils  -- TODO: should work in year fields
          f "textnormal" ils    = [Span ("",["nodecor"],[]) ils]
-         f "bibstring" [Str s] = [Str $ resolveKey' lang s]
+         f "bibstring" [Str s] = [Str $ T.pack $ resolveKey' lang $ T.unpack s]
          f _            ils    = [Span nullAttr ils]
 parseRawLaTeX _ _ = []
 
@@ -199,7 +202,7 @@ fieldName =
   resolveAlias . map toLower <$> many1 (letter <|> digit <|> oneOf "-_:+")
 
 isBibtexKeyChar :: Char -> Bool
-isBibtexKeyChar c = isAlphaNum c || c `elem` ".:;?!`'()/*@_+=-[]*&"
+isBibtexKeyChar c = isAlphaNum c || c `elem` (".:;?!`'()/*@_+=-[]*&" :: String)
 
 bibItem :: BibParser Item
 bibItem = do
@@ -377,7 +380,7 @@ langToLocale (Lang x y) = x ++ (if null y then [] else '-':y)
 
 resolveKey :: Lang -> Formatted -> Formatted
 resolveKey lang (Formatted ils) = Formatted (Walk.walk go ils)
-  where go (Str s) = Str $ resolveKey' lang s
+  where go (Str s) = Str $ T.pack $ resolveKey' lang $ T.unpack s
         go x       = x
 
 -- biblatex localization keys, from files at
@@ -877,7 +880,7 @@ parseMonth s =
          "oct" -> Just 10
          "nov" -> Just 11
          "dec" -> Just 12
-         _     -> safeRead s
+         _     -> safeRead $ T.pack s
 
 data BibState = BibState{
            untitlecase    :: Bool
@@ -951,20 +954,20 @@ getOldDates prefix = do
   year' <- fixLeadingDash <$> getRawField (prefix ++ "year") <|> return ""
   month' <- (parseMonth
               <$> getRawField (prefix ++ "month")) <|> return Nothing
-  day' <- (safeRead <$> getRawField (prefix ++ "day")) <|> return Nothing
+  day' <- (safeRead . T.pack <$> getRawField (prefix ++ "day")) <|> return Nothing
   endyear' <- (fixLeadingDash <$> getRawField (prefix ++ "endyear"))
             <|> return ""
   endmonth' <- (parseMonth <$> getRawField (prefix ++ "endmonth"))
             <|> return Nothing
-  endday' <- (safeRead <$> getRawField (prefix ++ "endday")) <|> return Nothing
-  let start' = RefDate { year   = safeRead year'
+  endday' <- (safeRead . T.pack <$> getRawField (prefix ++ "endday")) <|> return Nothing
+  let start' = RefDate { year   = safeRead $ T.pack year'
                        , month  = month'
                        , season = Nothing
                        , day    = day'
                        , other  = Literal $ if isNumber year' then "" else year'
                        , circa  = False
                        }
-  let end' = RefDate { year     = safeRead endyear'
+  let end' = RefDate { year     = safeRead $ T.pack endyear'
                        , month  = endmonth'
                        , day    = endday'
                        , season = Nothing
@@ -1040,7 +1043,7 @@ toAuthor _ [Span ("",[],[]) ils] =
           , parseNames      = False
           }
  -- extended BibLaTeX name format - see #266
-toAuthor _ ils@(Str ys:_) | '=' `elem` ys = do
+toAuthor _ ils@(Str ys:_) | T.any (== '=') ys = do
   let commaParts = splitWhen (== Str ",")
                    $ splitStrWhen (\c -> c == ',' || c == '=' || c == '\160')
                    $ ils
@@ -1114,7 +1117,7 @@ toAuthor opts ils = do
           }
 
 isCapitalized :: [Inline] -> Bool
-isCapitalized (Str (c:cs) : rest)
+isCapitalized (Str (T.uncons -> Just (c,cs)) : rest)
   | isUpper c = True
   | isDigit c = isCapitalized (Str cs : rest)
   | otherwise = False
@@ -1220,9 +1223,9 @@ concatWith sep = Formatted . foldl' go mempty . map unFormatted
         go accum s  = case reverse accum of
                            []    -> s
                            (Str x:_)
-                             | not (null x) && last x `elem` "!?.,:;"
+                             | not (T.null x) && T.last x `elem` ("!?.,:;" :: String)
                                           -> accum ++ (Space : s)
-                           _     -> accum ++ (Str [sep] : Space : s)
+                           _     -> accum ++ (Str (T.singleton sep) : Space : s)
 
 type Options = [(String, String)]
 
@@ -1278,7 +1281,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
        "inproceedings"   -> (PaperConference,mempty)
        "manual"          -> (Book,mempty)
        "mastersthesis"   -> (Thesis, if reftype' == mempty
-                                        then Formatted [Str $ resolveKey' lang "mathesis"]
+                                        then Formatted [Str $ T.pack $ resolveKey' lang "mathesis"]
                                         else reftype')
        "misc"            -> (NoType,mempty)
        "mvbook"          -> (Book,mempty)
@@ -1292,7 +1295,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
          | st == "newspaper" -> (ArticleNewspaper,mempty)
          | otherwise         -> (ArticleJournal,mempty)
        "phdthesis"       -> (Thesis, if reftype' == mempty
-                                        then Formatted [Str $ resolveKey' lang "phdthesis"]
+                                        then Formatted [Str $ T.pack $ resolveKey' lang "phdthesis"]
                                         else reftype')
        "proceedings"     -> (Book,mempty)
        "reference"       -> (Book,mempty)
@@ -1415,9 +1418,9 @@ itemToReference lang locale bibtex caseTransform = bib $ do
                         <|> getPeriodicalTitle "shortjournal"
                         <|> return mempty
   -- change numerical series title to e.g. 'series 3'
-  let fixSeriesTitle (Formatted [Str xs]) | all isDigit xs =
-         Formatted [Str (ordinalize locale xs),
-                    Space, Str (resolveKey' lang "ser.")]
+  let fixSeriesTitle (Formatted [Str xs]) | T.all isDigit xs =
+         Formatted [Str (T.pack $ ordinalize locale $ T.unpack xs),
+                    Space, Str (T.pack $ resolveKey' lang "ser.")]
       fixSeriesTitle x = x
   seriesTitle' <- (fixSeriesTitle . resolveKey lang) <$>
                       getTitle "series" <|> return mempty
@@ -1535,12 +1538,12 @@ itemToReference lang locale bibtex caseTransform = bib $ do
                          _ -> return mempty
                  )
 
-  let convertEnDash (Str s) = Str (map (\c -> if c == '–' then '-' else c) s)
+  let convertEnDash (Str s) = Str (T.map (\c -> if c == '–' then '-' else c) s)
       convertEnDash x       = x
 
   let takeDigits (Str xs : _) =
-         case takeWhile isDigit xs of
-              [] -> []
+         case T.takeWhile isDigit xs of
+              "" -> []
               ds -> [Str ds]
       takeDigits x             = x
 
