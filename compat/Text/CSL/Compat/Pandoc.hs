@@ -63,6 +63,7 @@ readNative = either mempty id . runPure . Pandoc.readNative def . T.pack
 writeMarkdown = either mempty T.unpack . runPure . Pandoc.writeMarkdown
    def{ writerExtensions = disableExtension Ext_smart $
                            disableExtension Ext_bracketed_spans $
+                           disableExtension Ext_raw_attribute $
                            pandocExtensions,
         writerWrapText = WrapNone }
 
