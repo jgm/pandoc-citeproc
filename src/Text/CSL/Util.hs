@@ -55,7 +55,7 @@ module Text.CSL.Util
   , isRange
   , addSpaceAfterPeriod
   ) where
-import Prelude
+import           Prelude
 import           Control.Monad.State
 import           Data.Aeson
 import           Data.Aeson.Types    (Parser)
@@ -151,8 +151,8 @@ parseBool (Bool b)   = return b
 parseBool (Number n) = case fromJSON (Number n) of
                             Success (0 :: Int) -> return False
                             Success _          -> return True
-                            Error e            -> fail $ "Could not read boolean: " ++ e
-parseBool _          = fail "Could not read boolean"
+                            Error e            -> Prelude.fail $ "Could not read boolean: " ++ e
+parseBool _          = Prelude.fail "Could not read boolean"
 
 -- | Parse JSON value as String.
 parseString :: Value -> Parser String
@@ -161,34 +161,34 @@ parseString (Number n) = case fromJSON (Number n) of
                             Success (x :: Int) -> return $ show x
                             Error _ -> case fromJSON (Number n) of
                                             Success (x :: Double) -> return $ show x
-                                            Error e -> fail $ "Could not read string: " ++ e
+                                            Error e -> Prelude.fail $ "Could not read string: " ++ e
 parseString (Bool b)   = return $ map toLower $ show b
 parseString v@(Array _)= inlinesToString `fmap` parseJSON v
-parseString v          = fail $ "Could not read as string: " ++ show v
+parseString v          = Prelude.fail $ "Could not read as string: " ++ show v
 
 -- | Parse JSON value as Int.
 parseInt :: Value -> Parser Int
 parseInt (Number n) = case fromJSON (Number n) of
                             Success (x :: Int) -> return x
-                            Error e -> fail $ "Could not read Int: " ++ e
+                            Error e -> Prelude.fail $ "Could not read Int: " ++ e
 parseInt x = parseString x >>= \s ->
               case safeRead (T.pack s) of
                    Just n  -> return n
-                   Nothing -> fail "Could not read Int"
+                   Nothing -> Prelude.fail "Could not read Int"
 
 -- | Parse JSON value as Maybe Int.
 parseMaybeInt :: Maybe Value -> Parser (Maybe Int)
 parseMaybeInt Nothing = return Nothing
 parseMaybeInt (Just (Number n)) = case fromJSON (Number n) of
                                        Success (x :: Int) -> return (Just x)
-                                       Error e -> fail $ "Could not read Int: " ++ e
+                                       Error e -> Prelude.fail $ "Could not read Int: " ++ e
 parseMaybeInt (Just x) =
   parseString x >>= \s ->
                    if null s
                       then return Nothing
                       else case safeRead (T.pack s) of
                                 Just n  -> return (Just n)
-                                Nothing -> fail $ "Could not read as Int: " ++ show s
+                                Nothing -> Prelude.fail $ "Could not read as Int: " ++ show s
 
 mb :: Monad m => (b -> m a) -> (Maybe b -> m (Maybe a))
 mb  = Data.Traversable.mapM
@@ -531,7 +531,7 @@ pRomanNumeral = do
                 hundreds + nineties + fifties + forties + tens + nines +
                 fives + fours + ones
     if total == 0
-       then fail "not a roman numeral"
+       then Prelude.fail "not a roman numeral"
        else return total
 
 isRange :: String -> Bool
