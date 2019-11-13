@@ -19,7 +19,7 @@ extra-deps:
 - doclayout-0.2.0.1
 - texmath-0.12
 - pandoc-types-1.20
-- git: git@github.com:jgm/pandoc
+- git: 'https://github.com/jgm/pandoc'
   commit: 7cd9694e5c34d87466749901feb52237def379fe
 
 ghc-options:
