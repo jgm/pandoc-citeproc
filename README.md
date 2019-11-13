@@ -1,6 +1,10 @@
 pandoc-citeproc
 ===============
 
+[![CI
+tests](https://github.com/jgm/pandoc-citeproc/workflows/CI%20tests/badge.svg)](https://github.com/jgm/pandoc-citeproc/actions)
+
+
 This package provides a library and executable to facilitate the use of
 citeproc with pandoc 1.12 and greater.  (Earlier versions of pandoc have
 integrated citeproc support.)
