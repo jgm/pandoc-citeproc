@@ -564,7 +564,7 @@ pLocatorLabel' locMap lim = go ""
 -- hard requirement for a locator to have some real digits in it
 requireDigits :: (Bool, String) -> Parsec [Inline] st String
 requireDigits (_, s) = if not (any isDigit s)
-                          then fail "requireDigits"
+                          then Prelude.fail "requireDigits"
                           else return s
 
 -- soft requirement for a sequence with some roman or arabic parts
@@ -573,7 +573,7 @@ requireDigits (_, s) = if not (any isDigit s)
 -- NOT: a, (a)-(b), hello, (some text in brackets)
 requireRomansOrDigits :: (Bool, String) -> Parsec [Inline] st String
 requireRomansOrDigits (d, s) = if not d
-                                  then fail "requireRomansOrDigits"
+                                  then Prelude.fail "requireRomansOrDigits"
                                   else return s
 
 pLocatorWordIntegrated :: Bool -> Parsec [Inline] st (Bool, String)
@@ -679,7 +679,7 @@ pMatch :: String -> (Inline -> Bool) -> Parsec [Inline] st Inline
 pMatch msg condition = try $ do
   t <- anyToken
   if not (condition t)
-     then fail msg
+     then Prelude.fail msg
      else return t
 
 type LocatorMap = M.Map String String
