@@ -890,7 +890,7 @@ data BibState = BibState{
 type Bib = RWST Item () BibState Maybe
 
 notFound :: String -> Bib a
-notFound f = fail $ f ++ " not found"
+notFound f = Prelude.fail $ f ++ " not found"
 
 getField :: String -> Bib Formatted
 getField f = do
