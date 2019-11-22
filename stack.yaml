@@ -20,7 +20,7 @@ extra-deps:
 - texmath-0.12
 - pandoc-types-1.20
 - git: 'https://github.com/jgm/pandoc'
-  commit: 7cd9694e5c34d87466749901feb52237def379fe
+  commit: cac01f45bb2247d152f649eb1ef30f21fbc28867
 
 ghc-options:
    "$locals": -fhide-source-paths
