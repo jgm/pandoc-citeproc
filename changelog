@@ -1,4 +1,4 @@
-pandoc-citeproc (0.17)
+pandoc-citeproc (0.16.4)
 
   * Simplify compat since we now require pandoc >= 2.8.
   * Update man page.  Clarify that `reference-section-title` doesn't have any
