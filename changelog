@@ -1,3 +1,19 @@
+pandoc-citeproc (0.17)
+
+  * Simplify compat since we now require pandoc >= 2.8.
+  * Update man page.  Clarify that `reference-section-title` doesn't have any
+    effect when an explicit Div is used (#424).
+  * Qualify fail with Prelude to fix compiler warnings.
+  * Disable `raw_attribute` extension when writing Markdown.
+    This way we avoid e.g. `<i>{=html}` in the CSL export.
+  * Use pandoc-types 1.20.  Note that this change removes
+    the ability to compile pandoc-citeproc with
+    older versions of pandoc (< 2.8).
+  * Incorporate the switch to Text in the dependencies (Christian
+    Despres).  The changes to the structure of the code are fairly minimal.
+    None of the types have changed, requiring a reasonable amount of
+    packing, unpacking, and view patterns.
+
 pandoc-citeproc (0.16.3.1)
 
   * Fix how LANG is set for bibtex conversion.
