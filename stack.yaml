@@ -15,7 +15,7 @@ extra-deps:
 - skylighting-0.8.2.3
 - skylighting-core-0.8.2.3
 - regex-pcre-builtin-0.95.0.8.8.35
-- doctemplates-0.7
+- doctemplates-0.7.1
 - doclayout-0.2.0.1
 - texmath-0.12
 - pandoc-types-1.20
