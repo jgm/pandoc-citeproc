@@ -19,7 +19,7 @@ description:        The pandoc-citeproc library supports automatic
 
 homepage:           https://github.com/jgm/pandoc-citeproc
 category:           Text
-tested-with:        GHC == 8.0.1, GHC == 8.2.2, GHC == 8.4.3
+tested-with:        GHC == 8.0.1, GHC == 8.2.2, GHC == 8.4.3, GHC == 8.6.3
 license:            BSD3
 license-file:       LICENSE
 author:             John MacFarlane, Andrea Rossato
