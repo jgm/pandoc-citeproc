@@ -12,8 +12,8 @@ extra-deps:
 - HsYAML-0.2.0.0
 - HsYAML-aeson-0.2.0.0
 - haddock-library-1.8.0
-- skylighting-0.8.2.3
-- skylighting-core-0.8.2.3
+- skylighting-0.8.3
+- skylighting-core-0.8.3
 - regex-pcre-builtin-0.95.0.8.8.35
 - doctemplates-0.8
 - doclayout-0.2.0.1
