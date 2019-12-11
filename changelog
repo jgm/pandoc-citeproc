@@ -1,3 +1,7 @@
+pandoc-citeproc (0.16.4.1)
+
+  * Allow pandoc 2.9.
+
 pandoc-citeproc (0.16.4)
 
   * Simplify compat since we now require pandoc >= 2.8.
