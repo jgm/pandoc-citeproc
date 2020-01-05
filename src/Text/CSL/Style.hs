@@ -104,21 +104,22 @@ import           Data.Aeson.Types       (Pair)
 import           Data.Char              (isLetter, isPunctuation, isUpper, toLower, isDigit)
 import qualified Data.Char              as Char
 import           Data.Generics          (Data, Typeable)
-import           Data.List              (intercalate, intersperse, isInfixOf,
-                                         isPrefixOf, nubBy)
-import           Data.List.Split        (splitWhen, wordsBy)
+import           Data.List              (intercalate, intersperse, nubBy)
+import           Data.List.Split        (wordsBy)
 import qualified Data.Map               as M
 import           Data.Maybe             (listToMaybe, isNothing)
 import           Data.String
+import           Data.Text              (Text)
 import qualified Data.Text              as T
 import           Data.Yaml.Builder      (ToYaml (..))
 import qualified Data.Yaml.Builder      as Y
 import           GHC.Generics           (Generic)
 import           Text.CSL.Compat.Pandoc (readHtml, writeMarkdown)
-import           Text.CSL.Util          (orIfNull, headInline, initInline,
+import           Text.CSL.Util          (headInline, initInline,
                                          lastInline, mapping', mb, parseBool,
-                                         parseString, query, splitStrWhen,
-                                         tailInline, trimr, (.#:), (.#?),
+                                         parseString, query, splitWhen,
+                                         splitStrWhen, tailInline, trimr,
+                                         (.#:), (.#?),
                                          AddYaml(..), addSpaceAfterPeriod)
 import qualified Text.Pandoc.Builder    as B
 import           Text.Pandoc.Definition hiding (Citation, Cite)
@@ -139,7 +140,7 @@ import qualified Data.Vector            as V
 -- for reading JSON citeproc bibliographies.  ToJSON is used to create
 -- pandoc metadata bibliographies.
 
-readCSLString :: String -> [Inline]
+readCSLString :: Text -> [Inline]
 readCSLString s = Walk.walk handleSmallCapsSpans
                 $ case readHtml (adjustScTags s) of
                         Pandoc _ [Plain ils] -> ils
@@ -154,23 +155,23 @@ readCSLString s = Walk.walk handleSmallCapsSpans
 
 -- <sc> is not a real HTML tag, but a CSL convention.  So we
 -- replace it with a real tag that the HTML reader will understand.
-adjustScTags :: String -> String
-adjustScTags zs =
-  case zs of
-       ('<':'s':'c':'>':xs)     -> "<span style=\"font-variant:small-caps;\">" ++
-                                    adjustScTags xs
-       ('<':'/':'s':'c':'>':xs) -> "</span>" ++ adjustScTags xs
-       (x:xs)                   -> x : adjustScTags xs
-       []                       -> []
+adjustScTags :: Text -> Text
+adjustScTags zs
+  | Just xs <- T.stripPrefix "<sc>" zs =
+      "<span style=\"font-variant:small-caps;\">" <> adjustScTags xs
+  | Just xs <- T.stripPrefix "</sc>" zs =
+      "</span>" <> adjustScTags xs
+  | Just (x, xs) <- T.uncons zs =
+    T.cons x (adjustScTags xs)
+  | otherwise = ""
 
-
-writeYAMLString :: [Inline] -> String
+writeYAMLString :: [Inline] -> Text
 writeYAMLString ils =
   trimr $ writeMarkdown
         $ Pandoc nullMeta
           [Plain $ Walk.walk (concatMap (adjustCSL False)) ils]
 
-writeCSLString :: [Inline] -> String
+writeCSLString :: [Inline] -> Text
 writeCSLString ils =
   trimr $ writeMarkdown
         $ Pandoc nullMeta
@@ -215,7 +216,7 @@ instance ToJSON Formatted where
   toJSON = toJSON . writeCSLString . unFormatted
 
 instance ToYaml Formatted where
-  toYaml = Y.string . T.pack . writeYAMLString . unFormatted
+  toYaml = Y.string . writeYAMLString . unFormatted
 
 instance IsString Formatted where
   fromString = Formatted . toStr
@@ -246,8 +247,8 @@ instance Walk.Walkable Formatted Formatted where
 
 toStr :: String -> [Inline]
 toStr = intercalate [Str "\n"] .
-        map (B.toList . B.text . T.pack . tweak . T.unpack . fromEntities . T.pack) .
-        splitWhen (=='\n')
+        map (B.toList . B.text . T.pack . tweak . T.unpack . fromEntities) .
+        splitWhen (=='\n') . T.pack
     where
       tweak ('«':' ':xs) = "«\8239" ++ tweak xs
       tweak (' ':'»':xs) = "\8239»" ++ tweak xs
@@ -261,28 +262,28 @@ toStr = intercalate [Str "\n"] .
 appendWithPunct :: Formatted -> Formatted -> Formatted
 appendWithPunct (Formatted left) (Formatted right) =
   Formatted $
-  case lastleft ++ firstright of
-       [' ',d] | d `elem` (",.:;" :: String) -> initInline left ++ right
-       [c,d] | c `elem` (" ,.:;" :: String), d == c -> left ++ tailInline right
-       [c,'.'] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
-       [c,':'] | c `elem` (",!:;?" :: String) -> left ++ tailInline right  -- Mich.: 2005
-       [c,'!'] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
-       [c,'?'] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
-       [c,';'] | c `elem` (",:;" :: String) -> left ++ tailInline right -- et al.;
-       [':',c] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
-       [';',c] | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
-       -- ".;" -> right  -- e.g. et al.;
-       _    -> left ++ right
+  case (,) <$> lastleft <*> firstright of
+    Just (' ', d) | d `elem` (",.:;" :: String) -> initInline left ++ right
+    Just (c,d) | c `elem` (" ,.:;" :: String), d == c -> left ++ tailInline right
+    Just (c,'.') | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
+    Just (c,':') | c `elem` (",!:;?" :: String) -> left ++ tailInline right  -- Mich.: 2005
+    Just (c,'!') | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
+    Just (c,'?') | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
+    Just (c,';') | c `elem` (",:;" :: String) -> left ++ tailInline right -- et al.;
+    Just (':',c) | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
+    Just (';',c) | c `elem` (",.!:;?" :: String) -> left ++ tailInline right
+    -- ".;" -> right  -- e.g. et al.;
+    _    -> left ++ right
   where lastleft     = lastInline left
         firstright   = headInline right
 
 -- | The representation of a parsed CSL style.
 data Style
     = Style
-      { styleVersion       ::  String
-      , styleClass         ::  String
+      { styleVersion       ::  Text
+      , styleClass         ::  Text
       , styleInfo          ::  Maybe CSInfo
-      , styleDefaultLocale ::  String
+      , styleDefaultLocale ::  Text
       , styleLocale        :: [Locale]
       , styleAbbrevs       :: Abbreviations
       , csOptions          :: [Option]
@@ -293,8 +294,8 @@ data Style
 
 data Locale
     = Locale
-      { localeVersion :: String
-      , localeLang    :: String
+      { localeVersion :: Text
+      , localeLang    :: Text
       , localeOptions :: [Option]
       , localeTerms   :: [CslTerm]
       , localeDate    :: [Element]
@@ -304,12 +305,12 @@ data Locale
 -- the parsed 'Style' cs:locale elements, produce the final 'Locale'
 -- as the only element of a list, taking into account CSL locale
 -- prioritization.
-mergeLocales :: String -> Locale -> [Locale] -> [Locale]
+mergeLocales :: Text -> Locale -> [Locale] -> [Locale]
 mergeLocales s l ls = doMerge list
     where
       list = filter ((==) s . localeLang) ls ++
-             filter ((\x -> x /= [] && x `isPrefixOf` s) . localeLang) ls ++
-             filter ((==) [] . localeLang) ls
+             filter ((\x -> x /= "" && x `T.isPrefixOf` s) . localeLang) ls ++
+             filter ((==) "" . localeLang) ls
       doMerge x = return l { localeOptions = newOpt     x
                            , localeTerms   = newTerms   x
                            , localeDate    = newDate    x
@@ -323,25 +324,25 @@ mergeLocales s l ls = doMerge list
 
 data CslTerm
     = CT
-      { cslTerm        :: String
+      { cslTerm        :: Text
       , termForm       :: Form
       , termGender     :: Gender
       , termGenderForm :: Gender
-      , termSingular   :: String
-      , termPlural     :: String
-      , termMatch      :: String
+      , termSingular   :: Text
+      , termPlural     :: Text
+      , termMatch      :: Text
       } deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 newTerm :: CslTerm
-newTerm = CT [] Long Neuter Neuter [] [] []
+newTerm = CT "" Long Neuter Neuter "" "" ""
 
-findTerm :: String -> Form -> [CslTerm] -> Maybe CslTerm
+findTerm :: Text -> Form -> [CslTerm] -> Maybe CslTerm
 findTerm s f = findTerm'' s f Nothing
 
-findTerm' :: String -> Form -> Gender -> [CslTerm] -> Maybe CslTerm
+findTerm' :: Text -> Form -> Gender -> [CslTerm] -> Maybe CslTerm
 findTerm' s f g = findTerm'' s f (Just g)
 
-findTerm'' :: String -> Form -> Maybe Gender -> [CslTerm] -> Maybe CslTerm
+findTerm'' :: Text -> Form -> Maybe Gender -> [CslTerm] -> Maybe CslTerm
 findTerm'' s f mbg ts
   = listToMaybe [ t | t <- ts, cslTerm t == s, termForm t == f,
                          isNothing mbg || mbg == Just (termGenderForm t) ]
@@ -359,18 +360,18 @@ hasOrdinals = any (any hasOrd . localeTerms)
     where
       hasOrd o
           | CT {cslTerm = t} <- o
-          , "ordinal" `isInfixOf` t = True
-          | otherwise               = False
+          , "ordinal" `T.isInfixOf` t = True
+          | otherwise                 = False
 
 rmOrdinals :: [CslTerm] -> [CslTerm]
 rmOrdinals [] = []
 rmOrdinals (o:os)
   | CT {cslTerm = t} <- o
-  , "ordinal" `isInfixOf` t =   rmOrdinals os
-  | otherwise               = o:rmOrdinals os
+  , "ordinal" `T.isInfixOf` t =   rmOrdinals os
+  | otherwise                 = o:rmOrdinals os
 
 newtype Abbreviations = Abbreviations {
-           unAbbreviations :: M.Map String (M.Map String (M.Map String String))
+           unAbbreviations :: M.Map Text (M.Map Text (M.Map Text Text))
            } deriving ( Show, Read, Typeable, Data, Generic )
 
 instance FromJSON Abbreviations where
@@ -379,7 +380,7 @@ instance FromJSON Abbreviations where
   parseJSON _            = fail "Could not read Abbreviations"
 
 type MacroMap
-    = (String,[Element])
+    = (Text,[Element])
 
 data Citation
     = Citation
@@ -395,7 +396,7 @@ data Bibliography
       , bibLayout  ::  Layout
       } deriving ( Show, Read, Typeable, Data, Generic )
 
-type Option = (String,String)
+type Option = (Text,Text)
 
 mergeOptions :: [Option] -> [Option] -> [Option]
 mergeOptions os = nubBy (\x y -> fst x == fst y) . (++) os
@@ -409,16 +410,16 @@ data Layout
 
 data Element
     = Choose       IfThen    [IfThen]    [Element]
-    | Macro        String                 Formatting
-    | Const        String                 Formatting
-    | Variable    [String]    Form        Formatting Delimiter
-    | Term         String     Form        Formatting Bool
-    | Label        String     Form        Formatting Plural
-    | Number       String     NumericForm Formatting
-    | Names       [String]   [Name]       Formatting Delimiter [Element]
+    | Macro        Text                   Formatting
+    | Const        Text                   Formatting
+    | Variable    [Text]      Form        Formatting Delimiter
+    | Term         Text       Form        Formatting Bool
+    | Label        Text       Form        Formatting Plural
+    | Number       Text       NumericForm Formatting
+    | Names       [Text  ]   [Name]       Formatting Delimiter [Element]
     | Substitute  [Element]
     | Group        Formatting Delimiter  [Element]
-    | Date        [String]    DateForm    Formatting Delimiter [DatePart] String
+    | Date        [Text  ]    DateForm    Formatting Delimiter [DatePart] Text
       deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 data IfThen
@@ -427,16 +428,16 @@ data IfThen
 
 data Condition
     = Condition
-      { isType          :: [String]
-      , isSet           :: [String]
-      , isNumeric       :: [String]
-      , isUncertainDate :: [String]
-      , isPosition      :: [String]
-      , disambiguation  :: [String]
-      , isLocator       :: [String]
+      { isType          :: [Text]
+      , isSet           :: [Text]
+      , isNumeric       :: [Text]
+      , isUncertainDate :: [Text]
+      , isPosition      :: [Text]
+      , disambiguation  :: [Text]
+      , isLocator       :: [Text]
       } deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
-type Delimiter = String
+type Delimiter = Text
 
 data Match
     = Any
@@ -451,9 +452,9 @@ match None = all not
 
 data DatePart
     = DatePart
-      { dpName       :: String
-      , dpForm       :: String
-      , dpRangeDelim :: String
+      { dpName       :: Text
+      , dpForm       :: Text
+      , dpRangeDelim :: Text
       , dpFormatting :: Formatting
       } deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
@@ -464,34 +465,37 @@ defaultDate
       , DatePart "day"   "" "-" emptyFormatting]
 
 data Sort
-    = SortVariable String Sorting
-    | SortMacro    String Sorting Int Int String
+    = SortVariable Text Sorting
+    | SortMacro    Text Sorting Int Int Text
       deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
 data Sorting
-    = Ascending  String
-    | Descending String
+    = Ascending  Text
+    | Descending Text
       deriving ( Read, Show, Eq, Typeable, Data, Generic )
 
 instance Ord Sorting where
-    compare (Ascending  []) (Ascending  []) = EQ
-    compare (Ascending  []) (Ascending   _) = GT
-    compare (Ascending   _) (Ascending  []) = LT
+    compare (Ascending  "") (Ascending  "") = EQ
+    compare (Ascending  "") (Ascending   _) = GT
+    compare (Ascending   _) (Ascending  "") = LT
     compare (Ascending   a) (Ascending   b) = compare' a b
-    compare (Descending []) (Descending []) = EQ
-    compare (Descending []) (Descending  _) = GT
-    compare (Descending  _) (Descending []) = LT
+    compare (Descending "") (Descending "") = EQ
+    compare (Descending "") (Descending  _) = GT
+    compare (Descending  _) (Descending "") = LT
     compare (Descending  a) (Descending  b) = compare' b a
     compare              _               _  = EQ
 
-compare' :: String -> String -> Ordering
-compare' x y
+compare' :: Text -> Text -> Ordering
+compare' x' y'
     = case (x, y) of
         ('-':_,'-':_) -> comp (normalize y) (normalize x)
         ('-':_, _ )   -> LT
         (_  ,'-':_)   -> GT
         _             -> comp (normalize x) (normalize y)
       where
+        -- FIXME: to Text
+        x = T.unpack x'
+        y = T.unpack y'
         -- we zero pad numbers so they're sorted numerically, see #399
         zeropad [] = []
         zeropad xs = if all isDigit xs
@@ -548,13 +552,13 @@ data Plural
 data Name
     = Name      Form Formatting NameAttrs Delimiter [NamePart]
     | NameLabel Form Formatting Plural
-    | EtAl           Formatting String
+    | EtAl           Formatting Text
       deriving ( Eq, Show, Read, Typeable, Data, Generic )
 
-type NameAttrs = [(String, String)]
+type NameAttrs = [(Text, Text)]
 
 data NamePart
-    = NamePart String Formatting
+    = NamePart Text Formatting
       deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 isPlural :: Plural -> Int -> Bool
@@ -577,21 +581,21 @@ hasEtAl = any isEtAl
 
 data Formatting
     = Formatting
-      { prefix         :: String
-      , suffix         :: String
-      , fontFamily     :: String
-      , fontStyle      :: String
-      , fontVariant    :: String
-      , fontWeight     :: String
-      , textDecoration :: String
-      , verticalAlign  :: String
-      , textCase       :: String
-      , display        :: String
+      { prefix         :: Text
+      , suffix         :: Text
+      , fontFamily     :: Text
+      , fontStyle      :: Text
+      , fontVariant    :: Text
+      , fontWeight     :: Text
+      , textDecoration :: Text
+      , verticalAlign  :: Text
+      , textCase       :: Text
+      , display        :: Text
       , quotes         :: Quote
       , stripPeriods   :: Bool
       , noCase         :: Bool
       , noDecor        :: Bool
-      , hyperlink      :: String  -- null for no link
+      , hyperlink      :: Text  -- null for no link
       } deriving ( Read, Eq, Ord, Typeable, Data, Generic )
 
 -- custom instance to make debugging output less busy
@@ -637,44 +641,47 @@ data Quote
 
 emptyFormatting :: Formatting
 emptyFormatting
-    = Formatting [] [] [] [] [] [] [] [] [] [] NoQuote False False False []
+    = Formatting "" "" "" "" "" "" "" "" "" "" NoQuote False False False ""
 
 mergeFM :: Formatting -> Formatting -> Formatting
 mergeFM (Formatting aa ab ac ad ae af ag ah ai aj ak al am an ahl)
         (Formatting ba bb bc bd be bf bg bh bi bj bk bl bm bn bhl) =
-                   Formatting (ba `orIfNull` aa)
-                              (bb `orIfNull` ab)
-                              (bc `orIfNull` ac)
-                              (bd `orIfNull` ad)
-                              (be `orIfNull` ae)
-                              (bf `orIfNull` af)
-                              (bg `orIfNull` ag)
-                              (bh `orIfNull` ah)
-                              (bi `orIfNull` ai)
-                              (bj `orIfNull` aj)
+                   Formatting (ba `orIfEmpty` aa)
+                              (bb `orIfEmpty` ab)
+                              (bc `orIfEmpty` ac)
+                              (bd `orIfEmpty` ad)
+                              (be `orIfEmpty` ae)
+                              (bf `orIfEmpty` af)
+                              (bg `orIfEmpty` ag)
+                              (bh `orIfEmpty` ah)
+                              (bi `orIfEmpty` ai)
+                              (bj `orIfEmpty` aj)
                               (if bk == NoQuote then ak else bk)
                               (bl || al)
                               (bm || am)
                               (bn || an)
-                              (bhl `mplus` ahl)
+                              (bhl <> ahl)
+ where orIfEmpty :: Text -> Text -> Text
+       orIfEmpty "" fallback = fallback
+       orIfEmpty t  _ = t
 
 data CSInfo
     = CSInfo
-      { csiTitle      :: String
+      { csiTitle      :: Text
       , csiAuthor     :: CSAuthor
       , csiCategories :: [CSCategory]
-      , csiId         :: String
-      , csiUpdated    :: String
+      , csiId         :: Text
+      , csiUpdated    :: Text
       } deriving ( Show, Read, Typeable, Data, Generic )
 
-data CSAuthor   = CSAuthor   String String String
+data CSAuthor   = CSAuthor   Text Text Text
                 deriving ( Show, Read, Eq, Typeable, Data, Generic )
-data CSCategory = CSCategory String String String
+data CSCategory = CSCategory Text Text Text
                 deriving ( Show, Read, Eq, Typeable, Data, Generic )
 
 data CiteprocError
    = NoOutput
-   | ReferenceNotFound String
+   | ReferenceNotFound Text
    deriving ( Eq, Ord, Show, Typeable, Data, Generic )
 
 -- | The 'Output' generated by the evaluation of a style. Must be
@@ -684,34 +691,34 @@ data Output
     | OSpace
     | OPan    [Inline]
     | OStatus [Inline]
-    | ODel     String                                   -- ^ A delimiter string.
-    | OStr     String             Formatting            -- ^ A simple 'String'
+    | ODel     Text                                   -- ^ A delimiter string.
+    | OStr     Text           Formatting            -- ^ A simple 'String'
     | OErr     CiteprocError                            -- ^ Warning message
-    | OLabel   String             Formatting            -- ^ A label used for roles
-    | ONum     Int                Formatting            -- ^ A number (used to count contributors)
-    | OCitNum  Int                Formatting            -- ^ The citation number
-    | OCitLabel String            Formatting            -- ^ The citation label
+    | OLabel   Text           Formatting            -- ^ A label used for roles
+    | ONum     Int            Formatting            -- ^ A number (used to count contributors)
+    | OCitNum  Int            Formatting            -- ^ The citation number
+    | OCitLabel Text          Formatting            -- ^ The citation label
     | ODate   [Output]                                  -- ^ A (possibly) ranged date
-    | OYear    String    String   Formatting            -- ^ The year and the citeId
-    | OYearSuf String    String   [Output]   Formatting -- ^ The year suffix, the citeId and a holder for collision data
+    | OYear    Text    Text   Formatting            -- ^ The year and the citeId
+    | OYearSuf Text    Text   [Output]   Formatting -- ^ The year suffix, the citeId and a holder for collision data
     | OName    Agent    [Output] [[Output]]  Formatting -- ^ A (family) name with the list of given names.
-    | OContrib String    String   [Output] [Output] [[Output]] -- ^ The citation key, the role (author, editor, etc.), the contributor(s),
+    | OContrib Text    Text   [Output] [Output] [[Output]] -- ^ The citation key, the role (author, editor, etc.), the contributor(s),
                                                         -- the output needed for year suf. disambiguation, and everything used for
                                                         -- name disambiguation.
-    | OLoc    [Output]            Formatting            -- ^ The citation's locator
-    | Output  [Output]            Formatting            -- ^ Some nested 'Output'
+    | OLoc    [Output]        Formatting            -- ^ The citation's locator
+    | Output  [Output]        Formatting            -- ^ Some nested 'Output'
       deriving ( Eq, Ord, Show, Typeable, Data, Generic )
 
 type Citations = [[Cite]]
 data Cite
     = Cite
-      { citeId         :: String
+      { citeId         :: Text
       , citePrefix     :: Formatted
       , citeSuffix     :: Formatted
-      , citeLabel      :: String
-      , citeLocator    :: String
-      , citeNoteNumber :: String
-      , citePosition   :: String
+      , citeLabel      :: Text
+      , citeLocator    :: Text
+      , citeNoteNumber :: Text
+      , citePosition   :: Text
       , nearNote       :: Bool
       , authorInText   :: Bool
       , suppressAuthor :: Bool
@@ -739,7 +746,7 @@ instance OVERLAPS
   parseJSON _         = return []
 
 emptyCite :: Cite
-emptyCite  = Cite [] mempty mempty [] [] [] [] False False False 0
+emptyCite  = Cite "" mempty mempty "" "" "" "" False False False 0
 
 -- | A citation group: the first list has a single member when the
 -- citation group starts with an "author-in-text" cite, the
@@ -751,7 +758,7 @@ data BiblioData
     = BD
       { citations    :: [Formatted]
       , bibliography :: [Formatted]
-      , citationIds  :: [String]
+      , citationIds  :: [Text]
       } deriving ( Show, Typeable, Data, Generic )
 
 -- | A record with all the data to produce the 'Formatted' of a
@@ -763,13 +770,13 @@ data BiblioData
 -- year, initially empty.
 data CiteData
     = CD
-      { key        ::   String
+      { key        ::   Text
       , collision  ::  [Output]
       , disambYS   ::  [Output]
       , disambData :: [[Output]]
       , disambed   ::  [Output]
-      , sameAs     ::  [String]
-      , citYear    ::   String
+      , sameAs     ::  [Text]
+      , citYear    ::   Text
       } deriving ( Show, Typeable, Data, Generic )
 
 instance Eq CiteData where
@@ -873,7 +880,7 @@ nonDroppingPartTransform ag
           unFormatted $ familyName ag) of
          ([], _)  -> ag
          (xs, ys)
-           | lastInline xs `elem` [" ", "-", "'", "’"] -> ag {
+           | lastInline xs `elem` map Just (" -'’" :: String) -> ag {
                           nonDroppingPart = Formatted $ trimSpace xs,
                           familyName = Formatted ys }
            | otherwise -> ag
@@ -906,7 +913,7 @@ startWithCapital :: Formatted -> Bool
 startWithCapital (Formatted (x:_)) = startWithCapital' x
 startWithCapital _                 = False
 
-stripFinalComma :: Formatted -> (String, Formatted)
+stripFinalComma :: Formatted -> (Text, Formatted)
 stripFinalComma (Formatted ils) =
   case reverse $ splitStrWhen isPunctuation ils of
        Str ",":xs         -> (",", Formatted $ reverse xs)

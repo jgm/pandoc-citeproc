@@ -19,6 +19,7 @@ import qualified Data.ByteString.Lazy     as L
 import           Data.Char                (isDigit, isPunctuation, isSpace)
 import qualified Data.Map                 as M
 import qualified Data.Set                 as Set
+import           Data.Text                (Text)
 import qualified Data.Text                as T
 import           Data.Maybe               (fromMaybe)
 import           System.Directory         (getAppUserDataDirectory)
@@ -69,17 +70,17 @@ processCites style refs (Pandoc m1 b1) =
                             Nothing -> m3
                             Just x  -> setMeta "nocite" x m3
       notemap       = mkNoteMap (Pandoc m3 bs)
-      hanging       = maybe False (== "true")
+      hanging       = (== Just "true")
                        (biblio style >>=
                         lookup "hanging-indent" . bibOptions)
   in  Pandoc m $ walk (addFirstNoteNumber notemap)
                $ walk (concatMap removeNocaseSpans)
                $ insertRefs hanging m biblioList bs
 
-addFirstNoteNumber :: M.Map String Int -> Inline -> Inline
+addFirstNoteNumber :: M.Map Text Int -> Inline -> Inline
 addFirstNoteNumber notemap
   s@(Span ("",["first-reference-note-number"],[("refid",refid)]) _)
-  = case M.lookup (T.unpack refid) notemap of
+  = case M.lookup refid notemap of
          Nothing -> s
          Just n  -> Str $ T.pack (show n)
 addFirstNoteNumber _ -- see below, these spans added by deNote
@@ -87,13 +88,13 @@ addFirstNoteNumber _ -- see below, these spans added by deNote
   = Note [Para ils]
 addFirstNoteNumber _ x = x
 
-mkNoteMap :: Pandoc -> M.Map String Int
+mkNoteMap :: Pandoc -> M.Map Text Int
 mkNoteMap doc =
   foldr go mempty $ splitUp $ zip [1..] $ query getNoteCitationIds doc
   where
-   splitUp :: [(Int, [String])] -> [(Int, String)]
+   splitUp :: [(Int, [Text])] -> [(Int, Text)]
    splitUp = concatMap (\(n,ss) -> map (n,) ss)
-   go :: (Int, String) -> M.Map String Int -> M.Map String Int
+   go :: (Int, Text) -> M.Map Text Int -> M.Map Text Int
    go (notenumber, citeid) = M.insert citeid notenumber
 
 -- if document contains a Div with id="refs", insert
@@ -148,12 +149,12 @@ isLinkCitations meta =
 
 truish :: MetaValue -> Bool
 truish (MetaBool t) = t
-truish (MetaString s) = isYesValue (T.unpack $ T.toLower s)
-truish (MetaInlines ils) = isYesValue (T.unpack $ T.toLower (stringify ils))
-truish (MetaBlocks [Plain ils]) = isYesValue (T.unpack $ T.toLower (stringify ils))
+truish (MetaString s) = isYesValue (T.toLower s)
+truish (MetaInlines ils) = isYesValue (T.toLower (stringify ils))
+truish (MetaBlocks [Plain ils]) = isYesValue (T.toLower (stringify ils))
 truish _ = False
 
-isYesValue :: String -> Bool
+isYesValue :: Text -> Bool
 isYesValue "t" = True
 isYesValue "true" = True
 isYesValue "yes" = True
@@ -170,7 +171,7 @@ mkNociteWildcards refs = map expandStar
               [] -> cs
               _  -> allcites
         allcites = map (\ref -> Citation{
-                                  citationId = T.pack $ unLiteral (refId ref),
+                                  citationId = unLiteral (refId ref),
                                   citationPrefix = [],
                                   citationSuffix = [],
                                   citationMode = NormalCitation,
@@ -202,7 +203,7 @@ processCites' (Pandoc meta blocks) = do
   let cslfile = (lookupMeta "csl" meta <|> lookupMeta "citation-style" meta)
                 >>= toPath
   let mbLocale = (lookupMeta "lang" meta `mplus` lookupMeta "locale" meta)
-                   >>= toPath
+                   >>= toText
   let tryReadCSLFile Nothing _  = mzero
       tryReadCSLFile (Just d) f = E.catch (readCSLFile mbLocale (d </> f))
                                      (\(_ :: E.SomeException) -> mzero)
@@ -216,8 +217,8 @@ processCites' (Pandoc meta blocks) = do
   -- if pandoc-citeproc compiled with unicode_collation flag
   case styleLocale csl of
        (l:_) -> do
-         setEnv "LC_ALL" (localeLang l)
-         setEnv "LANG"   (localeLang l)
+         setEnv "LC_ALL" (T.unpack $ localeLang l)
+         setEnv "LANG"   (T.unpack $ localeLang l)
        []    -> do
          envlang <- getEnv "LANG"
          if null envlang
@@ -245,6 +246,15 @@ processCites' (Pandoc meta blocks) = do
   let csl' = csl{ styleAbbrevs = abbrevs }
   return $ processCites (tr' "CSL" csl') refs $ Pandoc meta blocks
 
+toText :: MetaValue -> Maybe Text
+toText (MetaString s) = Just s
+-- take last in a list
+toText (MetaList xs) = case reverse xs of
+                             []    -> Nothing
+                             (x:_) -> toText x
+toText (MetaInlines ils) = Just $ stringify ils
+toText _ = Nothing
+
 toPath :: MetaValue -> Maybe String
 toPath (MetaString s) = Just $ T.unpack s
 -- take last in a list
@@ -254,7 +264,7 @@ toPath (MetaList xs) = case reverse xs of
 toPath (MetaInlines ils) = Just $ T.unpack $ stringify ils
 toPath _ = Nothing
 
-getBibRefs :: (String -> Bool) -> MetaValue -> IO [Reference]
+getBibRefs :: (Text -> Bool) -> MetaValue -> IO [Reference]
 getBibRefs idpred (MetaList xs) = concat `fmap` mapM (getBibRefs idpred) xs
 getBibRefs idpred (MetaInlines xs) = getBibRefs idpred (MetaString $ stringify xs)
 getBibRefs idpred (MetaString s) = do
@@ -267,20 +277,21 @@ getBibRefs _ _ = return []
 unescapeRefId :: Reference -> Reference
 unescapeRefId ref = ref{ refId = Literal $ decodeEntities (unLiteral $ refId ref) }
 
-decodeEntities :: String -> String
-decodeEntities [] = []
-decodeEntities ('&':xs) =
-  let (ys,zs) = break (==';') xs
-  in  case zs of
-           ';':ws -> case lookupEntity ('&':ys ++ ";") of
+decodeEntities :: Text -> Text
+decodeEntities t = case T.uncons t of
+  Nothing -> ""
+  Just ('&',xs) ->
+    let (ys,zs) = T.break (==';') xs
+    in  case T.uncons zs of
+           Just (';',ws) -> case lookupEntity  ('&': T.unpack ys ++ ";") of
 #if MIN_VERSION_tagsoup(0,13,0)
-                                       Just s  -> s ++ decodeEntities ws
+                              Just s  -> T.pack s <> decodeEntities ws
 #else
-                                       Just c  -> c   : decodeEntities ws
+                              Just c  -> T.cons c (decodeEntities ws)
 #endif
-                                       Nothing -> '&' : decodeEntities xs
-           _      -> '&' : decodeEntities xs
-decodeEntities (x:xs) = x : decodeEntities xs
+                              Nothing -> T.cons '&' (decodeEntities xs)
+           _      -> T.cons '&' (decodeEntities xs)
+  Just (x,xs) -> T.cons x (decodeEntities xs)
 
 -- | Substitute 'Cite' elements with formatted citations.
 processCite :: Style -> M.Map [Citation] Formatted -> Inline -> Inline
@@ -293,11 +304,11 @@ processCite s cs (Cite t _) =
     where isSuppressAuthor c = citationMode c == SuppressAuthor
 processCite _ _ x = x
 
-getNoteCitationIds :: Inline -> [[String]]
+getNoteCitationIds :: Inline -> [[Text]]
 getNoteCitationIds (Note [Para (Span ("",["reference-id-list"]
                                       ,[("refids",refids)]) [] : _)])
   -- see deNote below which inserts this special Span
-  = [words $ T.unpack refids]
+  = [T.words refids]
 getNoteCitationIds (Note _) = [[]]
 getNoteCitationIds _        = []
 
@@ -330,8 +341,8 @@ mvPunct moveNotes sty (q : s : x : ys)
   = if moveNotes
        then mvPunct moveNotes sty $
              case headInline ys of
-               "" -> q : x : tailInline ys
-               w  -> q : Str (T.pack w) : x : tailInline ys
+               Nothing -> q : x : tailInline ys
+               Just w  -> q : Str (T.singleton w) : x : tailInline ys
        else q : x : mvPunct moveNotes sty ys
 mvPunct moveNotes sty (Cite cs ils : ys)
    | length ils > 1
@@ -341,9 +352,9 @@ mvPunct moveNotes sty (Cite cs ils : ys)
    = Cite cs
       (init ils ++
          (case headInline ys of
-               "" -> []
-               s' | not (endWithPunct False (init ils)) -> [Str $ T.pack s']
-                  | otherwise                           -> [])
+            Nothing -> []
+            Just s' | not (endWithPunct False (init ils)) -> [Str $ T.singleton s']
+                    | otherwise                           -> [])
        ++ [last ils]) : mvPunct moveNotes sty (tailInline ys)
 mvPunct moveNotes sty (q@(Quoted _ _) : w@(Str _) : x : ys)
   | isNote x
@@ -355,7 +366,7 @@ mvPunct moveNotes sty (s : x : ys) | isSpacy s, isNote x =
 mvPunct moveNotes sty (s : x@(Cite _ (Superscript _ : _)) : ys)
   | isSpacy s = x : mvPunct moveNotes sty ys
 mvPunct moveNotes sty (Cite cs ils : Str "." : ys)
-  | lastInline ils == "."
+  | lastInline ils == Just '.'
   = Cite cs ils : mvPunct moveNotes sty ys
 mvPunct moveNotes sty (x:xs) = x : mvPunct moveNotes sty xs
 mvPunct _ _ [] = []
@@ -414,8 +425,8 @@ getCitation :: Inline -> [[Citation]]
 getCitation i | Cite t _ <- i = [t]
               | otherwise     = []
 
-getCitationIds :: Inline -> Set.Set String
-getCitationIds (Cite cs _) = Set.map T.unpack $ Set.fromList (map citationId cs)
+getCitationIds :: Inline -> Set.Set Text
+getCitationIds (Cite cs _) = Set.fromList (map citationId cs)
 getCitationIds _ = mempty
 
 setHashes :: Inline -> State Int Inline
@@ -440,12 +451,12 @@ toCslCite locMap c
                          _                   -> s
           isPunct (Str (T.uncons -> Just (x,_))) = isPunctuation x
           isPunct _           = False
-      in   emptyCite { CSL.citeId         = T.unpack $ citationId c
+      in   emptyCite { CSL.citeId         = citationId c
                      , CSL.citePrefix     = Formatted $ citationPrefix c
                      , CSL.citeSuffix     = Formatted s'
                      , CSL.citeLabel      = la
                      , CSL.citeLocator    = lo
-                     , CSL.citeNoteNumber = show $ citationNoteNum c
+                     , CSL.citeNoteNumber = T.pack $ show $ citationNoteNum c
                      , CSL.authorInText   = citationMode c == AuthorInText
                      , CSL.suppressAuthor = citationMode c == SuppressAuthor
                      , CSL.citeHash       = citationHash c
@@ -457,7 +468,7 @@ splitInp = splitStrWhen (\c -> splitOn c || isSpace c)
       splitOn ':' = False
       splitOn c   = isPunctuation c
 
-locatorWords :: LocatorMap -> [Inline] -> (String, String, [Inline])
+locatorWords :: LocatorMap -> [Inline] -> (Text, Text, [Inline])
 locatorWords locMap inp =
   case parse (pLocatorWords locMap) "suffix" $ splitInp inp of
        Right r -> r
@@ -495,7 +506,7 @@ locatorWords locMap inp =
 -- (a)(b)(c)
 -- (hello)
 
-pLocatorWords :: LocatorMap -> Parsec [Inline] st (String, String, [Inline])
+pLocatorWords :: LocatorMap -> Parsec [Inline] st (Text, Text, [Inline])
 pLocatorWords locMap = do
   optional $ pMatchChar "," (== ',')
   optional pSpace
@@ -505,26 +516,26 @@ pLocatorWords locMap = do
   -- i.e. the first one will be " 9"
   return (la, trim lo, s)
 
-pLocatorDelimited :: LocatorMap -> Parsec [Inline] st (String, String)
+pLocatorDelimited :: LocatorMap -> Parsec [Inline] st (Text, Text)
 pLocatorDelimited locMap = try $ do
   _ <- pMatchChar "{" (== '{')
   skipMany pSpace -- gobble pre-spaces so label doesn't try to include them
   (la, _) <- pLocatorLabelDelimited locMap
   -- we only care about balancing {} and [] (because of the outer [] scope);
   -- the rest can be anything
-  let inner = do { t <- anyToken; return (True, T.unpack $ stringify t) }
+  let inner = do { t <- anyToken; return (True, stringify t) }
   gs <- many (pBalancedBraces [('{','}'), ('[',']')] inner)
   _ <- pMatchChar "}" (== '}')
-  let lo = concatMap snd gs
+  let lo = T.concat $ map snd gs
   return (la, lo)
 
-pLocatorLabelDelimited :: LocatorMap -> Parsec [Inline] st (String, Bool)
+pLocatorLabelDelimited :: LocatorMap -> Parsec [Inline] st (Text, Bool)
 pLocatorLabelDelimited locMap
   = pLocatorLabel' locMap lim <|> return ("page", True)
     where
-        lim = T.unpack . stringify <$> anyToken
+        lim = stringify <$> anyToken
 
-pLocatorIntegrated :: LocatorMap -> Parsec [Inline] st (String, String)
+pLocatorIntegrated :: LocatorMap -> Parsec [Inline] st (Text, Text)
 pLocatorIntegrated locMap = try $ do
   (la, wasImplicit) <- pLocatorLabelIntegrated locMap
   -- if we got the label implicitly, we have presupposed the first one is going
@@ -535,17 +546,17 @@ pLocatorIntegrated locMap = try $ do
                     else requireRomansOrDigits
   g <- try $ pLocatorWordIntegrated (not wasImplicit) >>= modifier
   gs <- many (try $ pLocatorWordIntegrated False >>= modifier)
-  let lo = concat (g:gs)
+  let lo = T.concat (g:gs)
   return (la, lo)
 
-pLocatorLabelIntegrated :: LocatorMap -> Parsec [Inline] st (String, Bool)
+pLocatorLabelIntegrated :: LocatorMap -> Parsec [Inline] st (Text, Bool)
 pLocatorLabelIntegrated locMap
   = pLocatorLabel' locMap lim <|> (lookAhead digital >> return ("page", True))
     where
       lim = try $ pLocatorWordIntegrated True >>= requireRomansOrDigits
       digital = try $ pLocatorWordIntegrated True >>= requireDigits
 
-pLocatorLabel' :: LocatorMap -> Parsec [Inline] st String -> Parsec [Inline] st (String, Bool)
+pLocatorLabel' :: LocatorMap -> Parsec [Inline] st Text -> Parsec [Inline] st (Text, Bool)
 pLocatorLabel' locMap lim = go ""
     where
       -- grow the match string until we hit the end
@@ -555,15 +566,15 @@ pLocatorLabel' locMap lim = go ""
           -- the pathological case is "p.3"
           t <- anyToken
           ts <- manyTill anyToken (try $ lookAhead lim)
-          let s = acc ++ T.unpack (stringify (t:ts))
+          let s = acc <> stringify (t:ts)
           case M.lookup (trim s) locMap of
             -- try to find a longer one, or return this one
             Just l -> go s <|> return (l, False)
             Nothing -> go s
 
 -- hard requirement for a locator to have some real digits in it
-requireDigits :: (Bool, String) -> Parsec [Inline] st String
-requireDigits (_, s) = if not (any isDigit s)
+requireDigits :: (Bool, Text) -> Parsec [Inline] st Text
+requireDigits (_, s) = if not (T.any isDigit s)
                           then Prelude.fail "requireDigits"
                           else return s
 
@@ -571,39 +582,43 @@ requireDigits (_, s) = if not (any isDigit s)
 -- (a)(iv) -- because iv is roman
 -- 1(a)  -- because 1 is an actual digit
 -- NOT: a, (a)-(b), hello, (some text in brackets)
-requireRomansOrDigits :: (Bool, String) -> Parsec [Inline] st String
+requireRomansOrDigits :: (Bool, Text) -> Parsec [Inline] st Text
 requireRomansOrDigits (d, s) = if not d
                                   then Prelude.fail "requireRomansOrDigits"
                                   else return s
 
-pLocatorWordIntegrated :: Bool -> Parsec [Inline] st (Bool, String)
+pLocatorWordIntegrated :: Bool -> Parsec [Inline] st (Bool, Text)
 pLocatorWordIntegrated isFirst = try $ do
   punct <- if isFirst
               then return ""
               else (stringify <$> pLocatorSep) <|> return ""
   sp <- option "" (pSpace >> return " ")
   (dig, s) <- pBalancedBraces [('(',')'), ('[',']'), ('{','}')] pPageSeq
-  return (dig, T.unpack punct ++ sp ++ s)
+  return (dig, punct <> sp <> s)
 
 -- we want to capture:  123, 123A, C22, XVII, 33-44, 22-33; 22-11
 --                      34(1), 34A(A), 34(1)(i)(i), (1)(a)
 --                      [17], [17]-[18], '591 [84]'
 --                      (because CSL cannot pull out individual pages/sections
 --                      to wrap in braces on a per-style basis)
-pBalancedBraces :: [(Char, Char)] -> Parsec [Inline] st (Bool, String) -> Parsec [Inline] st (Bool, String)
+pBalancedBraces :: [(Char, Char)]
+                -> Parsec [Inline] st (Bool, Text)
+                -> Parsec [Inline] st (Bool, Text)
 pBalancedBraces braces p = try $ do
   ss <- many1 surround
   return $ anyWereDigitLike ss
   where
       except = notFollowedBy pBraces >> p
       -- outer and inner
-      surround = foldl (\a (open, close) -> sur open close except <|> a) except braces
+      surround = foldl (\a (open, close) -> sur open close except <|> a)
+                       except
+                       braces
 
       isc c = stringify <$> pMatchChar [c] (== c)
 
       sur c c' m = try $ do
           (d, mid) <- between (isc c) (isc c') (option (False, "") m)
-          return (d, [c] ++  mid ++ [c'])
+          return (d, T.cons c . flip T.snoc c' $  mid)
 
       flattened = concatMap (\(o, c) -> [o, c]) braces
       pBraces = pMatchChar "braces" (`elem` flattened)
@@ -611,7 +626,7 @@ pBalancedBraces braces p = try $ do
 -- YES 1, 1.2, 1.2.3
 -- NO  1., 1.2. a.6
 -- can't use sepBy because we want to leave trailing .s
-pPageSeq :: Parsec [Inline] st (Bool, String)
+pPageSeq :: Parsec [Inline] st (Bool, Text)
 pPageSeq = oneDotTwo <|> withPeriod
   where
       oneDotTwo = do
@@ -622,12 +637,12 @@ pPageSeq = oneDotTwo <|> withPeriod
           -- .2
           p <- pMatchChar "." (== '.')
           u <- try pPageUnit
-          return (fst u, T.unpack (stringify p) ++ snd u)
+          return (fst u, stringify p <> snd u)
 
-anyWereDigitLike :: [(Bool, String)] -> (Bool, String)
-anyWereDigitLike as = (any fst as, concatMap snd as)
+anyWereDigitLike :: [(Bool, Text)] -> (Bool, Text)
+anyWereDigitLike as = (any fst as, T.concat $ map snd as)
 
-pPageUnit :: Parsec [Inline] st (Bool, String)
+pPageUnit :: Parsec [Inline] st (Bool, Text)
 pPageUnit = roman <|> plainUnit
   where
       -- roman is a 'digit'
@@ -636,17 +651,17 @@ pPageUnit = roman <|> plainUnit
           ts <- many1 (notFollowedBy pSpace >>
                        notFollowedBy pLocatorPunct >>
                        anyToken)
-          let s = T.unpack $ stringify ts
+          let s = stringify ts
           -- otherwise look for actual digits or -s
-          return (any isDigit s, s)
+          return (T.any isDigit s, s)
 
-pRoman :: Parsec [Inline] st String
+pRoman :: Parsec [Inline] st Text
 pRoman = try $ do
   t <- anyToken
   case t of
        Str xs -> case parseRomanNumeral (T.unpack xs) of
                       Nothing -> mzero
-                      Just _  -> return $ T.unpack xs
+                      Just _  -> return $ xs
        _      -> mzero
 
 isLocatorPunct :: Char -> Bool
@@ -682,7 +697,7 @@ pMatch msg condition = try $ do
      then Prelude.fail msg
      else return t
 
-type LocatorMap = M.Map String String
+type LocatorMap = M.Map Text Text
 
 locatorMap :: Style -> LocatorMap
 locatorMap sty =

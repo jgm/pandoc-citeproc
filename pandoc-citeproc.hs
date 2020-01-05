@@ -17,7 +17,7 @@ import qualified Data.ByteString.Lazy             as BL
 import           Data.Char                        (chr, toLower)
 import           Data.List                        (group, sort)
 import qualified Data.Text                        as T
-import           Data.Text.Encoding               (encodeUtf8)
+import           Data.Text.Encoding               (encodeUtf8, decodeUtf8)
 import           Data.Version                     (showVersion)
 import           Data.Yaml.Builder                (toByteStringWith, setWidth)
 import           Text.Libyaml                     (defaultFormatOptions)
@@ -87,9 +87,9 @@ main = do
                                 ("Unknown format\n" ++ header) options
                               exitWith $ ExitFailure 4
          bibstring <- case args of
-                           [] -> UTF8.getContents
-                           xs -> mconcat <$> mapM UTF8.readFile xs
-         readBiblioString (const True) bibformat bibstring >>=
+                           [] -> B.getContents
+                           xs -> mconcat <$> mapM B.readFile xs
+         readBiblioString (const True) bibformat (decodeUtf8 bibstring) >>=
            (if Quiet `elem` flags then return else warnDuplicateKeys) >>=
            if Bib2YAML `elem` flags
               then outputYamlBlock .
@@ -169,7 +169,8 @@ options =
 
 warnDuplicateKeys :: [Reference] -> IO [Reference]
 warnDuplicateKeys refs = mapM_ warnDup dupKeys >> return refs
-  where warnDup k = UTF8.hPutStrLn stderr $ "biblio2yaml: duplicate key " ++ k
+  where warnDup k = UTF8.hPutStrLn stderr $
+                    "biblio2yaml: duplicate key " ++ T.unpack k
         allKeys   = map (unLiteral . refId) refs
         dupKeys   = [x | (x:_:_) <- group (sort allKeys)]
 

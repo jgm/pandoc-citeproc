@@ -25,6 +25,7 @@ import           Data.Char              (isLower, isUpper)
 import           Data.List              (intersperse, nub)
 import           Data.List.Split        (wordsBy)
 import           Data.Maybe             (isJust)
+import           Data.Text              (Text)
 import qualified Data.Text              as T
 
 import           Text.CSL.Eval.Common
@@ -36,7 +37,7 @@ import qualified Text.Pandoc.Builder    as B
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Shared     (stringify)
 
-evalNames :: Bool -> [String] -> [Name] -> String -> State EvalState [Output]
+evalNames :: Bool -> [Text] -> [Name] -> Text -> State EvalState [Output]
 evalNames skipEdTrans ns nl d
     | [sa,sb] <- ns, not skipEdTrans
     , (sa == "editor" && sb == "translator") ||
@@ -70,10 +71,10 @@ evalNames skipEdTrans ns nl d
     | otherwise = return []
     where
       agents p s a = concatMapM (formatNames (hasEtAl nl) d p s a) nl
-      delim    ops = if null d then getOptionVal "names-delimiter" ops else d
+      delim    ops = if T.null d then getOptionVal "names-delimiter" ops else d
       resetEtal    = modify (\s -> s { etal = [] })
       count  num x = if hasCount nl && num /= [] -- FIXME!! le zero!!
-                     then [OContrib [] [] [ONum (length num) emptyFormatting] [] []]
+                     then [OContrib "" "" [ONum (length num) emptyFormatting] [] []]
                      else x
       hasCount     = or . query hasCount'
       hasCount' n
@@ -81,9 +82,9 @@ evalNames skipEdTrans ns nl d
           | otherwise                = [False]
 
 -- | The 'Bool' is 'True' when formatting a name with a final "et-al".
--- The first 'String' represents the position and the second the role
+-- The first 'Text' represents the position and the second the role
 -- (e.i. editor, translator, etc.).
-formatNames :: Bool -> Delimiter -> String -> String -> [Agent] -> Name -> State EvalState [Output]
+formatNames :: Bool -> Delimiter -> Text -> Text -> [Agent] -> Name -> State EvalState [Output]
 formatNames ea del p s as n
     | Name f _ ns _ _ <- n, Count <- f = do
         b <- isBib <$> gets mode
@@ -95,16 +96,16 @@ formatNames ea del p s as n
         b <- isBib <$> gets mode
         o <- mergeOptions ns <$> gets (options . env)
         m <- gets mode
-        let odel  = if del /= [] then del else getOptionVal "name-delimiter" o
+        let odel  = if del /= "" then del else getOptionVal "name-delimiter" o
             del'
-              | d   /= [] = d
-              | null odel = ", "
+              | d   /= "" = d
+              | T.null odel = ", "
               | otherwise = odel
             (_,i) = isEtAl b o p as
             form  = case f of
                       NotSet -> case getOptionVal "name-form" o of
-                                  [] -> Long
-                                  x  -> read $ toRead x
+                                  "" -> Long
+                                  x  -> read . T.unpack $ toRead x
                       _      -> f
             genName x = do etal' <- formatEtAl o ea "et-al" fm del' x
                            if null etal'
@@ -133,7 +134,7 @@ formatNames ea del p s as n
         o <- gets (options . env)
         et <- gets etal
         let i = length as - length et
-            t' = if null t then "et-al" else t
+            t' = if T.null t then "et-al" else t
         r <- mapM (et_al o False t' fm del) [i .. length as]
         let (r',r'') = case r of
                          (x:xs) -> (x, xs)
@@ -175,10 +176,10 @@ formatNames ea del p s as n
           | length x >  2 = addDelim d (init x) ++ ODel (d <^> andStr t os) : [last x]
           | otherwise     = addDelim d x
       andStr t os
-          | "text"   <- getOptionVal "and" os = " " ++ t ++ " "
+          | "text"   <- getOptionVal "and" os = " " <> t <> " "
           | "symbol" <- getOptionVal "and" os = " & "
-          | otherwise                          = []
-      andStr' t d os = if null (andStr t os) then d else andStr t os
+          | otherwise                         = ""
+      andStr' t d os = if T.null (andStr t os) then d else andStr t os
 
       formatEtAl o b t fm d i = do
         ln <- gets lastName
@@ -193,18 +194,18 @@ formatNames ea del p s as n
             if b || length as <= i
             then return []
             else do x <- getTerm False Long t
-                    when' (return $ x /= []) $
+                    when' (return $ x /= "") $
                           case getOptionVal "delimiter-precedes-et-al" o of
                             "never"  -> return . (++) [OSpace] $ output fm x
                             "always" -> return . (++) [ODel d] $ output fm x
-                            _        -> if i > 1 && not (null d)
+                            _        -> if i > 1 && not (T.null d)
                                         then return . (++) [ODel d] $ output fm x
                                         else return . (++) [OSpace] $ output fm x
 
 -- | The first 'Bool' is 'True' if we are evaluating the bibliography.
--- The 'String' is the cite position. The function also returns the
+-- The 'Text' is the cite position. The function also returns the
 -- number of contributors to be displayed.
-isEtAl :: Bool -> [Option] -> String -> [Agent] -> (Bool, Int)
+isEtAl :: Bool -> [Option] -> Text -> [Agent] -> (Bool, Int)
 isEtAl b os p as
     | p /= "first"
     , isOptionSet    "et-al-subsequent-min"       os
@@ -225,18 +226,18 @@ isEtAl b os p as
     , length as >    1 = (,) True getUseFirst
     | otherwise        = (,) False $ length as
     where
-      etAlMin  x   = read $ getOptionVal x os
-      etAlMin' x y = if b then etAlMin x else read $ getOptionVal' x y
+      etAlMin  x   = read . T.unpack $ getOptionVal x os
+      etAlMin' x y = if b then etAlMin x else read . T.unpack $ getOptionVal' x y
       isOptionSet'  s1 s2 = if b
                             then isOptionSet s1 os
                             else or $ isOptionSet s1 os : [isOptionSet s2 os]
-      getOptionVal' s1 s2 = if null (getOptionVal s1 os)
+      getOptionVal' s1 s2 = if T.null (getOptionVal s1 os)
                             then getOptionVal s2 os
                             else getOptionVal s1 os
       getUseFirst = let u = if b
                             then getOptionVal  "et-al-use-first" os
                             else getOptionVal' "et-al-use-first" "et-al-subsequent-min"
-                    in if null u then 1 else read u
+                    in if T.null u then 1 else read (T.unpack u)
 
 -- | Generate the 'Agent's names applying et-al options, with all
 -- possible permutations to disambiguate colliding citations. The
@@ -270,19 +271,19 @@ formatName m b f fm ops np n
                   case lookup "initialize-with" ops of
                        Just iw
                          | getOptionVal "initialize" ops == "false"
-                         , isInit x  -> addIn x $ B.toList $ B.text $ T.pack iw
+                         , isInit x  -> addIn x $ B.toList $ B.text iw
                          | getOptionVal "initialize" ops /= "false"
-                         , not (all isLower $ query (:[]) x) -> addIn x $ B.toList $ B.text $ T.pack iw
+                         , not (all isLower $ query (:[]) x) -> addIn x $ B.toList $ B.text iw
                        Nothing
                          | isInit x  -> addIn x [Space] -- default
                        _ -> Space : x ++ [Space]
-      addIn x i = foldr (hyphenate . (\z -> Str (T.pack $ headInline z) : i)) []
+      addIn x i = foldr (hyphenate . (\z -> Str (maybe "" T.singleton $ headInline z) : i)) []
                      $ wordsBy (== Str "-")
                      $ splitStrWhen (=='-') x
 
       sortSep g s = when_ g $ separator ++ addAffixes (g <+> s) "given" mempty
       separator   = if isByzantineFamily
-                       then [OPan (B.toList (B.text $ T.pack
+                       then [OPan (B.toList (B.text
                               (getOptionValWithDefault "sort-separator" ", " ops)))]
                        else []
       suff      = if commaSuffix n && nameSuffix n /= mempty
@@ -347,7 +348,7 @@ formatName m b f fm ops np n
       initialize   = isJust (lookup "initialize-with" ops) && not onlyGiven
       isLong       = f /= Short && initialize
       givenRule    = let gr = getOptionVal "givenname-disambiguation-rule" ops
-                     in if null gr then "by-cite" else gr
+                     in if T.null gr then "by-cite" else gr
       disambdata   = case () of
                        _ | "all-names-with-initials"    <- givenRule
                          , disWithGiven, Short <- f, initialize    -> [longName given]
@@ -362,7 +363,7 @@ formatName m b f fm ops np n
                          | disWithGiven, isLong        -> [longName givenLong]
                          | otherwise                   -> []
 
-formatTerm :: Form -> Formatting -> Bool -> String -> String
+formatTerm :: Form -> Formatting -> Bool -> Text -> Text
            -> State EvalState [Output]
 formatTerm f fm p refid s = do
   plural <- if s `elem` ["page", "volume", "issue"]
@@ -378,9 +379,9 @@ formatTerm f fm p refid s = do
         then [OYear t refid fm]
         else oStr' t fm
 
-formatLabel :: Form -> Formatting -> Bool -> String -> State EvalState [Output]
+formatLabel :: Form -> Formatting -> Bool -> Text -> State EvalState [Output]
 formatLabel f fm p s
-    | "locator" <- s = when' ( (/=) [] <$> gets (citeLocator . cite . env)) $ do
+    | "locator" <- s = when' ( (/=) "" <$> gets (citeLocator . cite . env)) $ do
                        (l,v) <- getLocVar
                        form (\fm' -> return . flip OLoc emptyFormatting . output fm') id l (isRange v)
     | "page"    <- s = checkPlural
@@ -404,16 +405,16 @@ formatLabel f fm p s
                       format  s (isRange v)
       format      = form output id
       form o g t b = o fm . g . period <$> getTerm (b && p) f t
-      period      = if stripPeriods fm then filter (/= '.') else id
+      period      = if stripPeriods fm then T.filter (/= '.') else id
 
 (<+>) :: Formatted -> Formatted -> Formatted
 Formatted [] <+> ss = ss
 s  <+> Formatted [] = s
 Formatted xs <+> Formatted ys =
   case lastInline xs of
-       "’" -> Formatted (xs ++ ys)
-       "-" -> Formatted (xs ++ ys)
-       _   -> Formatted (xs ++ [Space] ++ ys)
+       Just '’' -> Formatted (xs ++ ys)
+       Just '-' -> Formatted (xs ++ ys)
+       _        -> Formatted (xs ++ [Space] ++ ys)
 
 (<++>) :: [Output] -> [Output] -> [Output]
 [] <++> o  = o

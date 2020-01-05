@@ -67,7 +67,6 @@ import           Data.Either         (lefts, rights)
 import           Data.Generics       hiding (Generic)
 import qualified Data.HashMap.Strict as H
 import           Data.List           (find, elemIndex)
-import           Data.List.Split     (splitWhen)
 import           Data.Maybe          (fromMaybe, isNothing)
 import           Data.String
 import           Data.Text           (Text)
@@ -83,13 +82,13 @@ import           Text.CSL.Util       (camelize, capitalize, inlinesToString,
                                       uncamelize, AddYaml(..), splitStrWhen)
 import           Text.Pandoc         (Inline (Str))
 import qualified Text.Parsec         as P
-import qualified Text.Parsec.String  as P
+import qualified Text.Parsec.Text    as P
 
-newtype Literal = Literal { unLiteral :: String }
+newtype Literal = Literal { unLiteral :: Text }
   deriving ( Show, Read, Eq, Data, Typeable, Semigroup, Monoid, Generic )
 
 instance AddYaml Literal
-  where x &= (Literal y) = x &= (T.pack y)
+  where x &= (Literal y) = x &= y
 
 instance FromJSON Literal where
   parseJSON v             = Literal `fmap` parseString v
@@ -98,10 +97,10 @@ instance ToJSON Literal where
   toJSON = toJSON . unLiteral
 
 instance ToYaml Literal where
-  toYaml = Y.string . T.pack . unLiteral
+  toYaml = Y.string . unLiteral
 
 instance IsString Literal where
-  fromString = Literal
+  fromString = Literal . T.pack
 
 -- | An existential type to wrap the different types a 'Reference' is
 -- made of. This way we can create a map to make queries easier.
@@ -111,12 +110,12 @@ data Value = forall a . Data a => Value a
 instance Show Value where
     show (Value a) = gshow a
 
-type ReferenceMap = [(String, Value)]
+type ReferenceMap = [(Text, Value)]
 
 mkRefMap :: Maybe Reference -> ReferenceMap
 mkRefMap Nothing  = []
 mkRefMap (Just r) = zip fields (gmapQ Value r)
-      where fields = map uncamelize . constrFields . toConstr $ r
+      where fields = map (T.pack . uncamelize) . constrFields . toConstr $ r
 
 fromValue :: Data a => Value -> Maybe a
 fromValue (Value a) = cast a
@@ -136,7 +135,7 @@ isValueSet val
 
 data Empty = Empty deriving ( Typeable, Data, Generic )
 
-data Season = Spring | Summer | Autumn | Winter | RawSeason String
+data Season = Spring | Summer | Autumn | Winter | RawSeason Text
      deriving (Show, Read, Eq, Typeable, Data, Generic)
 
 instance ToYaml Season where
@@ -144,7 +143,7 @@ instance ToYaml Season where
   toYaml Summer = toYaml (2 :: Int)
   toYaml Autumn = toYaml (3 :: Int)
   toYaml Winter = toYaml (4 :: Int)
-  toYaml (RawSeason s) = toYaml (T.pack s)
+  toYaml (RawSeason s) = toYaml s
 
 seasonToInt :: Season -> Maybe Int
 seasonToInt Spring = Just 1
@@ -177,7 +176,7 @@ parseMaybeSeason (Just x) = do
                       Nothing -> fail $ "Could not read season: " ++ show n
        Nothing -> do
          s <- parseString x
-         if null s
+         if T.null s
             then return Nothing
             else return $ Just $ RawSeason s
 
@@ -277,8 +276,8 @@ toJSONDate ds = object' $
         Just (RawSeason s) -> ["season" .= s]
         _                  -> []) ++
   (case mconcat (map other ds) of
-        Literal l | not (null l) -> ["literal" .= l]
-        _                        -> [])
+        Literal l | not (T.null l) -> ["literal" .= l]
+        _                          -> [])
   where dateparts = filter (not . emptyDatePart) $ map toDatePart ds
         emptyDatePart [] = True
         emptyDatePart xs = all (== 0) xs
@@ -300,12 +299,12 @@ toDatePart refdate =
 -- workaround is 2005_2007 or 2005_; support this as date range:
 handleLiteral :: RefDate -> [RefDate]
 handleLiteral d@(RefDate Nothing Nothing Nothing Nothing (Literal xs) b)
-  = case splitWhen (=='_') xs of
-         [x,y] | all isDigit x && all isDigit y &&
-                 not (null x) ->
-                 [RefDate (safeRead $ T.pack x) Nothing Nothing Nothing mempty b,
-                  RefDate (safeRead $ T.pack y) Nothing Nothing Nothing mempty b]
-         _ -> [d]
+  = case T.splitOn "_" xs of
+      [x,y] | T.all isDigit x && T.all isDigit y &&
+              not (T.null x) ->
+                [RefDate (safeRead x) Nothing Nothing Nothing mempty b,
+                 RefDate (safeRead y) Nothing Nothing Nothing mempty b]
+      _ -> [d]
 handleLiteral d = [d]
 
 setCirca :: Bool -> RefDate -> RefDate
@@ -360,12 +359,12 @@ instance FromJSON RefType where
   -- found in one of the test cases:
   parseJSON (String "film") = return MotionPicture
   parseJSON (String t) =
-    safeRead (T.pack . capitalize . camelize . T.unpack $ t) <|>
+    safeRead (capitalize . T.pack . camelize $ t) <|>
     fail ("'" ++ T.unpack t ++ "' is not a valid reference type")
   parseJSON v@(Array _) =
-    fmap (capitalize . camelize . inlinesToString) (parseJSON v) >>= \t ->
-      safeRead (T.pack t) <|>
-       fail ("'" ++ t ++ "' is not a valid reference type")
+    fmap (capitalize . T.pack . camelize . inlinesToString) (parseJSON v) >>= \t ->
+      safeRead t <|>
+       fail ("'" ++ T.unpack t ++ "' is not a valid reference type")
   parseJSON _ = fail "Could not parse RefType"
 
 instance ToJSON RefType where
@@ -394,7 +393,8 @@ instance ToJSON CNum where
 instance ToYaml CNum where
   toYaml r = Y.string (T.pack $ show $ unCNum r)
 
-newtype CLabel = CLabel { unCLabel :: String } deriving ( Show, Read, Eq, Typeable, Data, Generic, Semigroup, Monoid )
+newtype CLabel = CLabel { unCLabel :: Text }
+  deriving ( Show, Read, Eq, Typeable, Data, Generic, Semigroup, Monoid )
 
 instance FromJSON CLabel where
   parseJSON x = CLabel `fmap` parseString x
@@ -403,7 +403,7 @@ instance ToJSON CLabel where
   toJSON (CLabel s) = toJSON s
 
 instance ToYaml CLabel where
-  toYaml (CLabel s) = toYaml $ T.pack s
+  toYaml (CLabel s) = toYaml s
 
 -- | The 'Reference' record.
 data Reference =
@@ -863,7 +863,7 @@ emptyReference =
     , citationLabel            = mempty
     }
 
-numericVars :: [String]
+numericVars :: [Text]
 numericVars = [ "edition", "volume", "number-of-volumes", "number", "issue", "citation-number"
               , "chapter-number", "collection-number", "number-of-pages"]
 
@@ -872,7 +872,7 @@ getReference  rs c
     = case (hasId (citeId c)) `find` rs of
         Just r  -> Just $ setPageFirst r
         Nothing -> Nothing
-  where hasId :: String -> Reference -> Bool
+  where hasId :: Text -> Reference -> Bool
         hasId ident r = ident `elem` (map unLiteral (refId r : refOtherIds r))
 
 processCites :: [Reference] -> [[Cite]] -> [[(Cite, Maybe Reference)]]
@@ -957,8 +957,8 @@ setNearNote :: Style -> [[Cite]] -> [[Cite]]
 setNearNote s cs
     = procGr [] cs
     where
-      near_note   = let nn = fromMaybe [] . lookup "near-note-distance" . citOptions . citation $ s
-                    in  if null nn then 5 else readNum nn
+      near_note   = let nn = lookup "near-note-distance" . citOptions . citation $ s
+                    in maybe 5 readNum nn
       procGr _ [] = []
       procGr a (x:xs) = let (a',res) = procCs a x
                         in res : procGr a' xs
@@ -973,7 +973,7 @@ setNearNote s cs
                                   readNum (citeNoteNumber c) - readNum (citeNoteNumber x) <= near_note
                            _   -> False
 
-parseRawDate :: String -> [RefDate]
+parseRawDate :: Text -> [RefDate]
 parseRawDate o =
   case P.parse rawDate "raw date" o of
        Left _   -> [RefDate Nothing Nothing Nothing Nothing (Literal o) False]
@@ -982,21 +982,22 @@ parseRawDate o =
 rawDate :: P.Parser [RefDate]
 rawDate = rawDateISO <|> rawDateOld
 
-parseEDTFDate :: String -> [RefDate]
+parseEDTFDate :: Text -> [RefDate]
 parseEDTFDate o =
   case handleRanges (trim o) of
-       [] -> []
+       "" -> []
        o' -> case P.parse rawDateISO "date" o' of
                 Left _   -> []
                 Right ds -> ds
     where handleRanges s =
-            case splitWhen (=='/') s of
+            case T.splitOn "/" s of
                  -- 199u EDTF format for a range
-                 [x] | 'u' `elem` x ->
-                      map (\c -> if c == 'u' then '0' else c) x ++ "/" ++
-                      map (\c -> if c == 'u' then '9' else c) x
-                 [x, "open"] -> x ++ "/"    -- EDTF
-                 [x, "unknown"] -> x ++ "/" -- EDTF
+                 [x] | T.any (== 'u') x ->
+                      T.map (\c -> if c == 'u' then '0' else c) x
+                      <> "/" <>
+                      T.map (\c -> if c == 'u' then '9' else c) x
+                 [x, "open"] -> x <> "/"    -- EDTF
+                 [x, "unknown"] -> x <> "/" -- EDTF
                  _  -> s
 
 rawDateISO :: P.Parser [RefDate]

@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternGuards #-}
 #if MIN_VERSION_base(4,9,0)
 {-# OPTIONS_GHC -fno-warn-redundant-constraints #-}
@@ -25,7 +26,9 @@ module Text.CSL.Proc.Disamb where
 import Prelude
 import           Control.Arrow      (second, (&&&), (>>>))
 import           Data.List          (elemIndex, find, findIndex, groupBy,
-                                     isPrefixOf, mapAccumL, nub, nubBy, sortOn)
+                                     mapAccumL, nub, nubBy, sortOn)
+import           Data.Text          (Text)
+import qualified Data.Text          as T
 import           Data.Maybe
 import           Text.CSL.Eval
 import           Text.CSL.Reference
@@ -36,7 +39,7 @@ import           Text.Pandoc.Shared (ordNub)
 -- | Given the 'Style', the list of references and the citation
 -- groups, disambiguate citations according to the style options.
 disambCitations :: Style -> [Reference] -> Citations -> [CitationGroup]
-                -> ([(String, String)], [CitationGroup])
+                -> ([(Text, Text)], [CitationGroup])
 disambCitations s bibs cs groups
    = (,) yearSuffs citOutput
     where
@@ -81,7 +84,7 @@ disambCitations s bibs cs groups
 
       -- the list of citations that need re-evaluation with the
       -- \"disambiguate\" condition set to 'True'
-      reEval      = let chk = if hasYSuffOpt then filter ((==) [] . citYear) else id
+      reEval      = let chk = if hasYSuffOpt then filter (T.null . citYear) else id
                     in  chk needYSuff
       reEvaluated = if or (query hasIfDis s) && not (null reEval)
                     then zipWith (reEvaluate s reEval) refs groups
@@ -188,10 +191,10 @@ hasIfDis _                                              = [False]
 
 -- | Get the list of disambiguation options set in the 'Style' for
 -- citations.
-getCitDisambOptions :: Style -> [String]
+getCitDisambOptions :: Style -> [Text]
 getCitDisambOptions
     = map fst . filter ((==) "true" . snd) .
-      filter (isPrefixOf "disambiguate" . fst) . citOptions . citation
+      filter (T.isPrefixOf "disambiguate" . fst) . citOptions . citation
 
 -- | Group citation data (with possible alternative names) of
 -- citations which have a duplicate (same 'collision', and same
@@ -222,8 +225,8 @@ rmExtras g os
                                            ys -> ys ++ rmExtras g xs
     | OContrib _ _ (y:ys) _ _ : xs <- os
                                     = if g == PrimaryName
-                                         then OContrib [] [] [y] [] [] : rmExtras g xs
-                                         else OContrib [] [] (y:ys) [] [] : rmExtras g xs
+                                         then OContrib "" "" [y] [] [] : rmExtras g xs
+                                         else OContrib "" "" (y:ys) [] [] : rmExtras g xs
     | OYear{}            : xs <- os = rmExtras g xs
     | OYearSuf{}         : xs <- os = rmExtras g xs
     | OLabel{}           : xs <- os = rmExtras g xs
@@ -241,21 +244,21 @@ getCiteData out
     = (contribs &&& years >>> zipData) out
     where
       contribs x = case query contribsQ x of
-                        [] -> [CD [] [out] [] [] [] [] []]
+                        [] -> [CD "" [out] [] [] [] [] ""]
                               -- allow title to disambiguate
                         xs -> xs
       years o = case query getYears o of
-                     [] -> [([],[])]
+                     [] -> [("","")]
                      r  -> r
-      zipData = uncurry . zipWith $ \c y -> if key c /= []
+      zipData = uncurry . zipWith $ \c y -> if key c /= ""
                                             then c {citYear = snd y}
                                             else c {key     = fst y
                                                    ,citYear = snd y}
       contribsQ o
-          | OContrib k _ _ d dd <- o = [CD k [out] d (d:dd) [] [] []]
+          | OContrib k _ _ d dd <- o = [CD k [out] d (d:dd) [] [] ""]
           | otherwise                = []
 
-getYears :: Output -> [(String,String)]
+getYears :: Output -> [(Text,Text)]
 getYears o
     | OYear x k _ <- o = [(k,x)]
     | otherwise        = []
@@ -283,7 +286,7 @@ getName = query getName'
           | OName i n ns _ <- o = [ND i n (n:ns) []]
           | otherwise           = []
 
-generateYearSuffix :: [Reference] -> [(String, [Output])] -> [(String,String)]
+generateYearSuffix :: [Reference] -> [(Text, [Output])] -> [(Text,Text)]
 generateYearSuffix refs
     = concatMap (`zip` suffs) .
       -- sort clashing cites using their position in the sorted bibliography
@@ -299,15 +302,15 @@ generateYearSuffix refs
       getP k = case findIndex ((==) k . unLiteral . refId) refs of
                    Just x -> (k, x + 1)
                    _      -> (k,     0)
-      suffs = letters ++ [x ++ y | x <- letters, y <- letters ]
-      letters = map (:[]) ['a'..'z']
+      suffs = letters ++ [x <> y | x <- letters, y <- letters ]
+      letters = map T.singleton ['a'..'z']
 
 setYearSuffCollision :: Bool -> [CiteData] -> [Output] -> [Output]
 setYearSuffCollision b cs = proc (setYS cs) .
     map (\x -> if hasYearSuf x then x else addYearSuffix x)
     where
       setYS c o
-          | OYearSuf _ k _ f <- o = OYearSuf [] k (getCollision k c) f
+          | OYearSuf _ k _ f <- o = OYearSuf "" k (getCollision k c) f
           | otherwise             = o
       collide = if b then disambed else disambYS
       getCollision k c = case find ((==) k . key) c of
@@ -316,14 +319,14 @@ setYearSuffCollision b cs = proc (setYS cs) .
                                         ys -> ys
                            _      -> []
 
-updateYearSuffixes :: [(String, String)] -> Output -> Output
+updateYearSuffixes :: [(Text, Text)] -> Output -> Output
 updateYearSuffixes yss o
  | OYearSuf _ k c f <- o = case lookup k yss of
                              Just x -> OYearSuf x k c f
                              _      -> ONull
  | otherwise             = o
 
-getYearSuffixes :: CitationGroup -> [(String,[Output])]
+getYearSuffixes :: CitationGroup -> [(Text,[Output])]
 getYearSuffixes (CG _ _ _ d) = map go d
   where go (c,x) = (citeId c, relevant False [x])
         relevant :: Bool -> [Output] -> [Output] -- bool is true if has contrib
@@ -391,7 +394,7 @@ allTheSame (x:xs) = all (== x) xs
 addYearSuffix :: Output -> Output
 addYearSuffix o
     | OYear y k     f <- o = Output [ OYear y k emptyFormatting
-                                    , OYearSuf [] k [] emptyFormatting] f
+                                    , OYearSuf "" k [] emptyFormatting] f
     | ODate  (x:xs)   <- o = if any hasYear xs
                              then Output (x : [addYearSuffix $ ODate xs]) emptyFormatting
                              else addYearSuffix (Output (x:xs) emptyFormatting)
@@ -411,7 +414,7 @@ hasYear = not . null . query getYear
 
 hasYearSuf :: Output -> Bool
 hasYearSuf = not . null . query getYearSuf
-    where getYearSuf :: Output -> [String]
+    where getYearSuf :: Output -> [Text]
           getYearSuf o
               | OYearSuf{}   <- o = ["a"]
               | otherwise         = []

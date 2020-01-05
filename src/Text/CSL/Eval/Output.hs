@@ -20,6 +20,7 @@ module Text.CSL.Eval.Output where
 import Prelude
 import           Data.Maybe             (mapMaybe)
 import           Data.String            (fromString)
+import           Data.Text              (Text)
 import qualified Data.Text              as T
 import           Text.CSL.Output.Pandoc (lastInline)
 import           Text.CSL.Style
@@ -28,19 +29,20 @@ import           Text.CSL.Util          (capitalize, isPunct, titlecase,
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk       (walk)
 import           Text.Parsec
+import           Text.Parsec.Text       (Parser)
 
 -- Parse affix or delimiter into Formatted, splitting out
 -- raw components in @{{format}}...{{/format}}@.
-formatString :: String -> Formatted
+formatString :: Text -> Formatted
 formatString s =
-  case parse pAffix s s of
-       Left _    -> fromString s
+  case parse pAffix (T.unpack s) s of
+       Left _    -> fromString (T.unpack s)
        Right ils -> Formatted ils
 
-pAffix :: Parsec String () [Inline]
+pAffix :: Parser [Inline]
 pAffix = many (pRaw <|> pString <|> pSpace)
 
-pRaw :: Parsec String () Inline
+pRaw :: Parser Inline
 pRaw = try $ do
   _ <- string "{{"
   format <- many1 letter
@@ -48,17 +50,17 @@ pRaw = try $ do
   contents <- manyTill anyChar (try (string ("{{/" ++ format ++ "}}")))
   return $ RawInline (Format $ T.pack format) $ T.pack contents
 
-pString :: Parsec String () Inline
+pString :: Parser Inline
 pString = Str . T.pack <$> (many1 (noneOf " \t\n\r{}") <|> count 1 (oneOf "{}"))
 
-pSpace :: Parsec String () Inline
+pSpace :: Parser Inline
 pSpace = Space <$ many1 (oneOf " \t\n\r")
 
-output :: Formatting -> String -> [Output]
-output fm s
-    | ' ':xs <- s = OSpace : output fm xs
-    | []     <- s = []
-    | otherwise   = [OStr s fm]
+output :: Formatting -> Text -> [Output]
+output fm s = case T.uncons s of
+  Nothing        -> []
+  Just (' ', xs) -> OSpace : output fm xs
+  _              -> [OStr s fm]
 
 appendOutput :: Formatting -> [Output] -> [Output]
 appendOutput fm xs = [Output xs fm | xs /= []]
@@ -86,13 +88,13 @@ cleanOutput = flatten
 rmEmptyOutput :: Output -> Maybe Output
 rmEmptyOutput o
     | Output [] _ <- o = Nothing
-    | OStr []   _ <- o = Nothing
+    | OStr ""   _ <- o = Nothing
     | OPan []     <- o = Nothing
     | OStatus []  <- o = Nothing
-    | ODel []     <- o = Nothing
+    | ODel ""     <- o = Nothing
     | otherwise        = Just o
 
-addDelim :: String -> [Output] -> [Output]
+addDelim :: Text -> [Output] -> [Output]
 addDelim "" = id
 addDelim d  = foldr check []
     where
@@ -108,11 +110,11 @@ noOutputError = OErr NoOutput
 noBibDataError :: Cite -> Output
 noBibDataError c = OErr $ ReferenceNotFound (citeId c)
 
-oStr :: String -> [Output]
+oStr :: Text -> [Output]
 oStr s = oStr' s emptyFormatting
 
-oStr' :: String -> Formatting -> [Output]
-oStr' [] _ = []
+oStr' :: Text -> Formatting -> [Output]
+oStr' "" _ = []
 oStr' s  f = [OStr s f]
 
 oPan :: [Inline] -> [Output]
@@ -134,27 +136,27 @@ formatOutput o =
       OSpace              -> Formatted [Space]
       OPan     i          -> Formatted i
       OStatus  i          -> Formatted i
-      ODel     []         -> Formatted []
+      ODel     ""         -> Formatted []
       ODel     " "        -> Formatted [Space]
       ODel     "\n"       -> Formatted [SoftBreak]
       ODel     s          -> formatString s
-      OStr     []      _  -> Formatted []
+      OStr     ""      _  -> Formatted []
       OStr     s       f  -> addFormatting f $ formatString s
       OErr NoOutput       -> Formatted [Span ("",["citeproc-no-output"],[])
                                      [Strong [Str "???"]]]
       OErr (ReferenceNotFound r)
                           -> Formatted [Span ("",["citeproc-not-found"],
-                                            [("data-reference-id",T.pack r)])
+                                            [("data-reference-id",r)])
                                      [Strong [Str "???"]]]
-      OLabel   []      _  -> Formatted []
+      OLabel   ""      _  -> Formatted []
       OLabel   s       f  -> addFormatting f $ formatString s
       ODate    os         -> formatOutputList os
       OYear    s _     f  -> addFormatting f $ formatString s
       OYearSuf s _ _   f  -> addFormatting f $ formatString s
-      ONum     i       f  -> formatOutput (OStr (show i) f)
+      ONum     i       f  -> formatOutput (OStr (T.pack (show i)) f)
       OCitNum  i       f  -> if i == 0
                                 then Formatted [Strong [Str "???"]]
-                                else formatOutput (OStr (show i) f)
+                                else formatOutput (OStr (T.pack $ show i) f)
       OCitLabel s      f  -> if s == ""
                                 then Formatted [Strong [Str "???"]]
                                 else formatOutput (OStr s f)
@@ -170,15 +172,15 @@ addFormatting f =
   addDisplay . addLink . addSuffix . pref . quote . font . text_case . strip_periods
   where addLink i = case hyperlink f of
                          ""  -> i
-                         url -> Formatted [Link nullAttr (unFormatted i) (T.pack url, "")]
+                         url -> Formatted [Link nullAttr (unFormatted i) (url, "")]
         pref i = case prefix f of
                       "" -> i
                       x  -> formatString x <> i
         addSuffix i
-          | null (suffix f)       = i
-          | case suffix f of {(c:_) | isPunct c -> True; _ -> False}
-          , case lastInline (unFormatted i) of {(c:_) | isPunct c -> True; _ -> False}
-                                  = i <> formatString (tail $ suffix f)
+          | T.null (suffix f)       = i
+          | maybe False (isPunct . fst) (T.uncons (suffix f))
+          , case lastInline (unFormatted i) of {Just c | isPunct c -> True; _ -> False}
+                                  = i <> formatString (T.tail $ suffix f)
           | otherwise             = i <> formatString (suffix f)
 
         strip_periods (Formatted ils) = Formatted (walk removePeriod ils)
@@ -228,7 +230,7 @@ addFormatting f =
                    "title"            -> titlecase ils
                    "capitalize-first"
                      -> case i of
-                             Str cs -> Str (T.pack $ capitalize $ T.unpack cs) : is'
+                             Str cs -> Str (capitalize cs) : is'
                              _ -> unTitlecase [i] ++ is'
                    "sentence"         -> unTitlecase ils
                    _                  -> ils
@@ -237,7 +239,7 @@ addFormatting f =
         lowercaseStr x        = x
         uppercaseStr (Str xs) = Str $ T.toUpper xs
         uppercaseStr x        = x
-        capitalizeStr (Str xs) = Str $ T.pack $ capitalize $ T.unpack xs
+        capitalizeStr (Str xs) = Str $ capitalize xs
         capitalizeStr x        = x
 
         valign [] = []

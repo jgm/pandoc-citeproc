@@ -21,9 +21,9 @@ import Prelude
 import qualified Control.Exception      as E
 import           Control.Monad.State
 
-import           Data.List
 import           Data.List.Split
 import           Data.Maybe (fromMaybe, isNothing)
+import           Data.Text              (Text)
 import qualified Data.Text              as T
 
 import           Text.CSL.Exception
@@ -52,14 +52,14 @@ evalDate (Date s f fm dl dp dp') = do
                                     (updateS aj bj)
                                     (if bk /= ak then bk else ak)
                                     al am an ahl
-      updateS a b = if b /= a && b /= [] then b else a
+      updateS a b = if b /= a && b /= "" then b else a
   case f of
     NoFormDate -> outputList fm dl .
                   concatMap (formatDate em k tm dp) <$> mapM getDateVar s
     _          -> do res <- getDate f
                      case res of
                        Date _ _ lfm ldl ldp _ -> do
-                         let go dps = return . outputList (updateFM fm lfm) (if ldl /= [] then ldl else dl) .
+                         let go dps = return . outputList (updateFM fm lfm) (if ldl /= "" then ldl else dl) .
                                       concatMap (formatDate em k tm dps)
                              update l x@(DatePart a b c d) =
                                  case filter ((==) a . dpName) l of
@@ -81,9 +81,9 @@ getDate f = do
   x <- filter (\(Date _ df _ _ _ _) -> df == f) <$> gets (dates . env)
   case x of
     [x'] -> return x'
-    _    -> return $ Date [] NoFormDate emptyFormatting [] [] []
+    _    -> return $ Date [] NoFormDate emptyFormatting "" [] ""
 
-formatDate :: EvalMode -> String -> [CslTerm] -> [DatePart] -> [RefDate] -> [Output]
+formatDate :: EvalMode -> Text -> [CslTerm] -> [DatePart] -> [RefDate] -> [Output]
 formatDate em k tm dp date
     | [d]     <- date = concatMap (formatDatePart d) dp
     | (a:b:_) <- date = addODate . concat $ doRange a b
@@ -126,9 +126,9 @@ formatDate em k tm dp date
                           | otherwise -> ["year","month","day"]
 
       term f t = let f' = if f `elem` ["verb", "short", "verb-short", "symbol"]
-                          then read $ toRead f
+                          then read . T.unpack $ toRead f
                           else Long
-                 in maybe [] termPlural $ findTerm t f' tm
+                 in maybe "" termPlural $ findTerm t f' tm
 
       formatDatePart (RefDate y m e d o _) (DatePart n f _ fm)
           | "year"  <- n, Just y' <- y = return $ OYear (formatYear  f    y') k fm
@@ -136,8 +136,8 @@ formatDate em k tm dp date
           | "month" <- n, Just e' <- e =
                case e' of
                     RawSeason s -> [OStr s fm]
-                    _ -> output fm $ term f (printf "season-%02d"
-                                              $ fromMaybe 0 $ seasonToInt e')
+                    _ -> output fm . term f . T.pack $
+                         (printf "season-%02d" $ fromMaybe 0 $ seasonToInt e')
           | "day"   <- n, Just d' <- d = output fm      (formatDay   f m  d')
           | "year"  <- n, o /= mempty = output fm (unLiteral o)
           | otherwise                 = []
@@ -146,65 +146,70 @@ formatDate em k tm dp date
         | null (concat o1 ++ concat o2) = []
         | otherwise = o1 ++ (case dpRangeDelim <$> last' xs of
                               ["-"] -> [[OPan [Str "\x2013"]]]
-                              [s]   -> [[OPan [Str $ T.pack s]]]
+                              [s]   -> [[OPan [Str s]]]
                               _     -> []) ++ o2
 
       formatYear f y
-          | "short" <- f = printf "%02d" y
+          | "short" <- f = T.pack $ printf "%02d" y
           | isSorting em
-          , y < 0        = printf "-%04d" (abs y)
-          | isSorting em = printf "%04d" y
-          | y < 0        = printf "%d" (abs y) ++ term [] "bc"
+          , y < 0        = T.pack $ printf "-%04d" (abs y)
+          | isSorting em = T.pack $ printf "%04d" y
+          | y < 0        = (T.pack $ printf "%d" (abs y)) <> term "" "bc"
           | y < 1000
-          , y > 0        = printf "%d" y ++ term [] "ad"
+          , y > 0        = (T.pack $ printf "%d" y) <> term "" "ad"
           | y == 0       = ""
-          | otherwise    = printf "%d" y
+          | otherwise    = T.pack $ printf "%d" y
 
       formatMonth f fm m
           | "short"   <- f = getMonth $ period . termPlural
           | "long"    <- f = getMonth termPlural
-          | "numeric" <- f = printf "%d" m
-          | otherwise      = printf "%02d" m
+          | "numeric" <- f = T.pack $ printf "%d" m
+          | otherwise      = T.pack $ printf "%02d" m
           where
-            period     = if stripPeriods fm then filter (/= '.') else id
-            getMonth g = maybe (show m) g $ findTerm ("month-" ++ printf "%02d" m) (read $ toRead f) tm
+            period     = if stripPeriods fm then T.filter (/= '.') else id
+            getMonth g = case findTerm ("month-" <> T.pack (printf "%02d" m))
+                                       (read . T.unpack $ toRead f) tm of
+                           Nothing -> T.pack (show m)
+                           Just x  -> g x
 
       formatDay f m d
-          | "numeric-leading-zeros" <- f = printf "%02d" d
-          | "ordinal"               <- f = ordinal tm ("month-" ++ maybe "0" (printf "%02d") m) d
-          | otherwise                    = printf "%d" d
+          | "numeric-leading-zeros" <- f = T.pack $ printf "%02d" d
+          | "ordinal"               <- f = ordinal tm ("month-" <> maybe "0" (T.pack . printf "%02d") m) d
+          | otherwise                    = T.pack $ printf "%d" d
 
-ordinal :: [CslTerm] -> String -> Int -> String
+ordinal :: [CslTerm] -> Text -> Int -> Text
 ordinal ts v s
     | s < 10        = let a = termPlural (getWith1 (show s)) in
-                      if  null a then setOrd (term []) else show s ++ a
+                      if T.null a
+                      then setOrd (term "")
+                      else T.pack (show s) <> a
     | s < 100       = let a = termPlural (getWith2 (show s))
                           b = getWith1 [last (show s)] in
-                      if  not (null a)
-                      then show s ++ a
-                      else if null (termPlural b) ||
-                              (not (null (termMatch b)) &&
+                      if not (T.null a)
+                      then T.pack (show s) <> a
+                      else if T.null (termPlural b) ||
+                              (not (T.null (termMatch b)) &&
                                termMatch b /= "last-digit")
-                           then setOrd (term [])
+                           then setOrd (term "")
                            else setOrd b
     | otherwise     = let a = getWith2  last2
                           b = getWith1 [last (show s)] in
-                      if not (null (termPlural a)) &&
+                      if not (T.null (termPlural a)) &&
                          termMatch a /= "whole-number"
                       then setOrd a
-                      else if null (termPlural b) ||
-                              (not (null (termMatch b)) &&
+                      else if T.null (termPlural b) ||
+                              (not (T.null (termMatch b)) &&
                                termMatch b /= "last-digit")
-                           then setOrd (term [])
+                           then setOrd (term "")
                            else setOrd b
     where
-      setOrd   = (++) (show s) . termPlural
-      getWith1 = term . (++) "-0"
-      getWith2 = term . (++) "-"
+      setOrd   = T.append (T.pack $ show s) . termPlural
+      getWith1 = term . T.append "-0" . T.pack
+      getWith2 = term . T.append "-" . T.pack
       last2    = reverse . take 2 . reverse $ show s
-      term   t = getOrdinal v ("ordinal" ++ t) ts
+      term   t = getOrdinal v ("ordinal" <> t) ts
 
-longOrdinal :: [CslTerm] -> String -> Int -> String
+longOrdinal :: [CslTerm] -> Text -> Int -> Text
 longOrdinal ts v s
     | s > 10 ||
       s == 0  = ordinal ts v s
@@ -220,14 +225,13 @@ longOrdinal ts v s
                     9 -> term "09"
                     _ -> term "10"
     where
-      term t = termPlural $ getOrdinal v ("long-ordinal-" ++ t) ts
+      term t = termPlural $ getOrdinal v ("long-ordinal-" <> t) ts
 
-getOrdinal :: String -> String -> [CslTerm] -> CslTerm
+getOrdinal :: Text -> Text -> [CslTerm] -> CslTerm
 getOrdinal v s ts
     = fromMaybe newTerm $ findTerm' s Long gender ts `mplus`
                           findTerm' s Long Neuter ts
     where
-      gender = if v `elem` numericVars || "month" `isPrefixOf` v
+      gender = if v `elem` numericVars || "month" `T.isPrefixOf` v
                then maybe Neuter termGender $ findTerm v Long ts
                else Neuter
-

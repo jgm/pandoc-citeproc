@@ -26,35 +26,36 @@ import qualified Data.Map               as M
 import           Data.Maybe             (fromMaybe, listToMaybe)
 import           Data.Text              (Text, unpack)
 import qualified Data.Text              as T
+import qualified Data.Text.Lazy         as TL
+import qualified Data.Text.Lazy.Encoding as TL
 import           System.Directory       (getAppUserDataDirectory)
 import           Text.CSL.Compat.Pandoc (fetchItem)
 import           Text.CSL.Data          (getLocale)
 import           Text.CSL.Exception
 import           Text.CSL.Style         hiding (parseNames)
-import           Text.CSL.Util          (findFile, toRead)
+import           Text.CSL.Util          (findFile, toRead, trim)
 import           Text.Pandoc.Shared     (safeRead)
-import           Text.Pandoc.UTF8       (fromStringLazy)
 import qualified Text.XML               as X
 import           Text.XML.Cursor
 
 -- | Parse a 'String' into a 'Style' (with default locale).
-parseCSL :: String -> Style
-parseCSL = parseCSL' . fromStringLazy
+parseCSL :: Text -> Style
+parseCSL = parseCSL' . TL.encodeUtf8 . TL.fromStrict
 
 -- | Parse locale.  Raises 'CSLLocaleException' on error.
-parseLocale :: String -> IO Locale
+parseLocale :: Text -> IO Locale
 parseLocale locale =
   parseLocaleElement . fromDocument . X.parseLBS_ X.def <$> getLocale locale
 
 -- | Merge locale into a CSL style.
-localizeCSL :: Maybe String -> Style -> IO Style
+localizeCSL :: Maybe Text -> Style -> IO Style
 localizeCSL mbLocale s = do
   let locale = fromMaybe (styleDefaultLocale s) mbLocale
   l <- parseLocale locale
   return s { styleLocale = mergeLocales locale l (styleLocale s) }
 
 -- | Read and parse a CSL style file into a localized sytle.
-readCSLFile :: Maybe String -> FilePath -> IO Style
+readCSLFile :: Maybe Text -> FilePath -> IO Style
 readCSLFile mbLocale src = do
   csldir <- getAppUserDataDirectory "csl"
   mbSrc <- findFile [".", csldir] src
@@ -66,8 +67,8 @@ readCSLFile mbLocale src = do
   -- see if it's a dependent style, and if so, try to fetch its parent:
   let pickParentCur = get "link" >=> attributeIs (X.Name "rel" Nothing Nothing) "independent-parent"
   let parentCur = cur $/ get "info" &/ pickParentCur
-  let parent' = concatMap (stringAttr "href") parentCur
-  when (parent' == src) $
+  let parent' = T.concat $ map (stringAttr "href") parentCur
+  when (parent' == T.pack src) $
     E.throwIO $ DependentStyleHasItselfAsParent src
   case parent' of
        ""  -> localizeCSL mbLocale $ parseCSLCursor cur
@@ -76,15 +77,15 @@ readCSLFile mbLocale src = do
            let mbLocale' = case stringAttr "default-locale" cur of
                                   "" -> mbLocale
                                   x  -> Just x
-           readCSLFile mbLocale' y
+           readCSLFile mbLocale' (T.unpack y)
 
 parseCSL' :: L.ByteString -> Style
 parseCSL' = parseCSLCursor . fromDocument . X.parseLBS_ X.def
 
 parseCSLCursor :: Cursor -> Style
 parseCSLCursor cur =
-  Style{ styleVersion = version
-       , styleClass = class_
+  Style{ styleVersion = T.pack version
+       , styleClass = T.pack class_
        , styleInfo = Just info
        , styleDefaultLocale = defaultLocale
        , styleLocale = locales
@@ -104,20 +105,20 @@ parseCSLCursor cur =
   where version = unpack . T.concat $ cur $| laxAttribute "version"
         class_ = unpack . T.concat $ cur $| laxAttribute "class"
         defaultLocale = case cur $| laxAttribute "default-locale" of
-                             (x:_) -> unpack x
+                             (x:_) -> x
                              []    -> "en-US"
         author = case cur $// get "info" &/ get "author" of
-                      (x:_) -> CSAuthor (x $/ get "name" &/ string)
-                                 (x $/ get "email" &/ string)
-                                 (x $/ get "uri"   &/ string)
+                      (x:_) -> CSAuthor (T.concat $ x $/ get "name" &/ content)
+                                 (T.concat $ x $/ get "email" &/ content)
+                                 (T.concat $ x $/ get "uri"   &/ content)
                       _     -> CSAuthor "" "" ""
         info = CSInfo
-          { csiTitle      = cur $/ get "info" &/ get "title" &/ string
+          { csiTitle      = T.concat $ (cur $/ get "info" &/ get "title" &/ content)
           , csiAuthor     = author
           , csiCategories = []  -- TODO we don't really use this, and the type
                                 -- in Style doesn't match current CSL at all
-          , csiId         = cur $/ get "info" &/ get "id" &/ string
-          , csiUpdated    = cur $/ get "info" &/ get "updated" &/ string
+          , csiId         = T.concat $ cur $/ get "info" &/ get "id" &/ content
+          , csiUpdated    = T.concat $ cur $/ get "info" &/ get "updated" &/ content
           }
         locales = cur $/ get "locale" &| parseLocaleElement
         macros  = cur $/ get "macro" &| parseMacroMap
@@ -126,45 +127,40 @@ get :: Text -> Axis
 get name =
   element (X.Name name (Just "http://purl.org/net/xbiblio/csl") Nothing)
 
-string :: Cursor -> String
-string = unpack . T.concat . content
-
 attrWithDefault :: Read a => Text -> a -> Cursor -> a
 attrWithDefault t d cur =
-  fromMaybe d $ safeRead (T.pack $ toRead $ stringAttr t cur)
+  fromMaybe d $ safeRead (toRead $ stringAttr t cur)
 
-stringAttr :: Text -> Cursor -> String
+stringAttr :: Text -> Cursor -> Text
 stringAttr t cur =
   case node cur of
     X.NodeElement e ->
-      case M.lookup (X.Name t Nothing Nothing)
-           (X.elementAttributes e) of
-           Just x  -> unpack x
+      case M.lookup (X.Name t Nothing Nothing) (X.elementAttributes e) of
+           Just x  -> x
            Nothing -> ""
     _ -> ""
 
 parseCslTerm :: Cursor -> CslTerm
 parseCslTerm cur =
-    let body = unpack $ T.dropAround (`elem` (" \t\r\n" :: String)) $
-                  T.concat $ cur $/ content
+    let body = trim . T.concat $ cur $/ content
     in CT
       { cslTerm        = stringAttr "name" cur
       , termForm       = attrWithDefault "form" Long cur
       , termGender     = attrWithDefault "gender" Neuter cur
       , termGenderForm = attrWithDefault "gender-form" Neuter cur
-      , termSingular   = if null body
-                            then cur $/ get "single" &/ string
+      , termSingular   = if T.null body
+                            then T.concat $ cur $/ get "single" &/ content
                             else body
-      , termPlural     = if null body
-                            then cur $/ get "multiple" &/ string
+      , termPlural     = if T.null body
+                            then T.concat $ cur $/ get "multiple" &/ content
                             else body
       , termMatch      = stringAttr "match" cur
       }
 
 parseLocaleElement :: Cursor -> Locale
 parseLocaleElement cur = Locale
-      { localeVersion = unpack $ T.concat version
-      , localeLang    = unpack $ T.concat lang
+      { localeVersion = T.concat version
+      , localeLang    = T.concat lang
       , localeOptions = concat $ cur $/ get "style-options" &| parseOptions
       , localeTerms   = terms
       , localeDate    = concat $ cur $/ get "date" &| parseElement
@@ -212,7 +208,7 @@ getFormatting cur =
   }
 
 parseDate :: Cursor -> [Element]
-parseDate cur = [Date (words variable) form format delim parts partsAttr]
+parseDate cur = [Date (T.words variable) form format delim parts partsAttr]
   where variable   = stringAttr "variable" cur
         form       = case stringAttr "form" cur of
                            "text"    -> TextDate
@@ -239,13 +235,13 @@ parseDatePart defaultForm cur =
            }
 
 parseNames :: Cursor -> [Element]
-parseNames cur = [Names (words variable) names formatting delim others]
+parseNames cur = [Names (T.words variable) names formatting delim others]
   where variable   = stringAttr "variable" cur
         formatting = getFormatting cur
         delim      = stringAttr "delimiter" cur
         elts       = cur $/ parseName
         names      = case rights elts of
-                          [] -> [Name NotSet emptyFormatting [] [] []]
+                          [] -> [Name NotSet emptyFormatting [] "" []]
                           xs -> xs
         others     = lefts elts
 
@@ -265,7 +261,7 @@ parseName cur =
          plural    = attrWithDefault "plural" Contextual cur
          delim     = stringAttr "delimiter" cur
          nameParts = cur $/ get "name-part" &| parseNamePart
-         nameAttrs x = [(T.unpack n, T.unpack v) |
+         nameAttrs x = [(n, v) |
                  (X.Name n _ _, v) <- M.toList (X.elementAttributes x),
                  n `elem` nameAttrKeys]
          nameAttrKeys =  [ "et-al-min"
@@ -308,13 +304,13 @@ parseText cur =
       formatting     = getFormatting cur
       plural         = attrWithDefault "plural" True cur
       textForm       = attrWithDefault "form" Long cur
-  in  if not (null term)
+  in  if not (T.null term)
          then [Term term textForm formatting plural]
-         else if not (null macro)
+         else if not (T.null macro)
               then [Macro macro formatting]
-              else if not (null variable)
-                      then [Variable (words variable) textForm formatting delim]
-                      else [Const value formatting | not (null value)]
+              else if not (T.null variable)
+                      then [Variable (T.words variable) textForm formatting delim]
+                      else [Const value formatting | not (T.null value)]
 
 parseChoose :: Cursor -> [Element]
 parseChoose cur =
@@ -336,7 +332,7 @@ parseIf cur = IfThen cond mat elts
                }
         mat  = attrWithDefault "match" All cur
         elts = cur $/ parseElement
-        go x = words $ stringAttr x cur
+        go x = T.words $ stringAttr x cur
 
 parseLabel :: Cursor -> [Element]
 parseLabel cur = [Label variable form formatting plural]
@@ -408,7 +404,7 @@ parseOptions :: Cursor -> [Option]
 parseOptions cur =
   case node cur of
     X.NodeElement e ->
-     [(T.unpack n, T.unpack v) |
+     [(n, v) |
       (X.Name n _ _, v) <- M.toList (X.elementAttributes e)]
     _ -> []
 

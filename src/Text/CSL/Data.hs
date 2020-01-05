@@ -1,6 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE CPP                #-}
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE OverloadedStrings  #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Text.CSL.Data
@@ -25,6 +26,8 @@ module Text.CSL.Data
 import Prelude
 import qualified Control.Exception      as E
 import qualified Data.ByteString.Lazy   as L
+import qualified Data.Text              as T
+import           Data.Text              (Text)
 import           Data.Typeable
 import           System.FilePath        ()
 import           Data.Maybe             (fromMaybe)
@@ -37,47 +40,51 @@ import           System.Directory       (doesFileExist)
 #endif
 
 data CSLLocaleException =
-    CSLLocaleNotFound String
+    CSLLocaleNotFound Text
   | CSLLocaleReadError E.IOException
   deriving Typeable
 instance Show CSLLocaleException where
-  show (CSLLocaleNotFound s)  = "Could not find locale data for " ++ s
+  show (CSLLocaleNotFound s)  = "Could not find locale data for " ++ T.unpack s
   show (CSLLocaleReadError e) = show e
 instance E.Exception CSLLocaleException
 
 -- | Raises 'CSLLocaleException' on error.
-getLocale :: String -> IO L.ByteString
+getLocale :: Text -> IO L.ByteString
 getLocale s = do
-  let baseLocale = takeWhile (/='.') s
+  let baseLocale = T.takeWhile (/='.') s
 #ifdef EMBED_DATA_FILES
   let toLazy x = L.fromChunks [x]
   let returnDefaultLocale =
         maybe (E.throwIO $ CSLLocaleNotFound "en-US") (return . toLazy)
            $ lookup "locales-en-US.xml" localeFiles
-  case length baseLocale of
+  case T.length baseLocale of
       0 -> returnDefaultLocale
       1 | baseLocale == "C" -> returnDefaultLocale
-      _ -> case lookup ("locales-" ++ baseLocale ++ ".xml") localeFiles of
+      _ -> let localeFile = T.unpack ("locales-" <>
+                                      baseLocale <> ".xml")
+           in case lookup localeFile localeFiles of
                  Just x' -> return $ toLazy x'
                  Nothing ->
                        -- try again with 2-letter locale (lang only)
-                       let shortLocale = takeWhile (/='-') baseLocale in
-                       case lookup ("locales-" ++ fromMaybe shortLocale
-                              (lookup shortLocale langBase) ++ ".xml")
-                              localeFiles of
-                             Just x'' -> return $ toLazy x''
-                             _        -> E.throwIO $ CSLLocaleNotFound s
+                       let shortLocale = T.takeWhile (/='-') baseLocale
+                           lang = fromMaybe shortLocale $
+                                            lookup shortLocale langBase
+                           slFile = T.unpack $ T.concat ["locales-",lang,".xml"]
+                       in
+                       case lookup slFile localeFiles of
+                         Just x'' -> return $ toLazy x''
+                         _        -> E.throwIO $ CSLLocaleNotFound s
 #else
-  f <- getDataFileName $
-         case length baseLocale of
+  f <- getDataFileName . T.unpack $
+         case T.length baseLocale of
              0 -> "locales/locales-en-US.xml"
              1 | baseLocale == "C" -> "locales/locales-en-US.xml"
-             2 -> "locales/locales-" ++
-                    fromMaybe s (lookup s langBase) ++ ".xml"
-             _ -> "locales/locales-" ++ take 5 s ++ ".xml"
+             2 -> "locales/locales-" <>
+                    fromMaybe s (lookup s langBase) <> ".xml"
+             _ -> "locales/locales-" <> T.take 5 s <> ".xml"
   exists <- doesFileExist f
-  if not exists && length baseLocale > 2
-     then getLocale $ dropWhile (/='-') baseLocale
+  if not exists && T.compareLength baseLocale 2 == GT
+     then getLocale $ T.dropWhile (/='-') baseLocale
           -- try again with lang only
      else E.handle (E.throwIO . CSLLocaleReadError) $ L.readFile f
 #endif
@@ -106,7 +113,7 @@ getLicense =
   getDataFileName "LICENSE" >>= L.readFile
 #endif
 
-langBase :: [(String, String)]
+langBase :: [(Text, Text)]
 langBase
     = [("af", "af-ZA")
       ,("bg", "bg-BG")
