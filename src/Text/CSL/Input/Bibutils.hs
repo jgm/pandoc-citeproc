@@ -29,7 +29,9 @@ import           Data.Aeson.Types       (parseMaybe)
 import qualified Data.ByteString.Lazy   as BL
 import qualified Data.ByteString        as BS
 import qualified Data.HashMap.Strict    as HM
+import           Data.Text              (Text)
 import qualified Data.Text              as T
+import qualified Data.Text.Lazy         as TL
 import qualified Data.YAML.Aeson        as YA
 import qualified Data.YAML              as Y
 import qualified Data.Vector            as V
@@ -59,7 +61,7 @@ import           Text.Bibutils
 --
 -- Supported formats are: @json@, @mods@, @bibtex@, @biblatex@, @ris@,
 -- @endnote@, @endnotexml@, @isi@, @medline@, @copac@, and @nbib@.
-readBiblioFile :: (String -> Bool) -> FilePath -> IO [Reference]
+readBiblioFile :: (Text -> Bool) -> FilePath -> IO [Reference]
 readBiblioFile idpred f
     = case getExt f of
         ".json"     -> BL.readFile f >>= either
@@ -67,7 +69,7 @@ readBiblioFile idpred f
                        (return . filterEntries idpred) . eitherDecode
         ".yaml"     -> UTF8.readFile f >>= either
                        (E.throwIO . ErrorReadingBibFile f) return .
-                       readYamlBib idpred
+                       readYamlBib idpred . T.pack
         ".bib"      -> readBibtex idpred False True f
         ".bibtex"   -> readBibtex idpred True True f
         ".biblatex" -> readBibtex idpred False True f
@@ -102,10 +104,12 @@ data BibFormat
 #endif
     deriving Show
 
-readBiblioString :: (String -> Bool) -> BibFormat -> String -> IO [Reference]
+readBiblioString :: (Text -> Bool) -> BibFormat -> Text -> IO [Reference]
 readBiblioString idpred b s
     | Json      <- b = either (E.throwIO . ErrorReadingBib)
-                         return $ eitherDecode $ UTF8.fromStringLazy s
+                         return $ eitherDecode
+                                $ UTF8.fromTextLazy
+                                $ TL.fromStrict s
     | Yaml      <- b = either (E.throwIO . ErrorReadingBib)
                          return $ readYamlBib idpred s
     | Bibtex    <- b = readBibtexString idpred True True s
@@ -126,12 +130,12 @@ readBiblioString idpred b s
     where
       go f = withTempDir "citeproc" $ \tdir -> do
                let tfile = tdir </> "bibutils-tmp.biblio"
-               UTF8.writeFile tfile s
+               UTF8.writeFile tfile (T.unpack s)
                readBiblioFile' idpred tfile f
 #endif
 
 #ifdef USE_BIBUTILS
-readBiblioFile' :: (String -> Bool) -> FilePath -> BiblioIn -> IO [Reference]
+readBiblioFile' :: (Text -> Bool) -> FilePath -> BiblioIn -> IO [Reference]
 readBiblioFile' idpred fin bin
     | bin == biblatex_in = readBibtex idpred False True fin
     | otherwise      = withTempDir "citeproc"
@@ -171,19 +175,19 @@ createTempDir num baseName = do
 getExt :: String -> String
 getExt = takeExtension . map toLower
 
-readYamlBib :: (String -> Bool) -> String -> Either String [Reference]
+readYamlBib :: (Text -> Bool) -> Text -> Either String [Reference]
 readYamlBib idpred s =
   case readMarkdown s' of
          (Pandoc meta _) -> convertRefs (lookupMeta "references" meta)
-  where s' = addTop $ addBottom
-                    $ UTF8.toString
-                    $ selectEntries idpred
-                    $ UTF8.fromString
+  where s' = addTop . addBottom
+                    . UTF8.toText
+                    . selectEntries idpred
+                    . UTF8.fromText
                     $ s
-        addTop = ("---\n" ++)
-        addBottom = (++ "...\n")
+        addTop = ("---\n" <>)
+        addBottom = (<> "...\n")
 
-selectEntries :: (String -> Bool) -> BS.ByteString -> BS.ByteString
+selectEntries :: (Text -> Bool) -> BS.ByteString -> BS.ByteString
 selectEntries idpred bs =
   case YA.decode1Strict bs of
        Right (Array vs) -> YA.encode1Strict (filterObjects $ V.toList vs)
@@ -209,7 +213,7 @@ selectEntries idpred bs =
                                  _ -> False
                         _ -> False)
 
-filterEntries :: (String -> Bool) -> [Reference] -> [Reference]
+filterEntries :: (Text -> Bool) -> [Reference] -> [Reference]
 filterEntries idpred = filter (\r -> idpred (unLiteral (refId r)))
 
 convertRefs :: Maybe MetaValue -> Either String [Reference]

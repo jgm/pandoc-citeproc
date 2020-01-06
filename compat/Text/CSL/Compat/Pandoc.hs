@@ -18,9 +18,9 @@ import qualified Control.Exception as E
 import System.Exit (ExitCode)
 import Data.ByteString.Lazy as BL
 import Data.ByteString as B
-import Text.Pandoc (Pandoc, ReaderOptions(..), def, WrapOption(..),
-        WriterOptions(..))
-import Text.Pandoc (Extension(..), pandocExtensions)
+import Data.Text (Text)
+import Text.Pandoc (Extension (..), Pandoc, ReaderOptions(..), WrapOption(..),
+        WriterOptions(..), def, pandocExtensions)
 import qualified Text.Pandoc as Pandoc
 import qualified Text.Pandoc.Process
 import qualified Data.Text as T
@@ -31,36 +31,36 @@ import qualified Text.Pandoc.Class (fetchItem)
 import Control.Monad.Except (runExceptT, lift)
 import Text.Pandoc.Extensions (extensionsFromList, disableExtension)
 
-readHtml, readLaTeX, readMarkdown, readNative :: String -> Pandoc
-writeMarkdown, writePlain, writeNative, writeHtmlString :: Pandoc -> String
-
+readHtml :: Text -> Pandoc
 readHtml = either mempty id . runPure . Pandoc.readHtml
    def{ readerExtensions = extensionsFromList [Ext_native_divs,
-                           Ext_native_spans, Ext_raw_html, Ext_smart] } .
-   T.pack
+                           Ext_native_spans, Ext_raw_html, Ext_smart] }
 
+readMarkdown :: Text -> Pandoc
 readMarkdown = either mempty id . runPure . Pandoc.readMarkdown
-   def{ readerExtensions = pandocExtensions, readerStandalone = True } .
-   T.pack
+   def{ readerExtensions = pandocExtensions, readerStandalone = True }
 
+readLaTeX :: Text -> Pandoc
 readLaTeX = either mempty id . runPure . Pandoc.readLaTeX
-   def{ readerExtensions = extensionsFromList [Ext_raw_tex, Ext_smart] } .
-   T.pack
+   def{ readerExtensions = extensionsFromList [Ext_raw_tex, Ext_smart] }
 
-readNative = either mempty id . runPure . Pandoc.readNative def . T.pack
+readNative :: Text -> Pandoc
+readNative = either mempty id . runPure . Pandoc.readNative def
 
-writeMarkdown = either mempty T.unpack . runPure . Pandoc.writeMarkdown
+writeMarkdown, writePlain, writeNative, writeHtmlString :: Pandoc -> Text
+
+writeMarkdown = either mempty id . runPure . Pandoc.writeMarkdown
    def{ writerExtensions = disableExtension Ext_smart $
                            disableExtension Ext_bracketed_spans $
                            disableExtension Ext_raw_attribute $
                            pandocExtensions,
         writerWrapText = WrapNone }
 
-writePlain = either mempty T.unpack . runPure . Pandoc.writePlain def
+writePlain = either mempty id . runPure . Pandoc.writePlain def
 
-writeNative = either mempty T.unpack . runPure . Pandoc.writeNative def{ writerTemplate = Just mempty }
+writeNative = either mempty id . runPure . Pandoc.writeNative def{ writerTemplate = Just mempty }
 
-writeHtmlString = either mempty T.unpack . runPure . Pandoc.writeHtml4String
+writeHtmlString = either mempty id . runPure . Pandoc.writeHtml4String
    def{ writerExtensions = extensionsFromList
        [Ext_native_divs, Ext_native_spans, Ext_raw_html],
        writerWrapText = WrapPreserve }

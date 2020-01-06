@@ -4,7 +4,11 @@
 module Main where
 import Prelude
 import qualified Data.Aeson             as Aeson
+import qualified Data.ByteString        as B
 import           Data.List              (isSuffixOf)
+import           Data.Text              (Text)
+import           Data.Text.Encoding     (encodeUtf8)
+import qualified Data.Text              as T
 import           Data.Maybe             (fromMaybe)
 import           System.Directory
 import           System.Environment
@@ -75,12 +79,8 @@ testCase regenerate csl = do
           else
             if regenerate
                then do
-                 UTF8.writeFile ("tests/" ++ csl ++ ".expected.native") $
-#if MIN_VERSION_pandoc(1,19,0)
-                   writeNative outDoc
-#else
-                   writeNative outDoc
-#endif
+                 B.writeFile ("tests/" ++ csl ++ ".expected.native") $
+                   encodeUtf8 (writeNative outDoc)
                  err "PASSED (accepted)"
                  return Passed
                else do
@@ -92,13 +92,13 @@ testCase regenerate csl = do
        err $ "Error status " ++ show ec
        return Errored
 
-showDiff :: String -> String -> IO ()
+showDiff :: Text -> Text -> IO ()
 showDiff expected result =
   withSystemTempDirectory "test-pandoc-citeproc-XXX" $ \fp -> do
     let expectedf = fp </> "expected"
     let actualf   = fp </> "actual"
-    UTF8.writeFile expectedf expected
-    UTF8.writeFile actualf result
+    UTF8.writeFile expectedf $ T.unpack expected
+    UTF8.writeFile actualf $ T.unpack result
     oldDir <- getCurrentDirectory
     setCurrentDirectory fp
     _ <- rawSystem "diff" ["-U1","expected","actual"]
@@ -150,8 +150,8 @@ biblio2yamlTest regenerate fp = do
                  err "PASSED (accepted)"
                  return Passed
                else do
-                 err $ "FAILED"
-                 showDiff expected result
+                 err "FAILED"
+                 showDiff (T.pack expected) (T.pack result)
                  return Failed
      else do
        err "ERROR"

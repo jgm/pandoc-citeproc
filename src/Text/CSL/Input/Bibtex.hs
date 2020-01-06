@@ -29,13 +29,16 @@ import           Control.Applicative
 import qualified Control.Exception      as E
 import           Control.Monad
 import           Control.Monad.RWS      hiding ((<>))
+import qualified Data.ByteString        as B
 import           Data.Char              (isAlphaNum, isDigit, isUpper, toLower,
                                          toUpper)
 import           Data.List              (foldl', intercalate)
 import           Data.List.Split        (splitOn, splitWhen, wordsBy)
 import qualified Data.Map               as Map
 import           Data.Maybe
+import           Data.Text              (Text)
 import qualified Data.Text              as T
+import           Data.Text.Encoding     (decodeUtf8)
 import           System.Environment     (getEnvironment)
 import           Text.CSL.Compat.Pandoc (readLaTeX)
 import           Text.CSL.Exception     (CiteprocException (ErrorReadingBib, ErrorReadingBibFile))
@@ -44,10 +47,9 @@ import           Text.CSL.Reference
 import           Text.CSL.Style         (Agent (..), emptyAgent, CslTerm (..),
                                          Formatted (..), Locale (..))
 import           Text.CSL.Util          (onBlocks, protectCase, safeRead,
-                                         splitStrWhen, trim, unTitlecase,
-                                         addSpaceAfterPeriod)
+                                         splitWhen, splitStrWhen, trim,
+                                         unTitlecase, addSpaceAfterPeriod)
 import           Text.Pandoc.Definition
-import qualified Text.Pandoc.UTF8       as UTF8
 import qualified Text.Pandoc.Walk       as Walk
 import Text.Parsec hiding (State, many, (<|>))
 
@@ -63,18 +65,18 @@ adjustSpans _ (Span ("",[],[]) xs) = xs
 adjustSpans lang (RawInline (Format "latex") s)
   | s == "\\hyphen" || s == "\\hyphen " = [Str "-"]
   | otherwise = Walk.walk (concatMap (adjustSpans lang))
-                $ parseRawLaTeX lang (T.unpack s)
+                $ parseRawLaTeX lang s
 adjustSpans _ x = [x]
 
-parseRawLaTeX :: Lang -> String -> [Inline]
-parseRawLaTeX lang ('\\':xs) =
+parseRawLaTeX :: Lang -> Text -> [Inline]
+parseRawLaTeX lang (T.stripPrefix "\\" -> Just xs) =
   case latex' contents of
        [Para ys]  -> f command ys
        [Plain ys] -> f command ys
        _          -> []
-   where (command', contents') = break (=='{') xs
+   where (command', contents') = T.break (=='{') xs
          command  = trim command'
-         contents = drop 1 $ reverse $ drop 1 $ reverse contents'
+         contents = T.drop 1 $ T.dropEnd 1 contents'
          f "mkbibquote"    ils = [Quoted DoubleQuote ils]
          f "mkbibemph"     ils = [Emph ils]
          f "mkbibitalic"   ils = [Emph ils] -- TODO: italic/=emph
@@ -84,7 +86,7 @@ parseRawLaTeX lang ('\\':xs) =
          -- ... both should be nestable & should work in year fields
          f "autocap"    ils    = ils  -- TODO: should work in year fields
          f "textnormal" ils    = [Span ("",["nodecor"],[]) ils]
-         f "bibstring" [Str s] = [Str $ T.pack $ resolveKey' lang $ T.unpack s]
+         f "bibstring" [Str s] = [Str $ resolveKey' lang s]
          f _            ils    = [Span nullAttr ils]
 parseRawLaTeX _ _ = []
 
@@ -93,9 +95,9 @@ inlinesToFormatted ils = do
   lang <- gets localeLanguage
   return $ Formatted $ Walk.walk (concatMap (adjustSpans lang)) ils
 
-data Item = Item{ identifier :: String
-                , entryType  :: String
-                , fields     :: Map.Map String String
+data Item = Item{ identifier :: Text
+                , entryType  :: Text
+                , fields     :: Map.Map Text Text
                 }
 
 -- | Get 'Lang' from the environment variable LANG, defaulting to en-US.
@@ -103,33 +105,33 @@ getLangFromEnv :: IO Lang
 getLangFromEnv = do
   env <- getEnvironment
   return $ case lookup "LANG" env of
-                  Just x  -> case splitWhen (\c -> c == '_' || c == '-')
-                                  (takeWhile (/='.') x) of
-                                   (w:z:_) -> Lang w z
-                                   [w]     | not (null w) -> Lang w mempty
-                                   _       -> Lang "en" "US"
-                  Nothing -> Lang "en" "US"
+    Just x  -> case Text.CSL.Util.splitWhen (\c -> c == '_' || c == '-')
+                    (T.takeWhile (/='.') (T.pack x)) of
+                 (w:z:_) -> Lang w z
+                 [w]     | not (T.null w) -> Lang w mempty
+                 _       -> Lang "en" "US"
+    Nothing -> Lang "en" "US"
 
 -- | Parse a BibTeX or BibLaTeX file into a list of 'Reference's.
 -- The first parameter is a predicate to filter identifiers.
 -- If the second parameter is true, the file will be treated as
 -- BibTeX; otherwise as BibLaTeX.  If the third parameter is
 -- true, an "untitlecase" transformation will be performed.
-readBibtex :: (String -> Bool) -> Bool -> Bool -> FilePath -> IO [Reference]
+readBibtex :: (Text -> Bool) -> Bool -> Bool -> FilePath -> IO [Reference]
 readBibtex idpred isBibtex caseTransform f = do
-  contents <- UTF8.readFile f
+  contents <- decodeUtf8 <$> B.readFile f
   E.catch (readBibtexString idpred isBibtex caseTransform contents)
         (\e -> case e of
                   ErrorReadingBib es -> E.throwIO $ ErrorReadingBibFile f es
                   _                  -> E.throwIO e)
 
--- | Like 'readBibtex' but operates on a String rather than a file.
-readBibtexString :: (String -> Bool) -> Bool -> Bool -> String
+-- | Like 'readBibtex' but operates on Text rather than a file.
+readBibtexString :: (Text -> Bool) -> Bool -> Bool -> Text
                  -> IO [Reference]
 readBibtexString idpred isBibtex caseTransform contents = do
   lang <- getLangFromEnv
   locale <- parseLocale (langToLocale lang)
-  case runParser (bibEntries <* eof) (Map.empty) "stdin" contents of
+  case runParser (bibEntries <* eof) Map.empty "stdin" contents of
                       -- drop 8 to remove "stdin" + space
           Left err -> E.throwIO $ ErrorReadingBib $ drop 8 $ show err
           Right xs -> return $ mapMaybe
@@ -138,7 +140,7 @@ readBibtexString idpred isBibtex caseTransform contents = do
               (resolveCrossRefs isBibtex
                 xs))
 
-type BibParser = Parsec String (Map.Map String String)
+type BibParser = Parsec Text (Map.Map Text Text)
 
 bibEntries :: BibParser [Item]
 bibEntries = do
@@ -174,32 +176,32 @@ bibString = do
   updateState (Map.insert k v)
   return ()
 
-inBraces :: BibParser String
+inBraces :: BibParser Text
 inBraces = try $ do
   char '{'
   res <- manyTill
-         (  many1 (noneOf "{}\\")
+         (  (T.pack <$> many1 (noneOf "{}\\"))
         <|> (char '\\' >> (  (char '{' >> return "\\{")
                          <|> (char '}' >> return "\\}")
                          <|> return "\\"))
         <|> (braced <$> inBraces)
          ) (char '}')
-  return $ concat res
+  return $ T.concat res
 
-braced :: String -> String
-braced s = "{" ++ s ++ "}"
+braced :: Text -> Text
+braced = T.cons '{' . flip T.snoc '}'
 
-inQuotes :: BibParser String
+inQuotes :: BibParser Text
 inQuotes = do
   char '"'
-  concat <$> manyTill (  many1 (noneOf "\"\\{")
-                     <|> (char '\\' >> (\c -> ['\\',c]) <$> anyChar)
-                     <|> braced <$> inBraces
-                      ) (char '"')
+  T.concat <$> manyTill (  (T.pack <$> many1 (noneOf "\"\\{"))
+                       <|> (char '\\' >> T.cons '\\' . T.singleton <$> anyChar)
+                       <|> braced <$> inBraces
+                        ) (char '"')
 
-fieldName :: BibParser String
-fieldName =
-  resolveAlias . map toLower <$> many1 (letter <|> digit <|> oneOf "-_:+")
+fieldName :: BibParser Text
+fieldName = resolveAlias . T.toLower . T.pack
+  <$> many1 (letter <|> digit <|> oneOf "-_:+")
 
 isBibtexKeyChar :: Char -> Bool
 isBibtexKeyChar c = isAlphaNum c || c `elem` (".:;?!`'()/*@_+=-[]*&" :: String)
@@ -218,9 +220,9 @@ bibItem = do
   entfields <- entField `sepEndBy` (char ',' >> spaces)
   spaces
   char '}'
-  return $ Item entid enttype (Map.fromList entfields)
+  return $ Item (T.pack entid) (T.pack enttype) (Map.fromList entfields)
 
-entField :: BibParser (String, String)
+entField :: BibParser (Text, Text)
 entField = do
   k <- fieldName
   spaces
@@ -229,17 +231,17 @@ entField = do
   vs <- (expandString <|> inQuotes <|> inBraces <|> rawWord) `sepBy`
             try (spaces >> char '#' >> spaces)
   spaces
-  return (k, concat vs)
+  return (k, T.concat vs)
 
-resolveAlias :: String -> String
+resolveAlias :: Text -> Text
 resolveAlias "archiveprefix" = "eprinttype"
 resolveAlias "primaryclass" = "eprintclass"
 resolveAlias s = s
 
-rawWord :: BibParser String
-rawWord = many1 alphaNum
+rawWord :: BibParser Text
+rawWord = T.pack <$> many1 alphaNum
 
-expandString :: BibParser String
+expandString :: BibParser Text
 expandString = do
   k <- fieldName
   strs <- getState
@@ -247,22 +249,23 @@ expandString = do
        Just v  -> return v
        Nothing -> return k -- return raw key if not found
 
-cistring :: String -> BibParser String
+cistring :: Text -> BibParser Text
 cistring s = try (go s)
- where go [] = return []
-       go (c:cs) = do
-         x <- char (toLower c) <|> char (toUpper c)
-         xs <- go cs
-         return (x:xs)
+ where go t = case T.uncons t of
+         Nothing     -> return ""
+         Just (c,cs) -> do
+           x <- char (toLower c) <|> char (toUpper c)
+           xs <- go cs
+           return (T.cons x xs)
 
 resolveCrossRefs :: Bool -> [Item] -> [Item]
 resolveCrossRefs isBibtex entries =
   map (resolveCrossRef isBibtex entries) entries
 
-splitKeys :: String -> [String]
-splitKeys = wordsBy (\c -> c == ' ' || c == ',')
+splitKeys :: Text -> [Text]
+splitKeys = filter (not . T.null) . T.split (\c -> c == ' ' || c == ',')
 
-getXrefFields :: Bool -> Item -> [Item] -> String -> [(String, String)]
+getXrefFields :: Bool -> Item -> [Item] -> Text -> [(Text, Text)]
 getXrefFields isBibtex baseEntry entries keys = do
   let keys' = splitKeys keys
   xrefEntry <- [e | e <- entries, identifier e `elem` keys']
@@ -293,7 +296,7 @@ resolveCrossRef isBibtex entries entry =
 
 -- transformKey source target key
 -- derived from Appendix C of bibtex manual
-transformKey :: String -> String -> String -> [String]
+transformKey :: Text -> Text -> Text -> [Text]
 transformKey _ _ "ids"            = []
 transformKey _ _ "crossref"       = []
 transformKey _ _ "xref"           = []
@@ -343,7 +346,7 @@ transformKey "periodical" y z
        _                -> [z]
 transformKey _ _ x                = [x]
 
-standardTrans :: String -> [String]
+standardTrans :: Text -> [Text]
 standardTrans z =
   case z of
        "title"          -> ["maintitle"]
@@ -355,7 +358,7 @@ standardTrans z =
        "indexsorttitle" -> []
        _                -> [z]
 
-bookTrans :: String -> [String]
+bookTrans :: Text -> [Text]
 bookTrans z =
   case z of
        "title"          -> ["booktitle"]
@@ -368,11 +371,11 @@ bookTrans z =
        _                -> [z]
 
 -- | A representation of a language and localization.
-data Lang = Lang String String  -- e.g. "en" "US"
+data Lang = Lang Text Text  -- e.g. "en" "US"
 
 -- | Prints a 'Lang' in BCP 47 format.
-langToLocale :: Lang -> String
-langToLocale (Lang x y) = x ++ (if null y then [] else '-':y)
+langToLocale :: Lang -> Text
+langToLocale (Lang x y) = x <> (if T.null y then "" else T.cons '-' y)
 
 -- Biblatex Localization Keys (see Biblatex manual)
 -- Currently we only map a subset likely to be used in Biblatex *databases*
@@ -380,16 +383,16 @@ langToLocale (Lang x y) = x ++ (if null y then [] else '-':y)
 
 resolveKey :: Lang -> Formatted -> Formatted
 resolveKey lang (Formatted ils) = Formatted (Walk.walk go ils)
-  where go (Str s) = Str $ T.pack $ resolveKey' lang $ T.unpack s
+  where go (Str s) = Str $ resolveKey' lang s
         go x       = x
 
 -- biblatex localization keys, from files at
 -- http://github.com/plk/biblatex/tree/master/tex/latex/biblatex/lbx
 -- Some keys missing in these were added from csl locale files at
 -- http://github.com/citation-style-language/locales -- labeled "csl"
-resolveKey' :: Lang -> String -> String
+resolveKey' :: Lang -> Text -> Text
 resolveKey' (Lang "ca" "AD") k =
-    case map toLower k of
+    case T.toLower k of
        "inpreparation" -> "en preparació"
        "submitted"     -> "enviat"
        "forthcoming"   -> "disponible en breu"
@@ -425,7 +428,7 @@ resolveKey' (Lang "ca" "AD") k =
        "oldseries"     -> "sèrie antiga"
        _               -> k
 resolveKey' (Lang "da" "DK") k =
-    case map toLower k of
+    case T.toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
        "forthcoming" -> "kommende" -- csl
@@ -461,7 +464,7 @@ resolveKey' (Lang "da" "DK") k =
        "oldseries"   -> "gammel serie"
        _             -> k
 resolveKey' (Lang "de" "DE") k =
-    case map toLower k of
+    case T.toLower k of
        "inpreparation" -> "in Vorbereitung"
        "submitted"     -> "eingereicht"
        "forthcoming"   -> "im Erscheinen"
@@ -497,7 +500,7 @@ resolveKey' (Lang "de" "DE") k =
        "oldseries"     -> "alte Folge"
        _               -> k
 resolveKey' (Lang "en" "US") k =
-  case map toLower k of
+  case T.toLower k of
        "audiocd"        -> "audio CD"
        "by"             -> "by"
        "candthesis"     -> "Candidate thesis"
@@ -545,7 +548,7 @@ resolveKey' (Lang "en" "US") k =
        "volume"         -> "vol."
        _                -> k
 resolveKey' (Lang "es" "ES") k =
-    case map toLower k of
+    case T.toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
        "forthcoming" -> "previsto"    -- csl
@@ -581,7 +584,7 @@ resolveKey' (Lang "es" "ES") k =
        "oldseries"   -> "antigua época"
        _             -> k
 resolveKey' (Lang "fi" "FI") k =
-    case map toLower k of
+    case T.toLower k of
        -- "inpreparation" -> ""      -- missing
        -- "submitted"     -> ""      -- missing
        "forthcoming" -> "tulossa"  -- csl
@@ -618,7 +621,7 @@ resolveKey' (Lang "fi" "FI") k =
        _             -> k
 
 resolveKey' (Lang "fr" "FR") k =
-    case map toLower k of
+    case T.toLower k of
        "inpreparation" -> "en préparation"
        "submitted"     -> "soumis"
        "forthcoming"   -> "à paraître"
@@ -654,7 +657,7 @@ resolveKey' (Lang "fr" "FR") k =
        "oldseries"     -> "ancienne série"
        _               -> k
 resolveKey' (Lang "it" "IT") k =
-    case map toLower k of
+    case T.toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
        "forthcoming" -> "futuro" -- csl
@@ -690,7 +693,7 @@ resolveKey' (Lang "it" "IT") k =
        "oldseries"   -> "vecchia serie"
        _             -> k
 resolveKey' (Lang "nl" "NL") k =
-    case map toLower k of
+    case T.toLower k of
        "inpreparation" -> "in voorbereiding"
        "submitted"     -> "ingediend"
        "forthcoming"   -> "onderweg"
@@ -726,7 +729,7 @@ resolveKey' (Lang "nl" "NL") k =
        "oldseries"     -> "oude reeks"
        _               -> k
 resolveKey' (Lang "pl" "PL") k =
-    case map toLower k of
+    case T.toLower k of
        "inpreparation" -> "przygotowanie"
        "submitted"     -> "prezentacja"
        "forthcoming"   -> "przygotowanie"
@@ -758,7 +761,7 @@ resolveKey' (Lang "pl" "PL") k =
        "oldseries"     -> "stara serja"
        _               -> k
 resolveKey' (Lang "pt" "PT") k =
-    case map toLower k of
+    case T.toLower k of
        -- "candthesis" -> "" -- missing
        "techreport"  -> "relatório técnico"
        "resreport"   -> "relatório de pesquisa"
@@ -793,7 +796,7 @@ resolveKey' (Lang "pt" "PT") k =
        "audiocd"     -> "CD áudio"
        _             -> k
 resolveKey' (Lang "pt" "BR") k =
-    case map toLower k of
+    case T.toLower k of
        -- "candthesis" -> "" -- missing
        "techreport"    -> "relatório técnico"
        "resreport"     -> "relatório de pesquisa"
@@ -828,7 +831,7 @@ resolveKey' (Lang "pt" "BR") k =
        "audiocd"       -> "CD de áudio"
        _               -> k
 resolveKey' (Lang "sv" "SE") k =
-    case map toLower k of
+    case T.toLower k of
        -- "inpreparation" -> "" -- missing
        -- "submitted"     -> "" -- missing
        "forthcoming" -> "kommande" -- csl
@@ -865,9 +868,9 @@ resolveKey' (Lang "sv" "SE") k =
        _             -> k
 resolveKey' _ k = resolveKey' (Lang "en" "US") k
 
-parseMonth :: String -> Maybe Int
+parseMonth :: Text -> Maybe Int
 parseMonth s =
-  case map toLower s of
+  case T.toLower s of
          "jan" -> Just 1
          "feb" -> Just 2
          "mar" -> Just 3
@@ -880,7 +883,7 @@ parseMonth s =
          "oct" -> Just 10
          "nov" -> Just 11
          "dec" -> Just 12
-         _     -> safeRead $ T.pack s
+         _     -> safeRead s
 
 data BibState = BibState{
            untitlecase    :: Bool
@@ -889,31 +892,31 @@ data BibState = BibState{
 
 type Bib = RWST Item () BibState Maybe
 
-notFound :: String -> Bib a
-notFound f = Prelude.fail $ f ++ " not found"
+notFound :: Text -> Bib a
+notFound f = Prelude.fail $ T.unpack f ++ " not found"
 
-getField :: String -> Bib Formatted
+getField :: Text -> Bib Formatted
 getField f = do
   fs <- asks fields
   case Map.lookup f fs of
        Just x  -> latex x
        Nothing -> notFound f
 
-getPeriodicalTitle :: String -> Bib Formatted
+getPeriodicalTitle :: Text -> Bib Formatted
 getPeriodicalTitle f = do
   fs <- asks fields
   case Map.lookup f fs of
        Just x  -> blocksToFormatted $ onBlocks protectCase $ latex' $ trim x
        Nothing -> notFound f
 
-getTitle :: String -> Bib Formatted
+getTitle :: Text -> Bib Formatted
 getTitle f = do
   fs <- asks fields
   case Map.lookup f fs of
        Just x  -> latexTitle x
        Nothing -> notFound f
 
-getShortTitle :: Bool -> String -> Bib Formatted
+getShortTitle :: Bool -> Text -> Bib Formatted
 getShortTitle requireColon f = do
   fs <- asks fields
   utc <- gets untitlecase
@@ -935,39 +938,44 @@ upToColon [Para  xs] = [Para $ takeWhile (/= Str ":") xs]
 upToColon [Plain xs] = upToColon [Para xs]
 upToColon bs         = bs
 
-getDates :: String -> Bib [RefDate]
+getDates :: Text -> Bib [RefDate]
 getDates f = parseEDTFDate <$> getRawField f
 
-isNumber :: String -> Bool
-isNumber ('-':d:ds) = all isDigit (d:ds)
-isNumber (d:ds)     = all isDigit (d:ds)
-isNumber _          = False
+isNumber :: Text -> Bool
+isNumber t = case T.uncons t of
+  Just ('-', ds) -> T.all isDigit ds
+  Just _         -> T.all isDigit t
+  Nothing        -> False
 
 -- A negative (BC) year might be written with -- or --- in bibtex:
-fixLeadingDash :: String -> String
-fixLeadingDash (c:d:ds)
-  | (c == '–' || c == '—') && isDigit d = '-':d:ds
-fixLeadingDash xs = xs
+fixLeadingDash :: Text -> Text
+fixLeadingDash t = case T.uncons t of
+  Just (c, ds) | (c == '–' || c == '—') && firstIsDigit ds -> T.cons '–' ds
+  _ -> t
+ where firstIsDigit = maybe False (isDigit . fst) . T.uncons
 
-getOldDates :: String -> Bib [RefDate]
+getOldDates :: Text -> Bib [RefDate]
 getOldDates prefix = do
-  year' <- fixLeadingDash <$> getRawField (prefix ++ "year") <|> return ""
-  month' <- (parseMonth
-              <$> getRawField (prefix ++ "month")) <|> return Nothing
-  day' <- (safeRead . T.pack <$> getRawField (prefix ++ "day")) <|> return Nothing
-  endyear' <- (fixLeadingDash <$> getRawField (prefix ++ "endyear"))
-            <|> return ""
-  endmonth' <- (parseMonth <$> getRawField (prefix ++ "endmonth"))
+  year' <- fixLeadingDash <$> getRawField (prefix <> "year")
+           <|> return ""
+  month' <- (parseMonth <$> getRawField (prefix <> "month"))
             <|> return Nothing
-  endday' <- (safeRead . T.pack <$> getRawField (prefix ++ "endday")) <|> return Nothing
-  let start' = RefDate { year   = safeRead $ T.pack year'
+  day' <- (safeRead <$> getRawField (prefix <> "day"))
+          <|> return Nothing
+  endyear' <- (fixLeadingDash <$> getRawField (prefix <> "endyear"))
+            <|> return ""
+  endmonth' <- (parseMonth <$> getRawField (prefix <> "endmonth"))
+            <|> return Nothing
+  endday' <- (safeRead <$> getRawField (prefix <> "endday"))
+             <|> return Nothing
+  let start' = RefDate { year   = safeRead year'
                        , month  = month'
                        , season = Nothing
                        , day    = day'
                        , other  = Literal $ if isNumber year' then "" else year'
                        , circa  = False
                        }
-  let end' = RefDate { year     = safeRead $ T.pack endyear'
+  let end' = RefDate { year     = safeRead endyear'
                        , month  = endmonth'
                        , day    = endday'
                        , season = Nothing
@@ -977,21 +985,21 @@ getOldDates prefix = do
   let hasyear r = isJust (year r)
   return $ filter hasyear [start', end']
 
-getRawField :: String -> Bib String
+getRawField :: Text -> Bib Text
 getRawField f = do
   fs <- asks fields
   case Map.lookup f fs of
        Just x  -> return x
        Nothing -> notFound f
 
-getAuthorList :: Options -> String -> Bib [Agent]
+getAuthorList :: Options -> Text -> Bib [Agent]
 getAuthorList opts  f = do
   fs <- asks fields
   case Map.lookup f fs of
        Just x  -> latexAuthors opts x
        Nothing -> notFound f
 
-getLiteralList :: String -> Bib [Formatted]
+getLiteralList :: Text -> Bib [Formatted]
 getLiteralList f = do
   fs <- asks fields
   case Map.lookup f fs of
@@ -999,8 +1007,8 @@ getLiteralList f = do
        Nothing -> notFound f
 
 -- separates items with semicolons
-getLiteralList' :: String -> Bib Formatted
-getLiteralList' f = (Formatted . intercalate [Str ";", Space] . map unFormatted)
+getLiteralList' :: Text -> Bib Formatted
+getLiteralList' f = Formatted . intercalate [Str ";", Space] . map unFormatted
   <$> getLiteralList f
 
 splitByAnd :: [Inline] -> [[Inline]]
@@ -1044,8 +1052,8 @@ toAuthor _ [Span ("",[],[]) ils] =
           }
  -- extended BibLaTeX name format - see #266
 toAuthor _ ils@(Str ys:_) | T.any (== '=') ys = do
-  let commaParts = splitWhen (== Str ",")
-                   $ splitStrWhen (\c -> c == ',' || c == '=' || c == '\160')
+  let commaParts = Data.List.Split.splitWhen (== Str ",")
+                   . splitStrWhen (\c -> c == ',' || c == '=' || c == '\160')
                    $ ils
   let addPart ag (Str "given" : Str "=" : xs) =
         ag{ givenName = givenName ag ++ [Formatted xs] }
@@ -1075,7 +1083,7 @@ toAuthor opts ils = do
   let usecomma  = optionSet "juniorcomma" opts
   let bibtex    = optionSet "bibtex" opts
   let words' = wordsBy (\x -> x == Space || x == Str "\160")
-  let commaParts = map words' $ splitWhen (== Str ",")
+  let commaParts = map words' $ Data.List.Split.splitWhen (== Str ",")
                               $ splitStrWhen (\c -> c == ',' || c == '\160') ils
   let (first, vonlast, jr) =
           case commaParts of
@@ -1124,13 +1132,13 @@ isCapitalized (Str (T.uncons -> Just (c,cs)) : rest)
 isCapitalized (_:rest) = isCapitalized rest
 isCapitalized [] = True
 
-optionSet :: String -> Options -> Bool
+optionSet :: Text -> Options -> Bool
 optionSet key opts = case lookup key opts of
                       Just "true" -> True
                       Just s      -> s == mempty
                       _           -> False
 
-latex' :: String -> [Block]
+latex' :: Text -> [Block]
 latex' s = Walk.walk removeSoftBreak bs
   where Pandoc _ bs = readLaTeX s
 
@@ -1138,22 +1146,22 @@ removeSoftBreak :: Inline -> Inline
 removeSoftBreak SoftBreak = Space
 removeSoftBreak x         = x
 
-latex :: String -> Bib Formatted
+latex :: Text -> Bib Formatted
 latex s = blocksToFormatted $ latex' $ trim s
 
-latexTitle :: String -> Bib Formatted
+latexTitle :: Text -> Bib Formatted
 latexTitle s = do
   utc <- gets untitlecase
   let processTitle = if utc then onBlocks unTitlecase else id
   blocksToFormatted $ processTitle $ latex' s
 
-latexAuthors :: Options -> String -> Bib [Agent]
+latexAuthors :: Options -> Text -> Bib [Agent]
 latexAuthors opts = toAuthorList opts . latex' . trim
 
 bib :: Bib Reference -> Item -> Maybe Reference
 bib m entry = fst Control.Applicative.<$> evalRWST m entry (BibState True (Lang "en" "US"))
 
-toLocale :: String -> String
+toLocale :: Text -> Text
 toLocale "english"         = "en-US" -- "en-EN" unavailable in CSL
 toLocale "usenglish"       = "en-US"
 toLocale "american"        = "en-US"
@@ -1227,22 +1235,23 @@ concatWith sep = Formatted . foldl' go mempty . map unFormatted
                                           -> accum ++ (Space : s)
                            _     -> accum ++ (Str (T.singleton sep) : Space : s)
 
-type Options = [(String, String)]
+type Options = [(Text, Text)]
 
-parseOptions :: String -> Options
-parseOptions = map breakOpt . splitWhen (==',')
-  where breakOpt x = case break (=='=') x of
-                          (w,v) -> (map toLower $ trim w,
-                                    map toLower $ trim $ drop 1 v)
+parseOptions :: Text -> Options
+parseOptions = map breakOpt . T.splitOn ","
+  where breakOpt x = case T.break (=='=') x of
+                          (w,v) -> (T.toLower $ trim w,
+                                    T.toLower $ trim $ T.drop 1 v)
 
-ordinalize :: Locale -> String -> String
+ordinalize :: Locale -> Text -> Text
 ordinalize locale n =
-  case [termSingular c | c <- terms, cslTerm c == ("ordinal-" ++ pad0 n)] ++
+  case [termSingular c | c <- terms, cslTerm c == ("ordinal-" <> pad0 n)] ++
        [termSingular c | c <- terms, cslTerm c == "ordinal"] of
-       (suff:_) -> n ++ suff
+       (suff:_) -> n <> suff
        []       -> n
-    where pad0 [c] = ['0',c]
-          pad0 s   = s
+    where pad0 s = case T.uncons s of
+            Just (c,"") -> T.pack ['0', c]
+            _           -> s
           terms = localeTerms locale
 
 itemToReference :: Lang -> Locale -> Bool -> Bool -> Item -> Maybe Reference
@@ -1252,13 +1261,13 @@ itemToReference lang locale bibtex caseTransform = bib $ do
                                          Lang "en" _ -> caseTransform
                                          _           -> False }
   id' <- asks identifier
-  otherIds <- (map trim . splitWhen (==',') <$> getRawField "ids")
+  otherIds <- (map trim . T.splitOn "," <$> getRawField "ids")
                 <|> return []
   et <- asks entryType
   guard $ et /= "xdata"
   opts <- (parseOptions <$> getRawField "options") <|> return []
   let getAuthorList' = getAuthorList
-         (("bibtex", map toLower $ show bibtex):opts)
+         (("bibtex", T.toLower . T.pack $ show bibtex):opts)
   st <- getRawField "entrysubtype" <|> return mempty
   isEvent <- (True <$ (getRawField "eventdate"
                      <|> getRawField "eventtitle"
@@ -1281,7 +1290,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
        "inproceedings"   -> (PaperConference,mempty)
        "manual"          -> (Book,mempty)
        "mastersthesis"   -> (Thesis, if reftype' == mempty
-                                        then Formatted [Str $ T.pack $ resolveKey' lang "mathesis"]
+                                        then Formatted [Str $ resolveKey' lang "mathesis"]
                                         else reftype')
        "misc"            -> (NoType,mempty)
        "mvbook"          -> (Book,mempty)
@@ -1295,7 +1304,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
          | st == "newspaper" -> (ArticleNewspaper,mempty)
          | otherwise         -> (ArticleJournal,mempty)
        "phdthesis"       -> (Thesis, if reftype' == mempty
-                                        then Formatted [Str $ T.pack $ resolveKey' lang "phdthesis"]
+                                        then Formatted [Str $ resolveKey' lang "phdthesis"]
                                         else reftype')
        "proceedings"     -> (Book,mempty)
        "reference"       -> (Book,mempty)
@@ -1334,10 +1343,10 @@ itemToReference lang locale bibtex caseTransform = bib $ do
 
   -- hyphenation:
   let defaultHyphenation = case lang of
-                                Lang x y -> x ++ "-" ++ y
+                                Lang x y -> x <> "-" <> y
   let getLangId = do
-           langid <- (trim . map toLower) <$> getRawField "langid"
-           idopts <- (trim . map toLower) <$>
+           langid <- trim . T.toLower <$> getRawField "langid"
+           idopts <- trim . T.toLower <$>
                          getRawField "langidopts" <|> return ""
            case (langid, idopts) of
                 ("english","variant=british")    -> return "british"
@@ -1348,7 +1357,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
                 ("english","variant=australian") -> return "australian"
                 ("english","variant=newzealand") -> return "newzealand"
                 (x,_)                            -> return x
-  hyphenation <- ((toLocale . map toLower) <$>
+  hyphenation <- (toLocale . T.toLower <$>
                    (getLangId <|> getRawField "hyphenation"))
                 <|> return mempty
 
@@ -1370,10 +1379,10 @@ itemToReference lang locale bibtex caseTransform = bib $ do
   let isChapterlike = et `elem`
          ["inbook","incollection","inproceedings","inreference","bookinbook"]
   hasMaintitle <- (True <$ getRawField "maintitle") <|> return False
-  let hyphenation' = if null hyphenation
+  let hyphenation' = if T.null hyphenation
                      then defaultHyphenation
                      else hyphenation
-  let la = case splitWhen (== '-') hyphenation' of
+  let la = case T.splitOn "-" hyphenation' of
                       (x:_) -> x
                       []    -> mempty
   modify $ \s -> s{ untitlecase = caseTransform && la == "en" }
@@ -1419,10 +1428,10 @@ itemToReference lang locale bibtex caseTransform = bib $ do
                         <|> return mempty
   -- change numerical series title to e.g. 'series 3'
   let fixSeriesTitle (Formatted [Str xs]) | T.all isDigit xs =
-         Formatted [Str (T.pack $ ordinalize locale $ T.unpack xs),
-                    Space, Str (T.pack $ resolveKey' lang "ser.")]
+         Formatted [Str (ordinalize locale xs),
+                    Space, Str (resolveKey' lang "ser.")]
       fixSeriesTitle x = x
-  seriesTitle' <- (fixSeriesTitle . resolveKey lang) <$>
+  seriesTitle' <- fixSeriesTitle . resolveKey lang <$>
                       getTitle "series" <|> return mempty
   shortTitle' <- (guard (not hasMaintitle || isChapterlike) >>
                         getTitle "shorttitle")
@@ -1458,7 +1467,7 @@ itemToReference lang locale bibtex caseTransform = bib $ do
                     else getLiteralList' "origlocation")
                   <|> return mempty
   jurisdiction' <- if et == "patent"
-                   then ((concatWith ';' . map (resolveKey lang)) <$>
+                   then (concatWith ';' . map (resolveKey lang) <$>
                            getLiteralList "location") <|> return mempty
                    else return mempty
 
@@ -1500,15 +1509,15 @@ itemToReference lang locale bibtex caseTransform = bib $ do
        <|> (do etype <- getRawField "eprinttype"
                eprint <- getRawField "eprint"
                let baseUrl =
-                     case map toLower etype of
+                     case T.toLower etype of
                        "arxiv"       -> "http://arxiv.org/abs/"
                        "jstor"       -> "http://www.jstor.org/stable/"
                        "pubmed"      -> "http://www.ncbi.nlm.nih.gov/pubmed/"
                        "googlebooks" -> "http://books.google.com?id="
                        _             -> ""
-               if null baseUrl
+               if T.null baseUrl
                   then mzero
-                  else return $ baseUrl ++ eprint)
+                  else return $ baseUrl <> eprint)
        <|> return mempty
   doi' <- (guard (lookup "doi" opts /= Just "false") >> getRawField "doi")
          <|> return mempty

@@ -32,6 +32,7 @@ module Text.CSL.Util
   , titlecase
   , unTitlecase
   , protectCase
+  , splitWhen
   , splitStrWhen
   , proc
   , proc'
@@ -90,32 +91,36 @@ tr' :: String -> a -> a
 tr' _ x = x
 #endif
 
-readNum :: String -> Int
-readNum s = case reads s of
+readNum :: Text -> Int
+readNum s = case reads (T.unpack s) of
               [(x,"")] -> x
               _        -> 0
 
 -- | Conjoin strings, avoiding repeated punctuation.
-(<^>) :: String -> String -> String
-[] <^> sb         = sb
-sa <^> []         = sa
-sa <^> (s:xs)
-  | s `elem` puncts && last sa `elem` puncts = sa ++ xs
-  where puncts = ";:,. " :: String
-sa <^> sb         = sa ++ sb
+(<^>) :: Text -> Text -> Text
+"" <^> sb = sb
+sa <^> "" = sa
+sa <^> sb = case (,) <$> T.unsnoc sa <*> T.uncons sb of
+  Just ((_,la), (c,xs)) | isPunct' la && isPunct' c -> sa <> xs
+  _ -> sa <> sb
+ where isPunct' = (`elem` (";:,. " :: String))
 
-capitalize :: String -> String
-capitalize []     = []
-capitalize (c:cs) = toUpper c : cs
+capitalize :: Text -> Text
+capitalize t = case T.uncons t of
+  Nothing      -> ""
+  Just (c, cs) -> T.cons (toUpper c) cs
 
 isPunct :: Char -> Bool
 isPunct c = c `elem` (".;?!" :: String)
 
-camelize :: String -> String
-camelize ('-':y:ys) = toUpper y : camelize ys
-camelize ('_':y:ys) = toUpper y : camelize ys
-camelize     (y:ys) =         y : camelize ys
-camelize      _     = []
+camelize :: Text -> String
+camelize =
+  let camelize' t = case t of
+        ('-':y:ys) -> toUpper y : camelize' ys
+        ('_':y:ys) -> toUpper y : camelize' ys
+        (y:ys)     ->         y : camelize' ys
+        _          -> []
+  in camelize' . T.unpack
 
 uncamelize :: String -> String
 uncamelize = foldr g [] . f
@@ -136,14 +141,17 @@ words' :: String -> [String]
 words' = wordsBy (\c -> c == ' ' || c == '\t' || c == '\r' || c == '\n')
 
 -- | Remove leading and trailing space (including newlines) from string.
-trim :: String -> String
-trim = triml . trimr
+trim :: Text -> Text
+trim = T.dropAround isSpaceOrNewline
 
-triml :: String -> String
-triml = dropWhile (`elem` (" \r\n\t" :: String))
+triml :: Text -> Text
+triml = T.dropWhile isSpaceOrNewline
 
-trimr :: String -> String
-trimr = reverse . triml . reverse
+trimr :: Text -> Text
+trimr = T.dropWhileEnd isSpaceOrNewline
+
+isSpaceOrNewline :: Char -> Bool
+isSpaceOrNewline c = c `elem` (" \r\n\t" :: String)
 
 -- | Parse JSON Boolean or Number as Bool.
 parseBool :: Value -> Parser Bool
@@ -155,14 +163,14 @@ parseBool (Number n) = case fromJSON (Number n) of
 parseBool _          = Prelude.fail "Could not read boolean"
 
 -- | Parse JSON value as String.
-parseString :: Value -> Parser String
-parseString (String s) = return $ T.unpack s
+parseString :: Value -> Parser Text
+parseString (String s) = return s
 parseString (Number n) = case fromJSON (Number n) of
-                            Success (x :: Int) -> return $ show x
+                            Success (x :: Int) -> return . T.pack $ show x
                             Error _ -> case fromJSON (Number n) of
-                                            Success (x :: Double) -> return $ show x
-                                            Error e -> Prelude.fail $ "Could not read string: " ++ e
-parseString (Bool b)   = return $ map toLower $ show b
+                              Success (x :: Double) -> return . T.pack $ show x
+                              Error e -> Prelude.fail $ "Could not read string: " ++ e
+parseString (Bool b)   = return . T.toLower . T.pack $ show b
 parseString v@(Array _)= inlinesToString `fmap` parseJSON v
 parseString v          = Prelude.fail $ "Could not read as string: " ++ show v
 
@@ -172,7 +180,7 @@ parseInt (Number n) = case fromJSON (Number n) of
                             Success (x :: Int) -> return x
                             Error e -> Prelude.fail $ "Could not read Int: " ++ e
 parseInt x = parseString x >>= \s ->
-              case safeRead (T.pack s) of
+              case safeRead s of
                    Just n  -> return n
                    Nothing -> Prelude.fail "Could not read Int"
 
@@ -184,9 +192,9 @@ parseMaybeInt (Just (Number n)) = case fromJSON (Number n) of
                                        Error e -> Prelude.fail $ "Could not read Int: " ++ e
 parseMaybeInt (Just x) =
   parseString x >>= \s ->
-                   if null s
+                   if T.null s
                       then return Nothing
-                      else case safeRead (T.pack s) of
+                      else case safeRead s of
                                 Just n  -> return (Just n)
                                 Nothing -> Prelude.fail $ "Could not read as Int: " ++ show s
 
@@ -194,10 +202,10 @@ mb :: Monad m => (b -> m a) -> (Maybe b -> m (Maybe a))
 mb  = Data.Traversable.mapM
 
 -- | Parse as a string (even if the value is a number).
-(.#?) :: Object -> Text -> Parser (Maybe String)
+(.#?) :: Object -> Text -> Parser (Maybe Text)
 x .#? y = (x .:? y) >>= mb parseString
 
-(.#:) :: Object -> Text -> Parser String
+(.#:) :: Object -> Text -> Parser Text
 x .#: y = (x .: y) >>= parseString
 
 onBlocks :: ([Inline] -> [Inline]) -> [Block] -> [Block]
@@ -355,6 +363,9 @@ caseTransform xform = fmap reverse . foldM go [] . splitUpStr
         go acc (Span attr xs)    = (:acc) <$> (Span attr <$> caseTransform xform xs)
         go acc x                 = return $ x : acc
 
+splitWhen :: (Char -> Bool) -> Text -> [Text]
+splitWhen f = filter (not . T.null) . T.split f
+
 splitStrWhen :: (Char -> Bool) -> [Inline] -> [Inline]
 splitStrWhen _ [] = []
 splitStrWhen p (Str xs : ys) = go (T.unpack xs) ++ splitStrWhen p ys
@@ -362,8 +373,8 @@ splitStrWhen p (Str xs : ys) = go (T.unpack xs) ++ splitStrWhen p ys
         go s = case break p s of
                      ([],[])     -> []
                      (zs,[])     -> [Str $ T.pack zs]
-                     ([],(w:ws)) -> Str (T.singleton w) : go ws
-                     (zs,(w:ws)) -> Str (T.pack zs) : Str (T.singleton w) : go ws
+                     ([],w:ws) -> Str (T.singleton w) : go ws
+                     (zs,w:ws) -> Str (T.pack zs) : Str (T.singleton w) : go ws
 splitStrWhen p (x : ys) = x : splitStrWhen p ys
 
 -- | A generic processing function.
@@ -387,9 +398,10 @@ orIfNull :: [a] -> [a] -> [a]
 orIfNull [] b = b
 orIfNull a  _ = a
 
-toRead :: String -> String
-toRead    []  = []
-toRead (s:ss) = toUpper s : camel ss
+toRead :: Text -> Text
+toRead t = case T.uncons t of
+  Nothing     -> ""
+  Just (s,ss) -> T.cons (toUpper s) . T.pack . camel . T.unpack $ ss
     where
       camel x
           | '-':y:ys <- x = toUpper y : camel ys
@@ -397,16 +409,14 @@ toRead (s:ss) = toUpper s : camel ss
           |     y:ys <- x =         y : camel ys
           | otherwise     = []
 
-inlinesToString :: [Inline] -> String
-inlinesToString = T.unpack . stringify
+inlinesToString :: [Inline] -> Text
+inlinesToString = stringify
 
-headInline :: [Inline] -> String
-headInline = take 1 . T.unpack . stringify
+headInline :: [Inline] -> Maybe Char
+headInline = fmap fst . T.uncons . stringify
 
-lastInline :: [Inline] -> String
-lastInline xs = case T.unpack $ stringify xs of
-                      [] -> []
-                      ys -> [last ys]
+lastInline :: [Inline] -> Maybe Char
+lastInline = fmap snd . T.unsnoc . stringify
 
 initInline :: [Inline] -> [Inline]
 initInline [] = []
@@ -431,19 +441,19 @@ tailInline (SoftBreak:xs) = xs
 tailInline xs             = tailFirstInlineStr xs
 
 tailFirstInlineStr :: [Inline] -> [Inline]
-tailFirstInlineStr = mapHeadInline (drop 1)
+tailFirstInlineStr = mapHeadInline (T.drop 1)
 
 toCapital :: [Inline] -> [Inline]
 toCapital ils@(Span (_,["nocase"],_) _:_) = ils
 toCapital ils                             = mapHeadInline capitalize ils
 
-mapHeadInline :: (String -> String) -> [Inline] -> [Inline]
+mapHeadInline :: (Text -> Text) -> [Inline] -> [Inline]
 mapHeadInline _ [] = []
 mapHeadInline f (i:xs)
     | Str         "" <- i =                      mapHeadInline f xs
-    | Str          s <- i = case f (T.unpack s) of
+    | Str          s <- i = case f s of
                               "" -> xs
-                              _  -> Str (T.pack $ f $ T.unpack s) : xs
+                              t  -> Str t : xs
     | Emph        is <- i = Emph        (mapHeadInline f is)      : xs
     | Strong      is <- i = Strong      (mapHeadInline f is)      : xs
     | Superscript is <- i = Superscript (mapHeadInline f is)      : xs
@@ -534,8 +544,8 @@ pRomanNumeral = do
        then Prelude.fail "not a roman numeral"
        else return total
 
-isRange :: String -> Bool
-isRange s = ',' `elem` s || '-' `elem` s || '\x2013' `elem` s
+isRange :: Text -> Bool
+isRange = T.any (`elem` [',', '-', '\x2013'])
 
 -- see issue 392 for motivation.  We want to treat
 -- "J.G. Smith" and "J. G. Smith" the same.

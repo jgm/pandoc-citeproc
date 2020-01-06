@@ -29,7 +29,9 @@ module Text.CSL.Output.Pandoc
     ) where
 
 import Prelude
+import           Data.List              (dropWhileEnd)
 import           Data.Maybe             (fromMaybe)
+import           Data.Text              (Text)
 import qualified Data.Text              as T
 import           Text.CSL.Style
 import           Text.CSL.Util          (headInline, initInline, lastInline,
@@ -45,11 +47,10 @@ renderPandoc sty
 
 -- remove leading/trailing LineBreak
 fixBreaks :: [Inline] -> [Inline]
-fixBreaks =
-  dropWhile (== LineBreak) . reverse . dropWhile (== LineBreak) . reverse
+fixBreaks = dropWhile (== LineBreak) . dropWhileEnd (== LineBreak)
 
-renderPandoc' :: Style -> (Formatted, String) -> Block
-renderPandoc' sty (form, citId) = Div (T.pack $ "ref-" <> citId, [], []) [Para $ renderPandoc sty form]
+renderPandoc' :: Style -> (Formatted, Text) -> Block
+renderPandoc' sty (form, citId) = Div ("ref-" <> citId, [], []) [Para $ renderPandoc sty form]
 
 clean' :: Style -> [Inline] -> [Inline]
 clean' _   []  = []
@@ -65,14 +66,14 @@ clean' sty (i:is) =
       (Span ("",["csl-inquote"],kvs) inls : _) ->
          let isOuter = lookup "position" kvs == Just "outer"
          in  case headInline is of
-                    [x] -> if x `elem` (".," :: String) && isPunctuationInQuote sty
-                           then if lastInline inls `elem` [".",",",";",":","!","?"]
-                                then quoted isOuter inls ++
+               Just x -> if x `elem` (".," :: String) && isPunctuationInQuote sty
+                         then if lastInline inls `elem` map Just ".,;:!?"
+                              then quoted isOuter inls ++
+                                   clean' sty (tailInline is)
+                              else quoted isOuter (inls ++ [Str (T.singleton x)]) ++
                                      clean' sty (tailInline is)
-                                else quoted isOuter (inls ++ [Str (T.singleton x)]) ++
-                                     clean' sty (tailInline is)
-                           else quoted isOuter inls ++ clean' sty is
-                    _   ->      quoted isOuter inls ++ clean' sty is
+                         else quoted isOuter inls ++ clean' sty is
+               _      ->      quoted isOuter inls ++ clean' sty is
       (Quoted t inls : _) -> quoted (t == DoubleQuote) inls ++ clean' sty is
       _      -> if lastInline [i] == headInline is && isPunct
                    then i : clean' sty (tailInline is)
@@ -81,9 +82,9 @@ clean' sty (i:is) =
       isPunct = all (`elem` (".,;:!? " :: String)) $ headInline is
       locale  = case styleLocale sty of
                      (x:_) -> x
-                     []    -> Locale [] [] [] [] [] -- should not happen
+                     []    -> Locale "" "" [] [] [] -- should not happen
       getQuote s d     = case [term | term <- localeTerms locale, cslTerm term == s] of
-                               (x:_) -> Str $ T.pack $ termSingular x
+                               (x:_) -> Str $ termSingular x
                                _     -> Str d
       openQuoteOuter   = getQuote "open-quote" "“"
       openQuoteInner   = getQuote "open-inner-quote" "‘"
@@ -95,8 +96,8 @@ clean' sty (i:is) =
 convertQuoted :: Style -> [Inline] -> [Inline]
 convertQuoted s = convertQuoted'
     where
-      locale = let l = styleLocale s in case l of [x] -> x; _   -> Locale [] [] [] [] []
-      getQuote  x y = fromEntities . T.pack . termSingular . fromMaybe newTerm {termSingular = x} .
+      locale = let l = styleLocale s in case l of [x] -> x; _   -> Locale "" "" [] [] []
+      getQuote  x y = fromEntities . termSingular . fromMaybe newTerm {termSingular = x} .
                       findTerm y Long . localeTerms $ locale
       doubleQuotesO = getQuote "\"" "open-quote"
       doubleQuotesC = getQuote "\"" "close-quote"

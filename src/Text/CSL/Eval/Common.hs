@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternGuards #-}
 #if MIN_VERSION_base(4,9,0)
 {-# OPTIONS_GHC -fno-warn-redundant-constraints #-}
@@ -26,6 +27,7 @@ import           Data.Char           (toLower)
 import           Data.List           (elemIndex)
 import qualified Data.Map            as M
 import           Data.Maybe
+import           Data.Text           (Text)
 import qualified Data.Text           as T
 
 import           Text.CSL.Reference
@@ -38,12 +40,12 @@ data EvalState
     = EvalState
       { ref      :: ReferenceMap
       , env      :: Environment
-      , debug    :: [String]
+      , debug    :: [Text]
       , mode     :: EvalMode
       , disamb   :: Bool
       , consume  :: Bool
-      , authSub  :: [String]
-      , consumed :: [String]
+      , authSub  :: [Text]
+      , consumed :: [Text]
       , edtrans  :: Bool
       , etal     :: [[Output]]
       , contNum  :: [Agent]
@@ -72,35 +74,35 @@ isSorting m = case m of EvalSorting _ -> True; _ -> False
 
 -- | With the variable name and the variable value search for an
 -- abbreviation or return an empty string.
-getAbbreviation :: Abbreviations -> String -> String -> String
+getAbbreviation :: Abbreviations -> Text -> Text -> Text
 getAbbreviation (Abbreviations as) s v
-    = maybe [] id $ M.lookup "default" as >>=
-                    M.lookup (if s `elem` numericVars then "number" else s) >>=
-                    M.lookup v
+    = fromMaybe "" $ M.lookup "default" as >>=
+                     M.lookup (if s `elem` numericVars then "number" else s) >>=
+                     M.lookup v
 
 -- | If the first parameter is 'True' the plural form will be retrieved.
-getTerm :: Bool -> Form -> String -> State EvalState String
-getTerm b f s = maybe [] g . findTerm s f' <$> gets (terms  . env) -- FIXME: vedere i fallback
+getTerm :: Bool -> Form -> Text -> State EvalState Text
+getTerm b f s = maybe "" g . findTerm s f' <$> gets (terms  . env) -- FIXME: vedere i fallback
     where g  = if b then termPlural else termSingular
           f' = case f of NotSet -> Long; _ -> f
 
-getStringVar :: String -> State EvalState String
+getStringVar :: Text -> State EvalState Text
 getStringVar
-    = getVar [] getStringValue
+    = getVar "" getStringValue
 
-getDateVar :: String -> State EvalState [RefDate]
+getDateVar :: Text -> State EvalState [RefDate]
 getDateVar
     = getVar [] getDateValue
     where getDateValue = maybe [] id . fromValue
 
-getLocVar :: State EvalState (String,String)
+getLocVar :: State EvalState (Text,Text)
 getLocVar = gets (env >>> cite >>> citeLabel &&& citeLocator)
 
-getVar :: a -> (Value -> a) -> String -> State EvalState a
+getVar :: a -> (Value -> a) -> Text -> State EvalState a
 getVar a f s
     = withRefMap $ maybe a f . lookup (formatVariable s)
 
-getAgents :: String -> State EvalState [Agent]
+getAgents :: Text -> State EvalState [Agent]
 getAgents s
     = do
       mv <- withRefMap (lookup s)
@@ -110,7 +112,7 @@ getAgents s
                     _      -> return []
         _      -> return []
 
-getAgents' :: String -> State EvalState [Agent]
+getAgents' :: Text -> State EvalState [Agent]
 getAgents' s
     = do
       mv <- withRefMap (lookup s)
@@ -120,42 +122,43 @@ getAgents' s
                     _      -> return []
         _      -> return []
 
-getStringValue :: Value -> String
+getStringValue :: Value -> Text
 getStringValue val =
   -- The second clause handles the case where we have a Formatted
   -- but need a String.  This is currently needed for "page".  It's a bit
   -- hackish; we should probably change the type in Reference for
   -- page to String.
-  case fromValue val `mplus` ((T.unpack . stringify . unFormatted) `fmap` fromValue val)
+  case fromValue val `mplus` ((stringify . unFormatted) `fmap` fromValue val)
        `mplus` (unLiteral `fmap` fromValue val) of
        Just v   -> v
        Nothing  -> Debug.Trace.trace ("Expecting string value, got " ++
-                       show val) []
+                       show val) T.empty
 
-getOptionVal :: String -> [Option] -> String
-getOptionVal s = fromMaybe [] . lookup s
+getOptionVal :: Text -> [Option] -> Text
+getOptionVal s = fromMaybe "" . lookup s
 
-getOptionValWithDefault :: String -> String -> [Option] -> String
+getOptionValWithDefault :: Text -> Text -> [Option] -> Text
 getOptionValWithDefault s defvalue = fromMaybe defvalue . lookup s
 
-isOptionSet :: String -> [Option] -> Bool
-isOptionSet s = maybe False (not . null) . lookup s
+isOptionSet :: Text -> [Option] -> Bool
+isOptionSet s = maybe False (not . T.null) . lookup s
 
-isTitleVar, isTitleShortVar :: String -> Bool
+isTitleVar, isTitleShortVar :: Text -> Bool
 isTitleVar         = flip elem ["title", "container-title", "collection-title"]
 isTitleShortVar    = flip elem ["title-short", "container-title-short"]
 
-getTitleShort :: String -> State EvalState String
-getTitleShort s = do let s' = take (length s - 6) s  -- drop '-short'
+getTitleShort :: Text -> State EvalState Text
+getTitleShort s = do let s' = T.dropEnd 6 s  -- drop '-short'
                      v <- getStringVar s'
                      abbrs <- gets (abbrevs . env)
                      return $ getAbbreviation abbrs s' v
 
-isVarSet :: String -> State EvalState Bool
+isVarSet :: Text -> State EvalState Bool
 isVarSet s
     | isTitleShortVar s = do r <- getVar False isValueSet s
-                             if r then return r
-                                  else return . not . null =<< getTitleShort s
+                             if r
+                               then return r
+                               else fmap (not . T.null) (getTitleShort s)
     | otherwise = if s /= "locator"
                   then getVar False isValueSet s
                   else getLocVar >>= return . (/=) "" . snd
@@ -164,11 +167,11 @@ withRefMap :: (ReferenceMap -> a) -> State EvalState a
 withRefMap f = return . f =<< gets ref
 
 -- | Convert variable to lower case, translating underscores ("_") to dashes ("-")
-formatVariable :: String -> String
-formatVariable = foldr f []
-    where f x xs = if x == '_' then '-' : xs else toLower x : xs
+formatVariable :: Text -> Text
+formatVariable = T.foldr f T.empty
+    where f x xs = if x == '_' then '-' `T.cons` xs else toLower x `T.cons` xs
 
-consumeVariable :: String -> State EvalState ()
+consumeVariable :: Text -> State EvalState ()
 consumeVariable s
     = do b <- gets consume
          when b $ modify $ \st -> st { consumed = s : consumed st }

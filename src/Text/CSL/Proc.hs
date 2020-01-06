@@ -25,10 +25,11 @@ import           Control.Applicative    ((<|>))
 import           Control.Arrow          (second, (&&&), (>>>))
 import           Control.Monad.State    (execState, modify)
 import           Data.Aeson
-import           Data.Char              (isDigit, isLetter, toLower)
+import           Data.Char              (isDigit, isLetter)
 import           Data.List
 import           Data.Maybe             (mapMaybe)
 import           Data.Ord               (comparing)
+import           Data.Text              (Text)
 import qualified Data.Text              as T
 import           Text.CSL.Eval
 import           Text.CSL.Proc.Collapse
@@ -46,13 +47,13 @@ data ProcOpts
     deriving ( Show, Read, Eq )
 
 data BibOpts
-    = Select  [(String, String)] [(String, String)]
-    | Include [(String, String)] [(String, String)]
-    | Exclude [(String, String)] [(String, String)]
+    = Select  [(Text, Text)] [(Text, Text)]
+    | Include [(Text, Text)] [(Text, Text)]
+    | Exclude [(Text, Text)] [(Text, Text)]
     deriving ( Show, Read, Eq )
 
 newtype FieldVal = FieldVal{
-                      unFieldVal :: (String, String)
+                      unFieldVal :: (Text, Text)
                     } deriving Show
 
 instance FromJSON FieldVal where
@@ -125,15 +126,15 @@ citeproc ops s rs cs
       addLink :: (Cite, Output) -> (Cite, Output)
       addLink (cit, outp) = (cit, proc (addLink' (citeId cit)) outp)
       addLink' citeid (OYear y _ f) =
-         OYear y citeid f{hyperlink = "#ref-" ++ citeid}
+         OYear y citeid f{hyperlink = "#ref-" <> citeid}
       addLink' citeid (OYearSuf y _ d f) =
-         OYearSuf y citeid d f{hyperlink = "#ref-" ++ citeid}
+         OYearSuf y citeid d f{hyperlink = "#ref-" <> citeid}
       addLink' citeid (OCitNum n f) =
-         OCitNum n f{hyperlink = "#ref-" ++ citeid}
+         OCitNum n f{hyperlink = "#ref-" <> citeid}
       addLink' citeid (OCitLabel l f) =
-         OCitLabel l f{hyperlink = "#ref-" ++ citeid}
+         OCitLabel l f{hyperlink = "#ref-" <> citeid}
       addLink' citeid (Output xs@(OStr _ _: _) f) =
-         Output xs f{hyperlink = "#ref-" ++ citeid}
+         Output xs f{hyperlink = "#ref-" <> citeid}
       addLink' _ x = x
 
 -- | Given the CSL 'Style' and the list of 'Reference's sort the list
@@ -190,13 +191,13 @@ procBiblio bos Style {biblio = mb, csMacros = ms , styleLocale = l,
       evalBib b = evalLayout (bibLayout b) (EvalBiblio emptyCite {citePosition = "first"}) False l ms (mergeOptions (bibOptions b) opts) as . Just
 
 subsequentAuthorSubstitute :: Bibliography -> [[Output]] -> [[Output]]
-subsequentAuthorSubstitute b = if null subAuthStr then id else chkCreator
+subsequentAuthorSubstitute b = if T.null subAuthStr then id else chkCreator
     where
       subAuthStr  = getOptionVal "subsequent-author-substitute"      (bibOptions b)
       subAuthRule = getOptionVal "subsequent-author-substitute-rule" (bibOptions b)
 
       queryContrib = proc' rmLabel . query contribsQ
-      getContrib = if null subAuthStr
+      getContrib = if T.null subAuthStr
                    then const []
                    else case subAuthRule of
                           "partial-first" -> take 1  . query namesQ  . queryContrib
@@ -277,6 +278,7 @@ filterRefs bos refs
       select  s r =       all (lookup_ r) s
       include i r =       any (lookup_ r) i
       exclude e r =       all (not . lookup_ r) e
+      lookup_ :: Reference -> (Text, Text) -> Bool
       lookup_ r (f, v) = case f of
                           "type"       -> look "ref-type"
                           "id"         -> look "ref-id"
@@ -284,11 +286,11 @@ filterRefs bos refs
                           x            -> look x
           where
             look s = case lookup s (mkRefMap (Just r)) of
-                       Just x | Just v' <- (fromValue x :: Maybe RefType  ) -> v == uncamelize (show v')
-                              | Just v' <- (fromValue x :: Maybe String   ) -> v  == v'
-                              | Just v' <- (fromValue x :: Maybe [String] ) -> v `elem` v'
-                              | Just v' <- (fromValue x :: Maybe [Agent]  ) -> null v && null v' || v == show v'
-                              | Just v' <- (fromValue x :: Maybe [RefDate]) -> null v && null v' || v == show v'
+                       Just x | Just v' <- (fromValue x :: Maybe RefType  ) -> v == T.pack (uncamelize (show v'))
+                              | Just v' <- (fromValue x :: Maybe Text     ) -> v  == v'
+                              | Just v' <- (fromValue x :: Maybe [Text]   ) -> v `elem` v'
+                              | Just v' <- (fromValue x :: Maybe [Agent]  ) -> T.null v && null v' || v == T.pack (show v')
+                              | Just v' <- (fromValue x :: Maybe [RefDate]) -> T.null v && null v' || v == T.pack (show v')
                        _                                                    -> False
 
 -- | Given the CSL 'Style' and the list of 'Cite's coupled with their
@@ -349,7 +351,7 @@ formatCitLayout s (CG co f d cs)
                      formatOutputList . appendOutput formatting . addAffixes f .
                      addDelim d .
                      map (fst &&& localMod >>> uncurry addCiteAffixes)
-      formatting   = f{ prefix = [], suffix = [],
+      formatting   = f{ prefix = "", suffix = "",
                         verticalAlign = if isAuthorInText cs
                                            then ""
                                            else verticalAlign f }
@@ -368,15 +370,15 @@ addAffixes f os
     | [Output [ONull] _] <- os = []
     | otherwise                = pref ++ suff
     where
-      pref = if not (null (prefix f))
+      pref = if not (T.null (prefix f))
              then OStr (prefix f) emptyFormatting : os
              else os
-      suff = case suffix f of
-                  []     -> []
-                  (c:cs)
+      suff = case T.uncons $ suffix f of
+               Nothing     -> []
+               Just (c,_)
                     | isLetter c || isDigit c || c == '(' || c == '[' ->
-                         [OSpace, OStr (c:cs) emptyFormatting]
-                    | otherwise -> [OStr (c:cs) emptyFormatting]
+                         [OSpace, OStr (suffix f) emptyFormatting]
+                    | otherwise -> [OStr (suffix f) emptyFormatting]
 
 -- | The 'Bool' is 'True' if we are formatting a textual citation (in
 -- pandoc terminology).
@@ -386,8 +388,8 @@ localModifiers s b c
     | suppressAuthor c = check . rmContrib . return
     | otherwise        = id
     where
-      isPunct' [] = False
-      isPunct' xs = all (`elem` (".,;:!? " :: String)) xs
+      isPunct' "" = False
+      isPunct' xs = T.all (`elem` (".,;:!? " :: String)) xs
       check o = case cleanOutput o of
                   [] -> ONull
                   x  -> case trim' x of
@@ -401,15 +403,15 @@ localModifiers s b c
           | otherwise        = [True]
       trim' [] = []
       trim' (o:os)
-          | Output ot f <- o, p <- prefix f,  p /= []
-          , isPunct' p        = trim' $ Output ot f { prefix = []} : os
+          | Output ot f <- o, p <- prefix f,  p /= ""
+          , isPunct' p        = trim' $ Output ot f { prefix = "" } : os
           | Output ot f <- o  = if or (query hasOutput ot)
                                 then Output (trim' ot) f : os
                                 else Output       ot  f : trim' os
           | ODel _      <- o  = trim' os
           | OSpace      <- o  = trim' os
           | OStr    x f <- o  = OStr x (if isPunct' (prefix f)
-                                        then f { prefix = []} else f) : os
+                                        then f { prefix = "" } else f) : os
           | otherwise         = o:os
       rmCitNum o
           | OCitNum {} <- o = ONull
@@ -436,7 +438,7 @@ localModifiers s b c
           | OContrib _ "authorsub"
                   _ _ _ <- o =     rmContrib' os
           | OStr x _ <- o
-          , "ibid" <- filter (/= '.') (map toLower x) = rmContrib' os
+          , "ibid" <- T.filter (/= '.') (T.toLower x) = rmContrib' os
 
           | otherwise        = o : rmContrib' os
 
@@ -456,6 +458,5 @@ contribOnly s o
                             prefix = "",
                             suffix = "" }
     | OStr    x _ <- o
-    , "ibid" <- filter (/= '.')
-       (map toLower x) = o
+    , "ibid" <- T.filter (/= '.') (T.toLower x) = o
     | otherwise        = ONull
