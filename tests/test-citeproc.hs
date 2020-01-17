@@ -28,6 +28,8 @@ import           Text.Pandoc            (Block (..), Format (..), Inline (..),
                                          Pandoc (..), bottomUp, nullMeta)
 import qualified Text.Pandoc.UTF8       as UTF8
 import           Text.Printf
+import qualified Data.Text              as T
+import           Data.Text              (Text)
 
 data TestCase = TestCase{
     testMode          :: Mode        -- mode
@@ -37,7 +39,7 @@ data TestCase = TestCase{
   , testCsl           :: Style       -- csl
   , testAbbreviations :: Abbreviations -- abbreviations
   , testReferences    :: [Reference] -- input
-  , testResult        :: String      -- result
+  , testResult        :: Text        -- result
   } deriving (Show)
 
 data Mode = CitationMode
@@ -119,10 +121,10 @@ runTest path = E.handle (handler path) $ do
   let expected = adjustEntities $ fixBegins $ trimEnd $ testResult testCase
   let mode     = testMode testCase
   let assemble BibliographyMode xs =
-         "<div class=\"csl-bib-body\">\n" ++
-         unlines (map (\x -> "  <div class=\"csl-entry\">" ++ x ++
-                               "</div>") xs) ++ "</div>\n"
-      assemble _ xs = unlines xs
+         "<div class=\"csl-bib-body\">\n" <>
+         T.unlines (map (\x -> "  <div class=\"csl-entry\">" <> x <>
+                               "</div>") xs) <> "</div>\n"
+      assemble _ xs = T.unlines xs
   case mode of
        BibliographyHeaderMode  -> do
           putStrLn $ "[SKIPPED] " ++ path ++ "\n"
@@ -141,35 +143,35 @@ runTest path = E.handle (handler path) $ do
               return Passed
             else do
               putStrLn $ "[FAILED] " ++ path
-              showDiff expected result
+              showDiff (T.unpack expected) (T.unpack result)
               putStrLn ""
               return Failed
 
-trimEnd :: String -> String
-trimEnd = reverse . ('\n':) . dropWhile isSpace . reverse
+trimEnd :: Text -> Text
+trimEnd t = T.stripEnd t <> "\n"
 
 -- this is designed to mimic the test suite's output:
-inlinesToString  :: [Inline]  -> String
+inlinesToString  :: [Inline]  -> Text
 inlinesToString ils =
   writeHtmlString
     $ bottomUp (concatMap adjustSpans)
     $ Pandoc nullMeta [Plain ils]
 
 -- We want &amp; instead of &#38; etc.
-adjustEntities :: String -> String
-adjustEntities ('&':'#':'3':'8':';':xs) = "&amp;" ++ adjustEntities xs
-adjustEntities (x:xs)                   = x : adjustEntities xs
-adjustEntities []                       = []
+adjustEntities :: Text -> Text
+adjustEntities = T.replace "&#38;" "&amp;"
 
 -- citeproc-js test suite expects "citations" to be formatted like
 -- .. [0] Smith (2007)
 -- >> [1] Jones (2008)
 -- To get a meaningful comparison, we remove this.
-fixBegins :: String -> String
-fixBegins = unlines . map fixLine . lines
-  where fixLine ('.':'.':'[':xs) = dropWhile isSpace $ dropWhile (not . isSpace) xs
-        fixLine ('>':'>':'[':xs) = dropWhile isSpace $ dropWhile (not . isSpace) xs
-        fixLine xs = xs
+fixBegins :: Text -> Text
+fixBegins = T.unlines . map fixLine . T.lines
+  where fixLine t =
+         case T.stripPrefix "..[" t `mplus` T.stripPrefix ">>[" t of
+           Just rest ->
+             T.dropWhile isSpace . T.dropWhile (not . isSpace) $ rest
+           Nothing -> t
 
 -- adjust the spans so we fit what the test suite expects.
 adjustSpans :: Inline -> [Inline]
