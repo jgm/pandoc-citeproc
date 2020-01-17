@@ -107,16 +107,22 @@ insertRefs hanging meta refs bs =
      then bs
      else case runState (walkM go bs) False of
                (bs', True) -> bs'
-               (_, False)  ->
-                  case reverse bs of
-                        Header lev (id',classes,kvs) ys : xs ->
-                          reverse xs ++
+               (_, False)
+                 -> case refTitle meta of
+                      Nothing ->
+                        case reverse bs of
+                          Header lev (id',classes,kvs) ys : xs ->
+                            reverse xs ++
                             [Header lev (id',addUnNumbered classes,kvs) ys,
                              Div ("refs",refclasses,[]) refs]
-                        _   -> bs ++ refHeader ++
-                                [Div ("refs",refclasses,[]) refs]
+                          _ -> bs ++ [refDiv]
+                      Just ils -> bs ++
+                        [Header 1 ("bibliography", ["unnumbered"], []) ils,
+                         refDiv]
   where
    refclasses = "references" : if hanging then ["hanging-indent"] else []
+   refDiv = Div ("refs", refclasses, []) refs
+   addUnNumbered cs = "unnumbered" : [c | c <- cs, c /= "unnumbered"]
    go :: Block -> State Bool Block
    go (Div ("refs",cs,kvs) xs) = do
      put True
@@ -124,11 +130,6 @@ insertRefs hanging meta refs bs =
      let cs' = ordNub $ cs ++ refclasses
      return $ Div ("refs",cs',kvs) (xs ++ refs)
    go x = return x
-   addUnNumbered cs = "unnumbered" : [c | c <- cs, c /= "unnumbered"]
-   refHeader = case refTitle meta of
-                Just ils ->
-                  [Header 1 ("bibliography", ["unnumbered"], []) ils]
-                _        -> []
 
 refTitle :: Meta -> Maybe [Inline]
 refTitle meta =
