@@ -380,22 +380,23 @@ formatTerm f fm p refid s = do
         else oStr' t fm
 
 formatLabel :: Form -> Formatting -> Bool -> Text -> State EvalState [Output]
-formatLabel f fm p s
-    | "locator" <- s = when' ( (/=) "" <$> gets (citeLocator . cite . env)) $ do
-                       (l,v) <- getLocVar
-                       form (\fm' -> return . flip OLoc emptyFormatting . output fm') id l (isRange v)
-    | "page"    <- s = checkPlural
-    | "volume"  <- s = checkPlural
-    | "issue"   <- s = checkPlural
-    | "ibid"    <- s = format s p
-    | isRole       s = do a <- getAgents' (if s == "editortranslator"
-                                              then "editor"
-                                              else s)
-                          if null a
-                             then return []
-                             else form (\fm' x -> [OLabel x fm']) id s p
-    | otherwise      = format s p
+formatLabel f fm p s = when' (isVarSet s) go
     where
+      go
+        | "locator" <- s = when' ( (/=) "" <$> gets (citeLocator . cite . env)) $ do
+                           (l,v) <- getLocVar
+                           form (\fm' -> return . flip OLoc emptyFormatting . output fm') id l (isRange v)
+        | "page"    <- s = checkPlural
+        | "volume"  <- s = checkPlural
+        | "issue"   <- s = checkPlural
+        | "ibid"    <- s = format s p
+        | isRole       s = do a <- getAgents' (if s == "editortranslator"
+                                                  then "editor"
+                                                  else s)
+                              if null a
+                                 then return []
+                                 else form (\fm' x -> [OLabel x fm']) id s p
+        | otherwise      = format s p
       isRole = flip elem ["author", "collection-editor", "composer", "container-author"
                          ,"director", "editor", "editorial-director", "editortranslator"
                          ,"illustrator", "interviewer", "original-author", "recipient"
