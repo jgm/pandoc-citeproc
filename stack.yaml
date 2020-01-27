@@ -20,6 +20,7 @@ extra-deps:
 - emojis-0.1
 - texmath-0.12
 - pandoc-types-1.20
+- jira-wiki-markup-1.0.0
 - git: 'https://github.com/jgm/pandoc'
   commit: 05a217091f47b11d31eac687c6f62caeada4fb14
 
