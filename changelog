@@ -1,3 +1,12 @@
+pandoc-citeproc (0.17)
+
+  * Only print labels if selected variable is non-empty (#437).
+  * Make reference-section-title work even when doc ends with header (#431).
+    Previously, setting `reference-section-title` wouldn't do anything
+    when the document ended with a header -- contrary to what the
+    documentation suggests.
+  * Use Text instead of String (#430, Albert Krewinkel).
+
 pandoc-citeproc (0.16.4.1)
 
   * Allow pandoc 2.9.
