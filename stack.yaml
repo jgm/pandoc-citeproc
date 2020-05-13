@@ -9,20 +9,24 @@ flags:
 packages:
 - '.'
 extra-deps:
-- HsYAML-0.2.0.0
-- HsYAML-aeson-0.2.0.0
-- haddock-library-1.8.0
-- skylighting-0.8.3.2
-- skylighting-core-0.8.3.2
-- regex-pcre-builtin-0.95.0.8.8.35
-- doctemplates-0.8.1
+- texmath-0.12.0.2
+- haddock-library-1.9.0
+- skylighting-0.8.4
+- skylighting-core-0.8.4
+- regex-pcre-builtin-0.95.1.2.8.43
+- regex-base-0.94.0.0
 - doclayout-0.3
 - emojis-0.1
-- texmath-0.12
-- pandoc-types-1.20
-- jira-wiki-markup-1.0.0
+- hslua-1.1.0
+- jira-wiki-markup-1.3.0
+- HsYAML-0.2.1.0
+- HsYAML-aeson-0.2.0.0
+- doctemplates-0.8.2
+# to be replaced eventually by pandoc-types-1.21:
+- git: https://github.com/jgm/pandoc-types
+  commit: dd50a6eaeaf63773bbf04d6ef34b86d6f92b7825
 - git: 'https://github.com/jgm/pandoc'
-  commit: 05a217091f47b11d31eac687c6f62caeada4fb14
+  commit: be9e93d4aeb37db8e07d2735527f9afc324ac70d
 
 ghc-options:
    "$locals": -fhide-source-paths
