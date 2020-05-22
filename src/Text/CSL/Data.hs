@@ -84,8 +84,12 @@ getLocale s = do
              _ -> "locales/locales-" <> T.take 5 s <> ".xml"
   exists <- doesFileExist f
   if not exists && T.compareLength baseLocale 2 == GT
-     then getLocale $ T.dropWhile (/='-') baseLocale
-          -- try again with lang only
+     then do
+       -- try again with lang only
+       let (langOnly, rest) = T.break (=='-') baseLocale
+       if T.null rest || T.null langOnly -- no '-' or '-' at start
+          then E.throwIO $ CSLLocaleNotFound baseLocale
+          else getLocale langOnly
      else E.handle (E.throwIO . CSLLocaleReadError) $ L.readFile f
 #endif
 
