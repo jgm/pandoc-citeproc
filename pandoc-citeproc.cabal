@@ -1,6 +1,6 @@
+cabal-version:      1.12
 name:               pandoc-citeproc
 version:            0.17.0.1
-cabal-version:      1.12
 synopsis:           Supports using pandoc with citeproc
 
 description:        The pandoc-citeproc library supports automatic
@@ -111,7 +111,7 @@ library
                       bytestring, filepath,
                       network < 3.2,
                       pandoc-types >= 1.20 && < 1.22,
-                      pandoc >= 2.8 && < 2.10,
+                      pandoc >= 2.8 && < 2.11,
                       tagsoup,
                       aeson >= 0.7 && < 1.6,
                       text,
@@ -161,7 +161,7 @@ executable pandoc-citeproc
     build-depends:    base >= 4 && < 5,
                       pandoc-citeproc,
                       pandoc-types >= 1.20 && < 1.22,
-                      pandoc >= 2.8 && < 2.10,
+                      pandoc >= 2.8 && < 2.11,
                       aeson,
                       aeson-pretty >= 0.8,
                       yaml >= 0.11,
@@ -202,7 +202,7 @@ executable test-citeproc
                   text,
                   mtl,
                   pandoc-types >= 1.20 && < 1.22,
-                  pandoc >= 2.8 && < 2.10,
+                  pandoc >= 2.8 && < 2.11,
                   filepath,
                   bytestring,
                   process,
@@ -233,7 +233,7 @@ test-suite test-pandoc-citeproc
                   text,
                   pandoc-types >= 1.20 && < 1.22,
                   mtl,
-                  pandoc >= 2.8 && < 2.10,
+                  pandoc >= 2.8 && < 2.11,
                   filepath,
                   containers,
                   bytestring,
