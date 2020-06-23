@@ -1,3 +1,10 @@
+pandoc-citeproc (0.17.0.1)
+
+  * Allow aeson 1.5 (#452, Felix Yan).
+  * Fix infinite loop when compiled with `embed_data_files` flag (#450).
+    This arose when locale specified an unknown locale.
+  * Allow pandoc-types 1.21.
+
 pandoc-citeproc (0.17)
 
   * Only print labels if selected variable is non-empty (#437).
