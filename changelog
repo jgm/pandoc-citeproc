@@ -1,3 +1,8 @@
+pandoc-citeproc (0.17.0.2)
+
+  * Update to use latest rfc5051.
+  * Update chicago-author-date.csl and locales.
+
 pandoc-citeproc (0.17.0.1)
 
   * Allow aeson 1.5 (#452, Felix Yan).
