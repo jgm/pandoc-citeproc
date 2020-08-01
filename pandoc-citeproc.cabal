@@ -151,7 +151,7 @@ library
        build-depends: text, text-icu
        cpp-options:   -DUNICODE_COLLATION
     else
-       build-depends: rfc5051
+       build-depends: rfc5051 >= 0.2 && < 0.3
 
 executable pandoc-citeproc
     main-is:          pandoc-citeproc.hs

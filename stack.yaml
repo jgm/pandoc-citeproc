@@ -22,9 +22,12 @@ extra-deps:
 - HsYAML-0.2.1.0
 - HsYAML-aeson-0.2.0.0
 - doctemplates-0.8.2
+- commonmark-0.1.0.1
+- commonmark-extensions-0.2.0.1
+- commonmark-pandoc-0.2.0.0
 - pandoc-types-1.21
-- git: 'https://github.com/jgm/pandoc'
-  commit: 9672ff827194ddf5565351b2fdde942c03942b2d
+- rfc5051-0.2
+- pandoc-2.10.1
 
 ghc-options:
    "$locals": -fhide-source-paths

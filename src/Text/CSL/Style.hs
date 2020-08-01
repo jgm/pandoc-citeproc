@@ -101,7 +101,7 @@ import           Control.Monad          (mplus)
 import           Data.Aeson             hiding (Number)
 import qualified Data.Aeson             as Aeson
 import           Data.Aeson.Types       (Pair)
-import           Data.Char              (isLetter, isPunctuation, isUpper, toLower, isDigit)
+import           Data.Char              (isLetter, isPunctuation, isUpper, isDigit)
 import qualified Data.Char              as Char
 import           Data.Generics          (Data, Typeable)
 import           Data.List              (intercalate, intersperse, nubBy)
@@ -110,7 +110,6 @@ import qualified Data.Map               as M
 import           Data.Maybe             (listToMaybe, isNothing)
 import           Data.String
 import           Data.Text              (Text)
-import qualified Data.Text              as T
 import           Data.Yaml.Builder      (ToYaml (..))
 import qualified Data.Yaml.Builder      as Y
 import           GHC.Generics           (Generic)
@@ -126,8 +125,8 @@ import           Text.Pandoc.Definition hiding (Citation, Cite)
 import qualified Text.Pandoc.Walk       as Walk
 import           Text.Pandoc.XML        (fromEntities)
 
-#ifdef UNICODE_COLLATION
 import qualified Data.Text              as T
+#ifdef UNICODE_COLLATION
 import qualified Data.Text.ICU          as T
 #else
 import           Data.RFC5051           (compareUnicode)
@@ -486,32 +485,28 @@ instance Ord Sorting where
     compare              _               _  = EQ
 
 compare' :: Text -> Text -> Ordering
-compare' x' y'
-    = case (x, y) of
-        ('-':_,'-':_) -> comp (normalize y) (normalize x)
-        ('-':_, _ )   -> LT
-        (_  ,'-':_)   -> GT
-        _             -> comp (normalize x) (normalize y)
+compare' x y
+    = case (T.uncons x, T.uncons y) of
+        (Just ('-',_), Just ('-',_)) -> comp (normalize y) (normalize x)
+        (Just ('-',_), _)            -> LT
+        (_  ,Just ('-',_))           -> GT
+        _                            -> comp (normalize x) (normalize y)
       where
-        -- FIXME: to Text
-        x = T.unpack x'
-        y = T.unpack y'
         -- we zero pad numbers so they're sorted numerically, see #399
-        zeropad [] = []
-        zeropad xs = if all isDigit xs
-                        then replicate (10 - length xs) '0' ++ xs
-                        else xs
+        zeropad t = if T.all isDigit t
+                       then T.replicate (10 - T.length t) "0" <> t
+                       else t
         normalize = zeropad .
-                    map (\c -> if c == ',' || c == '.' then ' ' else c) .
-                    filter (\c -> c == ',' ||
+                    T.map (\c -> if c == ',' || c == '.' then ' ' else c) .
+                    T.filter (\c -> c == ',' ||
                                   not (isPunctuation c || Char.isSpace c
                                       -- ayn/hamza in transliterated arabic:
                                        || c == 'ʾ' || c == 'ʿ'
                                        ))
 #ifdef UNICODE_COLLATION
-        comp a b = T.collate (T.collator T.Current) (T.pack a) (T.pack b)
+        comp a b = T.collate (T.collator T.Current) a b
 #else
-        comp a b = compareUnicode (map toLower a) (map toLower b)
+        comp a b = compareUnicode a b
 #endif
 
 data Form
