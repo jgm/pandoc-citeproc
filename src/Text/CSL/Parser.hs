@@ -266,6 +266,8 @@ parseName cur =
                  n `elem` nameAttrKeys]
          nameAttrKeys =  [ "et-al-min"
                          , "et-al-use-first"
+                         , "suppress-min"
+                         , "suppress-max"
                          , "et-al-subsequent-min"
                          , "et-al-subsequent-use-first"
                          , "et-al-use-last"
