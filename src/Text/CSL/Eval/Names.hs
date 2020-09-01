@@ -21,10 +21,11 @@ module Text.CSL.Eval.Names where
 
 import Prelude
 import           Control.Monad.State
+import           Control.Monad.Trans.Maybe
 import           Data.Char              (isLower, isUpper)
 import           Data.List              (intersperse, nub)
 import           Data.List.Split        (wordsBy)
-import           Data.Maybe             (isJust)
+import           Data.Maybe             (isJust, fromMaybe)
 import           Data.Text              (Text)
 import qualified Data.Text              as T
 
@@ -70,7 +71,9 @@ evalNames skipEdTrans ns nl d
                  else count num $ cleanOutput (r ++ r')
     | otherwise = return []
     where
-      agents p s a = concatMapM (formatNames (hasEtAl nl) d p s a) nl
+      agents :: Text -> Text -> [Agent] -> State EvalState [Output]
+      agents p s a = do
+        fromMaybe [] <$> runMaybeT (concatMapM (formatNames (hasEtAl nl) d p s a) nl)
       delim    ops = if T.null d then getOptionVal "names-delimiter" ops else d
       resetEtal    = modify (\s -> s { etal = [] })
       count  num x = if hasCount nl && num /= [] -- FIXME!! le zero!!
@@ -84,8 +87,16 @@ evalNames skipEdTrans ns nl d
 -- | The 'Bool' is 'True' when formatting a name with a final "et-al".
 -- The first 'Text' represents the position and the second the role
 -- (e.i. editor, translator, etc.).
-formatNames :: Bool -> Delimiter -> Text -> Text -> [Agent] -> Name -> State EvalState [Output]
+formatNames :: Bool -> Delimiter -> Text -> Text -> [Agent] -> Name -> MaybeT (State EvalState) [Output]
 formatNames ea del p s as n
+    | Name _ _ attrs _ _  <- n
+    , isOptionSet "suppress-min" attrs
+    , length as >= read (T.unpack $ getOptionVal "suppress-min" attrs)
+    = mzero
+    | Name _ _ attrs _ _  <- n
+    , isOptionSet "suppress-max" attrs
+    , length as <= read (T.unpack $ getOptionVal "suppress-max" attrs)
+    = mzero
     | Name f _ ns _ _ <- n, Count <- f = do
         b <- isBib <$> gets mode
         o <- mergeOptions ns <$> gets (options . env)
@@ -116,10 +127,10 @@ formatNames ea del p s as n
                                     addDelim del' (format m o form fm np x)
                                     ++ etal'
         setLastName o $ formatName m False f fm o np (last as)
-        updateEtal =<< mapM genName [1 + i .. length as]
-        genName i
+        lift $ updateEtal =<< mapM genName [1 + i .. length as]
+        lift $ genName i
 
-    | NameLabel f fm pl <- n = when' (isVarSet s) $ do
+    | NameLabel f fm pl <- n = lift . when' (isVarSet s) $ do
         b <- gets edtrans
         res <- formatLabel f fm (isPlural pl $ length as) $
                if b then "editortranslator" else s
@@ -135,7 +146,7 @@ formatNames ea del p s as n
         et <- gets etal
         let i = length as - length et
             t' = if T.null t then "et-al" else t
-        r <- mapM (et_al o False t' fm del) [i .. length as]
+        r <- lift $ mapM (et_al o False t' fm del) [i .. length as]
         let (r',r'') = case r of
                          (x:xs) -> (x, xs)
                          []     -> ([],[])
