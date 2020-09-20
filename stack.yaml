@@ -9,10 +9,10 @@ flags:
 packages:
 - '.'
 extra-deps:
-- texmath-0.12.0.2
+- texmath-0.12.0.3
 - haddock-library-1.9.0
-- skylighting-0.8.5
-- skylighting-core-0.8.5
+- skylighting-0.10.0.2
+- skylighting-core-0.10.0.2
 - regex-pcre-builtin-0.95.1.2.8.43
 - regex-base-0.94.0.0
 - doclayout-0.3
@@ -22,12 +22,13 @@ extra-deps:
 - HsYAML-0.2.1.0
 - HsYAML-aeson-0.2.0.0
 - doctemplates-0.8.2
-- commonmark-0.1.0.1
+- commonmark-0.1.0.2
 - commonmark-extensions-0.2.0.1
-- commonmark-pandoc-0.2.0.0
-- pandoc-types-1.21
+- commonmark-pandoc-0.2.0.1
+- pandoc-types-1.22
 - rfc5051-0.2
-- pandoc-2.10.1
+- git: https://github.com/jgm/pandoc
+  commit: c9e7ccba6f8a5a840fd7a110b9dbb2d9fc80296b
 
 ghc-options:
    "$locals": -fhide-source-paths
