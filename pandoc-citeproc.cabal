@@ -1,6 +1,6 @@
 cabal-version:      1.12
 name:               pandoc-citeproc
-version:            0.17.0.2
+version:            0.17.1
 synopsis:           Supports using pandoc with citeproc
 
 description:        The pandoc-citeproc library supports automatic
