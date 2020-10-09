@@ -1,6 +1,10 @@
 pandoc-citeproc
 ===============
 
+**Note: This package is no longer maintained.
+Pandoc now uses the [citeproc](https://github.com/jgm/citeproc)
+library, and no external filter is needed.**
+
 [![CI
 tests](https://github.com/jgm/pandoc-citeproc/workflows/CI%20tests/badge.svg)](https://github.com/jgm/pandoc-citeproc/actions)
 
